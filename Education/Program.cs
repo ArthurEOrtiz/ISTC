@@ -1,4 +1,12 @@
-var builder = WebApplication.CreateBuilder(args);
+using Education.Configuration;
+using Microsoft.AspNetCore.Connections;
+
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+// Configure app settings using the options pattern, Learn more about the options pattern at https://learn.microsoft.com/en-us/dotnet/core/extensions/options
+
+
+
 
 // Add services to the container.
 
@@ -7,7 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
