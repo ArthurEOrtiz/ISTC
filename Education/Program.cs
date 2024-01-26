@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Configure app settings using the options pattern, Learn more about the options pattern at https://learn.microsoft.com/en-us/dotnet/core/extensions/options
-
 var options =
 	builder.Configuration.GetSection(nameof(EducationProgramDataBaseOptions))
 		.Get<EducationProgramDataBaseOptions>();
