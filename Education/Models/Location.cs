@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Education.Models
 {
-	[Table("Location")]
 	public class Location
 	{
 		[Key]

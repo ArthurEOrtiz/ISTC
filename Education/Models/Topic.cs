@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Education.Models
 {
-	[Table("Topics")]
 	public class Topic
 	{
 		public Topic()

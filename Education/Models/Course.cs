@@ -3,7 +3,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Education.Models
 {
-	[Table("Courses")]
+	/// <summary>
+	/// Represent a course in available for the user to sign up for. 
+	/// A Course has properties that give it a title and description.
+	/// It also tracks attendance and completion credits. 
+	/// If the admin assigns this course to a topic, it should have 
+	/// a topic id, null if otherwise. 
+	/// The admin can assign an location to the course, or, say in the
+	/// instance this course is online, can be null. 
+	/// A course can have one or many classes that represent day, or 
+	/// days the class is being held. 
+	/// </summary>
 	public class Course
 	{
 		public Course()

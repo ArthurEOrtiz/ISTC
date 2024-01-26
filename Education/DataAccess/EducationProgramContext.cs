@@ -22,6 +22,34 @@ namespace Education.DataAccess
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			/*
+				Temporal tables automatically keep track of all data ever stored in a table 
+				even after data has been updated or deleted. This is achieved by creating parallel
+				"history table" into which timestamped historical data is stored whenever a change is 
+				made to the main table. This allows historical data to be queried. This also guards against 
+				accidental mutation or deletion. 
+			  learn more about it here. 
+
+				https://learn.microsoft.com/en-us/ef/core/providers/sql-server/temporal-tables
+
+				!!!! IT'S IMPORTANT THAT YOU DO THIS ON SQL SERVER 2017 OR HIGHER !!!!
+			*/
+
+			modelBuilder.Entity<Attendance>()
+				.ToTable("Attendance", b => b.IsTemporal());
+			modelBuilder.Entity<Class>()
+				.ToTable("Classes", b => b.IsTemporal());
+			modelBuilder.Entity<Contact>()
+				.ToTable("Contact", b => b.IsTemporal());
+			modelBuilder.Entity<Course>()
+				.ToTable("Courses", b => b.IsTemporal());
+			modelBuilder.Entity<Location>()
+				.ToTable("Location", b => b.IsTemporal());
+			modelBuilder.Entity<Student>()
+				.ToTable("Students", b => b.IsTemporal());
+			modelBuilder.Entity<Topic>()
+				.ToTable("Topics", b => b.IsTemporal());
 		}
 	}
 }
