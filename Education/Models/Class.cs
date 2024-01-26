@@ -20,11 +20,11 @@ namespace Education.Models
 		[Column("course_id")]
 		public int CourseId { get; set; }
 
-		[Column("start_time")]
-		public DateTime? StartTime { get; set; }
+		[Column("schedule_start")]
+		public DateTime? ScheduleStart { get; set; }
 
-		[Column("end_time")]
-		public DateTime? EndTime { get; set; }
+		[Column("schedule_end")]
+		public DateTime? ScheduleEnd { get; set; }
 
 
 		[ForeignKey("CourseId")]
