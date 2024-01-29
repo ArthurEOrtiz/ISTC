@@ -1,13 +1,19 @@
-var builder = WebApplication.CreateBuilder(args);
+using Education.Configuration;
+using Education.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
-// Add services to the container.
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Configure app settings using the options pattern, Learn more about the options pattern at https://learn.microsoft.com/en-us/dotnet/core/extensions/options
+var options =
+	builder.Configuration.GetSection(nameof(EducationProgramDataBaseOptions))
+		.Get<EducationProgramDataBaseOptions>();
 
-var app = builder.Build();
+string connectionString = options.ConnectionString;
+
+ConfigureServices(builder, connectionString);
+
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -23,3 +29,17 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static void ConfigureServices(WebApplicationBuilder builder, string connectionString)
+{
+	// Add services to the container.
+	builder.Services.AddControllers();
+
+	// Configure the DbContext with the connection string 
+	builder.Services.AddDbContext<EducationProgramContext>(options =>
+		options.UseSqlServer(connectionString));
+
+	// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+	builder.Services.AddEndpointsApiExplorer();
+	builder.Services.AddSwaggerGen();
+}
