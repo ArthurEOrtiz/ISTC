@@ -14,7 +14,7 @@ namespace Education.Models
 		[MaxLength(255)]
 		public string? Email { get; set; }
 
-		[Column("Phone")]
+		[Column("phone")]
 		[MaxLength(15)]
 		public string? Phone { get; set; }
 
