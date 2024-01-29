@@ -36,20 +36,20 @@ namespace Education.DataAccess
 				!!!! IT'S IMPORTANT THAT YOU DO THIS ON SQL SERVER 2017 OR HIGHER !!!!
 			*/
 
-			modelBuilder.Entity<Attendance>()
-				.ToTable("Attendance", b => b.IsTemporal());
-			modelBuilder.Entity<Class>()
-				.ToTable("Classes", b => b.IsTemporal());
-			modelBuilder.Entity<Contact>()
-				.ToTable("Contact", b => b.IsTemporal());
-			modelBuilder.Entity<Course>()
-				.ToTable("Courses", b => b.IsTemporal());
-			modelBuilder.Entity<Location>()
-				.ToTable("Location", b => b.IsTemporal());
-			modelBuilder.Entity<Student>()
-				.ToTable("Students", b => b.IsTemporal());
-			modelBuilder.Entity<Topic>()
-				.ToTable("Topics", b => b.IsTemporal());
+			//modelBuilder.Entity<Attendance>()
+			//	.ToTable("Attendance", b => b.IsTemporal());
+			//modelBuilder.Entity<Class>()
+			//	.ToTable("Classes", b => b.IsTemporal());
+			//modelBuilder.Entity<Contact>()
+			//	.ToTable("Contact", b => b.IsTemporal());
+			//modelBuilder.Entity<Course>()
+			//	.ToTable("Courses", b => b.IsTemporal());
+			//modelBuilder.Entity<Location>()
+			//	.ToTable("Location", b => b.IsTemporal());
+			//modelBuilder.Entity<Student>()
+			//	.ToTable("Students", b => b.IsTemporal());
+			//modelBuilder.Entity<Topic>()
+			//	.ToTable("Topics", b => b.IsTemporal());
 		}
 	}
 }
