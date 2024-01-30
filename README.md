@@ -5,10 +5,10 @@ Arthur Edward Ortiz
 ## Overview
 This is a solution that contains two API's
 - Education
-  -The API that will eventually interface with a UI
+  - The API that will eventually interface with a UI
 - ProblemDataSet
-  -Taks in the data from ISTC
-  -Normalizes the data with the use DTO's
+  - Takes in the data from ISTC
+  - Normalizes the data with the use DTO's
 
 ## Technologies 
 - .NET 6
