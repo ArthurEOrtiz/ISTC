@@ -1,5 +1,5 @@
-﻿using ETL.Configuration;
-using ETL.Extract.DataAccess;
+﻿using ETL.Extract.DataAccess;
+using ETL.Extract.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,11 +28,14 @@ class Program
 		string transferConnectionString = connectionStrings.GetSection("TransferDataBase").Value;
 		string istcConnectionString = connectionStrings.GetSection("ISTCDataBase").Value;
 
-		// Send that connection string to right data access class
-		// Remember this is using direct injection. 
+		// Register classes with Direct Injection 
+		// Register the Data Access layers with the right connection string 
 		services.AddDbContext<ISTCContext>(options =>
 			options.UseSqlServer(istcConnectionString)
 		);
+
+		//Register the services
+		services.AddTransient<ISTCServiceInterface, ISTCService>();
 
 		// Build the service provider 
 		var serviceProvider = services.BuildServiceProvider();
@@ -40,12 +43,15 @@ class Program
 		// Retrieve ISTCContext from the service provider 
 		var istcContext = serviceProvider.GetRequiredService<ISTCContext>();
 
+		// Retrieve ISTCService from the service provider 
+		var istcService = serviceProvider.GetRequiredService<ISTCServiceInterface>();
+
 		// Query and output the first 5 records 
-		var firstFiveRecords = istcContext.TblSchoolHistories.Take(5).ToList();
+		var firstFiveRecords = istcService.GetFirstFiveRecords();
 
 		foreach( var record in firstFiveRecords )
 		{
-			Console.WriteLine($"hName: {record.HName}");
+			Console.WriteLine($"hName {record.HName}");
 		}
 
 		
