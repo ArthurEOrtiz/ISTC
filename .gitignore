@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /Education/appsettings.Development.json
 /Education/appsettings.json
+/ETL/appsettings.json
