@@ -27,6 +27,9 @@ namespace Education.Models
 		[MaxLength(50)]
 		public string? MiddleName { get; set; }
 
+		[Column("accumulated_credit")]
+		public int AccumulatedCredit { get; set; } = 0;
+
 		[Column("appraisal_certified")]
 		public bool AppraisalCertified { get; set; } = false;
 
