@@ -1,6 +1,7 @@
 -- This returns 11290 rows 
---SELECT tblSchoolEnroll. *
---FROM tblSchoolEnroll
+SELECT tblSchoolEnroll. *
+FROM tblSchoolEnroll
+
 
 -- This returns 3286 rows 
 --SELECT DISTINCT LastName, FirstName
