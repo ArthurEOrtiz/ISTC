@@ -8,6 +8,7 @@ namespace ETL.Transfer.DataAccess
 		public TransferContext(DbContextOptions<TransferContext> options) : base(options) { }
 
 		public DbSet<Student> Students { get; set; } = null!;
+		public DbSet<StudentInfo> StudentInfo { get; set; } = null!;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
