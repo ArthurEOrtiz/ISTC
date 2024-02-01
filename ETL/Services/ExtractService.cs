@@ -12,10 +12,6 @@ namespace ETL.Services
 			_istcContext = istcContext;
 		}
 
-		/// <summary>
-		/// Counts the number of unique first and last names in tblSchoolEnroll
-		/// </summary>
-		/// <returns><see cref="int"/></returns>
 		public int CountUniqueFirstAndLastNames()
 		{
 			return _istcContext.TblSchoolEnrolls
@@ -24,10 +20,6 @@ namespace ETL.Services
 			.Count();
 		}
 
-		/// <summary>
-		/// Creates a list of unique First and Last Names
-		/// </summary>
-		/// <returns><see cref="List{T}"/> of <see cref="Student"/></returns>
 		public List<Student> GetUniqueFistAndLastNames()
 		{
 			return _istcContext.TblSchoolEnrolls
@@ -39,5 +31,6 @@ namespace ETL.Services
 				.Distinct()
 				.ToList();
 		}
+
 	}
 }
