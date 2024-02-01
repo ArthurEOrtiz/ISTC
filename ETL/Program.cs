@@ -66,7 +66,7 @@ class Program
 
 			Console.WriteLine("Data added to students table.");
 
-			// Step 3: Lets pull tblSchoolEnroll and for every unique first and last name,
+			// Step 3: For every unique first and last name that we put into student,
 			// we'll put those rows into a student info page. 
 
 		}

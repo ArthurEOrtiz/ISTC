@@ -8,7 +8,7 @@ namespace ETL.Transfer.Models
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		[Column("student_ID")]
-		public int Id { get; set; }
+		public int StudentID { get; set; }
 
 		[Column("first_name")]
 		public string? FirstName { get; set; }

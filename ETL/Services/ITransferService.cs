@@ -9,7 +9,7 @@ namespace ETL.Services
 	  /// Creates a list of unique First and Last Names from <see cref="TblSchoolEnroll"/>
 	  /// </summary>
 	  /// <returns><see cref="List{T}"/> of <see cref="Student"/></returns>
-		List<Student> GetUniqueFirstAndLastName(List<TblSchoolEnroll> tblSchoolEnrolls);
+		IEnumerable<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
 
 		/// <summary>
 		/// Adds a list of students to the students into the Students table, 
@@ -17,6 +17,12 @@ namespace ETL.Services
 		/// </summary>
 		/// <param name="students">A list of <see cref="Student"/></param
 		void AddStudentsRange(IEnumerable<Student> students);
+
+		/// <summary>
+		/// Gets a list of all students in the Students table in the Transfer database.
+		/// </summary>
+		/// <returns>A <see cref="IEnumerable{T}"/> of <see cref="Student"/></returns>
+		IEnumerable<Student> GetAllStudents();
 
 		/// <summary>
 		/// Deletes all records in the Students table from the Transfer Database.

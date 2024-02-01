@@ -1,6 +1,5 @@
 ﻿using ETL.Extract.DataAccess;
 using ETL.Extract.Models;
-using ETL.Transfer.Models;
 
 namespace ETL.Services
 {
@@ -16,12 +15,12 @@ namespace ETL.Services
 		public int CountUniqueFirstAndLastNames()
 		{
 			return _istcContext.TblSchoolEnrolls
-			.Select(student => new {student.LastName, student.FirstName })
+			.Select(student => new { student.LastName, student.FirstName })
 			.Distinct()
 			.Count();
 		}
 
-		public List<TblSchoolEnroll> GetTblSchoolEnrolls()
+		public IEnumerable<TblSchoolEnroll> GetTblSchoolEnrolls()
 		{
 			return _istcContext.TblSchoolEnrolls.ToList();
 		}
