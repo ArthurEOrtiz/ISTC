@@ -1,9 +1,10 @@
 ﻿using ETL.Extract.DataAccess;
+using ETL.Extract.Models;
 using ETL.Transfer.Models;
 
 namespace ETL.Services
 {
-	internal class ExtractService : ExtractServiceInterface
+	internal class ExtractService : IExtractServices
 	{
 		private readonly ISTCContext _istcContext;
 
@@ -15,22 +16,14 @@ namespace ETL.Services
 		public int CountUniqueFirstAndLastNames()
 		{
 			return _istcContext.TblSchoolEnrolls
-			.Select(student => new { LastName = student.LastName, FirstName = student.FirstName })
+			.Select(student => new {student.LastName, student.FirstName })
 			.Distinct()
 			.Count();
 		}
 
-		public List<Student> GetUniqueFistAndLastNames()
+		public List<TblSchoolEnroll> GetTblSchoolEnrolls()
 		{
-			return _istcContext.TblSchoolEnrolls
-				.Select(student => new Student
-				{
-					LastName = student.LastName,
-					FirstName = student.FirstName
-				})
-				.Distinct()
-				.ToList();
+			return _istcContext.TblSchoolEnrolls.ToList();
 		}
-
 	}
 }

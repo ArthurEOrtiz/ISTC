@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
-using System.Text.Json;
 
 class Program
 {
@@ -31,45 +30,45 @@ class Program
 					options.UseSqlServer(context.Configuration.GetConnectionString("TransferDatabase")));
 
 				// Use Direct Injection to register classes. 
-				services.AddTransient<ISTCServiceInterface, ISTCService>();
-				services.AddTransient<ExtractServiceInterface, ExtractService>();
-				services.AddTransient<TransferServiceInterface, TransferService>();
+				services.AddTransient<IExtractServices, ExtractService>();
+				services.AddTransient<ITransferService, TransferService>();
 			})
 			.Build();
 
 		if (Debugger.IsAttached) // If you're running this in debug mode.
 		{
-			using (var scope = host.Services.CreateScope())
+			using var scope = host.Services.CreateScope();
+			var serviceProvider = scope.ServiceProvider;
+			var extractService = serviceProvider.GetRequiredService<IExtractServices>();
+			var transferService = serviceProvider.GetRequiredService<ITransferService>();
+
+			//Step 0: Lets make sure we start with a clean slate.
+			// I'm gonna un-comment and comment this out as I'm developing. 
+			//transferService.DeleteAllStudents();
+
+			// Step 1: Display count and list of unique student names 
+			int uniqueStudentCount = extractService.CountUniqueFirstAndLastNames();
+			var studentEnrolls = extractService.GetTblSchoolEnrolls();
+			var uniqueStudents = transferService.GetUniqueFirstAndLastName(studentEnrolls);
+
+			foreach (var student in uniqueStudents)
 			{
-				var serviceProvider = scope.ServiceProvider;
-				var extractService = serviceProvider.GetRequiredService<ExtractServiceInterface>();
-
-				// Step 1: Display count and list of unique student names 
-				var uniqueStudents = extractService.GetUniqueFistAndLastNames();
-				int uniqueStudentCount = extractService.CountUniqueFirstAndLastNames();
-
-				Console.WriteLine($"Unique student count: {uniqueStudentCount}");
-
-				foreach (var student in uniqueStudents)
-				{
-					Console.WriteLine($"Student: {student.FirstName} | {student.LastName}");
-				}
-				// Stop for user input 
-				Console.WriteLine("Press Enter to add data to the Students table...");
-				Console.ReadLine();
-
-				// Step 2: When Enter is hit, enter that data into the Students table
-				var transferService = serviceProvider.GetRequiredService<TransferServiceInterface>();
-
-				transferService.AddStudentsRange(uniqueStudents);
-
-				Console.WriteLine("Data added to students table.");
-				
-				// Step 3: Lets pull tblSchoolEnroll and for every unique first and last name,
-				// we'll put those rows into a student info page. 
-
-
+				Console.WriteLine($"Student: {student.FirstName} | {student.LastName}");
 			}
+
+			Console.WriteLine($"Unique student count: {uniqueStudentCount}");
+			// Stop for user input 
+			Console.WriteLine("Press Enter to add data to the Students table...");
+			Console.ReadLine();
+
+			// Step 2: When Enter is hit, enter that data into the Students table
+			transferService.AddStudentsRange(uniqueStudents);
+
+			Console.WriteLine("Data added to students table.");
+
+			// Step 3: Lets pull tblSchoolEnroll and for every unique first and last name,
+			// we'll put those rows into a student info page. 
+
 		}
 		else
 		{

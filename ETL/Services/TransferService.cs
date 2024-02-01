@@ -1,9 +1,10 @@
-﻿using ETL.Transfer.DataAccess;
+﻿using ETL.Extract.Models;
+using ETL.Transfer.DataAccess;
 using ETL.Transfer.Models;
 
 namespace ETL.Services
 {
-	internal class TransferService : TransferServiceInterface
+	internal class TransferService : ITransferService
 	{
 		private readonly TransferContext _transferContext;
 
@@ -12,7 +13,23 @@ namespace ETL.Services
 			_transferContext = transferContext;
 		}
 
-
+		public List<Student> GetUniqueFirstAndLastName(List<TblSchoolEnroll> tblSchoolEnrolls)
+		{
+			return tblSchoolEnrolls
+				.GroupBy(enroll => new
+				{
+					// Since there is no validation in the current system we have to make
+					// sure there no spaces before or after the first and last name strings. 
+					FirstName = (enroll.FirstName?.Trim() ?? "").ToLower(),
+					LastName = (enroll.LastName?.Trim() ?? "").ToLower()
+				})
+				.Select(group => new Student
+				{
+					FirstName = group.Key.FirstName,
+					LastName = group.Key.LastName
+				})
+				.ToList();
+		}
 
 		public void AddStudentsRange(IEnumerable<Student> students)
 		{
@@ -20,12 +37,12 @@ namespace ETL.Services
 			_transferContext.SaveChanges();
 		}
 
-		public IEnumerable<StudentInfo> CreateStudentInfoList()
+		public void DeleteAllStudents()
 		{
-			foreach (Student student in _transferContext.Students)
-			{
+			var allStudents = _transferContext.Students.ToList();
 
-			}
+			_transferContext.Students.RemoveRange(allStudents);
+			_transferContext.SaveChanges();
 		}
 
 		public void AddStudentInfoRange (IEnumerable<StudentInfo> studentInfo)
