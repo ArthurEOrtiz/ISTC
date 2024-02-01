@@ -3,12 +3,11 @@ Arthur Edward Ortiz
 2024-01-30
 
 ## Overview
-This is a solution that contains two API's
+This is a solution that contains an API and an ETL
 - Education
   - The API that will eventually interface with a UI
-- ProblemDataSet
-  - Takes in the data from ISTC
-  - Normalizes the data with the use DTO's
+- ETL
+  - Console Application that wil normalize the data
 
 ## Technologies 
 - .NET 6
