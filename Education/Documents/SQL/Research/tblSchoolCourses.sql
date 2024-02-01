@@ -1,0 +1,2 @@
+SELECT tblSchoolCourses . *
+FROM tblSchoolCourses
