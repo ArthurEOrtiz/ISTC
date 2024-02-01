@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ETL.Transfer.DataAccess
 {
-	internal class TransferContext : DbContext
+	public class TransferContext : DbContext
 	{
 		public TransferContext(DbContextOptions<TransferContext> options) : base(options) { }
 

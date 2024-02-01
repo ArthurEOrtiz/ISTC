@@ -1,5 +1,6 @@
 ﻿using ETL.Extract.DataAccess;
 using ETL.Services;
+using ETL.Transfer.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,30 +11,24 @@ class Program
 	static void Main()
 	{
 		// Configuration builder
-		// That last line `.Build()` builds the configuration. That might change later
-		// if this application gets more complex. 
-		var builder = new ConfigurationBuilder()
+		IConfigurationBuilder builder = new ConfigurationBuilder()
 			.SetBasePath(Directory.GetCurrentDirectory())
-			.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-			.Build();
+			.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
+
+		IConfiguration configuration = builder.Build();
 
 		// Dependency Injection
 		// This is used to configure and register services for dependency injection.
 		var services = new ServiceCollection();
 
-
-		// Setup 
-		// Get Connection Strings 
-		var connectionStrings = builder.GetSection("ConnectionStrings");
-		string transferConnectionString = connectionStrings.GetSection("TransferDataBase").Value;
-		string istcConnectionString = connectionStrings.GetSection("ISTCDataBase").Value;
-
+		// Setup
 		// Register classes with Direct Injection 
-		// Register the Data Access layers with the right connection string 
 		services.AddDbContext<ISTCContext>(options =>
-			options.UseSqlServer(istcConnectionString)
-		);
+			options.UseSqlServer(configuration.GetConnectionString("ISTCDatabase")));
+
+		services.AddDbContext<TransferContext>(options =>
+			options.UseSqlServer(configuration.GetConnectionString("TransferDatabase")));
 
 		//Register the services
 		services.AddTransient<ISTCServiceInterface, ISTCService>();
@@ -42,14 +37,13 @@ class Program
 		// Build the service provider 
 		var serviceProvider = services.BuildServiceProvider();
 
-		// Retrieve ISTCContext from the service provider 
-		var istcContext = serviceProvider.GetRequiredService<ISTCContext>();
-
 		// Retrieve from the service provider 
+		var istcContext = serviceProvider.GetRequiredService<ISTCContext>();
+		var transferContext = serviceProvider.GetRequiredService<TransferContext>();
 		//var istcService = serviceProvider.GetRequiredService<ISTCServiceInterface>();
 		var extractService = serviceProvider.GetRequiredService<ExtractServiceInterface>();
 
-		//// Query and output the first 5 records 
+		// Query and output the first 5 records 
 		//var firstFiveRecords = istcService.GetFirstFiveRecords();
 
 		//foreach( var record in firstFiveRecords )

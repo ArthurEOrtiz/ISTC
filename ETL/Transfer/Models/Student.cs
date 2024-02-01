@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ETL.Transfer.Models
 {
-	internal class Student
+	public class Student
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
