@@ -11,9 +11,9 @@ namespace ETL.Transfer.Models
 		public int Id { get; set; }
 
 		[Column("first_name")]
-		public string FirstName { get; set; } = null!;
+		public string? FirstName { get; set; }
 
 		[Column("last_name")]
-		public string LastName { get; set; } = null!;
+		public string? LastName { get; set; }
 	}
 }
