@@ -10,7 +10,7 @@ class Program
 	static void Main()
 	{
 		// Configuration builder
-		// That last line builds the configuration. That might change later
+		// That last line `.Build()` builds the configuration. That might change later
 		// if this application gets more complex. 
 		var builder = new ConfigurationBuilder()
 			.SetBasePath(Directory.GetCurrentDirectory())
@@ -46,7 +46,7 @@ class Program
 		var istcContext = serviceProvider.GetRequiredService<ISTCContext>();
 
 		// Retrieve from the service provider 
-		var istcService = serviceProvider.GetRequiredService<ISTCServiceInterface>();
+		//var istcService = serviceProvider.GetRequiredService<ISTCServiceInterface>();
 		var extractService = serviceProvider.GetRequiredService<ExtractServiceInterface>();
 
 		//// Query and output the first 5 records 
