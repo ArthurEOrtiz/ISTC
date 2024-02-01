@@ -12,10 +12,20 @@ namespace ETL.Services
 			_transferContext = transferContext;
 		}
 
+
+
 		public void AddStudentsRange(IEnumerable<Student> students)
 		{
 			_transferContext.Students.AddRange(students);
 			_transferContext.SaveChanges();
+		}
+
+		public IEnumerable<StudentInfo> CreateStudentInfoList()
+		{
+			foreach (Student student in _transferContext.Students)
+			{
+
+			}
 		}
 
 		public void AddStudentInfoRange (IEnumerable<StudentInfo> studentInfo)
