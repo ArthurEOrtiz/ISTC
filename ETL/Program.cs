@@ -73,7 +73,7 @@ class Program
 			// end user doesn't think something went wrong. 
 			var processLogger = new ProgressLogger();
 
-			transferService.AddStudentInfoRange(studentInfo, processLogger.RecordsProccessed);
+			transferService.AddStudentInfoRange(studentInfo, processLogger.RecordsProcessed);
 			Console.Write("Data added to StudentInfo table");
 		}
 		else

@@ -2,7 +2,7 @@
 {
 	internal class ProgressLogger
 	{
-		public void RecordsProccessed(int recordsProcessed, int totalRecords)
+		public void RecordsProcessed(int recordsProcessed, int totalRecords)
 		{
 			Console.Write($"\r{recordsProcessed} of {totalRecords} processed");
 		}
