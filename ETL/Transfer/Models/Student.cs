@@ -18,5 +18,6 @@ namespace ETL.Transfer.Models
 
 		// one-to-many relationships 
 		public List<StudentInfo> StudentInfo { get; set; } = null!;
+		public List<ContactInfo> ContactInfo { get; set; } = null!;
 	}
 }
