@@ -10,6 +10,7 @@ namespace ETL.Transfer.Models
 		[Column("student_info_ID")]
 		public int StudentInfoId { get; set; }
 
+		[ForeignKey("Student")]
 		[Column("student_ID")]
 		public int StudentID { get; set; }
 
@@ -71,5 +72,9 @@ namespace ETL.Transfer.Models
 		public bool? C38 { get; set; }
 		public bool? C39 { get; set; }
 		public bool? C40 { get; set; }
+
+		// Navigation property to student
+
+		public Student student { get; set; } = null!;
 	}
 }

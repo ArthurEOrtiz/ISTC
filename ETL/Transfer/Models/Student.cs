@@ -15,5 +15,8 @@ namespace ETL.Transfer.Models
 
 		[Column("last_name")]
 		public string? LastName { get; set; }
+
+		// one-to-many relationships 
+		public List<StudentInfo> StudentInfo { get; set; } = null!;
 	}
 }
