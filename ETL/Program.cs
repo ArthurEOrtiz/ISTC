@@ -71,6 +71,13 @@ class Program
 			// This process does take a moment so I set up a progress logger so the
 			// end user doesn't think something went wrong. 
 			transferService.AddStudentInfoRange(studentInfo, processLogger.RecordsProcessed);
+
+			// Step 4: Now lets find all the unique Contact information for each user. 
+			// User will have many contact info  rows becaus the way Glenn did it, 
+			// if a user got married or god forbid changed their email, or typed it different
+			// it creates a unique instance of that.
+			
+
 		
 		}
 		else

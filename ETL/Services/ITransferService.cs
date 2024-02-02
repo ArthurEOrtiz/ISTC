@@ -1,15 +1,14 @@
 ﻿using ETL.Extract.Models;
 using ETL.Transfer.Models;
-using ETL.Utilities;
 
 namespace ETL.Services
 {
 	internal interface ITransferService
 	{
 		/// <summary>
-	  /// Creates a list of unique First and Last Names from <see cref="TblSchoolEnroll"/>
-	  /// </summary>
-	  /// <returns><see cref="List{T}"/> of <see cref="Student"/></returns>
+		/// Creates a list of unique First and Last Names from <see cref="TblSchoolEnroll"/>
+		/// </summary>
+		/// <returns><see cref="List{T}"/> of <see cref="Student"/></returns>
 		List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
 
 		/// <summary>
@@ -36,7 +35,7 @@ namespace ETL.Services
 		/// it into a a collection of <see cref="StudentInfo"/>, by use of an inner join. 
 		/// </summary>
 		/// <param name="tblSchoolEnrolls"><see cref="List{T}"/> of <see cref="TblSchoolEnroll"/></param>
-		/// <returns><see cref="IEnumerable{T}}"/> of <see cref="StudentInfo"/></returns>
+		/// <returns><see cref="List{T}}"/> of <see cref="StudentInfo"/></returns>
 		List<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
 
 		/// <summary>
@@ -47,7 +46,7 @@ namespace ETL.Services
 		/// <param name="progressCallback"> A optional callback function that is invoked to 
 		/// report the addition process. The callback takes two parameters: the number of 
 		/// records processed, and the total number of records as <see cref="int"/></param>
-		void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int,int>? progressCallback);
+		void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback);
 
 		/// <summary>
 		/// Deletes all records in the StudentInfo table from the Transfer database and reset the

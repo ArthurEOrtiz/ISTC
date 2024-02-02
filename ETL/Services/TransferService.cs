@@ -154,14 +154,6 @@ namespace ETL.Services
 			SaveChangesAsync();
 		}
 
-		private void SaveChangesAsync()
-		{
-			_transferContext.SaveChangesAsync();
-
-			ProgressLogger progressLogger = new();
-			progressLogger.DisplaySavingProgress(_transferContext);
-		}
-
 		public void DeleteAllStudentInfo()
 		{
 			var allStudentEnroll = _transferContext.StudentInfo;
@@ -171,6 +163,14 @@ namespace ETL.Services
 
 			// Reset the Id count back down to zero 
 			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('StudentInfo', RESEED, 0);");
+		}
+
+		private void SaveChangesAsync()
+		{
+			_transferContext.SaveChangesAsync();
+
+			ProgressLogger progressLogger = new();
+			progressLogger.DisplaySavingProgress(_transferContext);
 		}
 	}
 }
