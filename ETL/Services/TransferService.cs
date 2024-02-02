@@ -137,7 +137,7 @@ namespace ETL.Services
 			return linkedStudents; 
 		}
 
-		public void AddStudentInfoRange (IEnumerable<StudentInfo> studentInfo, Action<int, int> progressCallback)
+		public void AddStudentInfoRange (IEnumerable<StudentInfo> studentInfo, Action<int, int>? progressCallback)
 		{
 			int totalRecords = studentInfo.Count();
 			int recordsProcessed = 0;
