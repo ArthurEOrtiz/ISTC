@@ -66,7 +66,7 @@ class Program
 			// Step 3: For every unique first and last name that we put into student,
 			// we'll put those rows into a student info page. 
 			var studentInfo = transferService.StudentToStudentInfo(studentEnrolls);
-			Console.WriteLine($"Press Enter to write {studentInfo.Count()} to StudentInfo Table, this could take a moment . . . ");
+			Console.WriteLine($"Press Enter to write {studentInfo.Count()} records to the StudentInfo Table, this could take a moment . . . ");
 			Console.ReadLine();
 
 			// This process does take a moment so I set up a progress logger so the
@@ -74,7 +74,7 @@ class Program
 			var processLogger = new ProgressLogger();
 
 			transferService.AddStudentInfoRange(studentInfo, processLogger.RecordsProcessed);
-			Console.Write("Data added to StudentInfo table");
+		
 		}
 		else
 		{

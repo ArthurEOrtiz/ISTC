@@ -1,6 +1,7 @@
 ﻿using ETL.Extract.Models;
 using ETL.Transfer.DataAccess;
 using ETL.Transfer.Models;
+using ETL.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ETL.Services
@@ -54,7 +55,7 @@ namespace ETL.Services
 			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('Students', RESEED, 0);");
 		}
 
-		public IEnumerable<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
+		public List<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
 		{
 			var students = GetAllStudents();
 
@@ -137,7 +138,7 @@ namespace ETL.Services
 			return linkedStudents; 
 		}
 
-		public void AddStudentInfoRange (IEnumerable<StudentInfo> studentInfo, Action<int, int>? progressCallback)
+		public void AddStudentInfoRange (List<StudentInfo> studentInfo, Action<int, int>? progressCallback)
 		{
 			int totalRecords = studentInfo.Count();
 			int recordsProcessed = 0;
@@ -149,8 +150,14 @@ namespace ETL.Services
 				recordsProcessed++;
 				progressCallback?.Invoke(totalRecords, recordsProcessed);
 			}
+			
+			System.Threading.Tasks.Task.Run(() =>
+			{
+				_transferContext.SaveChanges();
+			});
 
-			_transferContext.SaveChanges();
+			ProgressLogger progressLogger = new();
+			progressLogger.DisplaySavingProgress(_transferContext);
 		}
 
 		public void DeleteAllStudentInfo()

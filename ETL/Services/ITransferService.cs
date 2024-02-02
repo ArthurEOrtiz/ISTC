@@ -35,19 +35,19 @@ namespace ETL.Services
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms
 		/// it into a a collection of <see cref="StudentInfo"/>, by use of an inner join. 
 		/// </summary>
-		/// <param name="tblSchoolEnrolls"><see cref="IEnumerable{T}"/> of <see cref="TblSchoolEnroll"/></param>
+		/// <param name="tblSchoolEnrolls"><see cref="List{T}"/> of <see cref="TblSchoolEnroll"/></param>
 		/// <returns><see cref="IEnumerable{T}}"/> of <see cref="StudentInfo"/></returns>
-		IEnumerable<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
+		List<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
 
 		/// <summary>
 		/// Adds a list of Student Info into the StudentInfo table
 		/// by using range from Linq
 		/// </summary>
-		/// <param name="studentInfo">A <see cref="IEnumerable{T}"/> of <see cref="StudentInfo"/></param>
+		/// <param name="studentInfo">A <see cref="List{T}"/> of <see cref="StudentInfo"/></param>
 		/// <param name="progressCallback"> A optional callback function that is invoked to 
 		/// report the addition process. The callback takes two parameters: the number of 
 		/// records processed, and the total number of records as <see cref="int"/></param>
-		void AddStudentInfoRange(IEnumerable<StudentInfo> studentInfo, Action<int,int>? progressCallback);
+		void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int,int>? progressCallback);
 
 		/// <summary>
 		/// Deletes all records in the StudentInfo table from the Transfer database and reset the
