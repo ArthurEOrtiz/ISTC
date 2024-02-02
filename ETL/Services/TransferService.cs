@@ -137,33 +137,13 @@ namespace ETL.Services
 			return linkedStudents; 
 		}
 
-		public void AddStudentInfoRange(IEnumerable<StudentInfo> studentInfo, ProgressStatus progressStatus)
+		public void AddStudentInfoRange (IEnumerable<StudentInfo> studentInfo)
 		{
-			int totalCount = studentInfo.Count();
-			int processedCount = 0;
-
-			foreach (var student in studentInfo)
-			{
-				_transferContext.StudentInfo.Add(student);
-				processedCount++;
-
-				int progress = (int)((double)processedCount / totalCount * 100);
-				progressStatus.UpdateProgress(progress);
-			}
-
+			_transferContext.StudentInfo.AddRange(studentInfo);
 			_transferContext.SaveChanges();
 			Console.WriteLine(); // Move to the next line after completion
 		}
 
-		public void DeleteAllStudentInfo()
-		{
-			var allStudentInfo = _transferContext.StudentInfo;
 
-			_transferContext.StudentInfo.RemoveRange(allStudentInfo);
-			_transferContext.SaveChanges();
-
-			// Reset the Id count back down to zero 
-			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('StudentInfo', RESEED, 0);");
-		}
 	}
 }
