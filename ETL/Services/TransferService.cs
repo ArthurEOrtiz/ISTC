@@ -36,7 +36,7 @@ namespace ETL.Services
 		public void AddStudentsRange(IEnumerable<Student> students)
 		{
 			_transferContext.Students.AddRange(students);
-			_transferContext.SaveChanges();
+			SaveChangesAsync();
 		}
 
 		public IEnumerable<Student> GetAllStudents()
@@ -143,18 +143,20 @@ namespace ETL.Services
 			int totalRecords = studentInfo.Count();
 			int recordsProcessed = 0;
 
-			foreach(var record in  studentInfo)
+			foreach (var record in studentInfo)
 			{
 				_transferContext.StudentInfo.Add(record);
 
 				recordsProcessed++;
 				progressCallback?.Invoke(totalRecords, recordsProcessed);
 			}
-			
-			System.Threading.Tasks.Task.Run(() =>
-			{
-				_transferContext.SaveChanges();
-			});
+
+			SaveChangesAsync();
+		}
+
+		private void SaveChangesAsync()
+		{
+			_transferContext.SaveChangesAsync();
 
 			ProgressLogger progressLogger = new();
 			progressLogger.DisplaySavingProgress(_transferContext);

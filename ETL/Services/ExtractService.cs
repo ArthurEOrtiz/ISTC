@@ -12,14 +12,6 @@ namespace ETL.Services
 			_istcContext = istcContext;
 		}
 
-		public int CountUniqueFirstAndLastNames()
-		{
-			return _istcContext.TblSchoolEnrolls
-			.Select(student => new { student.LastName, student.FirstName })
-			.Distinct()
-			.Count();
-		}
-
 		public IEnumerable<TblSchoolEnroll> GetTblSchoolEnrolls()
 		{
 			return _istcContext.TblSchoolEnrolls.ToList();

@@ -42,37 +42,34 @@ class Program
 			var serviceProvider = scope.ServiceProvider;
 			var extractService = serviceProvider.GetRequiredService<IExtractServices>();
 			var transferService = serviceProvider.GetRequiredService<ITransferService>();
+			var processLogger = new ProgressLogger();
 
-			//Step 0: Lets make sure we start with a clean slate.
+			//Step 0: Start with a clean slate when needed. 
 			// I'm gonna un-comment and comment this out as I'm developing. 
 			transferService.DeleteAllStudents();
 			transferService.DeleteAllStudentInfo();
 
-			// Step 1: Display count and list of unique student names 
-			int uniqueStudentCount = extractService.CountUniqueFirstAndLastNames();
+			// Step 1: Display count of unique student names 
 			var studentEnrolls = extractService.GetTblSchoolEnrolls();
 			var uniqueStudents = transferService.GetUniqueFirstAndLastName(studentEnrolls);
 
-
-			Console.WriteLine($"Unique student count: {uniqueStudents.Count()}");
 			// Stop for user input 
-			Console.WriteLine("Press Enter to add data to the Students table...");
+			Console.WriteLine($"Press Enter to write {uniqueStudents.Count()} records to the Students table...");
 			Console.ReadLine();
 
 			// Step 2: When Enter is hit, enter that data into the Students table
 			transferService.AddStudentsRange(uniqueStudents);
-			Console.WriteLine("Data added to Students table.");
 
 			// Step 3: For every unique first and last name that we put into student,
 			// we'll put those rows into a student info page. 
 			var studentInfo = transferService.StudentToStudentInfo(studentEnrolls);
+
+			// Stop for user input 
 			Console.WriteLine($"Press Enter to write {studentInfo.Count()} records to the StudentInfo Table, this could take a moment . . . ");
 			Console.ReadLine();
 
 			// This process does take a moment so I set up a progress logger so the
 			// end user doesn't think something went wrong. 
-			var processLogger = new ProgressLogger();
-
 			transferService.AddStudentInfoRange(studentInfo, processLogger.RecordsProcessed);
 		
 		}
