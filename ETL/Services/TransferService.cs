@@ -15,6 +15,33 @@ namespace ETL.Services
 			_transferContext = transferContext;
 		}
 
+		public void AddStudentsRange(List<Student> students)
+		{
+			_transferContext.Students.AddRange(students);
+			SaveChangesAsync();
+		}
+
+		public void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback)
+		{
+			int totalRecords = studentInfo.Count();
+			int recordsProcessed = 0;
+
+			foreach (var record in studentInfo)
+			{
+				_transferContext.StudentInfo.Add(record);
+
+				recordsProcessed++;
+				progressCallback?.Invoke(totalRecords, recordsProcessed);
+			}
+
+			SaveChangesAsync();
+		}
+
+		public IEnumerable<Student> GetAllStudents()
+		{
+			return _transferContext.Students.ToList();
+		}
+
 		public List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
 		{
 			return tblSchoolEnrolls
@@ -31,28 +58,6 @@ namespace ETL.Services
 					LastName = group.Key.LastName
 				})
 				.ToList();
-		}
-
-		public void AddStudentsRange(List<Student> students)
-		{
-			_transferContext.Students.AddRange(students);
-			SaveChangesAsync();
-		}
-
-		public IEnumerable<Student> GetAllStudents()
-		{
-			return _transferContext.Students.ToList();
-		}
-
-		public void DeleteAllStudents()
-		{
-			var allStudents = _transferContext.Students.ToList();
-
-			_transferContext.Students.RemoveRange(allStudents);
-			_transferContext.SaveChanges();
-
-			// Reset the Id count back down to zero 
-			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('Students', RESEED, 0);");
 		}
 
 		public List<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
@@ -138,20 +143,15 @@ namespace ETL.Services
 			return linkedStudents; 
 		}
 
-		public void AddStudentInfoRange (List<StudentInfo> studentInfo, Action<int, int>? progressCallback)
+		public void DeleteAllStudents()
 		{
-			int totalRecords = studentInfo.Count();
-			int recordsProcessed = 0;
+			var allStudents = _transferContext.Students.ToList();
 
-			foreach (var record in studentInfo)
-			{
-				_transferContext.StudentInfo.Add(record);
+			_transferContext.Students.RemoveRange(allStudents);
+			_transferContext.SaveChanges();
 
-				recordsProcessed++;
-				progressCallback?.Invoke(totalRecords, recordsProcessed);
-			}
-
-			SaveChangesAsync();
+			// Reset the Id count back down to zero 
+			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('Students', RESEED, 0);");
 		}
 
 		public void DeleteAllStudentInfo()
