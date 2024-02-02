@@ -1,5 +1,6 @@
 ﻿using ETL.Extract.Models;
 using ETL.Transfer.Models;
+using ETL.Utilities;
 
 namespace ETL.Services
 {
@@ -25,7 +26,8 @@ namespace ETL.Services
 		IEnumerable<Student> GetAllStudents();
 
 		/// <summary>
-		/// Deletes all records in the Students table from the Transfer database.
+		/// Deletes all records in the Students table from the Transfer database, and
+		/// resets the Id count to zero
 		/// </summary>
 		void DeleteAllStudents();
 
@@ -41,11 +43,15 @@ namespace ETL.Services
 		/// Adds a list of Student Info into the StudentInfo table
 		/// by using range from Linq
 		/// </summary>
-		/// <param name="studentInfo">A list of <see cref="StudentInfo"/></param>
-		void AddStudentInfoRange(IEnumerable<StudentInfo> studentInfo, ProgressStatus progressStatus);
+		/// <param name="studentInfo">A <see cref="IEnumerable{T}"/> of <see cref="StudentInfo"/></param>
+		/// <param name="progressCallback"> A optional callback function that is invoked to 
+		/// report the addition process. The callback takes two parameters: the number of 
+		/// records processed, and the total number of records as <see cref="int"/></param>
+		void AddStudentInfoRange(IEnumerable<StudentInfo> studentInfo, Action<int,int>? progressCallback);
 
 		/// <summary>
-		/// Deletes all records in the StudentInfo table from the Transfer database. 
+		/// Deletes all records in the StudentInfo table from the Transfer database and reset the
+		/// Id count to zero. 
 		/// </summary>
 		void DeleteAllStudentInfo();
 

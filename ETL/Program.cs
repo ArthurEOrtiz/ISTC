@@ -1,6 +1,7 @@
 ﻿using ETL.Extract.DataAccess;
 using ETL.Services;
 using ETL.Transfer.DataAccess;
+using ETL.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,10 +68,12 @@ class Program
 			var studentInfo = transferService.StudentToStudentInfo(studentEnrolls);
 			Console.WriteLine($"Press Enter to write {studentInfo.Count()} to StudentInfo Table, this could take a moment . . . ");
 			Console.ReadLine();
-			var progressStatus = new ProgressStatus(studentInfo.Count());
 
+			// This process does take a moment so I set up a progress logger so the
+			// end user doesn't think something went wrong. 
+			var processLogger = new ProgressLogger();
 
-			transferService.AddStudentInfoRange(studentInfo, progressStatus);
+			transferService.AddStudentInfoRange(studentInfo, processLogger.RecordsProccessed);
 			Console.Write("Data added to StudentInfo table");
 		}
 		else
