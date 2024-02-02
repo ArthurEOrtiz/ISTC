@@ -1,6 +1,7 @@
 ﻿using ETL.Extract.Models;
 using ETL.Transfer.DataAccess;
 using ETL.Transfer.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ETL.Services
 {
@@ -20,8 +21,8 @@ namespace ETL.Services
 				{
 					// Since there is no validation in the current system we have to make
 					// sure there no spaces before or after the first and last name strings. 
-					FirstName = (enroll.FirstName?.Trim() ?? "").ToLower(),
-					LastName = (enroll.LastName?.Trim() ?? "").ToLower()
+					FirstName = enroll.FirstName.Trim().ToLower(),
+					LastName = enroll.LastName.Trim().ToLower()
 				})
 				.Select(group => new Student
 				{
@@ -48,6 +49,9 @@ namespace ETL.Services
 
 			_transferContext.Students.RemoveRange(allStudents);
 			_transferContext.SaveChanges();
+
+			// Reset the Id count back down to zero 
+			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('Students', RESEED, 0);");
 		}
 
 		public IEnumerable<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
@@ -57,8 +61,15 @@ namespace ETL.Services
 			var linkedStudents = tblSchoolEnrolls
 				.Join(
 					students,
-					enroll => new { FirstName = enroll.FirstName, LastName = enroll.LastName },
-					student => new { FirstName = student.FirstName, LastName = student.LastName },
+					enroll => new 
+					{ 
+						FirstName = enroll.FirstName.Trim().ToLower(), 
+						LastName = enroll.LastName.Trim().ToLower() 
+					},
+					student => new { 
+						FirstName = student.FirstName, 
+						LastName = student.LastName 
+					},
 					(enroll, student) => new StudentInfo
 					{
 						StudentID = student.StudentID,
@@ -126,11 +137,33 @@ namespace ETL.Services
 			return linkedStudents; 
 		}
 
-		public void AddStudentInfoRange (IEnumerable<StudentInfo> studentInfo)
+		public void AddStudentInfoRange(IEnumerable<StudentInfo> studentInfo, ProgressStatus progressStatus)
 		{
-			_transferContext.StudentInfo.AddRange(studentInfo);
+			int totalCount = studentInfo.Count();
+			int processedCount = 0;
+
+			foreach (var student in studentInfo)
+			{
+				_transferContext.StudentInfo.Add(student);
+				processedCount++;
+
+				int progress = (int)((double)processedCount / totalCount * 100);
+				progressStatus.UpdateProgress(progress);
+			}
+
 			_transferContext.SaveChanges();
+			Console.WriteLine(); // Move to the next line after completion
 		}
 
+		public void DeleteAllStudentInfo()
+		{
+			var allStudentInfo = _transferContext.StudentInfo;
+
+			_transferContext.StudentInfo.RemoveRange(allStudentInfo);
+			_transferContext.SaveChanges();
+
+			// Reset the Id count back down to zero 
+			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('StudentInfo', RESEED, 0);");
+		}
 	}
 }

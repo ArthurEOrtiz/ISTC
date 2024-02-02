@@ -44,31 +44,34 @@ class Program
 
 			//Step 0: Lets make sure we start with a clean slate.
 			// I'm gonna un-comment and comment this out as I'm developing. 
-			//transferService.DeleteAllStudents();
+			transferService.DeleteAllStudents();
+			transferService.DeleteAllStudentInfo();
 
 			// Step 1: Display count and list of unique student names 
 			int uniqueStudentCount = extractService.CountUniqueFirstAndLastNames();
 			var studentEnrolls = extractService.GetTblSchoolEnrolls();
 			var uniqueStudents = transferService.GetUniqueFirstAndLastName(studentEnrolls);
 
-			foreach (var student in uniqueStudents)
-			{
-				Console.WriteLine($"Student: {student.FirstName} | {student.LastName}");
-			}
 
-			Console.WriteLine($"Unique student count: {uniqueStudentCount}");
+			Console.WriteLine($"Unique student count: {uniqueStudents.Count()}");
 			// Stop for user input 
 			Console.WriteLine("Press Enter to add data to the Students table...");
 			Console.ReadLine();
 
 			// Step 2: When Enter is hit, enter that data into the Students table
 			transferService.AddStudentsRange(uniqueStudents);
-
-			Console.WriteLine("Data added to students table.");
+			Console.WriteLine("Data added to Students table.");
 
 			// Step 3: For every unique first and last name that we put into student,
 			// we'll put those rows into a student info page. 
+			var studentInfo = transferService.StudentToStudentInfo(studentEnrolls);
+			Console.WriteLine($"Press Enter to write {studentInfo.Count()} to StudentInfo Table, this could take a moment . . . ");
+			Console.ReadLine();
+			var progressStatus = new ProgressStatus(studentInfo.Count());
 
+
+			transferService.AddStudentInfoRange(studentInfo, progressStatus);
+			Console.Write("Data added to StudentInfo table");
 		}
 		else
 		{
