@@ -15,7 +15,7 @@ namespace ETL.Services
 			_transferContext = transferContext;
 		}
 
-		public IEnumerable<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
+		public List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
 		{
 			return tblSchoolEnrolls
 				.GroupBy(enroll => new
@@ -33,7 +33,7 @@ namespace ETL.Services
 				.ToList();
 		}
 
-		public void AddStudentsRange(IEnumerable<Student> students)
+		public void AddStudentsRange(List<Student> students)
 		{
 			_transferContext.Students.AddRange(students);
 			SaveChangesAsync();

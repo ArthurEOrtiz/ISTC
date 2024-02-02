@@ -10,14 +10,14 @@ namespace ETL.Services
 	  /// Creates a list of unique First and Last Names from <see cref="TblSchoolEnroll"/>
 	  /// </summary>
 	  /// <returns><see cref="List{T}"/> of <see cref="Student"/></returns>
-		IEnumerable<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
+		List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
 
 		/// <summary>
 		/// Adds a list of students to the students into the Students table, 
 		/// by using range from Linq.
 		/// </summary>
 		/// <param name="students">A list of <see cref="Student"/></param
-		void AddStudentsRange(IEnumerable<Student> students);
+		void AddStudentsRange(List<Student> students);
 
 		/// <summary>
 		/// Gets a list of all students in the Students table in the Transfer database.
