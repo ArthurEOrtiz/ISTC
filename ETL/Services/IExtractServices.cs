@@ -8,7 +8,7 @@ namespace ETL.Services
 		/// <summary>
 		/// Return all rows from tblSchoolEnroll in ISTC.
 		/// </summary>
-		/// <returns> A <see cref="IEnumerable{T}"/> of <see cref="TblSchoolEnroll"/></returns>
-		IEnumerable<TblSchoolEnroll> GetTblSchoolEnrolls();
+		/// <returns> A <see cref="List{T}"/> of <see cref="TblSchoolEnroll"/></returns>
+		List<TblSchoolEnroll> GetTblSchoolEnrolls();
 	}
 }

@@ -5,6 +5,8 @@ namespace ETL.Services
 {
 	internal interface ITransferService
 	{
+
+		List<T> LowerCaseAndTrimRecords<T>(List<T> records) where T : class;
 		/// <summary>
 		/// Adds a list of students to the students into the Students table, 
 		/// by using range from Linq.
@@ -20,7 +22,7 @@ namespace ETL.Services
 		/// <param name="progressCallback"> An optional callback function that is invoked to 
 		/// report the addition process. The callback takes two parameters: the number of 
 		/// records processed, and the total number of records as <see cref="int"/> and is used with <see cref="Utilities.ProgressLogger.RecordsProcessed(int, int)"/></param>
-		void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback);
+		void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback = null);
 
 		/// <summary>
 		/// Adds a list of Contact Info into the ContactInfo table in the Transfer database.
@@ -30,7 +32,7 @@ namespace ETL.Services
 		/// <param name="progressCallback">An optional callback function that is invoked to 
 		/// report the addition process. The callback takes two parameters: the number of 
 		/// records processed, and the total number of records as <see cref="int"/> and is used with <see cref="Utilities.ProgressLogger.RecordsProcessed(int, int)"/></param>
-		void AddContactInfoRange(List<ContactInfo> contactInfo, Action<int, int>? progressCallback);
+		void AddContactInfoRange(List<ContactInfo> contactInfo, Action<int, int>? progressCallback = null);
 
 		/// <summary>
 		/// Gets a list of all students in the Students table in the Transfer database.
@@ -42,7 +44,7 @@ namespace ETL.Services
 		/// Gets a list of all student information in StudentInfo table of the Transfer database.
 		/// </summary>
 		/// <returns><see cref="IEnumerable{T}"/> of <see cref="StudentInfo"/></returns>
-		IEnumerable<StudentInfo> GetAllStudentInfo();
+		List<StudentInfo> GetAllStudentInfo();
 
 		/// <summary>
 		/// Creates a list of unique First and Last Names from <see cref="TblSchoolEnroll"/>
@@ -50,7 +52,7 @@ namespace ETL.Services
 		/// <returns><see cref="List{T}"/> of <see cref="Student"/></returns>
 		List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
 
-		List<ContactInfo> GetUniqueContactInfo(IEnumerable<StudentInfo> studentInfo);
+		List<ContactInfo> GetUniqueContactInfo(List<StudentInfo> studentInfo);
 
 		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms

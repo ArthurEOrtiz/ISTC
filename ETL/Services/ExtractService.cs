@@ -12,7 +12,7 @@ namespace ETL.Services
 			_istcContext = istcContext;
 		}
 
-		public IEnumerable<TblSchoolEnroll> GetTblSchoolEnrolls()
+		public List<TblSchoolEnroll> GetTblSchoolEnrolls()
 		{
 			return _istcContext.TblSchoolEnrolls.ToList();
 		}

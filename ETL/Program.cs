@@ -38,6 +38,7 @@ class Program
 
 		if (Debugger.IsAttached) // If you're running this in debug mode.
 		{
+			Console.WriteLine("Application Started!");
 			using var scope = host.Services.CreateScope();
 			var serviceProvider = scope.ServiceProvider;
 			var extractService = serviceProvider.GetRequiredService<IExtractServices>();
@@ -49,12 +50,27 @@ class Program
 			transferService.DeleteAllStudents();
 			transferService.DeleteAllStudentInfo();
 
-			// Step 1: Display count of unique student names 
-			var studentEnrolls = extractService.GetTblSchoolEnrolls();
-			var uniqueStudents = transferService.GetUniqueFirstAndLastName(studentEnrolls);
+			// Step 1: Get all records from tblSchoolInfo and lower case and trim the records.
+			// tblSchoolInfo *should* have all records of every person enrollment history.
+			// The row count of my current tblSchoolEnroll is 11290
+			
+			var enrolls = extractService.GetTblSchoolEnrolls();
 
-			// Stop for user input 
-			Console.WriteLine($"Press Enter to write {uniqueStudents.Count()} records to the Students table...");
+			// Let the user know the count of records. 
+			Console.WriteLine($"{enrolls.Count} rows in tblSchoolInfo, press enter to lower case and trim records.");
+			
+			// Stop for user input.
+			Console.ReadLine();
+ 
+			var lowerCasedAndTrimmedEnrolls = transferService.LowerCaseAndTrimRecords(enrolls);
+			Console.WriteLine($"{lowerCasedAndTrimmedEnrolls.Count} enrolls trimmed and lowercased.");
+
+			// Get all the unique first and last names of tblSchoolInfo.
+			// This should be 3286 records. 
+			var uniqueStudents = transferService.GetUniqueFirstAndLastName(lowerCasedAndTrimmedEnrolls);
+			Console.WriteLine($"Press Enter to write {uniqueStudents.Count} unique first and last name combinations to the Students table...");
+
+			// Stop for user input.
 			Console.ReadLine();
 
 			// Step 2: When Enter is hit, enter that data into the Students table
@@ -62,34 +78,32 @@ class Program
 
 			// Step 3: For every unique first and last name that we put into student,
 			// we'll put those rows into a student info page. 
-			var studentInfo = transferService.StudentToStudentInfo(studentEnrolls);
+			var studentEnrollToStudentInfo = transferService.StudentToStudentInfo(lowerCasedAndTrimmedEnrolls);
 
 			// Stop for user input 
-			Console.WriteLine($"Press Enter to write {studentInfo.Count()} records to the StudentInfo Table, this could take a moment . . . ");
+			Console.WriteLine($"Press Enter to write {studentEnrollToStudentInfo.Count()} records to the StudentInfo Table, this could take a moment...");
 			Console.ReadLine();
 
 			// This process does take a moment so I set up a progress logger so the
 			// end user doesn't think something went wrong. 
-			transferService.AddStudentInfoRange(studentInfo, processLogger.RecordsProcessed);
+			transferService.AddStudentInfoRange(studentEnrollToStudentInfo, processLogger.RecordsProcessed);
 
 			// Step 4: Now lets find all the unique Contact information for each user. 
-			// User will have many contact info  rows becaus the way Glenn did it, 
+			// User will have many contact info rows, 
 			// if a user got married or god forbid changed their email, or typed it different
 			// it creates a unique instance of that.
 
-
-			var uniqueContactInfo = transferService.GetUniqueContactInfo(transferService.GetAllStudentInfo());
-
-			transferService.AddContactInfoRange(uniqueContactInfo,)
+			var studentInfoRecords = transferService.GetAllStudentInfo();
+			var uniqueContactInfo = transferService.GetUniqueContactInfo(studentInfoRecords);
 
 			// Stop for user input
-			Console.WriteLine($"Press Enter to write {uniqueContactInfo.Count()} records to the ContactInfo Table, this could take a moment. . . ");
+			Console.WriteLine($"Press Enter to write {uniqueContactInfo.Count()} records to the ContactInfo Table, this could take a moment...");
 			Console.ReadLine();
 			// TODO: START HERE TOMORROW, figure out what's the discrepancy in row counts between
 			// this application and SSMS.
-			
+			transferService.AddContactInfoRange(uniqueContactInfo);
 
-		
+
 		}
 		else
 		{

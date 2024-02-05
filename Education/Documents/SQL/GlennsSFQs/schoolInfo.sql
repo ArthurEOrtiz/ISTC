@@ -11,6 +11,7 @@ SELECT DISTINCT
 	EmailAddr, 
 	AddrStreet, 
 	AddrSteNmbr, 
+    AddrCity,
 	AddrState, 
 	AddrZip, 
 	TelAc, 
@@ -21,5 +22,4 @@ SELECT DISTINCT
 	FaxNmbr
 
 FROM StudentInfo
--- This returns 5479 rows 
--- When I did this in my App, I got 5686 records. 
+-- This returns 5482 rows 

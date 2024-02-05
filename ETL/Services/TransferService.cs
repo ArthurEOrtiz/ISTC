@@ -15,13 +15,36 @@ namespace ETL.Services
 			_transferContext = transferContext;
 		}
 
+		public List<T> LowerCaseAndTrimRecords<T>(List<T> records) where T : class
+		{
+			foreach(T record in records)
+			{
+				foreach(var property in typeof(T).GetProperties())
+				{
+					if(property.PropertyType == typeof(string))
+					{
+						var value = (string?)property.GetValue(record);
+						if(value != null)
+						{
+							property.SetValue(record, value.ToLower().Trim());
+						} else
+						{
+							property.SetValue(record, null);	
+						}
+					}
+				}
+			}
+
+			return records;
+		}
+
 		public void AddStudentsRange(List<Student> students)
 		{
 			_transferContext.Students.AddRange(students);
 			SaveChangesAsync();
 		}
 
-		public void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback)
+		public void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback = null)
 		{
 			int totalRecords = studentInfo.Count();
 			int recordsProcessed = 0;
@@ -37,7 +60,7 @@ namespace ETL.Services
 			SaveChangesAsync();
 		}
 
-		public void AddContactInfoRange(List<ContactInfo> contactInfo, Action<int, int>? progressCallback)
+		public void AddContactInfoRange(List<ContactInfo> contactInfo, Action<int, int>? progressCallback = null)
 		{
 			int totalRecords = contactInfo.Count();
 			int recordsProcessed = 0;
@@ -58,7 +81,7 @@ namespace ETL.Services
 			return _transferContext.Students.ToList();
 		}
 
-		public IEnumerable<StudentInfo> GetAllStudentInfo()
+		public List<StudentInfo> GetAllStudentInfo()
 		{
 			return _transferContext.StudentInfo.ToList();
 		}
@@ -68,10 +91,8 @@ namespace ETL.Services
 			return tblSchoolEnrolls
 				.GroupBy(enroll => new
 				{
-					// Since there is no validation in the current system we have to make
-					// sure there no spaces before or after the first and last name strings. 
-					FirstName = enroll.FirstName.Trim().ToLower(),
-					LastName = enroll.LastName.Trim().ToLower()
+					enroll.FirstName,
+					enroll.LastName
 				})
 				.Select(group => new Student
 				{
@@ -81,7 +102,7 @@ namespace ETL.Services
 				.ToList();
 		}
 
-		public List<ContactInfo> GetUniqueContactInfo(IEnumerable<StudentInfo> studentInfo)
+		public List<ContactInfo> GetUniqueContactInfo(List<StudentInfo> studentInfo)
 		{
 			return studentInfo
 				.GroupBy(si => new
@@ -92,6 +113,7 @@ namespace ETL.Services
 					si.EmailAddr,
 					si.AddrStreet,
 					si.AddrSteNmbr,
+					si.AddrCity,
 					si.AddrState,
 					si.AddrZip,
 					si.TelAc,
@@ -104,19 +126,20 @@ namespace ETL.Services
 				.Select(group => new ContactInfo
 				{
 					StudentID = group.Key.StudentID,
-					JobTitle = group.Key.JobTitle?.ToLower()?.Trim(),
-					Employer = group.Key.Employer?.ToLower()?.Trim(),
-					EmailAddr = group.Key.EmailAddr.ToLower().Trim(),
-					AddrStreet = group.Key.AddrStreet?.ToLower()?.Trim(),
-					AddrSteNmbr = group.Key.AddrSteNmbr?.ToLower()?.Trim(),
-					AddrState = group.Key.AddrState?.ToLower()?.Trim(),
-					AddrZip = group.Key.AddrZip?.ToLower()?.Trim(),
-					TelAc = group.Key.TelAc?.ToLower()?.Trim(),
-					TelPrfx = group.Key.TelPrfx?.ToLower()?.Trim(),
-					TelNmbr = group.Key.TelNmbr?.ToLower()?.Trim(),
-					FaxAc = group.Key.FaxAc?.ToLower()?.Trim(),
-					FaxPrfx = group.Key.FaxPrfx?.ToLower()?.Trim(),
-					FaxNmbr = group.Key.FaxNmbr?.ToLower()?.Trim()
+					JobTitle = group.Key.JobTitle,
+					Employer = group.Key.Employer,
+					EmailAddr = group.Key.EmailAddr,
+					AddrStreet = group.Key.AddrStreet,
+					AddrSteNmbr = group.Key.AddrSteNmbr,
+					AddrCity = group.Key.AddrCity,
+					AddrState = group.Key.AddrState,
+					AddrZip = group.Key.AddrZip,
+					TelAc = group.Key.TelAc,
+					TelPrfx = group.Key.TelPrfx,
+					TelNmbr = group.Key.TelNmbr,
+					FaxAc = group.Key.FaxAc,
+					FaxPrfx = group.Key.FaxPrfx,
+					FaxNmbr = group.Key.FaxNmbr
 				})
 				.ToList();
 		}
@@ -130,8 +153,8 @@ namespace ETL.Services
 					students,
 					enroll => new 
 					{ 
-						FirstName = enroll.FirstName.Trim().ToLower(), 
-						LastName = enroll.LastName.Trim().ToLower() 
+						FirstName = enroll.FirstName, 
+						LastName = enroll.LastName 
 					},
 					student => new { 
 						FirstName = student.FirstName, 
@@ -209,7 +232,7 @@ namespace ETL.Services
 			var allStudents = _transferContext.Students.ToList();
 
 			_transferContext.Students.RemoveRange(allStudents);
-			_transferContext.SaveChanges();
+			SaveChangesAsync();
 
 			// Reset the Id count back down to zero 
 			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('Students', RESEED, 0);");
@@ -220,7 +243,7 @@ namespace ETL.Services
 			var allStudentEnroll = _transferContext.StudentInfo;
 
 			_transferContext.StudentInfo.RemoveRange(allStudentEnroll);
-			_transferContext.SaveChanges();
+			SaveChangesAsync();
 
 			// Reset the Id count back down to zero 
 			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('StudentInfo', RESEED, 0);");
