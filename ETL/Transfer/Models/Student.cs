@@ -8,12 +8,17 @@ namespace ETL.Transfer.Models
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		[Column("student_ID")]
-		public int Id { get; set; }
+		public int StudentID { get; set; }
 
 		[Column("first_name")]
 		public string? FirstName { get; set; }
 
 		[Column("last_name")]
 		public string? LastName { get; set; }
+
+		// one-to-many relationships 
+		public List<StudentInfo> StudentInfo { get; set; } = null!;
+		public List<ContactInfo> ContactInfo { get; set; } = null!;
+		public List<CourseInfo> CoursesInfo { get; set; } = null!;
 	}
 }

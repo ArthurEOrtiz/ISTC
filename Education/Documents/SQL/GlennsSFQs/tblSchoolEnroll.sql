@@ -1,6 +1,6 @@
 -- This returns 11290 rows 
-SELECT tblSchoolEnroll. *
-FROM tblSchoolEnroll
+--SELECT tblSchoolEnroll. *
+--FROM tblSchoolEnroll
 
 
 -- This returns 3286 rows 
@@ -61,7 +61,7 @@ FROM tblSchoolEnroll
 -- Lets do last and first names 
 --SELECT DISTINCT LastName, FirstName
 --FROM tblSchoolEnroll
--- This returns 3,286 Rows 
+-- This returns 3286 Rows 
 
 -- Now lets do Glenn's stupid key 
 --SELECT DISTINCT LastName, FirstName, EmailAddr

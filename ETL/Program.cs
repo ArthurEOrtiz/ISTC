@@ -1,12 +1,12 @@
 ﻿using ETL.Extract.DataAccess;
 using ETL.Services;
 using ETL.Transfer.DataAccess;
+using ETL.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
-using System.Text.Json;
 
 class Program
 {
@@ -31,45 +31,106 @@ class Program
 					options.UseSqlServer(context.Configuration.GetConnectionString("TransferDatabase")));
 
 				// Use Direct Injection to register classes. 
-				services.AddTransient<ISTCServiceInterface, ISTCService>();
-				services.AddTransient<ExtractServiceInterface, ExtractService>();
-				services.AddTransient<TransferServiceInterface, TransferService>();
+				services.AddTransient<IExtractServices, ExtractService>();
+				services.AddTransient<ITransferService, TransferService>();
 			})
 			.Build();
 
 		if (Debugger.IsAttached) // If you're running this in debug mode.
 		{
-			using (var scope = host.Services.CreateScope())
-			{
-				var serviceProvider = scope.ServiceProvider;
-				var extractService = serviceProvider.GetRequiredService<ExtractServiceInterface>();
+			Console.WriteLine("Application Started!");
+			using var scope = host.Services.CreateScope();
+			var serviceProvider = scope.ServiceProvider;
+			var extractService = serviceProvider.GetRequiredService<IExtractServices>();
+			var transferService = serviceProvider.GetRequiredService<ITransferService>();
+			var processLogger = new ProgressLogger();
 
-				// Step 1: Display count and list of unique student names 
-				var uniqueStudents = extractService.GetUniqueFistAndLastNames();
-				int uniqueStudentCount = extractService.CountUniqueFirstAndLastNames();
+			//Step 0: Start with a clean slate when needed. 
+			// I'm gonna un-comment and comment this out as I'm developing. 
+			transferService.DeleteAllStudents();
+			transferService.DeleteAllStudentInfo();
 
-				Console.WriteLine($"Unique student count: {uniqueStudentCount}");
+			// Step 1: Get all records from tblSchoolInfo and lower case and trim the records.
+			// tblSchoolInfo *should* have all records of every person enrollment history.
+			// The row count of my current tblSchoolEnroll is 11290
+			var enrolls = extractService.GetTblSchoolEnrolls();
 
-				foreach (var student in uniqueStudents)
-				{
-					Console.WriteLine($"Student: {student.FirstName} | {student.LastName}");
-				}
-				// Stop for user input 
-				Console.WriteLine("Press Enter to add data to the Students table...");
-				Console.ReadLine();
+			// Let the user know the count of records. 
+			Console.WriteLine($"{enrolls.Count} rows in tblSchoolInfo, press enter to lower case and trim records.");
+			
+			// Stop for user input.
+			Console.ReadLine();
+ 
+			var lowerCasedAndTrimmedEnrolls = transferService.LowerCaseAndTrimRecords(enrolls);
+			Console.WriteLine($"{lowerCasedAndTrimmedEnrolls.Count} enrolls trimmed and lowercased.");
 
-				// Step 2: When Enter is hit, enter that data into the Students table
-				var transferService = serviceProvider.GetRequiredService<TransferServiceInterface>();
+			// Step 2: Get all the unique first and last names of tblSchoolEnroll and save them
+			// to the Student table. 
+			// This should be 3286 records. 
+			var uniqueStudents = transferService.GetUniqueFirstAndLastName(lowerCasedAndTrimmedEnrolls);
+			Console.WriteLine($"Press Enter to write {uniqueStudents.Count} unique first and last name combinations to the Students table...");
 
-				transferService.AddStudentsRange(uniqueStudents);
+			// Stop for user input.
+			Console.ReadLine();
 
-				Console.WriteLine("Data added to students table.");
-				
-				// Step 3: Lets pull tblSchoolEnroll and for every unique first and last name,
-				// we'll put those rows into a student info page. 
+			// Save the records.
+			transferService.AddStudentsRange(uniqueStudents);
+
+			// Step 3: Take the records from tblSchoolEnroll and create a new table in the transfer database, 
+			// called SchoolInfo, that has all the rows from tblSchoolEnroll but with the first and last names
+			// replaced with a foreign key to the Student table. 
+			var studentEnrollToStudentInfo = transferService.StudentToStudentInfo(lowerCasedAndTrimmedEnrolls);
+			Console.WriteLine($"Press Enter to write {studentEnrollToStudentInfo.Count} records to the StudentInfo Table, this could take a moment...");
+
+			// Stop for user input 
+			Console.ReadLine();
+
+			// This process does take a moment so I set up a progress logger so the
+			// end user doesn't think something went wrong. 
+			transferService.AddStudentInfoRange(studentEnrollToStudentInfo, processLogger.RecordsProcessed);
+
+			// Step 4: Now lets find all the unique Contact information for each user. 
+			// User will have many contact info rows, 
+			// if a user got married or god forbid changed their email, or typed it different
+			// it creates a unique instance of that.
+			var studentInfoRecords = transferService.GetAllStudentInfo();
+			var uniqueContactInfo = transferService.GetUniqueContactInfo(studentInfoRecords);
+			
+			Console.WriteLine($"Press Enter to write {uniqueContactInfo.Count} records to the ContactInfo Table, this could take a moment...");
+			// Stop for user input
+			Console.ReadLine();
+			
+			// Save the records
+			transferService.AddContactInfoRange(uniqueContactInfo);
+
+			// Step 5: Now let find all the unique course information for each user
+			// the way this is tracked, *I think*,  is with DateRegister, DateSchool, SchoolType,
+			// Seq, C01-C40 Columns. 
+			var uniqueCourseInfo = transferService.GetUniqueCourseInfo(studentInfoRecords);
+
+			Console.WriteLine($"Press Enter to write {uniqueCourseInfo.Count} records to the CourseInfo Table, this could take a moment...");
+			// Stop for user input 
+			Console.ReadLine();	
+
+			// Save the records
+			transferService.AddCourseInfoRange(uniqueCourseInfo);
+
+			// Step 6: Now I need to find a way to link the CourseInfo table with 
+			// the list of course data from the ISTC data base. 
+
+			// The way that the data is slapped together I might have to break
+			// up the logic for school type. A school type can be R for regional
+			// S for summer, W for winter, and there is 4 rows of 1. I don't know what 1
+			// is all about. 
+
+			// First lets get tblSchoolEnroll data in here and lower case and trim it. 
+			var tblSchoolCourse = extractService.GetTblSchoolCourse();
+			var tblSchoolCoursesLowerCasedAndTrimmed = transferService.LowerCaseAndTrimRecords(tblSchoolCourse);
+
+			// Now I'm just gonna worry about school type 'r'
 
 
-			}
+
 		}
 		else
 		{

@@ -4,6 +4,7 @@ using ETL.Transfer.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ETL.Migrations
 {
     [DbContext(typeof(TransferContext))]
-    partial class TransferContextModelSnapshot : ModelSnapshot
+    [Migration("20240202194124_AddContactInfoTable")]
+    partial class AddContactInfoTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,159 +85,6 @@ namespace ETL.Migrations
                     b.HasIndex("StudentID");
 
                     b.ToTable("ContactInfo");
-                });
-
-            modelBuilder.Entity("ETL.Transfer.Models.CourseInfo", b =>
-                {
-                    b.Property<int>("CourseInfoID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("course_info_ID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseInfoID"), 1L, 1);
-
-                    b.Property<bool?>("C01")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C02")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C03")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C04")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C05")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C06")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C07")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C08")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C09")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C10")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C11")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C12")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C13")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C14")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C15")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C16")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C17")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C18")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C19")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C20")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C21")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C22")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C23")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C24")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C25")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C26")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C27")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C28")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C29")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C30")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C31")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C32")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C33")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C34")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C35")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C36")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C37")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C38")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C39")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("C40")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("DateRegistered")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateSchool")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SchoolType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Seq")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StudentID")
-                        .HasColumnType("int")
-                        .HasColumnName("student_ID");
-
-                    b.HasKey("CourseInfoID");
-
-                    b.HasIndex("StudentID");
-
-                    b.ToTable("CourseInfo");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.Student", b =>
@@ -467,17 +316,6 @@ namespace ETL.Migrations
                     b.Navigation("student");
                 });
 
-            modelBuilder.Entity("ETL.Transfer.Models.CourseInfo", b =>
-                {
-                    b.HasOne("ETL.Transfer.Models.Student", "student")
-                        .WithMany("CoursesInfo")
-                        .HasForeignKey("StudentID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("student");
-                });
-
             modelBuilder.Entity("ETL.Transfer.Models.StudentInfo", b =>
                 {
                     b.HasOne("ETL.Transfer.Models.Student", "student")
@@ -492,8 +330,6 @@ namespace ETL.Migrations
             modelBuilder.Entity("ETL.Transfer.Models.Student", b =>
                 {
                     b.Navigation("ContactInfo");
-
-                    b.Navigation("CoursesInfo");
 
                     b.Navigation("StudentInfo");
                 });
