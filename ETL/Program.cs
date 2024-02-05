@@ -115,6 +115,21 @@ class Program
 			// Save the records
 			transferService.AddCourseInfoRange(uniqueCourseInfo);
 
+			// Step 6: Now I need to find a way to link the CourseInfo table with 
+			// the list of course data from the ISTC data base. 
+
+			// The way that the data is slapped together I might have to break
+			// up the logic for school type. A school type can be R for regional
+			// S for summer, W for winter, and there is 4 rows of 1. I don't know what 1
+			// is all about. 
+
+			// First lets get tblSchoolEnroll data in here and lower case and trim it. 
+			var tblSchoolCourse = extractService.GetTblSchoolCourse();
+			var tblSchoolCoursesLowerCasedAndTrimmed = transferService.LowerCaseAndTrimRecords(tblSchoolCourse);
+
+			// Now I'm just gonna worry about school type 'r'
+
+
 
 		}
 		else
