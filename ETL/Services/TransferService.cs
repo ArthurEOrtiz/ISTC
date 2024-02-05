@@ -37,9 +37,30 @@ namespace ETL.Services
 			SaveChangesAsync();
 		}
 
+		public void AddContactInfoRange(List<ContactInfo> contactInfo, Action<int, int>? progressCallback)
+		{
+			int totalRecords = contactInfo.Count();
+			int recordsProcessed = 0;
+
+			foreach (var record in contactInfo)
+			{
+				_transferContext.ContactInfo.Add(record);
+
+				recordsProcessed++;
+				progressCallback?.Invoke(totalRecords, recordsProcessed);
+			}
+
+			SaveChangesAsync();
+		}
+
 		public IEnumerable<Student> GetAllStudents()
 		{
 			return _transferContext.Students.ToList();
+		}
+
+		public IEnumerable<StudentInfo> GetAllStudentInfo()
+		{
+			return _transferContext.StudentInfo.ToList();
 		}
 
 		public List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
@@ -56,6 +77,46 @@ namespace ETL.Services
 				{
 					FirstName = group.Key.FirstName,
 					LastName = group.Key.LastName
+				})
+				.ToList();
+		}
+
+		public List<ContactInfo> GetUniqueContactInfo(IEnumerable<StudentInfo> studentInfo)
+		{
+			return studentInfo
+				.GroupBy(si => new
+				{
+					si.StudentID,
+					si.JobTitle,
+					si.Employer,
+					si.EmailAddr,
+					si.AddrStreet,
+					si.AddrSteNmbr,
+					si.AddrState,
+					si.AddrZip,
+					si.TelAc,
+					si.TelPrfx,
+					si.TelNmbr,
+					si.FaxAc,
+					si.FaxPrfx,
+					si.FaxNmbr
+				})
+				.Select(group => new ContactInfo
+				{
+					StudentID = group.Key.StudentID,
+					JobTitle = group.Key.JobTitle?.ToLower()?.Trim(),
+					Employer = group.Key.Employer?.ToLower()?.Trim(),
+					EmailAddr = group.Key.EmailAddr.ToLower().Trim(),
+					AddrStreet = group.Key.AddrStreet?.ToLower()?.Trim(),
+					AddrSteNmbr = group.Key.AddrSteNmbr?.ToLower()?.Trim(),
+					AddrState = group.Key.AddrState?.ToLower()?.Trim(),
+					AddrZip = group.Key.AddrZip?.ToLower()?.Trim(),
+					TelAc = group.Key.TelAc?.ToLower()?.Trim(),
+					TelPrfx = group.Key.TelPrfx?.ToLower()?.Trim(),
+					TelNmbr = group.Key.TelNmbr?.ToLower()?.Trim(),
+					FaxAc = group.Key.FaxAc?.ToLower()?.Trim(),
+					FaxPrfx = group.Key.FaxPrfx?.ToLower()?.Trim(),
+					FaxNmbr = group.Key.FaxNmbr?.ToLower()?.Trim()
 				})
 				.ToList();
 		}
@@ -172,5 +233,7 @@ namespace ETL.Services
 			ProgressLogger progressLogger = new();
 			progressLogger.DisplaySavingProgress(_transferContext);
 		}
+
+
 	}
 }

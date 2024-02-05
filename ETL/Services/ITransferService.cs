@@ -13,14 +13,24 @@ namespace ETL.Services
 		void AddStudentsRange(List<Student> students);
 
 		/// <summary>
-		/// Adds a list of Student Info into the StudentInfo table
-		/// by using range from Linq
+		/// Adds a list of Student Info into the StudentInfo table in the Transfer database
+		/// This utilizes <see cref="TransferService.SaveChangesAsync"/>
 		/// </summary>
 		/// <param name="studentInfo">A <see cref="List{T}"/> of <see cref="StudentInfo"/></param>
-		/// <param name="progressCallback"> A optional callback function that is invoked to 
+		/// <param name="progressCallback"> An optional callback function that is invoked to 
 		/// report the addition process. The callback takes two parameters: the number of 
-		/// records processed, and the total number of records as <see cref="int"/></param>
+		/// records processed, and the total number of records as <see cref="int"/> and is used with <see cref="Utilities.ProgressLogger.RecordsProcessed(int, int)"/></param>
 		void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback);
+
+		/// <summary>
+		/// Adds a list of Contact Info into the ContactInfo table in the Transfer database.
+		/// This utilizes <see cref="TransferService.SaveChangesAsync"/> 
+		/// </summary>
+		/// <param name="contactInfo">A <see cref="List{T}"/> od <see cref="ContactInfo"/></param>
+		/// <param name="progressCallback">An optional callback function that is invoked to 
+		/// report the addition process. The callback takes two parameters: the number of 
+		/// records processed, and the total number of records as <see cref="int"/> and is used with <see cref="Utilities.ProgressLogger.RecordsProcessed(int, int)"/></param>
+		void AddContactInfoRange(List<ContactInfo> contactInfo, Action<int, int>? progressCallback);
 
 		/// <summary>
 		/// Gets a list of all students in the Students table in the Transfer database.
@@ -29,10 +39,18 @@ namespace ETL.Services
 		IEnumerable<Student> GetAllStudents();
 
 		/// <summary>
+		/// Gets a list of all student information in StudentInfo table of the Transfer database.
+		/// </summary>
+		/// <returns><see cref="IEnumerable{T}"/> of <see cref="StudentInfo"/></returns>
+		IEnumerable<StudentInfo> GetAllStudentInfo();
+
+		/// <summary>
 		/// Creates a list of unique First and Last Names from <see cref="TblSchoolEnroll"/>
 		/// </summary>
 		/// <returns><see cref="List{T}"/> of <see cref="Student"/></returns>
 		List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
+
+		List<ContactInfo> GetUniqueContactInfo(IEnumerable<StudentInfo> studentInfo);
 
 		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms

@@ -76,6 +76,17 @@ class Program
 			// User will have many contact info  rows becaus the way Glenn did it, 
 			// if a user got married or god forbid changed their email, or typed it different
 			// it creates a unique instance of that.
+
+
+			var uniqueContactInfo = transferService.GetUniqueContactInfo(transferService.GetAllStudentInfo());
+
+			transferService.AddContactInfoRange(uniqueContactInfo,)
+
+			// Stop for user input
+			Console.WriteLine($"Press Enter to write {uniqueContactInfo.Count()} records to the ContactInfo Table, this could take a moment. . . ");
+			Console.ReadLine();
+			// TODO: START HERE TOMORROW, figure out what's the discrepancy in row counts between
+			// this application and SSMS.
 			
 
 		
