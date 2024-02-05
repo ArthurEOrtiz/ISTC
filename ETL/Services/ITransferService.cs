@@ -61,14 +61,18 @@ namespace ETL.Services
 		List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
 
 		/// <summary>
-		/// Creates a list of unique contact information.
+		/// Creates a list of unique contact information per <see cref="Student"/>.
 		/// </summary>
 		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="StudentInfo"/></param>
 		/// <returns><see cref="List{T}"/> of <see cref="ContactInfo"/></returns>
 		List<ContactInfo> GetUniqueContactInfo(List<StudentInfo> studentInfo);
 
+		/// <summary>
+		/// Creates a list of unique course information per <see cref="Student"/>.
+		/// </summary>
+		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="StudentInfo"/></param>
+		/// <returns><see cref="List{T}"/> of <see cref="CourseInfo"/></returns>
 		List<CourseInfo> GetUniqueCourseInfo(List<StudentInfo> studentInfo);
-
 
 		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms
