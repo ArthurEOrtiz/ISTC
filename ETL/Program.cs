@@ -53,7 +53,6 @@ class Program
 			// Step 1: Get all records from tblSchoolInfo and lower case and trim the records.
 			// tblSchoolInfo *should* have all records of every person enrollment history.
 			// The row count of my current tblSchoolEnroll is 11290
-			
 			var enrolls = extractService.GetTblSchoolEnrolls();
 
 			// Let the user know the count of records. 
@@ -65,7 +64,8 @@ class Program
 			var lowerCasedAndTrimmedEnrolls = transferService.LowerCaseAndTrimRecords(enrolls);
 			Console.WriteLine($"{lowerCasedAndTrimmedEnrolls.Count} enrolls trimmed and lowercased.");
 
-			// Get all the unique first and last names of tblSchoolInfo.
+			// Step 2: Get all the unique first and last names of tblSchoolEnroll and save them
+			// to the Student table. 
 			// This should be 3286 records. 
 			var uniqueStudents = transferService.GetUniqueFirstAndLastName(lowerCasedAndTrimmedEnrolls);
 			Console.WriteLine($"Press Enter to write {uniqueStudents.Count} unique first and last name combinations to the Students table...");
@@ -73,15 +73,16 @@ class Program
 			// Stop for user input.
 			Console.ReadLine();
 
-			// Step 2: When Enter is hit, enter that data into the Students table
+			// Save the records.
 			transferService.AddStudentsRange(uniqueStudents);
 
-			// Step 3: For every unique first and last name that we put into student,
-			// we'll put those rows into a student info page. 
+			// Step 3: Take the records from tblSchoolEnroll and create a new table in the transfer database, 
+			// called SchoolInfo, that has all the rows from tblSchoolEnroll but with the first and last names
+			// replaced with a foreign key to the Student table. 
 			var studentEnrollToStudentInfo = transferService.StudentToStudentInfo(lowerCasedAndTrimmedEnrolls);
+			Console.WriteLine($"Press Enter to write {studentEnrollToStudentInfo.Count} records to the StudentInfo Table, this could take a moment...");
 
 			// Stop for user input 
-			Console.WriteLine($"Press Enter to write {studentEnrollToStudentInfo.Count()} records to the StudentInfo Table, this could take a moment...");
 			Console.ReadLine();
 
 			// This process does take a moment so I set up a progress logger so the
@@ -92,16 +93,27 @@ class Program
 			// User will have many contact info rows, 
 			// if a user got married or god forbid changed their email, or typed it different
 			// it creates a unique instance of that.
-
 			var studentInfoRecords = transferService.GetAllStudentInfo();
 			var uniqueContactInfo = transferService.GetUniqueContactInfo(studentInfoRecords);
-
+			
+			Console.WriteLine($"Press Enter to write {uniqueContactInfo.Count} records to the ContactInfo Table, this could take a moment...");
 			// Stop for user input
-			Console.WriteLine($"Press Enter to write {uniqueContactInfo.Count()} records to the ContactInfo Table, this could take a moment...");
 			Console.ReadLine();
-			// TODO: START HERE TOMORROW, figure out what's the discrepancy in row counts between
-			// this application and SSMS.
+			
+			// Save the records
 			transferService.AddContactInfoRange(uniqueContactInfo);
+
+			// Step 5: Now let find all the unique course information for each user
+			// the way this is tracked, *I think*,  is with DateRegister, DateSchool, SchoolType,
+			// Seq, C01-C40 Columns. 
+			var uniqueCourseInfo = transferService.GetUniqueCourseInfo(studentInfoRecords);
+
+			Console.WriteLine($"Press Enter to write {uniqueCourseInfo.Count} records to the CourseInfo Table, this could take a moment...");
+			// Stop for user input 
+			Console.ReadLine();	
+
+			// Save the records
+			transferService.AddCourseInfoRange(uniqueCourseInfo);
 
 
 		}

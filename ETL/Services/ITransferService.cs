@@ -34,6 +34,8 @@ namespace ETL.Services
 		/// records processed, and the total number of records as <see cref="int"/> and is used with <see cref="Utilities.ProgressLogger.RecordsProcessed(int, int)"/></param>
 		void AddContactInfoRange(List<ContactInfo> contactInfo, Action<int, int>? progressCallback = null);
 
+		void AddCourseInfoRange(List<CourseInfo> courseInfo, Action<int, int>? progressCallback = null);
+
 		/// <summary>
 		/// Gets a list of all students in the Students table in the Transfer database.
 		/// </summary>
@@ -57,11 +59,14 @@ namespace ETL.Services
 		/// <returns><see cref="List{T}"/> of <see cref="ContactInfo"/></returns>
 		List<ContactInfo> GetUniqueContactInfo(List<StudentInfo> studentInfo);
 
+		List<CourseInfo> GetUniqueCourseInfo(List<StudentInfo> studentInfo);
+
+
 		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms
 		/// it into a a collection of <see cref="StudentInfo"/>. 
 		/// </summary>
-		/// <param name="tblSchoolEnrolls"><see cref="List{T}"/> of <see cref="TblSchoolEnroll"/></param>
+		/// <param name="tblSchoolEnrolls"><see cref="IEnumerable{T}{T}"/> of <see cref="TblSchoolEnroll"/></param>
 		/// <returns><see cref="List{T}}"/> of <see cref="StudentInfo"/></returns>
 		List<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
 
