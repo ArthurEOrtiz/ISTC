@@ -37,13 +37,11 @@ namespace ETL.Services
 		/// <summary>
 		/// Gets a list of all students in the Students table in the Transfer database.
 		/// </summary>
-		/// <returns>A <see cref="IEnumerable{T}"/> of <see cref="Student"/></returns>
 		IEnumerable<Student> GetAllStudents();
 
 		/// <summary>
 		/// Gets a list of all student information in StudentInfo table of the Transfer database.
 		/// </summary>
-		/// <returns><see cref="IEnumerable{T}"/> of <see cref="StudentInfo"/></returns>
 		List<StudentInfo> GetAllStudentInfo();
 
 		/// <summary>
@@ -52,6 +50,11 @@ namespace ETL.Services
 		/// <returns><see cref="List{T}"/> of <see cref="Student"/></returns>
 		List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
 
+		/// <summary>
+		/// Creates a list of unique contact information.
+		/// </summary>
+		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="StudentInfo"/></param>
+		/// <returns><see cref="List{T}"/> of <see cref="ContactInfo"/></returns>
 		List<ContactInfo> GetUniqueContactInfo(List<StudentInfo> studentInfo);
 
 		/// <summary>
