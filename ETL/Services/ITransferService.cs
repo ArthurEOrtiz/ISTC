@@ -59,7 +59,7 @@ namespace ETL.Services
 
 		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms
-		/// it into a a collection of <see cref="StudentInfo"/>, by use of an inner join. 
+		/// it into a a collection of <see cref="StudentInfo"/>. 
 		/// </summary>
 		/// <param name="tblSchoolEnrolls"><see cref="List{T}"/> of <see cref="TblSchoolEnroll"/></param>
 		/// <returns><see cref="List{T}}"/> of <see cref="StudentInfo"/></returns>
