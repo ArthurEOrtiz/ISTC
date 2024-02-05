@@ -15,7 +15,7 @@ namespace ETL.Services
 		void AddStudentsRange(List<Student> students);
 
 		/// <summary>
-		/// Adds a list of Student Info into the StudentInfo table in the Transfer database
+		/// Adds a list of student information to the StudentInfo table in the Transfer database
 		/// This utilizes <see cref="TransferService.SaveChangesAsync"/>
 		/// </summary>
 		/// <param name="studentInfo">A <see cref="List{T}"/> of <see cref="StudentInfo"/></param>
@@ -25,15 +25,23 @@ namespace ETL.Services
 		void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback = null);
 
 		/// <summary>
-		/// Adds a list of Contact Info into the ContactInfo table in the Transfer database.
+		/// Adds a list of contact information to the ContactInfo table in the Transfer database.
 		/// This utilizes <see cref="TransferService.SaveChangesAsync"/> 
 		/// </summary>
-		/// <param name="contactInfo">A <see cref="List{T}"/> od <see cref="ContactInfo"/></param>
+		/// <param name="contactInfo">A <see cref="List{T}"/> of <see cref="ContactInfo"/></param>
 		/// <param name="progressCallback">An optional callback function that is invoked to 
 		/// report the addition process. The callback takes two parameters: the number of 
 		/// records processed, and the total number of records as <see cref="int"/> and is used with <see cref="Utilities.ProgressLogger.RecordsProcessed(int, int)"/></param>
 		void AddContactInfoRange(List<ContactInfo> contactInfo, Action<int, int>? progressCallback = null);
 
+		/// <summary>
+		/// Add a list of course information into the CourseInfo table in the Transfer database
+		/// </summary>
+		/// <param name="courseInfo">A <see cref="List{T}"/> of <see cref="CourseInfo"/></param>
+		/// <param name="progressCallback">An optional callback function that is invoked to 
+		/// report the addition process. The callback takes two parameters: the number of 
+		/// records to processed, and the total number of records as <see cref="int"/> and is use with 
+		/// <see cref="Utilities.ProgressLogger.RecordsProcessed(int, int)"/></param>
 		void AddCourseInfoRange(List<CourseInfo> courseInfo, Action<int, int>? progressCallback = null);
 
 		/// <summary>
