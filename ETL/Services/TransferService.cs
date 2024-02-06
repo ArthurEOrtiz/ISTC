@@ -367,6 +367,27 @@ namespace ETL.Services
 			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('StudentInfo', RESEED, 0);");
 		}
 
+		public void DeleteAllContactInfo()
+		{
+			var allContactInfo = _transferContext.ContactInfo;
+
+			_transferContext.ContactInfo.RemoveRange(allContactInfo);
+			SaveChangesAsync();
+
+			// Reset the Id count back down to zero 
+			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('ContactInfo', RESEED, 0);");
+		}
+
+		public void DeleteAllCourseHistory()
+		{
+			var allCourseHistory = _transferContext.CourseHistory;
+			_transferContext.CourseHistory.RemoveRange(allCourseHistory);
+			SaveChangesAsync();
+
+			// Reset the Id count back down to zero 
+			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('CourseHistory', RESEED, 0);");
+		}
+
 		private void SaveChangesAsync()
 		{
 			_transferContext.SaveChangesAsync();
@@ -374,7 +395,5 @@ namespace ETL.Services
 			ProgressLogger progressLogger = new();
 			progressLogger.DisplaySavingProgress(_transferContext);
 		}
-
-
 	}
 }

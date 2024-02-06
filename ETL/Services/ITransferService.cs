@@ -93,6 +93,18 @@ namespace ETL.Services
 		/// Id count to zero. 
 		/// </summary>
 		void DeleteAllStudentInfo();
+		
+		/// <summary>
+		/// Deletes all records in the ContactInfo table from the Transfer database and resets the 
+		/// Id count to zero
+		/// </summary>
+		void DeleteAllContactInfo();
+
+		/// <summary>
+		/// Deletes all records in the CourseHistory table from the Transfer database and resets
+		/// the Id count to zero
+		/// </summary>
+		void DeleteAllCourseHistory();
 
 	}
 }

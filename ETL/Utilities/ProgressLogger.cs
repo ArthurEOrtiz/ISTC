@@ -28,7 +28,7 @@ namespace ETL.Utilities
 				dotCount = (dotCount + 1) % maxDots;
 
 			}
-			Console.WriteLine($"\nSaved to {dbContext.GetType().Name}");
+			Console.WriteLine($"Saved to {dbContext.GetType().Name}");
 		}
 	}
 }

@@ -49,6 +49,8 @@ class Program
 			// I'm gonna un-comment and comment this out as I'm developing. 
 			transferService.DeleteAllStudents();
 			transferService.DeleteAllStudentInfo();
+			transferService.DeleteAllContactInfo();
+			transferService.DeleteAllCourseHistory();
 
 			// Step 1: Get all records from tblSchoolInfo and lower case and trim the records.
 			// tblSchoolInfo *should* have all records of every person enrollment history.

@@ -14,7 +14,7 @@ namespace ETL.Services
 
 		public List<TblSchoolCourse> GetTblSchoolCourse()
 		{
-			throw new NotImplementedException();
+			return _istcContext.TblSchoolCourses.ToList();
 		}
 
 		public List<TblSchoolEnroll> GetTblSchoolEnrolls()
