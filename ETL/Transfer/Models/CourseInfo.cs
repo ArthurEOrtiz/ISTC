@@ -1,7 +1,14 @@
-﻿namespace ETL.Extract.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ETL.Transfer.Models
 {
-	public partial class TblSchoolCourse
+	public class CourseInfo
 	{
+		[Key]
+		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+		[Column("course_info_ID")]
+		public int CourseInfoID { get; set; }
 		public DateTime CDateSchool { get; set; }
 		public string CSchoolType { get; set; } = null!;
 		public int CSseq { get; set; }
