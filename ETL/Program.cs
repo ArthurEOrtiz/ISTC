@@ -103,19 +103,19 @@ class Program
 			// Save the records
 			transferService.AddContactInfoRange(uniqueContactInfo);
 
-			// Step 5: Now let find all the unique course information for each user
+			// Step 5: Now let find all the unique course history for each user
 			// the way this is tracked, *I think*,  is with DateRegister, DateSchool, SchoolType,
 			// Seq, C01-C40 Columns. 
-			var uniqueCourses = transferService.GetUniqueStudentCourseHistory(studentInfoRecords);
+			var uniqueCourses = transferService.GetUniqueCourseHistory(studentInfoRecords);
 
-			Console.WriteLine($"Press Enter to write {uniqueCourses.Count} records to the CourseInfo Table, this could take a moment...");
+			Console.WriteLine($"Press Enter to write {uniqueCourses.Count} records to the CourseHistory Table, this could take a moment...");
 			// Stop for user input 
 			Console.ReadLine();	
 
 			// Save the records
-			transferService.AddStudentCourseHistoryRange(uniqueCourses);
+			transferService.AddCourseHistoryRange(uniqueCourses);
 
-			// Step 6: Now I need to find a way to link the CourseInfo table with 
+			// Step 6: Now I need to find a way to link the course history table with 
 			// the list of course data from the ISTC data base. 
 
 			// The way that the data is slapped together I might have to break
@@ -124,8 +124,8 @@ class Program
 			// is all about. 
 
 			// First lets get tblSchoolEnroll data in here and lower case and trim it. 
-			var tblSchoolCourse = extractService.GetTblSchoolCourse();
-			var tblSchoolCoursesLowerCasedAndTrimmed = transferService.LowerCaseAndTrimRecords(tblSchoolCourse);
+			//var tblSchoolCourse = extractService.GetTblSchoolCourse();
+			//var tblSchoolCoursesLowerCasedAndTrimmed = transferService.LowerCaseAndTrimRecords(tblSchoolCourse);
 
 			// Now I'm just gonna worry about school type 'r'
 

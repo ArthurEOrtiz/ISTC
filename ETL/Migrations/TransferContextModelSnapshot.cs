@@ -85,36 +85,14 @@ namespace ETL.Migrations
                     b.ToTable("ContactInfo");
                 });
 
-            modelBuilder.Entity("ETL.Transfer.Models.Student", b =>
+            modelBuilder.Entity("ETL.Transfer.Models.CourseHistory", b =>
                 {
-                    b.Property<int>("StudentID")
+                    b.Property<int>("CourseHistoryID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("student_ID");
+                        .HasColumnName("course_history_ID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentID"), 1L, 1);
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("first_name");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("last_name");
-
-                    b.HasKey("StudentID");
-
-                    b.ToTable("Students");
-                });
-
-            modelBuilder.Entity("ETL.Transfer.Models.StudentCourseHistory", b =>
-                {
-                    b.Property<int>("CourseInfoID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("course_info_ID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseInfoID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseHistoryID"), 1L, 1);
 
                     b.Property<bool?>("C01")
                         .HasColumnType("bit");
@@ -253,11 +231,33 @@ namespace ETL.Migrations
                         .HasColumnType("int")
                         .HasColumnName("student_ID");
 
-                    b.HasKey("CourseInfoID");
+                    b.HasKey("CourseHistoryID");
 
                     b.HasIndex("StudentID");
 
-                    b.ToTable("StudentCourseHistory");
+                    b.ToTable("CourseHistory");
+                });
+
+            modelBuilder.Entity("ETL.Transfer.Models.Student", b =>
+                {
+                    b.Property<int>("StudentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("student_ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentID"), 1L, 1);
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("first_name");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("last_name");
+
+                    b.HasKey("StudentID");
+
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.StudentInfo", b =>
@@ -467,10 +467,10 @@ namespace ETL.Migrations
                     b.Navigation("student");
                 });
 
-            modelBuilder.Entity("ETL.Transfer.Models.StudentCourseHistory", b =>
+            modelBuilder.Entity("ETL.Transfer.Models.CourseHistory", b =>
                 {
                     b.HasOne("ETL.Transfer.Models.Student", "student")
-                        .WithMany("StudentCourseHistory")
+                        .WithMany("CourseHistory")
                         .HasForeignKey("StudentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -493,7 +493,7 @@ namespace ETL.Migrations
                 {
                     b.Navigation("ContactInfo");
 
-                    b.Navigation("StudentCourseHistory");
+                    b.Navigation("CourseHistory");
 
                     b.Navigation("StudentInfo");
                 });

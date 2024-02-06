@@ -37,12 +37,12 @@ namespace ETL.Services
 		/// <summary>
 		/// Add a list of course information into the CourseInfo table in the Transfer database
 		/// </summary>
-		/// <param name="studentCourseHistory">A <see cref="List{T}"/> of <see cref="StudentCourseHistory"/></param>
+		/// <param name="studentCourseHistory">A <see cref="List{T}"/> of <see cref="CourseHistory"/></param>
 		/// <param name="progressCallback">An optional callback function that is invoked to 
 		/// report the addition process. The callback takes two parameters: the number of 
 		/// records to processed, and the total number of records as <see cref="int"/> and is use with 
 		/// <see cref="Utilities.ProgressLogger.RecordsProcessed(int, int)"/></param>
-		void AddStudentCourseHistoryRange(List<StudentCourseHistory> studentCourseHistory, Action<int, int>? progressCallback = null);
+		void AddCourseHistoryRange(List<CourseHistory> courseHistory, Action<int, int>? progressCallback = null);
 
 		/// <summary>
 		/// Gets a list of all students in the Students table in the Transfer database.
@@ -71,8 +71,8 @@ namespace ETL.Services
 		/// Creates a list of unique student history per <see cref="Student"/>.
 		/// </summary>
 		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="StudentInfo"/></param>
-		/// <returns><see cref="List{T}"/> of <see cref="StudentCourseHistory"/></returns>
-		List<StudentCourseHistory> GetUniqueStudentCourseHistory(List<StudentInfo> studentInfo);
+		/// <returns><see cref="List{T}"/> of <see cref="CourseHistory"/></returns>
+		List<CourseHistory> GetUniqueCourseHistory(List<StudentInfo> studentInfo);
 
 		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms

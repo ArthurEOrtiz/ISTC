@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ETL.Migrations
 {
-    public partial class AddStudentCourseHistoryTable : Migration
+    public partial class AddCourseHistoryTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "StudentCourseHistory",
+                name: "CourseHistory",
                 columns: table => new
                 {
-                    course_info_ID = table.Column<int>(type: "int", nullable: false)
+                    course_history_ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     student_ID = table.Column<int>(type: "int", nullable: false),
                     DateRegistered = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -63,9 +63,9 @@ namespace ETL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StudentCourseHistory", x => x.course_info_ID);
+                    table.PrimaryKey("PK_CourseHistory", x => x.course_history_ID);
                     table.ForeignKey(
-                        name: "FK_StudentCourseHistory_Students_student_ID",
+                        name: "FK_CourseHistory_Students_student_ID",
                         column: x => x.student_ID,
                         principalTable: "Students",
                         principalColumn: "student_ID",
@@ -73,15 +73,15 @@ namespace ETL.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_StudentCourseHistory_student_ID",
-                table: "StudentCourseHistory",
+                name: "IX_CourseHistory_student_ID",
+                table: "CourseHistory",
                 column: "student_ID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "StudentCourseHistory");
+                name: "CourseHistory");
         }
     }
 }
