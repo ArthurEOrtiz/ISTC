@@ -2,7 +2,7 @@
 
 namespace ETL.Services
 {
-    internal class CourseService : ICourseService
+	internal class CourseService : ICourseService
 	{
 	}
 }

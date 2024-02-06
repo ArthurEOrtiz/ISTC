@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ETL.Transfer.Models
+﻿namespace ETL.Transfer.Models
 {
 	internal class RegionalCourse
 	{

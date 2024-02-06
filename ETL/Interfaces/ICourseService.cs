@@ -1,6 +1,6 @@
 ﻿namespace ETL.Interfaces
 {
-    internal interface ICourseService
-    {
-    }
+	internal interface ICourseService
+	{
+	}
 }

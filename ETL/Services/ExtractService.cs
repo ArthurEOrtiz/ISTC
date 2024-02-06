@@ -4,7 +4,7 @@ using ETL.Interfaces;
 
 namespace ETL.Services
 {
-    internal class ExtractService : IExtractService
+	internal class ExtractService : IExtractService
 	{
 		private readonly ISTCContext _istcContext;
 

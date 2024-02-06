@@ -5,7 +5,7 @@ using ETL.Transfer.Models;
 
 namespace ETL.Services
 {
-    internal class StudentService : IStudentService
+	internal class StudentService : IStudentService
 	{
 		private readonly TransferContext _transferContext;
 
