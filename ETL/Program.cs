@@ -154,14 +154,19 @@ class Program
 			// Save it 
 			transferService.AddRecordsRange(CourseInfo, processLogger.RecordsProcessed);
 
-			// For now, I'm just trying to focus on regional school type. In tblSchoolcourses 
-			// We have cDateSchool, cSchoolType, cSseq, and cSeq, that used to identify the course. 
+			// For now, I'm just trying to focus on regional school type.
+			// Filtering tblSchoolCourses for just cSchoolType = 'r'
+		
+			// I have observed that cDateSchool, cSchoolType, cSseq, and cSeq, are used to identify the course. 
 			// So far as I can tell it corresponds with tblSchoolEnrolls DateSchool, SchoolType, Seq, and 
 			// c01 - c40. cSeq, corresponds with c01-c40, if c05 is true, then, I THINK, that means cSeq = 5.
 			// I've noted that this relationship might not always be true for other school types, probably due
-			// the lack of any meaningful data validation. 
+			// the lack of any meaningful data validation. Let see if I can make a way to to build a query to
+			// change c01-40 into a cSeq number. 
 
 
+
+			
 		}
 		else
 		{

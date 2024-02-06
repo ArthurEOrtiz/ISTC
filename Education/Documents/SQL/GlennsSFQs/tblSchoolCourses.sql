@@ -78,6 +78,9 @@ SELECT tblSchoolCourses.*
 FROM tblSchoolCourses 
 WHERE 
 	cSchoolType = 'r' AND
+	cSSeq = 1 AND
+	cSeq = 1
+ORDER BY cSSeq, cSeq
 	--cDateSchool = '2009-11-16'
 	--cSSeq = 4
 	

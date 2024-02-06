@@ -63,38 +63,6 @@
 --FROM tblSchoolEnroll
 -- This returns 3286 Rows 
 
--- Now lets do Glenn's stupid key 
---SELECT DISTINCT LastName, FirstName, EmailAddr
---FROM tblSchoolEnroll
--- This returns 4300 rows
--- But I can see there are many duplicate records, so when someone gets married or god forbid
--- change their email you get another fuckin row. 
-
--- So I can know what everyone's distinct last and first name is then 
-
---SELECT DISTINCT LastName, FirstName
---FROM tblSchoolEnroll
-
--- Let try and make a table of unique Names and group that information into another table with a key 
-
-
----- Create tblUniqueNames table
---CREATE TABLE tblUniqueNames (
---    UniqueID INT PRIMARY KEY AUTO_INCREMENT,
---    LastName VARCHAR(255),
---    FirstName VARCHAR(255)
---);
-
----- Insert distinct names into tblUniqueNames
---INSERT INTO tblUniqueNames (LastName, FirstName)
---SELECT DISTINCT LastName, FirstName
---FROM tblSchoolEnroll;
-
----- Create a query to retrieve rows from tblSchoolEnroll with unique names
---SELECT tblSchoolEnroll.*
---FROM tblSchoolEnroll
---JOIN tblUniqueNames ON tblSchoolEnroll.LastName = tblUniqueNames.LastName
---                   AND tblSchoolEnroll.FirstName = tblUniqueNames.FirstName;
 
 
 
@@ -104,3 +72,9 @@
 
 SELECT tblSchoolEnroll.*
 FROM tblSchoolEnroll
+WHERE 
+	SchoolType = 'r' AND 
+	Seq = 1 AND 
+	c02 = 1
+
+
