@@ -6,6 +6,7 @@ namespace ETL.Services
 {
 	internal class CourseService : ICourseService
 	{
+
 		public List<CourseInfo> tblSchoolCourseToCourseInfo(List<TblSchoolCourse> tblSchoolCourses)
 		{
 			List<CourseInfo> courseInfos = new List<CourseInfo>();
@@ -42,5 +43,6 @@ namespace ETL.Services
 			}
 			return courseInfos;
 		}
+
 	}
 }

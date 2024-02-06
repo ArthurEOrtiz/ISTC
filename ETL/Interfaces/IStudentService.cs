@@ -43,5 +43,6 @@ namespace ETL.Interfaces
 		/// <returns><see cref="List{T}}"/> of <see cref="StudentInfo"/></returns>
 		List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls);
 
+		StudentHistory CourseHistoryConverter(CourseHistory courseHistory);
 	}
 }

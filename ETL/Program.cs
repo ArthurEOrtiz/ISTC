@@ -163,6 +163,7 @@ class Program
 			// I've noted that this relationship might not always be true for other school types, probably due
 			// the lack of any meaningful data validation. Let see if I can make a way to to build a query to
 			// change c01-40 into a cSeq number. 
+			// To accomplish this we have to go back up to the methods that created CourseInfo. 
 
 
 

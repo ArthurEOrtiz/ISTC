@@ -268,5 +268,30 @@ namespace ETL.Services
 			return linkedStudents;
 		}
 
+		public StudentHistory CourseHistoryConverter(CourseHistory courseHistory)
+		{
+			var transformed = new StudentHistory
+			{
+				StudentID = courseHistory.StudentID,
+				DateRegistered = courseHistory.DateRegistered,
+				DateSchool = courseHistory.DateSchool,
+				SchoolType = courseHistory.SchoolType,
+				Seq = courseHistory.Seq
+			};
+
+			// Loop through through C01 to C40 columns - I hate them so much. 
+			for(int i = 1; i<=40;  i++)
+			{
+				var cSeqProperty = typeof(CourseHistory).GetProperty($"C{i:D2}");
+				if (cSeqProperty != null && cSeqProperty.GetValue(courseHistory) as bool? == true)
+				{
+					transformed.CSeq = i;
+					break;
+				}
+			}
+
+			transformed.student = courseHistory.student;
+			return transformed;
+		}
 	}
 }
