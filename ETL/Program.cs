@@ -77,7 +77,7 @@ class Program
 			Console.ReadLine();
 
 			// Save the records.
-			transferService.AddStudentsRange(uniqueStudents);
+			transferService.AddRecordsRange(uniqueStudents, processLogger.RecordsProcessed);
 
 			// Step 3: Take the records from tblSchoolEnroll and create a new table in the transfer database, 
 			// called SchoolInfo, that has all the rows from tblSchoolEnroll but with the first and last names
@@ -90,7 +90,7 @@ class Program
 
 			// This process does take a moment so I set up a progress logger so the
 			// end user doesn't think something went wrong. 
-			transferService.AddStudentInfoRange(studentEnrollToStudentInfo, processLogger.RecordsProcessed);
+			transferService.AddRecordsRange(studentEnrollToStudentInfo, processLogger.RecordsProcessed);
 
 			// Step 4: Now lets find all the unique Contact information for each user. 
 			// User will have many contact info rows, 
@@ -104,7 +104,7 @@ class Program
 			Console.ReadLine();
 			
 			// Save the records
-			transferService.AddContactInfoRange(uniqueContactInfo);
+			transferService.AddRecordsRange(uniqueContactInfo, processLogger.RecordsProcessed);
 
 			// Step 5: Now let find all the unique course history for each user
 			// the way this is tracked, *I think*,  is with DateRegister, DateSchool, SchoolType,
@@ -116,7 +116,7 @@ class Program
 			Console.ReadLine();	
 
 			// Save the records
-			transferService.AddCourseHistoryRange(uniqueCourses);
+			transferService.AddRecordsRange(uniqueCourses, processLogger.RecordsProcessed);
 
 			// Step 6: Now I need to find a way to link the course history table with 
 			// the list of course data from the ISTC data base. 

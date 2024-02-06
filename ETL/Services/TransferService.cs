@@ -38,52 +38,14 @@ namespace ETL.Services
 			return records;
 		}
 
-		public void AddStudentsRange(List<Student> students)
+		public void AddRecordsRange<T>(List<T> records, Action<int, int>? progressCallback = null) where T : class
 		{
-			_transferContext.Students.AddRange(students);
-			SaveChangesAsync();
-		}
-
-		public void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback = null)
-		{
-			int totalRecords = studentInfo.Count;
+			int totalRecords = records.Count;
 			int recordsProcessed = 0;
 
-			foreach (var record in studentInfo)
+			foreach (var record in records)
 			{
-				_transferContext.StudentInfo.Add(record);
-
-				recordsProcessed++;
-				progressCallback?.Invoke(totalRecords, recordsProcessed);
-			}
-
-			SaveChangesAsync();
-		}
-
-		public void AddContactInfoRange(List<ContactInfo> contactInfo, Action<int, int>? progressCallback = null)
-		{
-			int totalRecords = contactInfo.Count();
-			int recordsProcessed = 0;
-
-			foreach (var record in contactInfo)
-			{
-				_transferContext.ContactInfo.Add(record);
-
-				recordsProcessed++;
-				progressCallback?.Invoke(totalRecords, recordsProcessed);
-			}
-
-			SaveChangesAsync();
-		}
-
-		public void AddCourseHistoryRange(List<CourseHistory> courseHistory, Action<int, int>? progressCallback = null)
-		{
-			int totalRecords = courseHistory.Count();
-			int recordsProcessed = 0;
-
-			foreach (var record in courseHistory)
-			{
-				_transferContext.CourseHistory.Add(record);
+				_transferContext.Set<T>().Add(record);
 
 				recordsProcessed++;
 				progressCallback?.Invoke(totalRecords, recordsProcessed);
@@ -395,5 +357,7 @@ namespace ETL.Services
 			ProgressLogger progressLogger = new();
 			progressLogger.DisplaySavingProgress(_transferContext);
 		}
+
+
 	}
 }
