@@ -15,7 +15,7 @@ namespace ETL.Utilities
 			int dotCount = 0;
 
 
-			Console.WriteLine(); // Go to ta new line. 
+			Console.WriteLine(); // Go to to a new line. 
 
 			while (dbContext.ChangeTracker.HasChanges())
 			{
