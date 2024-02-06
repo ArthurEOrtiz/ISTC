@@ -1,11 +1,9 @@
-﻿using ETL.Extract.Models;
-using ETL.Transfer.Models;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace ETL.Services
 {
 	internal interface ITransferService
 	{
-
 		/// <summary>
 		/// Modifies string properties of records in a list to convert them to lowercase and remove leading and trailing whitespace.
 		/// </summary>
@@ -23,66 +21,11 @@ namespace ETL.Services
 		public void AddRecordsRange<T>(List<T> records, Action<int, int>? progressCallback = null) where T : class;
 
 		/// <summary>
-		/// Gets a list of all students in the Students table in the Transfer database.
+		///  Deletes all records from the specified DbSet and resets the identity seed to zero for the corresponding table in the database. This utilizes <see cref="TransferService.SaveChangesAsync()"/>
 		/// </summary>
-		List<Student> GetAllStudents();
-
-		/// <summary>
-		/// Gets a list of all student information in StudentInfo table of the Transfer database.
-		/// </summary>
-		List<StudentInfo> GetAllStudentInfo();
-
-		/// <summary>
-		/// Creates a list of unique First and Last Names from <see cref="TblSchoolEnroll"/>
-		/// </summary>
-		/// <returns><see cref="List{T}"/> of <see cref="Student"/></returns>
-		List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
-
-		/// <summary>
-		/// Creates a list of unique contact information per <see cref="Student"/>.
-		/// </summary>
-		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="StudentInfo"/></param>
-		/// <returns><see cref="List{T}"/> of <see cref="ContactInfo"/></returns>
-		List<ContactInfo> GetUniqueContactInfo(List<StudentInfo> studentInfo);
-
-		/// <summary>
-		/// Creates a list of unique student history per <see cref="Student"/>.
-		/// </summary>
-		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="StudentInfo"/></param>
-		/// <returns><see cref="List{T}"/> of <see cref="CourseHistory"/></returns>
-		List<CourseHistory> GetUniqueCourseHistory(List<StudentInfo> studentInfo);
-
-		/// <summary>
-		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms
-		/// it into a a collection of <see cref="StudentInfo"/>. 
-		/// </summary>
-		/// <param name="tblSchoolEnrolls"><see cref="List{T}"/> of <see cref="TblSchoolEnroll"/></param>
-		/// <returns><see cref="List{T}}"/> of <see cref="StudentInfo"/></returns>
-		List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls);
-
-		/// <summary>
-		/// Deletes all records in the Students table from the Transfer database, and
-		/// resets the Id count to zero
-		/// </summary>
-		void DeleteAllStudents();
-
-		/// <summary>
-		/// Deletes all records in the StudentInfo table from the Transfer database and reset the
-		/// Id count to zero. 
-		/// </summary>
-		void DeleteAllStudentInfo();
-		
-		/// <summary>
-		/// Deletes all records in the ContactInfo table from the Transfer database and resets the 
-		/// Id count to zero
-		/// </summary>
-		void DeleteAllContactInfo();
-
-		/// <summary>
-		/// Deletes all records in the CourseHistory table from the Transfer database and resets
-		/// the Id count to zero
-		/// </summary>
-		void DeleteAllCourseHistory();
+		/// <typeparam name="T">The type of entity in the DbSet.</typeparam>
+		/// <param name="dbSet">The DbSet from which records will be deleted.</param>
+		public void DeleteAllRecords<T>(DbSet<T> dbSet) where T : class;
 
 	}
 }

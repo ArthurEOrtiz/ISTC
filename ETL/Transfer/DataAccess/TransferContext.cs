@@ -16,6 +16,5 @@ namespace ETL.Transfer.DataAccess
 		{
 			base.OnModelCreating(modelBuilder);
 		}
-
 	}
 }
