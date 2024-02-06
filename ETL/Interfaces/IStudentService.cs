@@ -35,6 +35,8 @@ namespace ETL.Interfaces
 		/// <returns><see cref="List{T}"/> of <see cref="CourseHistory"/></returns>
 		List<CourseHistory> GetUniqueCourseHistory(List<StudentInfo> studentInfo);
 
+		CourseHistory? GetCourseHistoryByID(int id);
+
 		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms
 		/// it into a a collection of <see cref="StudentInfo"/>. 
@@ -43,6 +45,6 @@ namespace ETL.Interfaces
 		/// <returns><see cref="List{T}}"/> of <see cref="StudentInfo"/></returns>
 		List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls);
 
-		StudentHistory CourseHistoryConverter(CourseHistory courseHistory);
+		List<StudentHistory> CourseHistoryConverter(CourseHistory courseHistory);
 	}
 }
