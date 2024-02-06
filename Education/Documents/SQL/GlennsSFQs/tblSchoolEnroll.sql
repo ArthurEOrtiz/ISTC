@@ -98,3 +98,9 @@
 
 
 
+--SELECT tblSchoolEnroll. *
+--FROM tblSchoolEnroll
+--WHERE SchoolType IS NULL
+
+SELECT tblSchoolEnroll.*
+FROM tblSchoolEnroll

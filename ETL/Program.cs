@@ -35,6 +35,7 @@ class Program
 				services.AddTransient<IExtractService, ExtractService>();
 				services.AddTransient<ITransferService, TransferService>();
 				services.AddTransient<IStudentService, StudentService>();
+				services.AddTransient<ICourseService, CourseService>();
 			})
 			.Build();
 
@@ -47,6 +48,7 @@ class Program
 			var extractService = serviceProvider.GetRequiredService<IExtractService>();
 			var transferService = serviceProvider.GetRequiredService<ITransferService>();
 			var studentService = serviceProvider.GetRequiredService<IStudentService>();
+			var courseService = serviceProvider.GetRequiredService<ICourseService>();
 			var processLogger = new ProgressLogger();
 
 			//Step 0: Start with a clean slate when needed. 
@@ -75,7 +77,7 @@ class Program
 			// to the Student table. 
 			// This should be 3286 records. 
 			var uniqueStudents = studentService.GetUniqueFirstAndLastName(lowerCasedAndTrimmedEnrolls);
-			Console.WriteLine($"Press Enter to write {uniqueStudents.Count} unique first and last name combinations to the Students table...");
+			Console.WriteLine($"Press enter to write {uniqueStudents.Count} unique first and last name combinations to the Students table...");
 
 			// Stop for user input.
 			Console.ReadLine();
@@ -87,7 +89,7 @@ class Program
 			// called SchoolInfo, that has all the rows from tblSchoolEnroll but with the first and last names
 			// replaced with a foreign key to the Student table. 
 			var studentEnrollToStudentInfo = studentService.StudentToStudentInfo(lowerCasedAndTrimmedEnrolls);
-			Console.WriteLine($"Press Enter to write {studentEnrollToStudentInfo.Count} records to the StudentInfo Table, this could take a moment...");
+			Console.WriteLine($"Press enter to write {studentEnrollToStudentInfo.Count} records to the StudentInfo Table, this could take a moment...");
 
 			// Stop for user input 
 			Console.ReadLine();
@@ -103,7 +105,7 @@ class Program
 			var studentInfoRecords = studentService.GetAllStudentInfo();
 			var uniqueContactInfo = studentService.GetUniqueContactInfo(studentInfoRecords);
 
-			Console.WriteLine($"Press Enter to write {uniqueContactInfo.Count} records to the ContactInfo Table, this could take a moment...");
+			Console.WriteLine($"Press enter to write {uniqueContactInfo.Count} records to the ContactInfo Table, this could take a moment...");
 			// Stop for user input
 			Console.ReadLine();
 
@@ -115,7 +117,7 @@ class Program
 			// Seq, C01-C40 Columns. 
 			var uniqueCourses = studentService.GetUniqueCourseHistory(studentInfoRecords);
 
-			Console.WriteLine($"Press Enter to write {uniqueCourses.Count} records to the CourseHistory Table, this could take a moment...");
+			Console.WriteLine($"Press enter to write {uniqueCourses.Count} records to the CourseHistory Table, this could take a moment...");
 			// Stop for user input 
 			Console.ReadLine();
 
@@ -126,21 +128,39 @@ class Program
 			// the list of course data (tblSchoolCourses) from the ISTC data base. 
 
 			// The way that the data is slapped together I might have to break
-			// up the logic for school type. A school type can be R for regional
-			// S for summer, W for winter, and there is 4 rows of 1. I don't know what 1
-			// is all about, so we'll treat that as an anomaly.
+			// up the logic for school types, to make it more manageable. A school
+			// type can be R for regional S for summer, W for winter, and there is 4
+			// rows of 1. I don't know what 1 is all about, so we'll treat that as an anomaly.
 
 			// First lets get tblSchoolEnroll data in here and lowercase and trim it. 
-			var tblSchoolCourse = extractService.GetTblSchoolCourse();
-			Console.WriteLine($"{tblSchoolCourse.Count} rows in tblSchoolCourses, press enter to lowercase and trim records.");
+			var tblSchoolCourses = extractService.GetTblSchoolCourse();
+			Console.WriteLine($"{tblSchoolCourses.Count} rows in tblSchoolCourses, press enter to lowercase and trim records.");
 
 			// Stop for user input
 			Console.ReadLine();
 
-			var tblSchoolCoursesLowerCasedAndTrimmed = transferService.LowerCaseAndTrimRecords(tblSchoolCourse);
+			var tblSchoolCoursesLowerCasedAndTrimmed = transferService.LowerCaseAndTrimRecords(tblSchoolCourses);
 			Console.WriteLine($"{tblSchoolCoursesLowerCasedAndTrimmed.Count} records trimmed and lowercased!");
 
-			// Second I just want to worry about the logic for hSchoolType r
+			// Second, add that to a table in the Transfer database for further processing. 
+			Console.WriteLine($"Press enter to write {tblSchoolCoursesLowerCasedAndTrimmed.Count} records to the CourseInfo Table, this could take a moment...");
+
+			// Stop for user input 
+			Console.ReadLine();
+
+			// Let convert that object so AddRecordsRange knows where to put that information.
+			var CourseInfo = courseService.tblSchoolCourseToCourseInfo(tblSchoolCoursesLowerCasedAndTrimmed);
+
+			// Save it 
+			transferService.AddRecordsRange(CourseInfo, processLogger.RecordsProcessed);
+
+			// For now, I'm just trying to focus on regional school type. In tblSchoolcourses 
+			// We have cDateSchool, cSchoolType, cSseq, and cSeq, that used to identify the course. 
+			// So far as I can tell it corresponds with tblSchoolEnrolls DateSchool, SchoolType, Seq, and 
+			// c01 - c40. cSeq, corresponds with c01-c40, if c05 is true, then, I THINK, that means cSeq = 5.
+			// I've noted that this relationship might not always be true for other school types, probably due
+			// the lack of any meaningful data validation. 
+
 
 		}
 		else
