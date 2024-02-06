@@ -47,7 +47,7 @@ namespace ETL.Services
 		/// <summary>
 		/// Gets a list of all students in the Students table in the Transfer database.
 		/// </summary>
-		IEnumerable<Student> GetAllStudents();
+		List<Student> GetAllStudents();
 
 		/// <summary>
 		/// Gets a list of all student information in StudentInfo table of the Transfer database.
@@ -78,9 +78,9 @@ namespace ETL.Services
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms
 		/// it into a a collection of <see cref="StudentInfo"/>. 
 		/// </summary>
-		/// <param name="tblSchoolEnrolls"><see cref="IEnumerable{T}{T}"/> of <see cref="TblSchoolEnroll"/></param>
+		/// <param name="tblSchoolEnrolls"><see cref="List{T}"/> of <see cref="TblSchoolEnroll"/></param>
 		/// <returns><see cref="List{T}}"/> of <see cref="StudentInfo"/></returns>
-		List<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
+		List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls);
 
 		/// <summary>
 		/// Deletes all records in the Students table from the Transfer database, and

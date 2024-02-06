@@ -6,14 +6,13 @@ namespace ETL.Utilities
 	{
 		public void RecordsProcessed(int recordsProcessed, int totalRecords)
 		{
-			Console.Write($"\r{recordsProcessed} of {totalRecords} processed");
+			Console.Write($"\r{recordsProcessed} of {totalRecords} processed!");
 		}
 
 		public void DisplaySavingProgress(DbContext dbContext)
 		{
 			const int maxDots = 3;
 			int dotCount = 0;
-
 
 			Console.WriteLine(); // Go to to a new line. 
 
@@ -28,7 +27,9 @@ namespace ETL.Utilities
 				dotCount = (dotCount + 1) % maxDots;
 
 			}
-			Console.WriteLine($"Saved to {dbContext.GetType().Name}");
+
+			string rightMargin = new string(' ', maxDots + 1);
+			Console.Write($"\rSaved to {dbContext.GetType().Name}!{rightMargin}\n");
 		}
 	}
 }

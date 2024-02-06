@@ -46,7 +46,7 @@ namespace ETL.Services
 
 		public void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback = null)
 		{
-			int totalRecords = studentInfo.Count();
+			int totalRecords = studentInfo.Count;
 			int recordsProcessed = 0;
 
 			foreach (var record in studentInfo)
@@ -78,7 +78,7 @@ namespace ETL.Services
 
 		public void AddCourseHistoryRange(List<CourseHistory> courseHistory, Action<int, int>? progressCallback = null)
 		{
-			int totalRecords = courseHistory.Count;
+			int totalRecords = courseHistory.Count();
 			int recordsProcessed = 0;
 
 			foreach (var record in courseHistory)
@@ -92,7 +92,7 @@ namespace ETL.Services
 			SaveChangesAsync();
 		}
 
-		public IEnumerable<Student> GetAllStudents()
+		public List<Student> GetAllStudents()
 		{
 			return _transferContext.Students.ToList();
 		}
@@ -262,7 +262,7 @@ namespace ETL.Services
 				.ToList();
 		}
 
-		public List<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
+		public List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls)
 		{
 			var students = GetAllStudents();
 

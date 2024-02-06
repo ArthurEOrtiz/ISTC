@@ -47,6 +47,7 @@ class Program
 
 			//Step 0: Start with a clean slate when needed. 
 			// I'm gonna un-comment and comment this out as I'm developing. 
+			Console.WriteLine("Deleting all records in the Transfer database.");
 			transferService.DeleteAllStudents();
 			transferService.DeleteAllStudentInfo();
 			transferService.DeleteAllContactInfo();
@@ -123,7 +124,7 @@ class Program
 			// The way that the data is slapped together I might have to break
 			// up the logic for school type. A school type can be R for regional
 			// S for summer, W for winter, and there is 4 rows of 1. I don't know what 1
-			// is all about. 
+			// is all about, so we'll treat that as an anomaly.
 
 			// First lets get tblSchoolEnroll data in here and lower case and trim it. 
 			//var tblSchoolCourse = extractService.GetTblSchoolCourse();
