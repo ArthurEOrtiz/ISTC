@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ETL.Migrations
 {
-    public partial class AddCourseInfoTable : Migration
+    public partial class AddStudentCourseHistoryTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "CourseInfo",
+                name: "StudentCourseHistory",
                 columns: table => new
                 {
                     course_info_ID = table.Column<int>(type: "int", nullable: false)
@@ -63,9 +63,9 @@ namespace ETL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CourseInfo", x => x.course_info_ID);
+                    table.PrimaryKey("PK_StudentCourseHistory", x => x.course_info_ID);
                     table.ForeignKey(
-                        name: "FK_CourseInfo_Students_student_ID",
+                        name: "FK_StudentCourseHistory_Students_student_ID",
                         column: x => x.student_ID,
                         principalTable: "Students",
                         principalColumn: "student_ID",
@@ -73,15 +73,15 @@ namespace ETL.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CourseInfo_student_ID",
-                table: "CourseInfo",
+                name: "IX_StudentCourseHistory_student_ID",
+                table: "StudentCourseHistory",
                 column: "student_ID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CourseInfo");
+                name: "StudentCourseHistory");
         }
     }
 }

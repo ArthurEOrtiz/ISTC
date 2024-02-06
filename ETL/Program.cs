@@ -106,14 +106,14 @@ class Program
 			// Step 5: Now let find all the unique course information for each user
 			// the way this is tracked, *I think*,  is with DateRegister, DateSchool, SchoolType,
 			// Seq, C01-C40 Columns. 
-			var uniqueCourseInfo = transferService.GetUniqueCourseInfo(studentInfoRecords);
+			var uniqueCourses = transferService.GetUniqueStudentCourseHistory(studentInfoRecords);
 
-			Console.WriteLine($"Press Enter to write {uniqueCourseInfo.Count} records to the CourseInfo Table, this could take a moment...");
+			Console.WriteLine($"Press Enter to write {uniqueCourses.Count} records to the CourseInfo Table, this could take a moment...");
 			// Stop for user input 
 			Console.ReadLine();	
 
 			// Save the records
-			transferService.AddCourseInfoRange(uniqueCourseInfo);
+			transferService.AddStudentCourseHistoryRange(uniqueCourses);
 
 			// Step 6: Now I need to find a way to link the CourseInfo table with 
 			// the list of course data from the ISTC data base. 

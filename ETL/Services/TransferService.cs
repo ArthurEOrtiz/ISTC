@@ -76,14 +76,14 @@ namespace ETL.Services
 			SaveChangesAsync();
 		}
 
-		public void AddCourseInfoRange(List<CourseInfo> courseInfo, Action<int, int>? progressCallback = null)
+		public void AddStudentCourseHistoryRange(List<StudentCourseHistory> studentCourseHistory, Action<int, int>? progressCallback = null)
 		{
-			int totalRecords = courseInfo.Count;
+			int totalRecords = studentCourseHistory.Count;
 			int recordsProcessed = 0;
 
-			foreach (var record in courseInfo)
+			foreach (var record in studentCourseHistory)
 			{
-				_transferContext.CourseInfo.Add(record);
+				_transferContext.StudentCourseHistory.Add(record);
 
 				recordsProcessed++;
 				progressCallback?.Invoke(totalRecords, recordsProcessed);
@@ -160,7 +160,7 @@ namespace ETL.Services
 				.ToList();
 		}
 
-		public List<CourseInfo> GetUniqueCourseInfo(List<StudentInfo> studentInfo)
+		public List<StudentCourseHistory> GetUniqueStudentCourseHistory(List<StudentInfo> studentInfo)
 		{
 			return studentInfo
 				.GroupBy(si => new 
@@ -211,7 +211,7 @@ namespace ETL.Services
 					si.C39,
 					si.C40
 				})
-				.Select(group => new CourseInfo 
+				.Select(group => new StudentCourseHistory 
 				{
 					StudentID = group.Key.StudentID,
 					DateRegistered = group.Key.DateRegistered,
