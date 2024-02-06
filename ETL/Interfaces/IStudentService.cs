@@ -1,14 +1,9 @@
 ﻿using ETL.Extract.Models;
 using ETL.Transfer.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ETL.Services
+namespace ETL.Interfaces
 {
-	internal interface IStudentService 
+	internal interface IStudentService
 	{
 		/// <summary>
 		/// Gets a list of all students in the Students table in the Transfer database.
@@ -24,7 +19,7 @@ namespace ETL.Services
 		/// Creates a list of unique First and Last Names from <see cref="TblSchoolEnroll"/>
 		/// </summary>
 		/// <returns><see cref="List{T}"/> of <see cref="Student"/></returns>
-		List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
+		List<Student> GetUniqueFirstAndLastName(List<TblSchoolEnroll> tblSchoolEnrolls);
 
 		/// <summary>
 		/// Creates a list of unique contact information per <see cref="Student"/>.

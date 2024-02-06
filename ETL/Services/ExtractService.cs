@@ -1,9 +1,10 @@
 ﻿using ETL.Extract.DataAccess;
 using ETL.Extract.Models;
+using ETL.Interfaces;
 
 namespace ETL.Services
 {
-	internal class ExtractService : IExtractServices
+    internal class ExtractService : IExtractService
 	{
 		private readonly ISTCContext _istcContext;
 

@@ -1,12 +1,11 @@
 ﻿using ETL.Extract.Models;
+using ETL.Interfaces;
 using ETL.Transfer.DataAccess;
 using ETL.Transfer.Models;
-using ETL.Utilities;
-using Microsoft.EntityFrameworkCore;
 
 namespace ETL.Services
 {
-	internal class StudentService : IStudentService
+    internal class StudentService : IStudentService
 	{
 		private readonly TransferContext _transferContext;
 
@@ -25,7 +24,7 @@ namespace ETL.Services
 			return _transferContext.StudentInfo.ToList();
 		}
 
-		public List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
+		public List<Student> GetUniqueFirstAndLastName(List<TblSchoolEnroll> tblSchoolEnrolls)
 		{
 			return tblSchoolEnrolls
 				.GroupBy(enroll => new

@@ -1,6 +1,5 @@
-﻿using ETL.Extract.Models;
+﻿using ETL.Interfaces;
 using ETL.Transfer.DataAccess;
-using ETL.Transfer.Models;
 using ETL.Utilities;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,26 +9,27 @@ namespace ETL.Services
 	{
 		private readonly TransferContext _transferContext;
 
-		public TransferService(TransferContext transferContext) 
+		public TransferService(TransferContext transferContext)
 		{
 			_transferContext = transferContext;
 		}
 
 		public List<T> LowerCaseAndTrimRecords<T>(List<T> records) where T : class
 		{
-			foreach(T record in records)
+			foreach (T record in records)
 			{
-				foreach(var property in typeof(T).GetProperties())
+				foreach (var property in typeof(T).GetProperties())
 				{
-					if(property.PropertyType == typeof(string))
+					if (property.PropertyType == typeof(string))
 					{
 						var value = (string?)property.GetValue(record);
-						if(value != null)
+						if (value != null)
 						{
 							property.SetValue(record, value.ToLower().Trim());
-						} else
+						}
+						else
 						{
-							property.SetValue(record, null);	
+							property.SetValue(record, null);
 						}
 					}
 				}

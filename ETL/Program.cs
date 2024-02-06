@@ -1,7 +1,7 @@
 ﻿using ETL.Extract.DataAccess;
+using ETL.Interfaces;
 using ETL.Services;
 using ETL.Transfer.DataAccess;
-using ETL.Transfer.Models;
 using ETL.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +32,7 @@ class Program
 					options.UseSqlServer(context.Configuration.GetConnectionString("TransferDatabase")));
 
 				// Use Direct Injection to register classes. 
-				services.AddTransient<IExtractServices, ExtractService>();
+				services.AddTransient<IExtractService, ExtractService>();
 				services.AddTransient<ITransferService, TransferService>();
 				services.AddTransient<IStudentService, StudentService>();
 			})
@@ -44,7 +44,7 @@ class Program
 			using var scope = host.Services.CreateScope();
 			var serviceProvider = scope.ServiceProvider;
 			var transferContext = serviceProvider.GetRequiredService<TransferContext>();
-			var extractService = serviceProvider.GetRequiredService<IExtractServices>();
+			var extractService = serviceProvider.GetRequiredService<IExtractService>();
 			var transferService = serviceProvider.GetRequiredService<ITransferService>();
 			var studentService = serviceProvider.GetRequiredService<IStudentService>();
 			var processLogger = new ProgressLogger();
@@ -64,10 +64,10 @@ class Program
 
 			// Let the user know the count of records. 
 			Console.WriteLine($"{tblSchoolEnrolls.Count} rows in tblSchoolEnrolls, press enter to lowercase and trim records.");
-			
+
 			// Stop for user input.
 			Console.ReadLine();
- 
+
 			var lowerCasedAndTrimmedEnrolls = transferService.LowerCaseAndTrimRecords(tblSchoolEnrolls);
 			Console.WriteLine($"{lowerCasedAndTrimmedEnrolls.Count} enrolls trimmed and lowercased.");
 
@@ -102,11 +102,11 @@ class Program
 			// it creates a unique instance of that.
 			var studentInfoRecords = studentService.GetAllStudentInfo();
 			var uniqueContactInfo = studentService.GetUniqueContactInfo(studentInfoRecords);
-			
+
 			Console.WriteLine($"Press Enter to write {uniqueContactInfo.Count} records to the ContactInfo Table, this could take a moment...");
 			// Stop for user input
 			Console.ReadLine();
-			
+
 			// Save the records
 			transferService.AddRecordsRange(uniqueContactInfo, processLogger.RecordsProcessed);
 
@@ -117,7 +117,7 @@ class Program
 
 			Console.WriteLine($"Press Enter to write {uniqueCourses.Count} records to the CourseHistory Table, this could take a moment...");
 			// Stop for user input 
-			Console.ReadLine();	
+			Console.ReadLine();
 
 			// Save the records
 			transferService.AddRecordsRange(uniqueCourses, processLogger.RecordsProcessed);
@@ -136,7 +136,7 @@ class Program
 
 			// Stop for user input
 			Console.ReadLine();
-			
+
 			var tblSchoolCoursesLowerCasedAndTrimmed = transferService.LowerCaseAndTrimRecords(tblSchoolCourse);
 			Console.WriteLine($"{tblSchoolCoursesLowerCasedAndTrimmed.Count} records trimmed and lowercased!");
 
