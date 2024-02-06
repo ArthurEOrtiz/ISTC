@@ -12,6 +12,11 @@ namespace ETL.Services
 			_istcContext = istcContext;
 		}
 
+		public List<TblSchoolCourse> GetTblSchoolCourse()
+		{
+			return _istcContext.TblSchoolCourses.ToList();
+		}
+
 		public List<TblSchoolEnroll> GetTblSchoolEnrolls()
 		{
 			return _istcContext.TblSchoolEnrolls.ToList();

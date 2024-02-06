@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ETL.Migrations
 {
     [DbContext(typeof(TransferContext))]
-    [Migration("20240205200653_AddCourseInfoTable")]
-    partial class AddCourseInfoTable
+    [Migration("20240206004725_AddCourseHistoryTable")]
+    partial class AddCourseHistoryTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -87,14 +87,14 @@ namespace ETL.Migrations
                     b.ToTable("ContactInfo");
                 });
 
-            modelBuilder.Entity("ETL.Transfer.Models.CourseInfo", b =>
+            modelBuilder.Entity("ETL.Transfer.Models.CourseHistory", b =>
                 {
-                    b.Property<int>("CourseInfoID")
+                    b.Property<int>("CourseHistoryID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("course_info_ID");
+                        .HasColumnName("course_history_ID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseInfoID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseHistoryID"), 1L, 1);
 
                     b.Property<bool?>("C01")
                         .HasColumnType("bit");
@@ -233,11 +233,11 @@ namespace ETL.Migrations
                         .HasColumnType("int")
                         .HasColumnName("student_ID");
 
-                    b.HasKey("CourseInfoID");
+                    b.HasKey("CourseHistoryID");
 
                     b.HasIndex("StudentID");
 
-                    b.ToTable("CourseInfo");
+                    b.ToTable("CourseHistory");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.Student", b =>
@@ -469,10 +469,10 @@ namespace ETL.Migrations
                     b.Navigation("student");
                 });
 
-            modelBuilder.Entity("ETL.Transfer.Models.CourseInfo", b =>
+            modelBuilder.Entity("ETL.Transfer.Models.CourseHistory", b =>
                 {
                     b.HasOne("ETL.Transfer.Models.Student", "student")
-                        .WithMany("CoursesInfo")
+                        .WithMany("CourseHistory")
                         .HasForeignKey("StudentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -495,7 +495,7 @@ namespace ETL.Migrations
                 {
                     b.Navigation("ContactInfo");
 
-                    b.Navigation("CoursesInfo");
+                    b.Navigation("CourseHistory");
 
                     b.Navigation("StudentInfo");
                 });

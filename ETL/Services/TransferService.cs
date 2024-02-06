@@ -46,7 +46,7 @@ namespace ETL.Services
 
 		public void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback = null)
 		{
-			int totalRecords = studentInfo.Count();
+			int totalRecords = studentInfo.Count;
 			int recordsProcessed = 0;
 
 			foreach (var record in studentInfo)
@@ -76,14 +76,14 @@ namespace ETL.Services
 			SaveChangesAsync();
 		}
 
-		public void AddCourseInfoRange(List<CourseInfo> courseInfo, Action<int, int>? progressCallback = null)
+		public void AddCourseHistoryRange(List<CourseHistory> courseHistory, Action<int, int>? progressCallback = null)
 		{
-			int totalRecords = courseInfo.Count;
+			int totalRecords = courseHistory.Count();
 			int recordsProcessed = 0;
 
-			foreach (var record in courseInfo)
+			foreach (var record in courseHistory)
 			{
-				_transferContext.CourseInfo.Add(record);
+				_transferContext.CourseHistory.Add(record);
 
 				recordsProcessed++;
 				progressCallback?.Invoke(totalRecords, recordsProcessed);
@@ -92,7 +92,7 @@ namespace ETL.Services
 			SaveChangesAsync();
 		}
 
-		public IEnumerable<Student> GetAllStudents()
+		public List<Student> GetAllStudents()
 		{
 			return _transferContext.Students.ToList();
 		}
@@ -160,7 +160,7 @@ namespace ETL.Services
 				.ToList();
 		}
 
-		public List<CourseInfo> GetUniqueCourseInfo(List<StudentInfo> studentInfo)
+		public List<CourseHistory> GetUniqueCourseHistory(List<StudentInfo> studentInfo)
 		{
 			return studentInfo
 				.GroupBy(si => new 
@@ -211,7 +211,7 @@ namespace ETL.Services
 					si.C39,
 					si.C40
 				})
-				.Select(group => new CourseInfo 
+				.Select(group => new CourseHistory 
 				{
 					StudentID = group.Key.StudentID,
 					DateRegistered = group.Key.DateRegistered,
@@ -262,7 +262,7 @@ namespace ETL.Services
 				.ToList();
 		}
 
-		public List<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
+		public List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls)
 		{
 			var students = GetAllStudents();
 
@@ -367,6 +367,27 @@ namespace ETL.Services
 			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('StudentInfo', RESEED, 0);");
 		}
 
+		public void DeleteAllContactInfo()
+		{
+			var allContactInfo = _transferContext.ContactInfo;
+
+			_transferContext.ContactInfo.RemoveRange(allContactInfo);
+			SaveChangesAsync();
+
+			// Reset the Id count back down to zero 
+			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('ContactInfo', RESEED, 0);");
+		}
+
+		public void DeleteAllCourseHistory()
+		{
+			var allCourseHistory = _transferContext.CourseHistory;
+			_transferContext.CourseHistory.RemoveRange(allCourseHistory);
+			SaveChangesAsync();
+
+			// Reset the Id count back down to zero 
+			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('CourseHistory', RESEED, 0);");
+		}
+
 		private void SaveChangesAsync()
 		{
 			_transferContext.SaveChangesAsync();
@@ -374,7 +395,5 @@ namespace ETL.Services
 			ProgressLogger progressLogger = new();
 			progressLogger.DisplaySavingProgress(_transferContext);
 		}
-
-
 	}
 }

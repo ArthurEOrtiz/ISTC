@@ -37,17 +37,17 @@ namespace ETL.Services
 		/// <summary>
 		/// Add a list of course information into the CourseInfo table in the Transfer database
 		/// </summary>
-		/// <param name="courseInfo">A <see cref="List{T}"/> of <see cref="CourseInfo"/></param>
+		/// <param name="studentCourseHistory">A <see cref="List{T}"/> of <see cref="CourseHistory"/></param>
 		/// <param name="progressCallback">An optional callback function that is invoked to 
 		/// report the addition process. The callback takes two parameters: the number of 
 		/// records to processed, and the total number of records as <see cref="int"/> and is use with 
 		/// <see cref="Utilities.ProgressLogger.RecordsProcessed(int, int)"/></param>
-		void AddCourseInfoRange(List<CourseInfo> courseInfo, Action<int, int>? progressCallback = null);
+		void AddCourseHistoryRange(List<CourseHistory> courseHistory, Action<int, int>? progressCallback = null);
 
 		/// <summary>
 		/// Gets a list of all students in the Students table in the Transfer database.
 		/// </summary>
-		IEnumerable<Student> GetAllStudents();
+		List<Student> GetAllStudents();
 
 		/// <summary>
 		/// Gets a list of all student information in StudentInfo table of the Transfer database.
@@ -68,19 +68,19 @@ namespace ETL.Services
 		List<ContactInfo> GetUniqueContactInfo(List<StudentInfo> studentInfo);
 
 		/// <summary>
-		/// Creates a list of unique course information per <see cref="Student"/>.
+		/// Creates a list of unique student history per <see cref="Student"/>.
 		/// </summary>
 		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="StudentInfo"/></param>
-		/// <returns><see cref="List{T}"/> of <see cref="CourseInfo"/></returns>
-		List<CourseInfo> GetUniqueCourseInfo(List<StudentInfo> studentInfo);
+		/// <returns><see cref="List{T}"/> of <see cref="CourseHistory"/></returns>
+		List<CourseHistory> GetUniqueCourseHistory(List<StudentInfo> studentInfo);
 
 		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms
 		/// it into a a collection of <see cref="StudentInfo"/>. 
 		/// </summary>
-		/// <param name="tblSchoolEnrolls"><see cref="IEnumerable{T}{T}"/> of <see cref="TblSchoolEnroll"/></param>
+		/// <param name="tblSchoolEnrolls"><see cref="List{T}"/> of <see cref="TblSchoolEnroll"/></param>
 		/// <returns><see cref="List{T}}"/> of <see cref="StudentInfo"/></returns>
-		List<StudentInfo> StudentToStudentInfo(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls);
+		List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls);
 
 		/// <summary>
 		/// Deletes all records in the Students table from the Transfer database, and
@@ -93,6 +93,18 @@ namespace ETL.Services
 		/// Id count to zero. 
 		/// </summary>
 		void DeleteAllStudentInfo();
+		
+		/// <summary>
+		/// Deletes all records in the ContactInfo table from the Transfer database and resets the 
+		/// Id count to zero
+		/// </summary>
+		void DeleteAllContactInfo();
+
+		/// <summary>
+		/// Deletes all records in the CourseHistory table from the Transfer database and resets
+		/// the Id count to zero
+		/// </summary>
+		void DeleteAllCourseHistory();
 
 	}
 }

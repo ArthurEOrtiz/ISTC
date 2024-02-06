@@ -47,8 +47,11 @@ class Program
 
 			//Step 0: Start with a clean slate when needed. 
 			// I'm gonna un-comment and comment this out as I'm developing. 
+			Console.WriteLine("Deleting all records in the Transfer database.");
 			transferService.DeleteAllStudents();
 			transferService.DeleteAllStudentInfo();
+			transferService.DeleteAllContactInfo();
+			transferService.DeleteAllCourseHistory();
 
 			// Step 1: Get all records from tblSchoolInfo and lower case and trim the records.
 			// tblSchoolInfo *should* have all records of every person enrollment history.
@@ -103,29 +106,29 @@ class Program
 			// Save the records
 			transferService.AddContactInfoRange(uniqueContactInfo);
 
-			// Step 5: Now let find all the unique course information for each user
+			// Step 5: Now let find all the unique course history for each user
 			// the way this is tracked, *I think*,  is with DateRegister, DateSchool, SchoolType,
 			// Seq, C01-C40 Columns. 
-			var uniqueCourseInfo = transferService.GetUniqueCourseInfo(studentInfoRecords);
+			var uniqueCourses = transferService.GetUniqueCourseHistory(studentInfoRecords);
 
-			Console.WriteLine($"Press Enter to write {uniqueCourseInfo.Count} records to the CourseInfo Table, this could take a moment...");
+			Console.WriteLine($"Press Enter to write {uniqueCourses.Count} records to the CourseHistory Table, this could take a moment...");
 			// Stop for user input 
 			Console.ReadLine();	
 
 			// Save the records
-			transferService.AddCourseInfoRange(uniqueCourseInfo);
+			transferService.AddCourseHistoryRange(uniqueCourses);
 
-			// Step 6: Now I need to find a way to link the CourseInfo table with 
+			// Step 6: Now I need to find a way to link the course history table with 
 			// the list of course data from the ISTC data base. 
 
 			// The way that the data is slapped together I might have to break
 			// up the logic for school type. A school type can be R for regional
 			// S for summer, W for winter, and there is 4 rows of 1. I don't know what 1
-			// is all about. 
+			// is all about, so we'll treat that as an anomaly.
 
 			// First lets get tblSchoolEnroll data in here and lower case and trim it. 
-			var tblSchoolCourse = extractService.GetTblSchoolCourse();
-			var tblSchoolCoursesLowerCasedAndTrimmed = transferService.LowerCaseAndTrimRecords(tblSchoolCourse);
+			//var tblSchoolCourse = extractService.GetTblSchoolCourse();
+			//var tblSchoolCoursesLowerCasedAndTrimmed = transferService.LowerCaseAndTrimRecords(tblSchoolCourse);
 
 			// Now I'm just gonna worry about school type 'r'
 
