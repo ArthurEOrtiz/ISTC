@@ -330,7 +330,7 @@ namespace ETL.Services
 				StudentID = courseHistory.StudentID,
 				DateRegistered = courseHistory.DateRegistered,
 				DateSchool = courseHistory.DateSchool,
-				SchoolType = courseHistory.SchoolType,
+				//SchoolType = courseHistory.SchoolType,
 				Seq = courseHistory.Seq,
 				CSeq = cSeq,
 				student = courseHistory.student

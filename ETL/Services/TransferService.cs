@@ -1,5 +1,6 @@
 ﻿using ETL.Interfaces;
 using ETL.Transfer.DataAccess;
+using ETL.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ETL.Services
@@ -51,7 +52,8 @@ namespace ETL.Services
 				progressCallback?.Invoke(totalRecords, recordsProcessed);
 			}
 
-			AttemptToSave();
+			//AttemptToSave();
+			AttemptToSaveAsync();
 		}
 
 		public void DeleteAllRecords<T>(DbSet<T> dbSet) where T : class
@@ -59,7 +61,8 @@ namespace ETL.Services
 			var allRecords = dbSet.ToList();
 			_transferContext.RemoveRange(allRecords);
 
-			AttemptToSave();
+			//AttemptToSave();
+			AttemptToSaveAsync();
 
 			//Reset the ID count back to zero
 			var tableName = _transferContext.Model.FindEntityType(typeof(T)).GetTableName();
@@ -68,7 +71,28 @@ namespace ETL.Services
 
 		private async Task SaveChangesAsync()
 		{
-			await _transferContext.SaveChangesAsync();
+			CancellationTokenSource cancellationTokenSource = new ();
+			CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+			// Start the task to display progress
+			Task displayProgressTask = new ProgressLogger().DisplayProgressAsync(_transferContext, cancellationToken);
+			try
+			{
+				// Save changes asynchronously
+				await _transferContext.SaveChangesAsync(cancellationToken);
+				// Once saving is complete cancel the progress task 
+				cancellationTokenSource.Cancel();
+				await displayProgressTask;
+			}
+			catch(OperationCanceledException)
+			{
+				Console.WriteLine("\rSaving progress canceled.");
+			}
+			finally
+			{
+				cancellationTokenSource.Dispose();
+			}
+			
 		}
 
 		private void SaveChanges()
