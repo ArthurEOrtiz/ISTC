@@ -1,6 +1,5 @@
 ﻿using ETL.Interfaces;
 using ETL.Transfer.DataAccess;
-using ETL.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ETL.Services
@@ -40,6 +39,7 @@ namespace ETL.Services
 
 		public void AddRecordsRange<T>(List<T> records, Action<int, int>? progressCallback = null) where T : class
 		{
+
 			int totalRecords = records.Count;
 			int recordsProcessed = 0;
 
@@ -51,27 +51,69 @@ namespace ETL.Services
 				progressCallback?.Invoke(totalRecords, recordsProcessed);
 			}
 
-			SaveChangesAsync();
+			AttemptToSave();
 		}
 
 		public void DeleteAllRecords<T>(DbSet<T> dbSet) where T : class
 		{
 			var allRecords = dbSet.ToList();
 			_transferContext.RemoveRange(allRecords);
-			SaveChangesAsync();
+
+			AttemptToSave();
 
 			//Reset the ID count back to zero
 			var tableName = _transferContext.Model.FindEntityType(typeof(T)).GetTableName();
 			_transferContext.Database.ExecuteSqlRaw($"DBCC CHECKIDENT('{tableName}', RESEED, 0);");
 		}
 
-		private void SaveChangesAsync()
+		private async Task SaveChangesAsync()
 		{
-			_transferContext.SaveChangesAsync();
-
-			ProgressLogger progressLogger = new();
-			progressLogger.DisplaySavingProgress(_transferContext);
+			await _transferContext.SaveChangesAsync();
 		}
 
+		private void SaveChanges()
+		{
+			_transferContext.ChangeTracker.DetectChanges();
+			Console.WriteLine(_transferContext.ChangeTracker.DebugView.ShortView);
+			_transferContext.SaveChanges();
+		}
+
+		public void AttemptToSaveAsync()
+		{
+			try
+			{
+				SaveChangesAsync().Wait();
+			}
+			catch (AggregateException ex)
+			{
+				InnerAndOuterExceptionMessage(ex);
+
+				foreach (var item in ex.InnerExceptions)
+				{
+					InnerAndOuterExceptionMessage(item);
+				}
+			}
+		}
+
+		public void AttemptToSave()
+		{
+			try
+			{
+				SaveChanges();
+			}
+			catch (Exception ex)
+			{
+				InnerAndOuterExceptionMessage(ex);
+			}
+		}
+
+		private static void InnerAndOuterExceptionMessage(Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+			if (ex.InnerException != null)
+			{
+				Console.WriteLine(ex.InnerException.Message);
+			}
+		}
 	}
 }

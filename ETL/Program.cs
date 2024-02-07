@@ -51,112 +51,111 @@ class Program
 			var courseService = serviceProvider.GetRequiredService<ICourseService>();
 			var processLogger = new ProgressLogger();
 
-			////Step 0: Start with a clean slate when needed. 
-			//// I'm gonna un-comment and comment this out as I'm developing. 
-			////Console.WriteLine("Deleting all records in the Transfer database.");
-			//transferService.DeleteAllRecords(transferContext.Students);
-			//transferService.DeleteAllRecords(transferContext.StudentInfo);
-			//transferService.DeleteAllRecords(transferContext.ContactInfo);
-			//transferService.DeleteAllRecords(transferContext.CourseHistory);
+			//Step 0: Start with a clean slate when needed. 
+			// I'm gonna un-comment and comment this out as I'm developing. 
+			Console.WriteLine("Deleting all records in the Transfer database.");
+			transferService.DeleteAllRecords(transferContext.Students);
+			transferService.DeleteAllRecords(transferContext.StudentInfo);
+			transferService.DeleteAllRecords(transferContext.ContactInfo);
+			transferService.DeleteAllRecords(transferContext.CourseHistory);
 			transferService.DeleteAllRecords(transferContext.StudentHistory);
 
-			//// Step 1: Get all records from tblSchoolInfo and lower case and trim the records.
-			//// tblSchoolInfo *should* have all records of every person enrollment history.
-			//// The row count of my current tblSchoolEnroll is 11290
-			//var tblSchoolEnrolls = extractService.GetTblSchoolEnrolls();
+			// Step 1: Get all records from tblSchoolInfo and lower case and trim the records.
+			// tblSchoolInfo *should* have all records of every person enrollment history.
+			// The row count of my current tblSchoolEnroll is 11290
+			var tblSchoolEnrolls = extractService.GetTblSchoolEnrolls();
 
-			//// Let the user know the count of records. 
-			//Console.WriteLine($"{tblSchoolEnrolls.Count} rows in tblSchoolEnrolls, press enter to lowercase and trim records.");
+			// Let the user know the count of records. 
+			Console.WriteLine($"{tblSchoolEnrolls.Count} rows in tblSchoolEnrolls, press enter to lowercase and trim records.");
 
-			//// Stop for user input.
-			//Console.ReadLine();
+			// Stop for user input.
+			Console.ReadLine();
 
-			//var lowerCasedAndTrimmedEnrolls = transferService.LowerCaseAndTrimRecords(tblSchoolEnrolls);
-			//Console.WriteLine($"{lowerCasedAndTrimmedEnrolls.Count} enrolls trimmed and lowercased.");
+			var lowerCasedAndTrimmedEnrolls = transferService.LowerCaseAndTrimRecords(tblSchoolEnrolls);
+			Console.WriteLine($"{lowerCasedAndTrimmedEnrolls.Count} enrolls trimmed and lowercased.");
 
-			//// Step 2: Get all the unique first and last names of tblSchoolEnroll and save them
-			//// to the Student table. 
-			//// This should be 3286 records. 
-			//var uniqueStudents = studentService.GetUniqueFirstAndLastName(lowerCasedAndTrimmedEnrolls);
-			//Console.WriteLine($"Press enter to write {uniqueStudents.Count} unique first and last name combinations to the Students table...");
+			// Step 2: Get all the unique first and last names of tblSchoolEnroll and save them
+			// to the Student table. 
+			// This should be 3286 records. 
+			var uniqueStudents = studentService.GetUniqueFirstAndLastName(lowerCasedAndTrimmedEnrolls);
+			Console.WriteLine($"Press enter to write {uniqueStudents.Count} unique first and last name combinations to the Students table...");
 
-			//// Stop for user input.
-			//Console.ReadLine();
+			// Stop for user input.
+			Console.ReadLine();
 
-			//// Save the records.
-			//transferService.AddRecordsRange(uniqueStudents, processLogger.RecordsProcessed);
+			// Save the records.
+			transferService.AddRecordsRange(uniqueStudents, processLogger.RecordsProcessed);
 
-			//// Step 3: Take the records from tblSchoolEnroll and create a new table in the transfer database, 
-			//// called SchoolInfo, that has all the rows from tblSchoolEnroll but with the first and last names
-			//// replaced with a foreign key to the Student table. 
-			//var studentEnrollToStudentInfo = studentService.StudentToStudentInfo(lowerCasedAndTrimmedEnrolls);
-			//Console.WriteLine($"Press enter to write {studentEnrollToStudentInfo.Count} records to the StudentInfo Table, this could take a moment...");
+			// Step 3: Take the records from tblSchoolEnroll and create a new table in the transfer database, 
+			// called SchoolInfo, that has all the rows from tblSchoolEnroll but with the first and last names
+			// replaced with a foreign key to the Student table. 
+			var studentEnrollToStudentInfo = studentService.StudentToStudentInfo(lowerCasedAndTrimmedEnrolls);
+			Console.WriteLine($"Press enter to write {studentEnrollToStudentInfo.Count} records to the StudentInfo Table, this could take a moment...");
 
-			//// Stop for user input 
-			//Console.ReadLine();
+			// Stop for user input 
+			Console.ReadLine();
 
-			//// This process does take a moment so I set up a progress logger so the
-			//// end user doesn't think something went wrong. 
-			//transferService.AddRecordsRange(studentEnrollToStudentInfo, processLogger.RecordsProcessed);
+			// This process does take a moment so I set up a progress logger so the
+			// end user doesn't think something went wrong. 
+			transferService.AddRecordsRange(studentEnrollToStudentInfo, processLogger.RecordsProcessed);
 
-			//// Step 4: Now lets find all the unique Contact information for each user. 
-			//// User will have many contact info rows, 
-			//// if a user got married or god forbid changed their email, or typed it different
-			//// it creates a unique instance of that.
-			//var studentInfoRecords = studentService.GetAllStudentInfo();
-			//var uniqueContactInfo = studentService.GetUniqueContactInfo(studentInfoRecords);
+			// Step 4: Now lets find all the unique Contact information for each user. 
+			// User will have many contact info rows, 
+			// if a user got married or god forbid changed their email, or typed it different
+			// it creates a unique instance of that.
+			var studentInfoRecords = studentService.GetAllStudentInfo();
+			var uniqueContactInfo = studentService.GetUniqueContactInfo(studentInfoRecords);
 
-			//Console.WriteLine($"Press enter to write {uniqueContactInfo.Count} records to the ContactInfo Table, this could take a moment...");
-			//// Stop for user input
-			//Console.ReadLine();
+			Console.WriteLine($"Press enter to write {uniqueContactInfo.Count} records to the ContactInfo Table, this could take a moment...");
 
-			//// Save the records
-			//transferService.AddRecordsRange(uniqueContactInfo, processLogger.RecordsProcessed);
+			// Stop for user input
+			Console.ReadLine();
 
-			//// Step 5: Now let find all the unique course history for each user
-			//// the way this is tracked, *I think*,  is with DateRegister, DateSchool, SchoolType,
-			//// Seq, C01-C40 Columns. 
-			//var uniqueCourses = studentService.GetUniqueCourseHistory(studentInfoRecords);
+			// Save the records
+			transferService.AddRecordsRange(uniqueContactInfo, processLogger.RecordsProcessed);
 
-			//Console.WriteLine($"Press enter to write {uniqueCourses.Count} records to the CourseHistory Table, this could take a moment...");
-			//// Stop for user input 
-			//Console.ReadLine();
+			// Step 5: Now let find all the unique course history for each user
+			// the way this is tracked, *I think*,  is with DateRegister, DateSchool, SchoolType,
+			// Seq, C01-C40 Columns. 
+			var courseHistory = studentService.GetUniqueCourseHistory(studentInfoRecords);
 
-			//// Save the records
-			//transferService.AddRecordsRange(uniqueCourses, processLogger.RecordsProcessed);
+			Console.WriteLine($"Press enter to write {courseHistory.Count} records to the CourseHistory Table, this could take a moment...");
 
-			//// Step 6: Now I need to find a way to link the course history table with 
-			//// the list of course data (tblSchoolCourses) from the ISTC data base. 
+			// Stop for user input 
+			Console.ReadLine();
 
-			//// The way that the data is slapped together I might have to break
-			//// up the logic for school types, to make it more manageable. A school
-			//// type can be R for regional S for summer, W for winter, and there is 4
-			//// rows of 1. I don't know what 1 is all about, so we'll treat that as an anomaly.
+			// Save the records
+			transferService.AddRecordsRange(courseHistory, processLogger.RecordsProcessed);
 
-			//// First lets get tblSchoolEnroll data in here and lowercase and trim it. 
-			//var tblSchoolCourses = extractService.GetTblSchoolCourse();
-			//Console.WriteLine($"{tblSchoolCourses.Count} rows in tblSchoolCourses, press enter to lowercase and trim records.");
+			// Step 6: Now I need to find a way to link the course history table with 
+			// the list of course data (tblSchoolCourses) from the ISTC data base. 
 
-			//// Stop for user input
-			//Console.ReadLine();
+			// The way that the data is slapped together I might have to break
+			// up the logic for school types, to make it more manageable. A school
+			// type can be R for regional S for summer, W for winter, and there is 4
+			// rows of 1. I don't know what 1 is all about, so we'll treat that as an anomaly.
 
-			//var tblSchoolCoursesLowerCasedAndTrimmed = transferService.LowerCaseAndTrimRecords(tblSchoolCourses);
-			//Console.WriteLine($"{tblSchoolCoursesLowerCasedAndTrimmed.Count} records trimmed and lowercased!");
+			// First lets get tblSchoolEnroll data in here and lowercase and trim it. 
+			var tblSchoolCourses = extractService.GetTblSchoolCourse();
+			Console.WriteLine($"{tblSchoolCourses.Count} rows in tblSchoolCourses, press enter to lowercase and trim records.");
 
-			//// Second, add that to a table in the Transfer database for further processing. 
-			//Console.WriteLine($"Press enter to write {tblSchoolCoursesLowerCasedAndTrimmed.Count} records to the CourseInfo Table, this could take a moment...");
+			// Stop for user input
+			Console.ReadLine();
 
-			//// Stop for user input 
-			//Console.ReadLine();
+			var tblSchoolCoursesLowerCasedAndTrimmed = transferService.LowerCaseAndTrimRecords(tblSchoolCourses);
+			Console.WriteLine($"{tblSchoolCoursesLowerCasedAndTrimmed.Count} records trimmed and lowercased!");
 
-			//// Let convert that object so AddRecordsRange knows where to put that information.
-			//var CourseInfo = courseService.tblSchoolCourseToCourseInfo(tblSchoolCoursesLowerCasedAndTrimmed);
+			// Second, add that to a table in the Transfer database for further processing. 
+			Console.WriteLine($"Press enter to write {tblSchoolCoursesLowerCasedAndTrimmed.Count} records to the CourseInfo Table, this could take a moment...");
 
-			//// Save it 
-			//transferService.AddRecordsRange(CourseInfo, processLogger.RecordsProcessed);
+			// Stop for user input 
+			Console.ReadLine();
 
-			// For now, I'm just trying to focus on regional school type.
-			// Filtering tblSchoolCourses for just cSchoolType = 'r'
+			// Let convert that object so AddRecordsRange knows where to put that information.
+			var CourseInfo = courseService.tblSchoolCourseToCourseInfo(tblSchoolCoursesLowerCasedAndTrimmed);
+
+			// Save it 
+			transferService.AddRecordsRange(CourseInfo, processLogger.RecordsProcessed);
 
 			// I have observed that cDateSchool, cSchoolType, cSseq, and cSeq, are used to identify the course. 
 			// So far as I can tell it corresponds with tblSchoolEnrolls DateSchool, SchoolType, Seq, and 
@@ -164,18 +163,13 @@ class Program
 			// I've noted that this relationship might not always be true for other school types, probably due
 			// the lack of any meaningful data validation. Let see if I can make a way to to build a query to
 			// change c01-40 into a cSeq number. 
-			// To accomplish this we have to go back up to the methods that created CourseInfo. 
-			Console.WriteLine("****NEW LOGIC****");
 
-			var courseHistory = studentService.GetAllCourseHistory();
+			// courseHistory in initialized at line 120.
 			var studentHistory = studentService.CourseHistoryToStudentHistory(courseHistory);
 
-			// Currently this throws exception 
-			// `'Microsoft.Data.SqlClient.SqlException' in Microsoft.Data.SqlClient.dll`
-			// `'Microsoft.EntityFrameworkCore.DbUpdateException' in Microsoft.EntityFrameworkCore.Relational.dll`
+			
 			transferService.AddRecordsRange(studentHistory, processLogger.RecordsProcessed);
 
-			Console.WriteLine("This concludes or test!");
 
 		}
 		else

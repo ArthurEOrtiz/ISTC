@@ -4,6 +4,8 @@ namespace ETL.Utilities
 {
 	internal class ProgressLogger
 	{
+		private const int MaxDots = 3;
+
 		public void RecordsProcessed(int recordsProcessed, int totalRecords)
 		{
 			Console.Write($"\r{recordsProcessed} of {totalRecords} processed!");
@@ -11,24 +13,26 @@ namespace ETL.Utilities
 
 		public void DisplaySavingProgress(DbContext dbContext)
 		{
-			const int maxDots = 3;
-			int dotCount = 0;
 
 			Console.WriteLine(); // Go to to a new line. 
+			int dotCount = 0;
 
 			while (dbContext.ChangeTracker.HasChanges())
 			{
 				Thread.Sleep(250);
 
 				string dots = new string('.', dotCount + 1);
-				int spaceCount = maxDots - dotCount;
+				int spaceCount = MaxDots - dotCount;
 				string spaces = new string(' ', spaceCount);
 				Console.Write($"\rSaving to {dbContext.GetType().Name}{dots}{spaces}");
-				dotCount = (dotCount + 1) % maxDots;
+				dotCount = (dotCount + 1) % MaxDots;
 
 			}
+		}
 
-			string rightMargin = new string(' ', maxDots + 1);
+		public void DisplaySaveComplete(DbContext dbContext)
+		{
+			string rightMargin = new string(' ', MaxDots + 1);
 			Console.Write($"\rSaved to {dbContext.GetType().Name}!{rightMargin}\n");
 		}
 	}
