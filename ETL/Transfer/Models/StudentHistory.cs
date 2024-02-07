@@ -18,9 +18,9 @@ namespace ETL.Transfer.Models
 		public DateTime DateSchool {  get; set; }
 		public string SchoolType { get; set; } = null!;
 		public int Seq {  get; set; }
-		public int CSeq { get; set; }	
+		public int? CSeq { get; set; }	
 
 		// Navigation property to student. 
-		public Student student = null!;
+		public Student student { get; set; } = null!;
 	}
 }

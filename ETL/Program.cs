@@ -51,9 +51,9 @@ class Program
 			var courseService = serviceProvider.GetRequiredService<ICourseService>();
 			var processLogger = new ProgressLogger();
 
-			//Step 0: Start with a clean slate when needed. 
-			// I'm gonna un-comment and comment this out as I'm developing. 
-			//Console.WriteLine("Deleting all records in the Transfer database.");
+			////Step 0: Start with a clean slate when needed. 
+			//// I'm gonna un-comment and comment this out as I'm developing. 
+			////Console.WriteLine("Deleting all records in the Transfer database.");
 			//transferService.DeleteAllRecords(transferContext.Students);
 			//transferService.DeleteAllRecords(transferContext.StudentInfo);
 			//transferService.DeleteAllRecords(transferContext.ContactInfo);
@@ -169,16 +169,14 @@ class Program
 
 			var courseHistory = studentService.GetAllCourseHistory();
 			var studentHistory = studentService.CourseHistoryToStudentHistory(courseHistory);
-			transferService.AddRecordsRange(studentHistory);
 
-			// Currently this skips rows that don't have any true values in the C01-C40 Columns. 
+			// Currently this throws exception 
+			// `'Microsoft.Data.SqlClient.SqlException' in Microsoft.Data.SqlClient.dll`
+			// `'Microsoft.EntityFrameworkCore.DbUpdateException' in Microsoft.EntityFrameworkCore.Relational.dll`
+			transferService.AddRecordsRange(studentHistory, processLogger.RecordsProcessed);
 
 			Console.WriteLine("This concludes or test!");
 
-	
-
-
-			
 		}
 		else
 		{

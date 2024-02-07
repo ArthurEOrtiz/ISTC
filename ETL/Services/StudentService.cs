@@ -278,15 +278,30 @@ namespace ETL.Services
 			return linkedStudents;
 		}
 
-		public List<StudentHistory> CourseHistoryConverter(CourseHistory courseHistory)
+		public List<StudentHistory> CourseHistoryToStudentHistory(List<CourseHistory> courseHistory)
+		{
+			var StudentHistoryList = new List<StudentHistory>();
+			foreach (var record in courseHistory)
+			{
+				var outputRecords = CourseHistoryConverter(record);
+				StudentHistoryList.AddRange(outputRecords);
+			}
+			return StudentHistoryList;
+		}
+
+		private List<StudentHistory> CourseHistoryConverter(CourseHistory courseHistory)
 		{
 			List<StudentHistory> studentHistoryList = new List<StudentHistory>();
+			// Initialize cSeq to null in case column C01 - C40, have no true value.
+			int? cSeq = null; 
 
 			for (int i = 0; i <=40; i++)
 			{
 				var cSeqProperty = typeof(CourseHistory).GetProperty($"C{i:D2}");
 				if (cSeqProperty != null && cSeqProperty.GetValue(courseHistory) as bool? == true)
 				{
+					// If a true value is found within those columns then assign it. 
+					cSeq = i; 
 					var studentHistory = new StudentHistory
 					{
 						StudentID = courseHistory.StudentID,
@@ -294,26 +309,67 @@ namespace ETL.Services
 						DateSchool = courseHistory.DateSchool,
 						SchoolType = courseHistory.SchoolType,
 						Seq = courseHistory.Seq,
-						CSeq = i,
+						CSeq = cSeq,
 						student = courseHistory.student
 					};
-
 					studentHistoryList.Add(studentHistory);
-
 				}
+			}
+
+			// If cSeq is still null no true values were found in columns C01 - C40.
+			if (cSeq == null)
+			{
+				var studentHistory = new StudentHistory
+				{
+					StudentID = courseHistory.StudentID,
+					DateRegistered = courseHistory.DateRegistered,
+					DateSchool = courseHistory.DateSchool,
+					Seq = courseHistory.Seq,
+					CSeq = null,
+					student = courseHistory.student
+				};
+				studentHistoryList.Add(studentHistory);
 			}
 			return studentHistoryList;
 		}
 
-		public List<StudentHistory> CourseHistoryToStudentHistory(List<CourseHistory> courseHistory)
+		private int? FindCSeq(CourseHistory courseHistory)
 		{
-			var StudentHistoryList = new List<StudentHistory>();
-			foreach (var record  in courseHistory)
+			for(int i =1; i<=40; i++)
 			{
-				var outputRecords = CourseHistoryConverter(record);
-				StudentHistoryList.AddRange(outputRecords);
+				var cSeqProperty = typeof(CourseHistory).GetProperty($"C{i:D2}");
+				if (cSeqProperty != null && cSeqProperty.GetValue(courseHistory) as bool? == true)
+				{
+					return i;
+				}
 			}
-			return StudentHistoryList;
+			return null;
 		}
+
+		private List<StudentHistory> CreateStudentHistoryList(CourseHistory courseHistory, int? cSeq)
+		{
+			var studentHistoryList = new List<StudentHistory>();
+
+			var studentHistory = new StudentHistory
+			{
+				StudentID = courseHistory.StudentID,
+				DateRegistered = courseHistory.DateRegistered,
+				DateSchool = courseHistory.DateSchool,
+				SchoolType = courseHistory.SchoolType,
+				Seq = courseHistory.Seq,
+				CSeq = cSeq,
+				student = courseHistory.student
+			};
+
+			if(cSeq == null)
+			{
+				studentHistory.CSeq = null;
+			}
+
+			studentHistoryList.Add(studentHistory);
+			return studentHistoryList;
+		}
+
+		
 	}
 }
