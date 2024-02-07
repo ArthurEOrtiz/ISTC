@@ -295,9 +295,12 @@ namespace ETL.Services
 			// Initialize cSeq to null in case column C01 - C40, have no true value.
 			int? cSeq = null; 
 
-			for (int i = 0; i <=40; i++)
+			// Iterate by 1, through a count of 1 through 40, for C01 to to C40
+			for (int i = 1; i <=40; i++)
 			{
+				// obtains the Type object representing the CourseHistory class
 				var cSeqProperty = typeof(CourseHistory).GetProperty($"C{i:D2}");
+				// I know that C01-C40 should never be null, but we'll check anyway. 
 				if (cSeqProperty != null && cSeqProperty.GetValue(courseHistory) as bool? == true)
 				{
 					// If a true value is found within those columns then assign it. 
@@ -324,6 +327,7 @@ namespace ETL.Services
 					StudentID = courseHistory.StudentID,
 					DateRegistered = courseHistory.DateRegistered,
 					DateSchool = courseHistory.DateSchool,
+					SchoolType = courseHistory.SchoolType,
 					Seq = courseHistory.Seq,
 					CSeq = null,
 					student = courseHistory.student
