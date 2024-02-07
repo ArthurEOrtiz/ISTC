@@ -24,6 +24,11 @@ namespace ETL.Services
 			return _transferContext.StudentInfo.ToList();
 		}
 
+		public List<CourseHistory> GetAllCourseHistory()
+		{
+			return _transferContext.CourseHistory.ToList();
+		}
+
 		public List<Student> GetUniqueFirstAndLastName(List<TblSchoolEnroll> tblSchoolEnrolls)
 		{
 			return tblSchoolEnrolls
@@ -298,6 +303,17 @@ namespace ETL.Services
 				}
 			}
 			return studentHistoryList;
+		}
+
+		public List<StudentHistory> CourseHistoryToStudentHistory(List<CourseHistory> courseHistory)
+		{
+			var StudentHistoryList = new List<StudentHistory>();
+			foreach (var record  in courseHistory)
+			{
+				var outputRecords = CourseHistoryConverter(record);
+				StudentHistoryList.AddRange(outputRecords);
+			}
+			return StudentHistoryList;
 		}
 	}
 }

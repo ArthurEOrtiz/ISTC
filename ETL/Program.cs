@@ -58,6 +58,7 @@ class Program
 			//transferService.DeleteAllRecords(transferContext.StudentInfo);
 			//transferService.DeleteAllRecords(transferContext.ContactInfo);
 			//transferService.DeleteAllRecords(transferContext.CourseHistory);
+			transferService.DeleteAllRecords(transferContext.StudentHistory);
 
 			//// Step 1: Get all records from tblSchoolInfo and lower case and trim the records.
 			//// tblSchoolInfo *should* have all records of every person enrollment history.
@@ -166,10 +167,15 @@ class Program
 			// To accomplish this we have to go back up to the methods that created CourseInfo. 
 			Console.WriteLine("****NEW LOGIC****");
 
-			var testRecord = studentService.GetCourseHistoryByID(11);
-			var newRecord = studentService.CourseHistoryConverter(testRecord);
+			var courseHistory = studentService.GetAllCourseHistory();
+			var studentHistory = studentService.CourseHistoryToStudentHistory(courseHistory);
+			transferService.AddRecordsRange(studentHistory);
+
+			// Currently this skips rows that don't have any true values in the C01-C40 Columns. 
 
 			Console.WriteLine("This concludes or test!");
+
+	
 
 
 			

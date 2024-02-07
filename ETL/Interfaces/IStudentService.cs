@@ -15,6 +15,8 @@ namespace ETL.Interfaces
 		/// </summary>
 		List<StudentInfo> GetAllStudentInfo();
 
+		List<CourseHistory> GetAllCourseHistory();
+
 		/// <summary>
 		/// Creates a list of unique First and Last Names from <see cref="TblSchoolEnroll"/>
 		/// </summary>
@@ -46,5 +48,7 @@ namespace ETL.Interfaces
 		List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls);
 
 		List<StudentHistory> CourseHistoryConverter(CourseHistory courseHistory);
+
+		List<StudentHistory> CourseHistoryToStudentHistory(List<CourseHistory> courseHistory);
 	}
 }
