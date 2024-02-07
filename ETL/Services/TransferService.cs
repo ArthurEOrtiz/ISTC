@@ -52,7 +52,6 @@ namespace ETL.Services
 				progressCallback?.Invoke(totalRecords, recordsProcessed);
 			}
 
-			//AttemptToSave();
 			AttemptToSaveAsync();
 		}
 
@@ -61,7 +60,6 @@ namespace ETL.Services
 			var allRecords = dbSet.ToList();
 			_transferContext.RemoveRange(allRecords);
 
-			//AttemptToSave();
 			AttemptToSaveAsync();
 
 			//Reset the ID count back to zero
@@ -71,11 +69,13 @@ namespace ETL.Services
 
 		private async Task SaveChangesAsync()
 		{
-			CancellationTokenSource cancellationTokenSource = new ();
+			CancellationTokenSource cancellationTokenSource = new();
 			CancellationToken cancellationToken = cancellationTokenSource.Token;
+			ProgressLogger progressLogger = new();
 
 			// Start the task to display progress
-			Task displayProgressTask = new ProgressLogger().DisplayProgressAsync(_transferContext, cancellationToken);
+			Task displayProgressTask = progressLogger.DisplayProgressAsync(_transferContext, cancellationToken);
+
 			try
 			{
 				// Save changes asynchronously
@@ -84,22 +84,15 @@ namespace ETL.Services
 				cancellationTokenSource.Cancel();
 				await displayProgressTask;
 			}
-			catch(OperationCanceledException)
+			catch (OperationCanceledException)
 			{
-				Console.WriteLine("\rSaving progress canceled.");
+				// When saving is canceled run this, don't throw exception.
+				progressLogger.DisplayProgressComplete(_transferContext);
 			}
 			finally
 			{
 				cancellationTokenSource.Dispose();
 			}
-			
-		}
-
-		private void SaveChanges()
-		{
-			_transferContext.ChangeTracker.DetectChanges();
-			Console.WriteLine(_transferContext.ChangeTracker.DebugView.ShortView);
-			_transferContext.SaveChanges();
 		}
 
 		public void AttemptToSaveAsync()
@@ -110,13 +103,18 @@ namespace ETL.Services
 			}
 			catch (AggregateException ex)
 			{
-				InnerAndOuterExceptionMessage(ex);
-
 				foreach (var item in ex.InnerExceptions)
 				{
 					InnerAndOuterExceptionMessage(item);
 				}
 			}
+		}
+
+		private void SaveChanges()
+		{
+			_transferContext.ChangeTracker.DetectChanges();
+			Console.WriteLine(_transferContext.ChangeTracker.DebugView.ShortView);
+			_transferContext.SaveChanges();
 		}
 
 		public void AttemptToSave()
