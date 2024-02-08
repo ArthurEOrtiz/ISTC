@@ -47,6 +47,14 @@ namespace ETL.Interfaces
 		/// <returns><see cref="List{T}}"/> of <see cref="StudentInfo"/></returns>
 		List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls);
 
+		/// <summary>
+		/// Converts <see cref="CourseHistory"/> records and transforms columns C01 - C40 into 
+		/// a CSeq <see cref="int"/> value. For example if a row of CourseHistory has C23 set as true, 
+		/// then, it will have a StudentHistory CSeq value of 23. If multiple rows between C01 and C40 
+		/// are true, then each instance of a true value will have its own row in StudentHistory. 
+		/// </summary>
+		/// <param name="courseHistory"><see cref="List{T}"/> of <see cref="CourseHistory"/></param>
+		/// <returns><see cref="List{T}"/> of <see cref="StudentHistory"/></returns>
 		List<StudentHistory> CourseHistoryToStudentHistory(List<CourseHistory> courseHistory);
 	}
 }

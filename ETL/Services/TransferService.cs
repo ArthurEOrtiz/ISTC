@@ -67,6 +67,12 @@ namespace ETL.Services
 			_transferContext.Database.ExecuteSqlRaw($"DBCC CHECKIDENT('{tableName}', RESEED, 0);");
 		}
 
+		/// <summary>
+		/// Save changes asynchronously to the transfer context, displaying progress, with <see cref="Utilities.ProgressLogger.DisplayProgressAsync(DbContext, CancellationToken)"/>, to the console.
+		/// </summary>
+		/// <remarks>
+		/// See <see href="https://aka.ms/efcore-docs-saving-data">Saving data in EF Core</see> for more information.
+		/// </remarks>
 		private async Task SaveChangesAsync()
 		{
 			CancellationTokenSource cancellationTokenSource = new();
@@ -95,6 +101,10 @@ namespace ETL.Services
 			}
 		}
 
+		/// <summary>
+		/// Attempts to save changes asynchronously to the transfer context. Captures exceptions and sends them 
+		/// to <see cref="InnerAndOuterExceptionMessage(Exception)"/>
+		/// </summary>
 		public void AttemptToSaveAsync()
 		{
 			try
@@ -110,6 +120,9 @@ namespace ETL.Services
 			}
 		}
 
+		/// <summary>
+		/// Not in use. 
+		/// </summary>
 		private void SaveChanges()
 		{
 			_transferContext.ChangeTracker.DetectChanges();
@@ -117,6 +130,9 @@ namespace ETL.Services
 			_transferContext.SaveChanges();
 		}
 
+		/// <summary>
+		/// Not in use. 
+		/// </summary>
 		public void AttemptToSave()
 		{
 			try
@@ -129,6 +145,10 @@ namespace ETL.Services
 			}
 		}
 
+		/// <summary>
+		/// Prints inner and outer exception messages to the console. 
+		/// </summary>
+		/// <param name="ex"><see cref="Exception"/> object.</param>
 		private static void InnerAndOuterExceptionMessage(Exception ex)
 		{
 			Console.WriteLine(ex.Message);
