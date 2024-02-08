@@ -1,6 +1,5 @@
-﻿using ETL.Extract.Models;
+﻿using ETL.Interfaces;
 using ETL.Transfer.DataAccess;
-using ETL.Transfer.Models;
 using ETL.Utilities;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,26 +9,27 @@ namespace ETL.Services
 	{
 		private readonly TransferContext _transferContext;
 
-		public TransferService(TransferContext transferContext) 
+		public TransferService(TransferContext transferContext)
 		{
 			_transferContext = transferContext;
 		}
 
 		public List<T> LowerCaseAndTrimRecords<T>(List<T> records) where T : class
 		{
-			foreach(T record in records)
+			foreach (T record in records)
 			{
-				foreach(var property in typeof(T).GetProperties())
+				foreach (var property in typeof(T).GetProperties())
 				{
-					if(property.PropertyType == typeof(string))
+					if (property.PropertyType == typeof(string))
 					{
 						var value = (string?)property.GetValue(record);
-						if(value != null)
+						if (value != null)
 						{
 							property.SetValue(record, value.ToLower().Trim());
-						} else
+						}
+						else
 						{
-							property.SetValue(record, null);	
+							property.SetValue(record, null);
 						}
 					}
 				}
@@ -38,362 +38,104 @@ namespace ETL.Services
 			return records;
 		}
 
-		public void AddStudentsRange(List<Student> students)
+		public void AddRecordsRange<T>(List<T> records, Action<int, int>? progressCallback = null) where T : class
 		{
-			_transferContext.Students.AddRange(students);
-			SaveChangesAsync();
-		}
 
-		public void AddStudentInfoRange(List<StudentInfo> studentInfo, Action<int, int>? progressCallback = null)
-		{
-			int totalRecords = studentInfo.Count;
+			int totalRecords = records.Count;
 			int recordsProcessed = 0;
 
-			foreach (var record in studentInfo)
+			foreach (var record in records)
 			{
-				_transferContext.StudentInfo.Add(record);
+				_transferContext.Set<T>().Add(record);
 
 				recordsProcessed++;
 				progressCallback?.Invoke(totalRecords, recordsProcessed);
 			}
 
-			SaveChangesAsync();
+			AttemptToSaveAsync();
 		}
 
-		public void AddContactInfoRange(List<ContactInfo> contactInfo, Action<int, int>? progressCallback = null)
+		public void DeleteAllRecords<T>(DbSet<T> dbSet) where T : class
 		{
-			int totalRecords = contactInfo.Count();
-			int recordsProcessed = 0;
+			var allRecords = dbSet.ToList();
+			_transferContext.RemoveRange(allRecords);
 
-			foreach (var record in contactInfo)
-			{
-				_transferContext.ContactInfo.Add(record);
+			AttemptToSaveAsync();
 
-				recordsProcessed++;
-				progressCallback?.Invoke(totalRecords, recordsProcessed);
-			}
-
-			SaveChangesAsync();
+			//Reset the ID count back to zero
+			var tableName = _transferContext.Model.FindEntityType(typeof(T)).GetTableName();
+			_transferContext.Database.ExecuteSqlRaw($"DBCC CHECKIDENT('{tableName}', RESEED, 0);");
 		}
 
-		public void AddCourseHistoryRange(List<CourseHistory> courseHistory, Action<int, int>? progressCallback = null)
+		private async Task SaveChangesAsync()
 		{
-			int totalRecords = courseHistory.Count();
-			int recordsProcessed = 0;
-
-			foreach (var record in courseHistory)
-			{
-				_transferContext.CourseHistory.Add(record);
-
-				recordsProcessed++;
-				progressCallback?.Invoke(totalRecords, recordsProcessed);
-			}
-
-			SaveChangesAsync();
-		}
-
-		public List<Student> GetAllStudents()
-		{
-			return _transferContext.Students.ToList();
-		}
-
-		public List<StudentInfo> GetAllStudentInfo()
-		{
-			return _transferContext.StudentInfo.ToList();
-		}
-
-		public List<Student> GetUniqueFirstAndLastName(IEnumerable<TblSchoolEnroll> tblSchoolEnrolls)
-		{
-			return tblSchoolEnrolls
-				.GroupBy(enroll => new
-				{
-					enroll.FirstName,
-					enroll.LastName
-				})
-				.Select(group => new Student
-				{
-					FirstName = group.Key.FirstName,
-					LastName = group.Key.LastName
-				})
-				.ToList();
-		}
-
-		public List<ContactInfo> GetUniqueContactInfo(List<StudentInfo> studentInfo)
-		{
-			return studentInfo
-				.GroupBy(si => new
-				{
-					si.StudentID,
-					si.JobTitle,
-					si.Employer,
-					si.EmailAddr,
-					si.AddrStreet,
-					si.AddrSteNmbr,
-					si.AddrCity,
-					si.AddrState,
-					si.AddrZip,
-					si.TelAc,
-					si.TelPrfx,
-					si.TelNmbr,
-					si.FaxAc,
-					si.FaxPrfx,
-					si.FaxNmbr
-				})
-				.Select(group => new ContactInfo
-				{
-					StudentID = group.Key.StudentID,
-					JobTitle = group.Key.JobTitle,
-					Employer = group.Key.Employer,
-					EmailAddr = group.Key.EmailAddr,
-					AddrStreet = group.Key.AddrStreet,
-					AddrSteNmbr = group.Key.AddrSteNmbr,
-					AddrCity = group.Key.AddrCity,
-					AddrState = group.Key.AddrState,
-					AddrZip = group.Key.AddrZip,
-					TelAc = group.Key.TelAc,
-					TelPrfx = group.Key.TelPrfx,
-					TelNmbr = group.Key.TelNmbr,
-					FaxAc = group.Key.FaxAc,
-					FaxPrfx = group.Key.FaxPrfx,
-					FaxNmbr = group.Key.FaxNmbr
-				})
-				.ToList();
-		}
-
-		public List<CourseHistory> GetUniqueCourseHistory(List<StudentInfo> studentInfo)
-		{
-			return studentInfo
-				.GroupBy(si => new 
-				{
-					si.StudentID,
-					si.DateRegistered,
-					si.DateSchool,
-					si.SchoolType,
-					si.Seq,
-					si.C01,
-					si.C02,
-					si.C03,
-					si.C04,
-					si.C05,
-					si.C06,
-					si.C07,
-					si.C08,
-					si.C09,
-					si.C10,
-					si.C11,
-					si.C12,
-					si.C13,
-					si.C14,
-					si.C15,
-					si.C16,
-					si.C17,
-					si.C18,
-					si.C19,
-					si.C20,
-					si.C21,
-					si.C22,
-					si.C23,
-					si.C24,
-					si.C25,
-					si.C26,
-					si.C27,
-					si.C28,
-					si.C29,
-					si.C30,
-					si.C31,
-					si.C32,
-					si.C33,
-					si.C34,
-					si.C35,
-					si.C36,
-					si.C37,
-					si.C38,
-					si.C39,
-					si.C40
-				})
-				.Select(group => new CourseHistory 
-				{
-					StudentID = group.Key.StudentID,
-					DateRegistered = group.Key.DateRegistered,
-					DateSchool = group.Key.DateSchool,
-					SchoolType = group.Key.SchoolType,
-					Seq = group.Key.Seq,
-					C01 = group.Key.C01,
-					C02 = group.Key.C02,
-					C03 = group.Key.C03,
-					C04 = group.Key.C04,
-					C05 = group.Key.C05,
-					C06 = group.Key.C06,
-					C07 = group.Key.C07,
-					C08 = group.Key.C08,
-					C09 = group.Key.C09,
-					C10 = group.Key.C10,
-					C11 = group.Key.C11,
-					C12 = group.Key.C12,
-					C13 = group.Key.C13,
-					C14 = group.Key.C14,
-					C15 = group.Key.C15,
-					C16 = group.Key.C16,
-					C17 = group.Key.C17,
-					C18 = group.Key.C18,
-					C19 = group.Key.C19,
-					C20 = group.Key.C20,
-					C21 = group.Key.C21,
-					C22 = group.Key.C22,
-					C23 = group.Key.C23,
-					C24 = group.Key.C24,
-					C25 = group.Key.C25,
-					C26 = group.Key.C26,
-					C27 = group.Key.C27,
-					C28 = group.Key.C28,
-					C29 = group.Key.C29,
-					C30 = group.Key.C30,
-					C31 = group.Key.C31,
-					C32 = group.Key.C32,
-					C33 = group.Key.C33,
-					C34 = group.Key.C34,
-					C35 = group.Key.C35,
-					C36 = group.Key.C36,
-					C37 = group.Key.C37,
-					C38 = group.Key.C38,
-					C39 = group.Key.C39,
-					C40 = group.Key.C40
-				})
-				.ToList();
-		}
-
-		public List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls)
-		{
-			var students = GetAllStudents();
-
-			var linkedStudents = tblSchoolEnrolls
-				.Join(
-					students,
-					enroll => new 
-					{ 
-						FirstName = enroll.FirstName, 
-						LastName = enroll.LastName 
-					},
-					student => new { 
-						FirstName = student.FirstName, 
-						LastName = student.LastName 
-					},
-					(enroll, student) => new StudentInfo
-					{
-						StudentID = student.StudentID,
-						JobTitle = enroll?.JobTitle, 
-						Employer = enroll?.Employer,
-						EmailAddr = enroll.EmailAddr,
-						AddrStreet = enroll?.AddrStreet,
-						AddrSteNmbr = enroll?.AddrSteNmbr,
-						AddrCity = enroll?.AddrCity,
-						AddrState = enroll?.AddrState,
-						AddrZip = enroll?.AddrZip,
-						TelAc = enroll?.TelAc,
-						TelPrfx = enroll?.TelPrfx,
-						TelNmbr = enroll?.TelNmbr,
-						FaxAc = enroll?.FaxAc,
-						FaxPrfx = enroll?.FaxPrfx,
-						FaxNmbr = enroll?.FaxNmbr,
-						DateRegistered = enroll?.DateRegistered, 
-						DateSchool = enroll.DateSchool,
-						SchoolType = enroll.SchoolType,
-						Seq = enroll.Seq,
-						C01 = enroll?.C01, // GLENN
-						C02 = enroll?.C02, // DID
-						C03 = enroll?.C03, // IT
-						C04 = enroll?.C04, // FOR
-						C05 = enroll?.C05, // THE 
-						C06 = enroll?.C06, // NULLS
-						C07 = enroll?.C07, 
-						C08 = enroll?.C08, 
-						C09 = enroll?.C09,
-						C10 = enroll?.C10,
-						C11 = enroll?.C11,
-						C12 = enroll?.C12,
-						C13 = enroll?.C13,
-						C14 = enroll?.C14,
-						C15 = enroll?.C15,
-						C16 = enroll?.C16,
-						C17 = enroll?.C17,
-						C18 = enroll?.C18,
-						C19 = enroll?.C19,
-						C20 = enroll?.C20,
-						C21 = enroll?.C21,
-						C22 = enroll?.C22,
-						C23 = enroll?.C23,
-						C24 = enroll?.C24,
-						C25 = enroll?.C25,
-						C26 = enroll?.C26,
-						C27 = enroll?.C27,
-						C28 = enroll?.C28,
-						C29 = enroll?.C29,
-						C30 = enroll?.C30,
-						C31 = enroll?.C31,
-						C32 = enroll?.C32,
-						C33 = enroll?.C33,
-						C34 = enroll?.C34,
-						C35 = enroll?.C35,
-						C36 = enroll?.C36,
-						C37 = enroll?.C37,
-						C38 = enroll?.C38,
-						C39 = enroll?.C39,
-						C40 = enroll?.C40
-					})
-				.ToList();
-
-			return linkedStudents; 
-		}
-
-		public void DeleteAllStudents()
-		{
-			var allStudents = _transferContext.Students.ToList();
-
-			_transferContext.Students.RemoveRange(allStudents);
-			SaveChangesAsync();
-
-			// Reset the Id count back down to zero 
-			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('Students', RESEED, 0);");
-		}
-
-		public void DeleteAllStudentInfo()
-		{
-			var allStudentEnroll = _transferContext.StudentInfo;
-
-			_transferContext.StudentInfo.RemoveRange(allStudentEnroll);
-			SaveChangesAsync();
-
-			// Reset the Id count back down to zero 
-			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('StudentInfo', RESEED, 0);");
-		}
-
-		public void DeleteAllContactInfo()
-		{
-			var allContactInfo = _transferContext.ContactInfo;
-
-			_transferContext.ContactInfo.RemoveRange(allContactInfo);
-			SaveChangesAsync();
-
-			// Reset the Id count back down to zero 
-			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('ContactInfo', RESEED, 0);");
-		}
-
-		public void DeleteAllCourseHistory()
-		{
-			var allCourseHistory = _transferContext.CourseHistory;
-			_transferContext.CourseHistory.RemoveRange(allCourseHistory);
-			SaveChangesAsync();
-
-			// Reset the Id count back down to zero 
-			_transferContext.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('CourseHistory', RESEED, 0);");
-		}
-
-		private void SaveChangesAsync()
-		{
-			_transferContext.SaveChangesAsync();
-
+			CancellationTokenSource cancellationTokenSource = new();
+			CancellationToken cancellationToken = cancellationTokenSource.Token;
 			ProgressLogger progressLogger = new();
-			progressLogger.DisplaySavingProgress(_transferContext);
+
+			// Start the task to display progress
+			Task displayProgressTask = progressLogger.DisplayProgressAsync(_transferContext, cancellationToken);
+
+			try
+			{
+				// Save changes asynchronously
+				await _transferContext.SaveChangesAsync(cancellationToken);
+				// Once saving is complete cancel the progress task 
+				cancellationTokenSource.Cancel();
+				await displayProgressTask;
+			}
+			catch (OperationCanceledException)
+			{
+				// When saving is canceled run this, don't throw exception.
+				progressLogger.DisplayProgressComplete(_transferContext);
+			}
+			finally
+			{
+				cancellationTokenSource.Dispose();
+			}
+		}
+
+		public void AttemptToSaveAsync()
+		{
+			try
+			{
+				SaveChangesAsync().Wait();
+			}
+			catch (AggregateException ex)
+			{
+				foreach (var item in ex.InnerExceptions)
+				{
+					InnerAndOuterExceptionMessage(item);
+				}
+			}
+		}
+
+		private void SaveChanges()
+		{
+			_transferContext.ChangeTracker.DetectChanges();
+			Console.WriteLine(_transferContext.ChangeTracker.DebugView.ShortView);
+			_transferContext.SaveChanges();
+		}
+
+		public void AttemptToSave()
+		{
+			try
+			{
+				SaveChanges();
+			}
+			catch (Exception ex)
+			{
+				InnerAndOuterExceptionMessage(ex);
+			}
+		}
+
+		private static void InnerAndOuterExceptionMessage(Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+			if (ex.InnerException != null)
+			{
+				Console.WriteLine(ex.InnerException.Message);
+			}
 		}
 	}
 }

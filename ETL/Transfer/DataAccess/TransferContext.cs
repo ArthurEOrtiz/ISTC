@@ -11,11 +11,12 @@ namespace ETL.Transfer.DataAccess
 		public DbSet<StudentInfo> StudentInfo { get; set; } = null!;
 		public DbSet<ContactInfo> ContactInfo { get; set; } = null!;
 		public DbSet<CourseHistory> CourseHistory { get; set; } = null!;
+		public DbSet<StudentHistory> StudentHistory { get; set; } = null!;
+		public DbSet<CourseInfo> CourseInfo { get; set; } = null!;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
 		}
-
 	}
 }

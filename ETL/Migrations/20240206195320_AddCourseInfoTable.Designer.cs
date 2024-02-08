@@ -4,6 +4,7 @@ using ETL.Transfer.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ETL.Migrations
 {
     [DbContext(typeof(TransferContext))]
-    partial class TransferContextModelSnapshot : ModelSnapshot
+    [Migration("20240206195320_AddCourseInfoTable")]
+    partial class AddCourseInfoTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -347,42 +349,6 @@ namespace ETL.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("ETL.Transfer.Models.StudentHistory", b =>
-                {
-                    b.Property<int>("StudentHistoryID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("student_history_ID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentHistoryID"), 1L, 1);
-
-                    b.Property<int?>("CSeq")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DateRegistered")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateSchool")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SchoolType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Seq")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StudentID")
-                        .HasColumnType("int")
-                        .HasColumnName("student_ID");
-
-                    b.HasKey("StudentHistoryID");
-
-                    b.HasIndex("StudentID");
-
-                    b.ToTable("StudentHistory");
-                });
-
             modelBuilder.Entity("ETL.Transfer.Models.StudentInfo", b =>
                 {
                     b.Property<int>("StudentInfoId")
@@ -594,17 +560,6 @@ namespace ETL.Migrations
                 {
                     b.HasOne("ETL.Transfer.Models.Student", "student")
                         .WithMany("CourseHistory")
-                        .HasForeignKey("StudentID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("student");
-                });
-
-            modelBuilder.Entity("ETL.Transfer.Models.StudentHistory", b =>
-                {
-                    b.HasOne("ETL.Transfer.Models.Student", "student")
-                        .WithMany()
                         .HasForeignKey("StudentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

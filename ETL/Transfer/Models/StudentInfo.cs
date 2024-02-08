@@ -13,7 +13,6 @@ namespace ETL.Transfer.Models
 		[ForeignKey("Student")]
 		[Column("student_ID")]
 		public int StudentID { get; set; }
-
 		public string? JobTitle { get; set; }
 		public string? Employer { get; set; }
 		public string EmailAddr { get; set; } = null!;

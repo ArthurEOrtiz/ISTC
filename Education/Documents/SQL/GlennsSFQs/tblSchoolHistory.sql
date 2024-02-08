@@ -1,6 +1,6 @@
 -- these return 36 rows
-SELECT tblSchoolHistory. *
-FROM tblSchoolHistory
+--SELECT tblSchoolHistory. *
+--FROM tblSchoolHistory
 --WHERE hNAME = 'ABEGGLEN, DIANE'
 -- *******************************
 --WHERE hLastName = 'ABEGGLEN' AND
@@ -17,9 +17,9 @@ FROM tblSchoolHistory
 --ORDER BY hLastName
 
 -- this returns 989 rows 
-SELECT DISTINCT hLastName, hFirstName, hEmployer
-FROM tblSchoolHistory
-ORDER BY hLastName
+--SELECT DISTINCT hLastName, hFirstName, hEmployer
+--FROM tblSchoolHistory
+--ORDER BY hLastName
 
 
 
@@ -34,13 +34,14 @@ ORDER BY hLastName
 	In ANNEGGLEN's case its all pre 2009
 */
 
+-- Glenn's query 
 --SELECT yearx, course, hCertType, hours
 --from tblSchoolhistory where hEmployer = 'RETIRED' and hlastname = 'ABEGGLEN' and hfirstname = 'DIANE'
 --order by yearx desc, hCertType, course
---
+----
 
 -- my modification
---Select yearx, hDateSchool, course, hCertType, hours
+--Select tblSchoolHistory.*
 --from tblSchoolhistory where hEmployer = 'RETIRED' and hlastname = 'ABEGGLEN' and hfirstname = 'DIANE'
 --order by yearx desc
 
@@ -79,3 +80,11 @@ ORDER BY hLastName
 --hLastName = 'BARDAN' AND
 --hFirstName = 'KAYTLYNN'
 --ORDER BY hDateSchool
+
+SELECT tblSchoolHistory. *
+From tblSchoolhistory 
+WHERE 
+	--hEmployer = 'RETIRED' AND 
+	--hlastname = 'ABEGGLEN' AND 
+	--hfirstname = 'DIANE' AND
+	hSchoolType = 'r';

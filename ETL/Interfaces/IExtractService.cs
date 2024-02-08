@@ -1,8 +1,8 @@
 ﻿using ETL.Extract.Models;
 
-namespace ETL.Services
+namespace ETL.Interfaces
 {
-	internal interface IExtractServices
+	internal interface IExtractService
 	{
 		/// <summary>
 		/// Return all rows from tblSchoolEnroll in the ISTC database. 
