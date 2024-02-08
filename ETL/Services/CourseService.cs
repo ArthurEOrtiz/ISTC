@@ -6,10 +6,9 @@ namespace ETL.Services
 {
 	internal class CourseService : ICourseService
 	{
-
 		public List<CourseInfo> tblSchoolCourseToCourseInfo(List<TblSchoolCourse> tblSchoolCourses)
 		{
-			List<CourseInfo> courseInfos = new List<CourseInfo>();
+			List<CourseInfo> courseInfoList = new();
 
 			foreach (var tblSchoolCourse in tblSchoolCourses)
 			{
@@ -17,7 +16,7 @@ namespace ETL.Services
 				{ 
 					CDateSchool = tblSchoolCourse.CDateSchool,
 					CSchoolType = tblSchoolCourse.CSchoolType,
-					CSseq = tblSchoolCourse.CSseq,
+					CSSeq = tblSchoolCourse.CSseq,
 					CSeq = tblSchoolCourse.CSseq,
 					CName = tblSchoolCourse.CName,
 					CRoom = tblSchoolCourse.CRoom,
@@ -39,10 +38,9 @@ namespace ETL.Services
 					Cprereq = tblSchoolCourse.Cprereq,
 				};
 
-				courseInfos.Add(courseInfo);
+				courseInfoList.Add(courseInfo);
 			}
-			return courseInfos;
+			return courseInfoList;
 		}
-
 	}
 }

@@ -1,3 +1,4 @@
 SELECT tblSchoolInfo. * 
 FROM tblSchoolInfo
-ORDER BY SDateSchool
+WHERE SSchoolType = 'r'
+AND SDateSchool = '2007-10-11'
