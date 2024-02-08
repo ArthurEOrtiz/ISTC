@@ -74,13 +74,11 @@
 --FROM tblSchoolCourses
 -- this return R, W, 1, S
 
-SELECT tblSchoolCourses.*
-FROM tblSchoolCourses 
+SELECT 
+	tblSchoolCourses.*
+FROM 
+	tblSchoolCourses 
 WHERE 
-	cSchoolType = 'r' AND
-	cSSeq = 1 AND
-	cSeq = 1
-ORDER BY cSSeq, cSeq
-	--cDateSchool = '2009-11-16'
-	--cSSeq = 4
+	cDateSchool = '2007-10-11'
+
 	

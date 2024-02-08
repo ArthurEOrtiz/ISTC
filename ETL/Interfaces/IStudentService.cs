@@ -39,6 +39,8 @@ namespace ETL.Interfaces
 
 		CourseHistory? GetCourseHistoryByID(int id);
 
+		List<StudentHistory> GetAllStudentHistoryBySchoolType(string schoolType);
+
 		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms
 		/// it into a a collection of <see cref="StudentInfo"/>. 
@@ -56,5 +58,7 @@ namespace ETL.Interfaces
 		/// <param name="courseHistory"><see cref="List{T}"/> of <see cref="CourseHistory"/></param>
 		/// <returns><see cref="List{T}"/> of <see cref="StudentHistory"/></returns>
 		List<StudentHistory> CourseHistoryToStudentHistory(List<CourseHistory> courseHistory);
+
+		List<StudentHistory> NonAnomalousStudentHistoryRecords();
 	}
 }

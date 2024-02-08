@@ -12,6 +12,6 @@ namespace ETL.Interfaces
 		/// <returns><see cref="List{T}"/> of <see cref="CourseInfo"/></returns>
 		List<CourseInfo> tblSchoolCourseToCourseInfo(List<TblSchoolCourse> tblSchoolCourses);
 
-	
+		List<CourseInfo> GetAllCoursesBySchoolType(string schoolType);
 	}
 }

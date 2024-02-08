@@ -1,11 +1,20 @@
 ﻿using ETL.Extract.Models;
 using ETL.Interfaces;
+using ETL.Transfer.DataAccess;
 using ETL.Transfer.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ETL.Services
 {
 	internal class CourseService : ICourseService
 	{
+		private readonly TransferContext _transferContext;
+
+		public CourseService(TransferContext transferContext) 
+		{
+			_transferContext = transferContext;
+		}
+
 		public List<CourseInfo> tblSchoolCourseToCourseInfo(List<TblSchoolCourse> tblSchoolCourses)
 		{
 			List<CourseInfo> courseInfoList = new();
@@ -42,6 +51,23 @@ namespace ETL.Services
 				courseInfoList.Add(courseInfo);
 			}
 			return courseInfoList;
+		}
+
+		public List<CourseInfo> GetAllCoursesBySchoolType(string schoolType)
+		{
+			if (string.IsNullOrEmpty(schoolType))
+			{
+				throw new ArgumentNullException(nameof(schoolType));
+			}
+
+			if (schoolType != "r" && schoolType != "s" && schoolType != "w")
+			{
+				throw new ArgumentException("Invalid school type, Allowed values are 'r' 's' or 'w'");
+			}
+
+			return _transferContext.CourseInfo
+				.Where(record => record.CSchoolType == schoolType)
+				.ToList();
 		}
 	}
 }
