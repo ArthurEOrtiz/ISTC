@@ -209,12 +209,6 @@ class Program
 			var regionalCourses = courseService.GetAllCoursesBySchoolType("r");
 
 
-			  
-
-			
-
-
-
 			Console.WriteLine("ETL Complete!");
 		}
 		else
