@@ -212,23 +212,25 @@ class Program
 			// 4826, so I have to account for 26 rows. I've tried two separate methods, one using linq and another
 			// that just uses for each loops, and both create the same results and no difference in performance
 			// was detected.
-			var regionalHistoryCourse = studentService.CreateRegionalStudentHistory(regionalStudentHistory, regionalCourses);
+			var regionalHistoryCourse = studentService
+				.CreateRegionalStudentHistory(regionalStudentHistory, regionalCourses);
+
 			/*
 			 
 			So lets just check if we're mostly right. Ol' Diane Abegglen is right so far. It caught her 2 
-			regional courses. Lets try Student ID 36, alexa allen, shes not in tblSchoolHistory, 
-			
-			Kaytlynn Bardan (student id 155) according to my methods has been to 6 regional courses, but they
-			way Gleen records it in tblSchoolHistory she's has been to at least 3 regional course, but I can
-			say for certain because Glenn's stupid fucking database has so many fucking nulls everywhere. Oh by
-			the way there's an anomaly with her because she entered her name in as Katie Bardan(student_ID 154)
-			once. Further evidence of glenns bdumb fucking logic is that in Kaytlynn Bardan's one regional
-			class, in tblSchoolEnroll its "property tax assistance programs (ptr) training" with credit hours
-			set to 0 and in tblSchoolHistory its "Tax Commission: Property Tax Assistance Programs Training" and 
-			she has 7 hours of credit from it. Fuck you Glenn. Fuck you so much. Judging from his ColdFusion 
-			application, email is sometimes used as a key. So I might have to try a different approach using	
+			regional courses. Kaytlynn Bardan (student id 155) according to my methods has been to 6 regional 
+			courses, but they way Glenn records it in tblSchoolHistory she's has been to at least 3 regional 
+			course, but I can say for certain because Glenn's stupid fucking database has so many fucking nulls 
+			everywhere. Oh by the way there's an anomaly with her because she entered her name in as Katie Bardan
+			(student_ID 154) once. Further evidence of glenn's dumb fucking logic is that in Kaytlynn Bardan's on 
+			regional class, in tblSchoolEnroll its "property tax assistance programs (ptr) training" with credit 
+			hours set to 0 and in tblSchoolHistory its "Tax Commission: Property Tax Assistance Programs Training"
+			and she has 7 hours of credit from it. Fuck you Glenn. Fuck you so much. Judging from his ColdFusion 
+			application, email is sometimes used as a key. So I might have to try a different approach using 
 			email. 
-
+			
+			After talking to the end user, I found out that they're entering in everything by hand into
+			tblSchoolHistory because they found Glenn's program to be to buggy and unreliable. 
 			*/
 
 
