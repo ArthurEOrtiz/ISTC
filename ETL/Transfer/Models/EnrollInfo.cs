@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ETL.Transfer.Models
 {
-	public class StudentInfo
+	public class EnrollInfo
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		[Column("student_info_ID")]
-		public int StudentInfoId { get; set; }
+		[Column("enroll_info_ID")]
+		public int EnrollInfoId { get; set; }
 
 		[ForeignKey("Student")]
 		[Column("student_ID")]

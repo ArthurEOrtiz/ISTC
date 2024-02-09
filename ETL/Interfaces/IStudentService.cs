@@ -11,9 +11,9 @@ namespace ETL.Interfaces
 		List<Student> GetAllStudents();
 
 		/// <summary>
-		/// Gets a list of all student information in StudentInfo table of the Transfer database.
+		/// Gets a list of all student information in <see cref="EnrollInfo"/> table of the Transfer database.
 		/// </summary>
-		List<StudentInfo> GetAllStudentInfo();
+		List<EnrollInfo> GetAllEnrollInfo();
 
 		List<CourseHistory> GetAllCourseHistory();
 
@@ -26,51 +26,27 @@ namespace ETL.Interfaces
 		/// <summary>
 		/// Creates a list of unique contact information per <see cref="Student"/>.
 		/// </summary>
-		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="StudentInfo"/></param>
+		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="EnrollInfo"/></param>
 		/// <returns><see cref="List{T}"/> of <see cref="ContactInfo"/></returns>
-		List<ContactInfo> GetUniqueContactInfo(List<StudentInfo> studentInfo);
+		List<ContactInfo> GetUniqueContactInfo(List<EnrollInfo> studentInfo);
 
 		/// <summary>
 		/// Creates a list of unique student history per <see cref="Student"/>.
 		/// </summary>
-		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="StudentInfo"/></param>
+		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="EnrollInfo"/></param>
 		/// <returns><see cref="List{T}"/> of <see cref="CourseHistory"/></returns>
-		List<CourseHistory> GetUniqueCourseHistory(List<StudentInfo> studentInfo);
-		
-		/// <summary>
-		/// Return single record by <see cref="CourseHistory.CourseHistoryID"/> value. 
-		/// </summary>
-		/// <param name="id"><see cref="int"/> value of <see cref="CourseHistory.CourseHistoryID"/></param>
-		/// <returns>Single record of <see cref="CourseHistory"/> or null if no record is found.</returns>
+		List<CourseHistory> GetUniqueCourseHistory(List<EnrollInfo> studentInfo);
+
 		CourseHistory? GetCourseHistoryByID(int id);
 
 		/// <summary>
-		/// Return a <see cref="List{T}"/> of <see cref="StudentHistory"/> school type, which 
-		/// is either "r" for regional, "w" for winter, or "s" for summer. 
-		/// </summary>
-		/// <param name="schoolType"><see cref="string"/> of a single character "r", "w", or "s"</param>
-		/// <returns><see cref="List{T}"/> of <see cref="StudentHistory"/></returns>
-		/// <exception cref="ArgumentNullException"> If <paramref name="schoolType"/> is null</exception>
-		/// <exception cref="ArgumentException"> Invalid <paramref name="schoolType"/></exception>
-		List<StudentHistory> GetAllStudentHistoryBySchoolType(string schoolType);
-
-		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms
-		/// it into a a collection of <see cref="StudentInfo"/>. 
+		/// it into a a collection of <see cref="EnrollInfo"/>. 
 		/// </summary>
 		/// <param name="tblSchoolEnrolls"><see cref="List{T}"/> of <see cref="TblSchoolEnroll"/></param>
-		/// <returns><see cref="List{T}}"/> of <see cref="StudentInfo"/></returns>
-		List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls);
+		/// <returns><see cref="List{T}}"/> of <see cref="EnrollInfo"/></returns>
+		List<EnrollInfo> StudentToEnrollInfo(List<TblSchoolEnroll> tblSchoolEnrolls);
 
-		/// <summary>
-		/// Converts <see cref="CourseHistory"/> records and transforms columns C01 - C40 into 
-		/// a CSeq <see cref="int"/> value. For example if a row of CourseHistory has C23 set as true, 
-		/// then, it will have a StudentHistory CSeq value of 23. If multiple rows between C01 and C40 
-		/// are true, then each instance of a true value will have its own row in StudentHistory. 
-		/// </summary>
-		/// <param name="courseHistory"><see cref="List{T}"/> of <see cref="CourseHistory"/></param>
-		/// <returns><see cref="List{T}"/> of <see cref="StudentHistory"/></returns>
 		List<StudentHistory> CourseHistoryToStudentHistory(List<CourseHistory> courseHistory);
-
 	}
 }

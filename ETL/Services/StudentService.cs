@@ -2,6 +2,7 @@
 using ETL.Interfaces;
 using ETL.Transfer.DataAccess;
 using ETL.Transfer.Models;
+using System.Reflection;
 
 namespace ETL.Services
 {
@@ -19,9 +20,9 @@ namespace ETL.Services
 			return _transferContext.Students.ToList();
 		}
 
-		public List<StudentInfo> GetAllStudentInfo()
+		public List<EnrollInfo> GetAllEnrollInfo()
 		{
-			return _transferContext.StudentInfo.ToList();
+			return _transferContext.EnrollInfo.ToList();
 		}
 
 		public List<CourseHistory> GetAllCourseHistory()
@@ -45,7 +46,7 @@ namespace ETL.Services
 				.ToList();
 		}
 
-		public List<ContactInfo> GetUniqueContactInfo(List<StudentInfo> studentInfo)
+		public List<ContactInfo> GetUniqueContactInfo(List<EnrollInfo> studentInfo)
 		{
 			return studentInfo
 				.GroupBy(si => new
@@ -87,7 +88,7 @@ namespace ETL.Services
 				.ToList();
 		}
 
-		public List<CourseHistory> GetUniqueCourseHistory(List<StudentInfo> studentInfo)
+		public List<CourseHistory> GetUniqueCourseHistory(List<EnrollInfo> studentInfo)
 		{
 			return studentInfo
 				.GroupBy(si => new
@@ -194,24 +195,7 @@ namespace ETL.Services
 			return _transferContext.CourseHistory.Find(id);
 		}
 
-		public List<StudentHistory> GetAllStudentHistoryBySchoolType(string schoolType)
-		{
-			if (string.IsNullOrEmpty(schoolType))
-			{
-				throw new ArgumentNullException(nameof(schoolType));
-			}
-
-			if (schoolType != null && schoolType != "r" && schoolType != "s" && schoolType != "w")
-			{
-				throw new ArgumentException("Invalid school type, Allowed values are 'r' 's' or 'w'");
-			}
-
-			return _transferContext.StudentHistory
-				.Where(record => record.SchoolType == schoolType)
-				.ToList();
-		}
-
-		public List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls)
+		public List<EnrollInfo> StudentToEnrollInfo(List<TblSchoolEnroll> tblSchoolEnrolls)
 		{
 			var students = GetAllStudents();
 
@@ -228,7 +212,7 @@ namespace ETL.Services
 						FirstName = student.FirstName,
 						LastName = student.LastName
 					},
-					(enroll, student) => new StudentInfo
+					(enroll, student) => new EnrollInfo
 					{
 						StudentID = student.StudentID,
 						JobTitle = enroll?.JobTitle,
@@ -312,13 +296,13 @@ namespace ETL.Services
 			List<StudentHistory> studentHistoryList = new List<StudentHistory>();
 			// Initialize an int cSeq to have the logic below determine its value.
 			// Set it to null in case column C01 - C40, have no true value.
-			int? cSeq = null;
+			int? cSeq = null; 
 
 			// Iterate by 1, through a count of 1 through 40, for C01 to to C40
-			for (int i = 1; i <= 40; i++)
+			for (int i = 1; i <=40; i++)
 			{
 				// This obtains the Type object representing the CourseHistory class.
-				var cSeqProperty = typeof(CourseHistory).GetProperty($"C{i:D2}");
+				var cSeqProperty = typeof(CourseHistory).GetProperty($"C{i:D2}"); 
 				// I know that C01-C40 should never be null, but we'll check anyway. 
 				if (cSeqProperty != null && cSeqProperty.GetValue(courseHistory) as bool? == true)
 				{
@@ -352,6 +336,6 @@ namespace ETL.Services
 				student = courseHistory.student
 			};
 		}
-
+		
 	}
 }

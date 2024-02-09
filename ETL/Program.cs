@@ -55,7 +55,7 @@ class Program
 			// I'm gonna un-comment and comment this out as I'm developing. 
 			Console.WriteLine("Deleting all records in the Transfer database.");
 			transferService.DeleteAllRecords(transferContext.Students);
-			transferService.DeleteAllRecords(transferContext.StudentInfo);
+			transferService.DeleteAllRecords(transferContext.EnrollInfo);
 			transferService.DeleteAllRecords(transferContext.ContactInfo);
 			transferService.DeleteAllRecords(transferContext.CourseInfo);
 			transferService.DeleteAllRecords(transferContext.CourseHistory);
@@ -94,24 +94,24 @@ class Program
 			transferService.AddRecordsRange(uniqueStudents, processLogger.RecordsProcessed);
 
 			// Step 3: Take the records from tblSchoolEnroll and create a new table in the transfer database, 
-			// called SchoolInfo, that has all the rows from tblSchoolEnroll but with the first and last names
+			// called EnrollInfo, that has all the rows from tblSchoolEnroll but with the first and last names
 			// replaced with a foreign key to the Student table. 
-			var studentEnrollToStudentInfo = studentService.StudentToStudentInfo(lowerCasedAndTrimmedEnrolls);
-			Console.WriteLine($"Press enter to write {studentEnrollToStudentInfo.Count} records to the StudentInfo Table, this could take a moment...");
+			var studentToEnrollInfo = studentService.StudentToEnrollInfo(lowerCasedAndTrimmedEnrolls);
+			Console.WriteLine($"Press enter to write {studentToEnrollInfo.Count} records to the EnrollInfo Table, this could take a moment...");
 
 			// Stop for user input 
 			Console.ReadLine();
 
 			// Save the records
-			transferService.AddRecordsRange(studentEnrollToStudentInfo, processLogger.RecordsProcessed);
+			transferService.AddRecordsRange(studentToEnrollInfo, processLogger.RecordsProcessed);
 
 			// Step 4: Now lets find all the unique Contact information for each user. 
 
 			// User will have many contact info rows, I think this is because every time the user signs up 
 			// for a class, they have to type everything in again, allowing for so many anomalies. 
 
-			var studentInfoRecords = studentService.GetAllStudentInfo();
-			var uniqueContactInfo = studentService.GetUniqueContactInfo(studentInfoRecords);
+			var enrollInfoRecords = studentService.GetAllEnrollInfo();
+			var uniqueContactInfo = studentService.GetUniqueContactInfo(enrollInfoRecords);
 
 			Console.WriteLine($"Press enter to write {uniqueContactInfo.Count} records to the ContactInfo Table, this could take a moment...");
 
@@ -124,7 +124,7 @@ class Program
 			// Step 5: Now let find all the unique course history for each user
 			// the way this is tracked, *I think*,  is with DateRegister, DateSchool, SchoolType,
 			// Seq, C01-C40 Columns. 
-			var courseHistory = studentService.GetUniqueCourseHistory(studentInfoRecords);
+			var courseHistory = studentService.GetUniqueCourseHistory(enrollInfoRecords);
 
 			Console.WriteLine($"Press enter to write {courseHistory.Count} records to the CourseHistory Table, this could take a moment...");
 

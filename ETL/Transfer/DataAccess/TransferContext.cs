@@ -8,7 +8,7 @@ namespace ETL.Transfer.DataAccess
 		public TransferContext(DbContextOptions<TransferContext> options) : base(options) { }
 
 		public DbSet<Student> Students { get; set; } = null!;
-		public DbSet<StudentInfo> StudentInfo { get; set; } = null!;
+		public DbSet<EnrollInfo> EnrollInfo { get; set; } = null!;
 		public DbSet<ContactInfo> ContactInfo { get; set; } = null!;
 		public DbSet<CourseHistory> CourseHistory { get; set; } = null!;
 		public DbSet<StudentHistory> StudentHistory { get; set; } = null!;
