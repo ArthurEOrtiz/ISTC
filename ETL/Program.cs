@@ -208,6 +208,15 @@ class Program
 			// Then get all the CSchoolType = 'r' from  CourseInfo, this should be 326 rows. 
 			var regionalCourses = courseService.GetAllCoursesBySchoolType("r");
 
+			// For now, I'm ignoring the Student History rows where SchoolType = 'r' and CSeq is null. That
+			// makes up for 56 rows. So with those excluded this should be 4854 rows. At the moment this returns 
+			// 4826, so I have to account for 26 rows. I've tried two separate methods, one using linq and another
+			// that just uses for each loops, and both create the same results and no difference in performance
+			// was detected.
+			var regionalHistoryCourse = studentService.CreateRegionalStudentHistory(regionalStudentHistory, regionalCourses);
+
+			// So lets just check if we're mostly right. 
+
 
 			Console.WriteLine("ETL Complete!");
 		}
