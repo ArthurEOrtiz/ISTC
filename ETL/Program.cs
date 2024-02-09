@@ -193,10 +193,9 @@ class Program
 			/*
 				So now I can link Student history with CourseInfo. But there are many anomalies. When 
 				SchoolType = s and CSeq is null(24 rows), I cannot establish which summer course the student took. 
-				And it should be known that if SchoolType = r and CSeq is null, then consider the Seq value a cSeq 
-				value. Also the value of CSSeq in tblSchoolCourses can be between 1-27 while the seq of
-				tblSchoolEnroll, tblSchoolInfo only goes up to 4. This might have something to do with the first 
-				anomaly. 
+				And it should be known that if SchoolType = r and CSeq is null, then I think the Seq value should
+				be used as the Cseq, but definitely not in all cases. Also the value of CSSeq in tblSchoolCourses 
+				can be between 1-27 while the seq of tblSchoolEnroll, tblSchoolInfo only goes up to 4. This might have something to do with the first anomaly. 
 			*/
 
 			Console.WriteLine("**** NEW LOGIC ****");
@@ -214,8 +213,23 @@ class Program
 			// that just uses for each loops, and both create the same results and no difference in performance
 			// was detected.
 			var regionalHistoryCourse = studentService.CreateRegionalStudentHistory(regionalStudentHistory, regionalCourses);
+			/*
+			 
+			So lets just check if we're mostly right. Ol' Diane Abegglen is right so far. It caught her 2 
+			regional courses. Lets try Student ID 36, alexa allen, shes not in tblSchoolHistory, 
+			
+			Kaytlynn Bardan (student id 155) according to my methods has been to 6 regional courses, but they
+			way Gleen records it in tblSchoolHistory she's has been to at least 3 regional course, but I can
+			say for certain because Glenn's stupid fucking database has so many fucking nulls everywhere. Oh by
+			the way there's an anomaly with her because she entered her name in as Katie Bardan(student_ID 154)
+			once. Further evidence of glenns bdumb fucking logic is that in Kaytlynn Bardan's one regional
+			class, in tblSchoolEnroll its "property tax assistance programs (ptr) training" with credit hours
+			set to 0 and in tblSchoolHistory its "Tax Commission: Property Tax Assistance Programs Training" and 
+			she has 7 hours of credit from it. Fuck you Glenn. Fuck you so much. Judging from his ColdFusion 
+			application, email is sometimes used as a key. So I might have to try a different approach using	
+			email. 
 
-			// So lets just check if we're mostly right. 
+			*/
 
 
 			Console.WriteLine("ETL Complete!");

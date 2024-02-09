@@ -45,12 +45,12 @@
 --    --AND tblSchoolInfo.SSeq = 1;
 --	--AND tblSchoolCourses.cSeq = 1;
 
-SELECT 
-	tblSchoolCourses.*
-FROM 
-	tblSchoolCourses 
-WHERE 
-	cDateSchool = '2007-10-11';
+--SELECT 
+--	tblSchoolCourses.*
+--FROM 
+--	tblSchoolCourses 
+--WHERE 
+--	cDateSchool = '2007-10-11';
 
 --SELECT
 --	tblSchoolCourses.*
