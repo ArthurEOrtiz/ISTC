@@ -10,9 +10,9 @@ namespace ETL.Transfer.Models
 		[Column("course_history_ID")]
 		public int CourseHistoryID { get; set; }
 
-		[ForeignKey("Student")]
-		[Column("student_ID")]
-		public int StudentID { get; set; }
+		[ForeignKey("EnrollStudent")]
+		[Column("enroll_student_ID")]
+		public int EnrollStudentID { get; set; }
 
 		public DateTime? DateRegistered { get; set; }
 		public DateTime DateSchool { get; set; }
@@ -60,6 +60,6 @@ namespace ETL.Transfer.Models
 		public bool? C40 { get; set; }
 
 		// Navigation property to student
-		public Student student { get; set; } = null!;
+		public EnrollStudent EnrollStudent { get; set; } = null!;
 	}
 }

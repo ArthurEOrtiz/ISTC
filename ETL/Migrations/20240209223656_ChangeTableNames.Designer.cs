@@ -4,6 +4,7 @@ using ETL.Transfer.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ETL.Migrations
 {
     [DbContext(typeof(TransferContext))]
-    partial class TransferContextModelSnapshot : ModelSnapshot
+    [Migration("20240209223656_ChangeTableNames")]
+    partial class ChangeTableNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,10 +159,6 @@ namespace ETL.Migrations
                     b.Property<DateTime>("DateSchool")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("EnrollStudentID")
-                        .HasColumnType("int")
-                        .HasColumnName("enroll_student_ID");
-
                     b.Property<string>("SchoolType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -168,9 +166,13 @@ namespace ETL.Migrations
                     b.Property<int>("Seq")
                         .HasColumnType("int");
 
+                    b.Property<int>("StudentID")
+                        .HasColumnType("int")
+                        .HasColumnName("student_ID");
+
                     b.HasKey("CourseHistoryID");
 
-                    b.HasIndex("EnrollStudentID");
+                    b.HasIndex("StudentID");
 
                     b.ToTable("CourseHistory");
                 });
@@ -206,10 +208,6 @@ namespace ETL.Migrations
                     b.Property<string>("Employer")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EnrollStudentID")
-                        .HasColumnType("int")
-                        .HasColumnName("enroll_student_ID");
-
                     b.Property<string>("FaxAc")
                         .HasColumnType("nvarchar(max)");
 
@@ -222,6 +220,10 @@ namespace ETL.Migrations
                     b.Property<string>("JobTitle")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("StudentID")
+                        .HasColumnType("int")
+                        .HasColumnName("student_ID");
+
                     b.Property<string>("TelAc")
                         .HasColumnType("nvarchar(max)");
 
@@ -233,7 +235,7 @@ namespace ETL.Migrations
 
                     b.HasKey("EnrollContactID");
 
-                    b.HasIndex("EnrollStudentID");
+                    b.HasIndex("StudentID");
 
                     b.ToTable("EnrollContact");
                 });
@@ -256,10 +258,6 @@ namespace ETL.Migrations
                     b.Property<DateTime>("DateSchool")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("EnrollStudentID")
-                        .HasColumnType("int")
-                        .HasColumnName("enroll_student_ID");
-
                     b.Property<string>("SchoolType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -267,21 +265,25 @@ namespace ETL.Migrations
                     b.Property<int>("Seq")
                         .HasColumnType("int");
 
+                    b.Property<int>("StudentID")
+                        .HasColumnType("int")
+                        .HasColumnName("student_ID");
+
                     b.HasKey("EnrollHistoryID");
 
-                    b.HasIndex("EnrollStudentID");
+                    b.HasIndex("StudentID");
 
                     b.ToTable("EnrollHistory");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.EnrollInfo", b =>
                 {
-                    b.Property<int>("EnrollInfoID")
+                    b.Property<int>("EnrollInfoId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("enroll_info_ID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EnrollInfoID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EnrollInfoId"), 1L, 1);
 
                     b.Property<string>("AddrCity")
                         .HasColumnType("nvarchar(max)");
@@ -431,10 +433,6 @@ namespace ETL.Migrations
                     b.Property<string>("Employer")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EnrollStudentID")
-                        .HasColumnType("int")
-                        .HasColumnName("enroll_student_ID");
-
                     b.Property<string>("FaxAc")
                         .HasColumnType("nvarchar(max)");
 
@@ -454,6 +452,10 @@ namespace ETL.Migrations
                     b.Property<int>("Seq")
                         .HasColumnType("int");
 
+                    b.Property<int>("StudentID")
+                        .HasColumnType("int")
+                        .HasColumnName("student_ID");
+
                     b.Property<string>("TelAc")
                         .HasColumnType("nvarchar(max)");
 
@@ -463,88 +465,86 @@ namespace ETL.Migrations
                     b.Property<string>("TelPrfx")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("EnrollInfoID");
+                    b.HasKey("EnrollInfoId");
 
-                    b.HasIndex("EnrollStudentID");
+                    b.HasIndex("StudentID");
 
                     b.ToTable("EnrollInfo");
                 });
 
-            modelBuilder.Entity("ETL.Transfer.Models.EnrollStudent", b =>
+            modelBuilder.Entity("ETL.Transfer.Models.Student", b =>
                 {
-                    b.Property<int>("EnrollStudentID")
+                    b.Property<int>("StudentID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("enroll_student_ID");
+                        .HasColumnName("student_ID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EnrollStudentID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentID"), 1L, 1);
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("first_name");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("last_name");
 
-                    b.HasKey("EnrollStudentID");
+                    b.HasKey("StudentID");
 
-                    b.ToTable("EnrollStudents");
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.CourseHistory", b =>
                 {
-                    b.HasOne("ETL.Transfer.Models.EnrollStudent", "EnrollStudent")
-                        .WithMany()
-                        .HasForeignKey("EnrollStudentID")
+                    b.HasOne("ETL.Transfer.Models.Student", "student")
+                        .WithMany("CourseHistory")
+                        .HasForeignKey("StudentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EnrollStudent");
+                    b.Navigation("student");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.EnrollContact", b =>
                 {
-                    b.HasOne("ETL.Transfer.Models.EnrollStudent", "EnrollStudent")
-                        .WithMany("EnrollContacts")
-                        .HasForeignKey("EnrollStudentID")
+                    b.HasOne("ETL.Transfer.Models.Student", "student")
+                        .WithMany("ContactInfo")
+                        .HasForeignKey("StudentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EnrollStudent");
+                    b.Navigation("student");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.EnrollHistory", b =>
                 {
-                    b.HasOne("ETL.Transfer.Models.EnrollStudent", "EnrollStudent")
-                        .WithMany("EnrollHistory")
-                        .HasForeignKey("EnrollStudentID")
+                    b.HasOne("ETL.Transfer.Models.Student", "student")
+                        .WithMany()
+                        .HasForeignKey("StudentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EnrollStudent");
+                    b.Navigation("student");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.EnrollInfo", b =>
                 {
-                    b.HasOne("ETL.Transfer.Models.EnrollStudent", "EnrollStudent")
-                        .WithMany("EnrollInfo")
-                        .HasForeignKey("EnrollStudentID")
+                    b.HasOne("ETL.Transfer.Models.Student", "student")
+                        .WithMany("StudentInfo")
+                        .HasForeignKey("StudentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EnrollStudent");
+                    b.Navigation("student");
                 });
 
-            modelBuilder.Entity("ETL.Transfer.Models.EnrollStudent", b =>
+            modelBuilder.Entity("ETL.Transfer.Models.Student", b =>
                 {
-                    b.Navigation("EnrollContacts");
+                    b.Navigation("ContactInfo");
 
-                    b.Navigation("EnrollHistory");
+                    b.Navigation("CourseHistory");
 
-                    b.Navigation("EnrollInfo");
+                    b.Navigation("StudentInfo");
                 });
 #pragma warning restore 612, 618
         }

@@ -8,11 +8,12 @@ namespace ETL.Transfer.Models
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		[Column("enroll_info_ID")]
-		public int EnrollInfoId { get; set; }
+		public int EnrollInfoID { get; set; }
 
-		[ForeignKey("Student")]
-		[Column("student_ID")]
-		public int StudentID { get; set; }
+		[ForeignKey("EnrollStudent")]
+		[Column("enroll_student_ID")]
+		public int EnrollStudentID { get; set; }
+
 		public string? JobTitle { get; set; }
 		public string? Employer { get; set; }
 		public string EmailAddr { get; set; } = null!;
@@ -74,6 +75,6 @@ namespace ETL.Transfer.Models
 
 		// Navigation property to student
 
-		public Student student { get; set; } = null!;
+		public EnrollStudent EnrollStudent { get; set; } = null!;
 	}
 }
