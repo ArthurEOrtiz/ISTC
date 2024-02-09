@@ -205,11 +205,11 @@ class Program
 			This changes everything, I'll have to go back and just address tblSchoolHistory for now. 
 			*/
 
-			Console.WriteLine("**** NEW LOGIC ****");
+			//Console.WriteLine("**** NEW LOGIC ****");
 
 
 
-			Console.WriteLine("ETL Complete!");
+			Console.WriteLine("Success!");
 		}
 		else
 		{

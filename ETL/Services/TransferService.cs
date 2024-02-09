@@ -105,6 +105,7 @@ namespace ETL.Services
 		/// Attempts to save changes asynchronously to the transfer context. Captures exceptions and sends them 
 		/// to <see cref="InnerAndOuterExceptionMessage(Exception)"/>
 		/// </summary>
+		/// <exception cref="AggregateException">Will be thrown if one or more exceptions are thrown.</exception>
 		public void AttemptToSaveAsync()
 		{
 			try
