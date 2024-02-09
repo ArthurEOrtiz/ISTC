@@ -36,8 +36,23 @@ namespace ETL.Interfaces
 		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="StudentInfo"/></param>
 		/// <returns><see cref="List{T}"/> of <see cref="CourseHistory"/></returns>
 		List<CourseHistory> GetUniqueCourseHistory(List<StudentInfo> studentInfo);
-
+		
+		/// <summary>
+		/// Return single record by <see cref="CourseHistory.CourseHistoryID"/> value. 
+		/// </summary>
+		/// <param name="id"><see cref="int"/> value of <see cref="CourseHistory.CourseHistoryID"/></param>
+		/// <returns>Single record of <see cref="CourseHistory"/> or null if no record is found.</returns>
 		CourseHistory? GetCourseHistoryByID(int id);
+
+		/// <summary>
+		/// Return a <see cref="List{T}"/> of <see cref="StudentHistory"/> school type, which 
+		/// is either "r" for regional, "w" for winter, or "s" for summer. 
+		/// </summary>
+		/// <param name="schoolType"><see cref="string"/> of a single character "r", "w", or "s"</param>
+		/// <returns><see cref="List{T}"/> of <see cref="StudentHistory"/></returns>
+		/// <exception cref="ArgumentNullException"> If <paramref name="schoolType"/> is null</exception>
+		/// <exception cref="ArgumentException"> Invalid <paramref name="schoolType"/></exception>
+		List<StudentHistory> GetAllStudentHistoryBySchoolType(string schoolType);
 
 		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms
@@ -47,6 +62,15 @@ namespace ETL.Interfaces
 		/// <returns><see cref="List{T}}"/> of <see cref="StudentInfo"/></returns>
 		List<StudentInfo> StudentToStudentInfo(List<TblSchoolEnroll> tblSchoolEnrolls);
 
+		/// <summary>
+		/// Converts <see cref="CourseHistory"/> records and transforms columns C01 - C40 into 
+		/// a CSeq <see cref="int"/> value. For example if a row of CourseHistory has C23 set as true, 
+		/// then, it will have a StudentHistory CSeq value of 23. If multiple rows between C01 and C40 
+		/// are true, then each instance of a true value will have its own row in StudentHistory. 
+		/// </summary>
+		/// <param name="courseHistory"><see cref="List{T}"/> of <see cref="CourseHistory"/></param>
+		/// <returns><see cref="List{T}"/> of <see cref="StudentHistory"/></returns>
 		List<StudentHistory> CourseHistoryToStudentHistory(List<CourseHistory> courseHistory);
+
 	}
 }

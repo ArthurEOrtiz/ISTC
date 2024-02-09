@@ -9,9 +9,9 @@ namespace ETL.Transfer.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		[Column("course_info_ID")]
 		public int CourseInfoID { get; set; }
-		public DateTime CDateSchool { get; set; }
 		public string CSchoolType { get; set; } = null!;
-		public int CSseq { get; set; }
+		public DateTime CDateSchool { get; set; }
+		public int CSSeq { get; set; }
 		public int CSeq { get; set; }
 		public string? CName { get; set; }
 		public string? CRoom { get; set; }

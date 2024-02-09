@@ -84,7 +84,7 @@
 SELECT tblSchoolHistory. *
 From tblSchoolhistory 
 WHERE 
-	--hEmployer = 'RETIRED' AND 
-	--hlastname = 'ABEGGLEN' AND 
-	--hfirstname = 'DIANE' AND
+	hEmployer = 'RETIRED' AND 
+	hlastname = 'ABEGGLEN' AND 
+	hfirstname = 'DIANE' AND
 	hSchoolType = 'r';

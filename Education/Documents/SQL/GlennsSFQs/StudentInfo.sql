@@ -1,5 +1,5 @@
---SELECT StudentInfo. *
---FROM StudentInfo
+SELECT StudentInfo. *
+FROM StudentInfo
 
 --SELECT DISTINCT 
 --	student_ID,
