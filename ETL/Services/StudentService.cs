@@ -306,14 +306,7 @@ namespace ETL.Services
 			return StudentHistoryList;
 		}
 
-		public List<StudentHistory> NonAnomalousStudentHistoryRecords()
-		{
-			return _transferContext.StudentHistory
-				.Where(record => !(record.SchoolType == "s" && record.CSeq == null))
-				.ToList();
-		}
-
-		private List<StudentHistory> CourseHistoryConverter(CourseHistory courseHistory)
+		private static List<StudentHistory> CourseHistoryConverter(CourseHistory courseHistory)
 		{
 			// Initialize a list of StudentHistory, we'll stuff that with converted CourseHistory. 
 			List<StudentHistory> studentHistoryList = new List<StudentHistory>();
@@ -359,7 +352,6 @@ namespace ETL.Services
 				student = courseHistory.student
 			};
 		}
-
 
 	}
 }
