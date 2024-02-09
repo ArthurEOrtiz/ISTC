@@ -231,6 +231,8 @@ class Program
 			
 			After talking to the end user, I found out that they're entering in everything by hand into
 			tblSchoolHistory because they found Glenn's program to be to buggy and unreliable. 
+
+			This changes everything, I'll have to go back and just address tblSchoolHistory for now. 
 			*/
 
 
