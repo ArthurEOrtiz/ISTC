@@ -5,12 +5,11 @@ namespace Education.Models
 {
 	public class Attendance
 	{
+
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		[Column("attendance_ID")]
 		public int AttendanceId { get; set; }
 
-		[Column("attended")]
 		public bool Attended { get; set; } = false;
 
 		[Required]

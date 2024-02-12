@@ -12,36 +12,28 @@ namespace Education.Models
 
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		[Column("student_ID")]
 		public int StudentId { get; set; }
 
-		[Column("first_name")]
 		[MaxLength(50)]
-		public string? FirstName { get; set; }
+		public string FirstName { get; set; } = null!;
 
-		[Column("last_name")]
 		[MaxLength(50)]
-		public string? LastName { get; set; }
+		public string LastName { get; set; } = null!;
 
-		[Column("middle_name")]
 		[MaxLength(50)]
 		public string? MiddleName { get; set; }
 
-		[Column("accumulated_credit")]
 		public int AccumulatedCredit { get; set; } = 0;
 
-		[Column("appraisal_certified")]
 		public bool AppraisalCertified { get; set; } = false;
 
-		[Column("mapping_certified")]
 		public bool MappingCertified { get; set; } = false;
 
-		[Column("contact_id")]
-		public int? ContactId { get; set; }
-
+		public int ContactId { get; set; }
 
 		[ForeignKey("ContactId")]
 		public virtual Contact? Contact { get; set; }
+
 		public virtual ICollection<Attendance>? Attendances { get; set; }
 	}
 }
