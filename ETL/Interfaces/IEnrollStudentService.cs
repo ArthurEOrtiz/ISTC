@@ -17,6 +17,5 @@ namespace ETL.Interfaces
 		/// <returns><see cref="List{T}"/> of <see cref="EnrollStudent"/></returns>
 		List<EnrollStudent> GetUniqueFirstAndLastName(List<TblSchoolEnroll> tblSchoolEnrolls);
 
-		
 	}
 }
