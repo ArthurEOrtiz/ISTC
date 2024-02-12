@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Education.Migrations
+namespace EducationAPI.Migrations
 {
     public partial class RefactorTables : Migration
     {

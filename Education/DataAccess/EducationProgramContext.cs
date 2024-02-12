@@ -1,7 +1,7 @@
-﻿using Education.Models;
+﻿using EducationAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Education.DataAccess
+namespace EducationAPI.DataAccess
 {
 	public partial class EducationProgramContext : DbContext
 	{

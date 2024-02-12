@@ -1,4 +1,4 @@
-﻿namespace Education.Configuration
+﻿namespace EducationAPI.Configuration
 {
 	public sealed class EducationProgramDataBaseOptions
 	{

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Education.Models
+namespace EducationAPI.Models
 {
 	/// <summary>
 	/// Represent a course in available for the user to sign up for. 

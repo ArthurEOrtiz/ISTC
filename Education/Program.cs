@@ -1,5 +1,5 @@
-using Education.Configuration;
-using Education.DataAccess;
+using EducationAPI.Configuration;
+using EducationAPI.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Education", "Education\Education.csproj", "{D870A11F-4C6F-4719-BB6C-625515DB4D49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EducationAPI", "Education\EducationAPI.csproj", "{D870A11F-4C6F-4719-BB6C-625515DB4D49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ETL", "ETL\ETL.csproj", "{BF0C8B31-7919-4542-AABB-59C38FB33C7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ETL", "ETL\ETL.csproj", "{BF0C8B31-7919-4542-AABB-59C38FB33C7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
