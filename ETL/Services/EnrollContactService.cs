@@ -40,7 +40,9 @@ namespace ETL.Services
 					e.TelNmbr,
 					e.FaxAc,
 					e.FaxPrfx,
-					e.FaxNmbr
+					e.FaxNmbr,
+
+					e.EnrollStudent
 				})
 				.Select(group => new EnrollContact
 				{
@@ -60,7 +62,9 @@ namespace ETL.Services
 					TelNmbr = group.Key.TelNmbr,
 					FaxAc = group.Key.FaxAc,
 					FaxPrfx = group.Key.FaxPrfx,
-					FaxNmbr = group.Key.FaxNmbr
+					FaxNmbr = group.Key.FaxNmbr,
+
+					EnrollStudent = group.Key.EnrollStudent
 				})
 				.ToList();
 		}

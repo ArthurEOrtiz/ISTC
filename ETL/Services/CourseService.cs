@@ -8,7 +8,7 @@ namespace ETL.Services
 	{
 		public List<CourseInfo> tblSchoolCourseToCourseInfo(List<TblSchoolCourse> tblSchoolCourses)
 		{
-			List<CourseInfo> courseInfos = new ();
+			List<CourseInfo> courseInfoList = new ();
 
 			foreach (var tblSchoolCourse in tblSchoolCourses)
 			{
@@ -38,9 +38,9 @@ namespace ETL.Services
 					Cprereq = tblSchoolCourse.Cprereq,
 				};
 
-				courseInfos.Add(courseInfo);
+				courseInfoList.Add(courseInfo);
 			}
-			return courseInfos;
+			return courseInfoList;
 		}
 
 	}

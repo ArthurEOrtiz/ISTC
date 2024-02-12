@@ -64,7 +64,7 @@ class Program
 			transferService.DeleteAllRecords(transferContext.EnrollInfo);
 			transferService.DeleteAllRecords(transferContext.EnrollContacts);
 			transferService.DeleteAllRecords(transferContext.EnrollHistory);
-			//transferService.DeleteAllRecords(transferContext.CourseInfo);
+			transferService.DeleteAllRecords(transferContext.CourseInfo);
 
 
 			// Step 1: Get all records from tblSchoolInfo and lower case and trim the records.
@@ -175,46 +175,10 @@ class Program
 			// Convert that object so AddRecordsRange knows where to put that information.
 			var CourseInfo = courseService.tblSchoolCourseToCourseInfo(tblSchoolCoursesLowerCasedAndTrimmed);
 
-			//// Save the records
-			//transferService.AddRecordsRange(CourseInfo, processLogger.RecordsProcessed);
+			// Save the records
+			transferService.AddRecordsRange(CourseInfo, processLogger.RecordsProcessed);
 
-			///*
-			//I have observed that cDateSchool, cSchoolType, cSSeq, and cSeq, are used to identify the course. 
-			//So far as I can tell it corresponds with tblSchoolEnrolls DateSchool, SchoolType, Seq, and 
-			//c01 - c40. cSeq, corresponds with c01-c40, if c05 is true, then, I THINK, that means cSeq = 5.
-			//I've noted that this relationship might not always be true, due the lack of any meaningful data
-			//validation.
-			//*/
-
-			//// So then lets make a method to to build a query to change c01-40 into a cSeq number. 
-
-			//// courseHistory in initialized at line 120.
-			//var studentHistory = studentService.CourseHistoryToStudentHistory(courseHistory);
-
-			//// Then lets put that in its own table. We might refactor this to happen sooner, and bypassing 
-			//// the need for a courseHistory table.
-			//Console.WriteLine($"Press enter to write {studentHistory.Count} records to to the StudentHistory Table, this could take a moment...");
-
-			//// Stop for user input 
-			//Console.ReadLine();
-
-			//// Save the records 
-			//transferService.AddRecordsRange(studentHistory, processLogger.RecordsProcessed);
-
-			/*
-			So now I can link Student history with CourseInfo. But there are many anomalies. When 
-			SchoolType = s and CSeq is null(24 rows), I cannot establish which summer course the student took. 
-			And it should be known that if SchoolType = r and CSeq is null, then I think the Seq value should
-			be used as the Cseq, but definitely not in all cases. Also the value of CSSeq in tblSchoolCourses 
-			can be between 1-27 while the seq of tblSchoolEnroll, tblSchoolInfo only goes up to 4. This might
-			have something to do with the first anomaly. 
-
-			After talking to the end user, I found out that they're entering in everything by hand into
-			tblSchoolHistory because they found Glenn's program to be too buggy and unreliable. But not always
-			there was a time when it was entered in programmatically. 
-
-			This changes everything, I'll have to go back and just address tblSchoolHistory for now. 
-			*/
+			
 
 			//Console.WriteLine("**** NEW LOGIC ****");
 
