@@ -5,6 +5,7 @@ namespace ETL.Interfaces
 {
 	internal interface ITransferService
 	{
+
 		/// <summary>
 		/// Modifies string properties of records in a list to convert them to lowercase and remove leading and trailing whitespace.
 		/// </summary>

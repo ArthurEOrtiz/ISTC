@@ -36,6 +36,7 @@ class Program
 				services.AddTransient<ITransferService, TransferService>();
 				services.AddTransient<IEnrollStudentService, EnrollStudentService>();
 				services.AddTransient<IEnrollInfoService, EnrollInfoService>();
+				services.AddTransient<IEnrollContactService, EnrollContactService>();
 				services.AddTransient<ICourseService, CourseService>();
 			})
 			.Build();
@@ -50,15 +51,16 @@ class Program
 			var transferService = serviceProvider.GetRequiredService<ITransferService>();
 			var studentService = serviceProvider.GetRequiredService<IEnrollStudentService>();
 			var enrollInfoService = serviceProvider.GetRequiredService<IEnrollInfoService>();
+			var enrollContactService = serviceProvider.GetRequiredService<IEnrollContactService>();
 			var courseService = serviceProvider.GetRequiredService<ICourseService>();
 			var processLogger = new ProgressLogger();
 
 			//Step 0: Start with a clean slate when needed. 
 			// I'm gonna un-comment and comment this out as I'm developing. 
 			Console.WriteLine("Deleting all records in the Transfer database.");
-			//transferService.DeleteAllRecords(transferContext.EnrollStudents);
+			transferService.DeleteAllRecords(transferContext.EnrollStudents);
 			transferService.DeleteAllRecords(transferContext.EnrollInfo);
-			//transferService.DeleteAllRecords(transferContext.EnrollContacts);
+			transferService.DeleteAllRecords(transferContext.EnrollContacts);
 			//transferService.DeleteAllRecords(transferContext.CourseHistory);
 			//transferService.DeleteAllRecords(transferContext.EnrollHistory);
 			//transferService.DeleteAllRecords(transferContext.CourseInfo);
@@ -66,64 +68,64 @@ class Program
 
 			// Step 1: Get all records from tblSchoolInfo and lower case and trim the records.
 			// tblSchoolInfo *should* have all records of every person enrollment history.
-			//var tblSchoolEnrolls = extractService.GetTblSchoolEnrolls();
+			var tblSchoolEnrolls = extractService.GetTblSchoolEnrolls();
 
-			//// Let the user know the count of records. 
-			//Console.WriteLine($"{tblSchoolEnrolls.Count} rows in tblSchoolEnrolls, press enter to lowercase and trim records.");
+			// Let the user know the count of records. 
+			Console.WriteLine($"{tblSchoolEnrolls.Count} rows in tblSchoolEnrolls, press enter to lowercase and trim records.");
 
-			//// Stop for user input.
-			//Console.ReadLine();
+			// Stop for user input.
+			Console.ReadLine();
 
-			//var lowerCasedAndTrimmedEnrolls = transferService.LowerCaseAndTrimRecords(tblSchoolEnrolls);
-			//Console.WriteLine($"{lowerCasedAndTrimmedEnrolls.Count} enrolls trimmed and lowercased.");
+			var lowerCasedAndTrimmedEnrolls = transferService.LowerCaseAndTrimRecords(tblSchoolEnrolls);
+			Console.WriteLine($"{lowerCasedAndTrimmedEnrolls.Count} enrolls trimmed and lowercased.");
 
-			//// Step 2: Get all the unique first and last names of tblSchoolEnroll and save them
-			//// to the EnrollStudent table. 
-			//var uniqueStudents = studentService.GetUniqueFirstAndLastName(lowerCasedAndTrimmedEnrolls);
-			//Console.WriteLine($"Press enter to write {uniqueStudents.Count} unique first and last name combinations to the EnrollStudents table...");
+			// Step 2: Get all the unique first and last names of tblSchoolEnroll and save them
+			// to the EnrollStudent table. 
+			var uniqueStudents = studentService.GetUniqueFirstAndLastName(lowerCasedAndTrimmedEnrolls);
+			Console.WriteLine($"Press enter to write {uniqueStudents.Count} unique first and last name combinations to the EnrollStudents table...");
 
-			//// Stop for user input.
-			//Console.ReadLine();
+			// Stop for user input.
+			Console.ReadLine();
 
-			//// Save the records.
-			///*
-			//This process can take a moment so I set up a progress logger with exception handling so the
-			//end user doesn't think something went wrong, and if there is an error, they should be updated with
-			//relevant information.
-			//TODO: Have the ability for the user to do something about the error. ie, Cancel, Return, Inspect?
-			//*/
+			// Save the records.
+			/*
+			This process can take a moment so I set up a progress logger with exception handling so the
+			end user doesn't think something went wrong, and if there is an error, they should be updated with
+			relevant information.
+			TODO: Have the ability for the user to do something about the error. ie, Cancel, Return, Inspect?
+			*/
 
-			//transferService.AddRecordsRange(uniqueStudents, processLogger.RecordsProcessed);
+			transferService.AddRecordsRange(uniqueStudents, processLogger.RecordsProcessed);
 
-			//// Step 3: Lets take tblSchoolEnroll table and create a version of it with the the first middle and
-			//// last names removed and replaced with the student id value. Then from here we'll process the data
-			//// further. We'll call this EnrollInfo. 
-			//var students = studentService.GetAllEnrollStudents();
-			//var studentsToEnrollInfo = enrollInfoService.tblSchoolEnrollToEnrollInfo(lowerCasedAndTrimmedEnrolls, students);
-			
-			//Console.WriteLine($"Press enter to write {studentsToEnrollInfo.Count} records to the EnrollInfo Table, this could take a moment...");
+			// Step 3: Lets take tblSchoolEnroll table and create a version of it with the the first middle and
+			// last names removed and replaced with the student id value. Then from here we'll process the data
+			// further. We'll call this EnrollInfo. 
+			var enrollStudents = studentService.GetAllEnrollStudents();
+			var studentsToEnrollInfo = enrollInfoService.tblSchoolEnrollToEnrollInfo(lowerCasedAndTrimmedEnrolls, enrollStudents);
 
-			//// Stop for user input 
-			//Console.ReadLine();
+			Console.WriteLine($"Press enter to write {studentsToEnrollInfo.Count} records to the EnrollInfo Table, this could take a moment...");
 
-			//// Save the records
-			//transferService.AddRecordsRange(studentsToEnrollInfo, processLogger.RecordsProcessed);
+			// Stop for user input 
+			Console.ReadLine();
 
-			//// Step 4: Now lets find all the unique Contact information for each user. 
+			// Save the records
+			transferService.AddRecordsRange(studentsToEnrollInfo, processLogger.RecordsProcessed);
 
-			//// User will have many contact info rows, I think this is because every time the user signs up 
-			//// for a class, they have to type everything in again, allowing for so many anomalies. 
+			// Step 4: Now lets find all the unique Contact information for each user. 
 
-			//var studentInfoRecords = studentService.GetAllStudentInfo();
-			//var uniqueContactInfo = studentService.GetUniqueContactInfo(studentInfoRecords);
+			// User will have many contact info rows, I think this is because every time the user signs up 
+			// for a class, they have to type everything in again, allowing for so many anomalies. 
 
-			//Console.WriteLine($"Press enter to write {uniqueContactInfo.Count} records to the ContactInfo Table, this could take a moment...");
+			var enrollInfoRecords = enrollInfoService.GetAllEnrollInfo();
+			var uniqueEnrollContact = enrollContactService.GetUniqueContacts(enrollInfoRecords);
 
-			//// Stop for user input
-			//Console.ReadLine();
+			Console.WriteLine($"Press enter to write {uniqueEnrollContact.Count} records to the ContactInfo Table, this could take a moment...");
 
-			//// Save the records
-			//transferService.AddRecordsRange(uniqueContactInfo, processLogger.RecordsProcessed);
+			// Stop for user input
+			Console.ReadLine();
+
+			// Save the records
+			transferService.AddRecordsRange(uniqueEnrollContact, processLogger.RecordsProcessed);
 
 			//// Step 5: Now let find all the unique course history for each user
 			//// the way this is tracked, *I think*,  is with DateRegister, DateSchool, SchoolType,

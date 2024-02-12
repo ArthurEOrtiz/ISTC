@@ -11,13 +11,6 @@ namespace ETL.Interfaces
 		List<EnrollInfo> GetAllEnrollInfo();
 
 		/// <summary>
-		/// Creates a list of unique contact information.
-		/// </summary>
-		/// <param name="studentInfo"><see cref="List{T}"/> of <see cref="EnrollInfo"/></param>
-		/// <returns><see cref="List{T}"/> of <see cref="EnrollContact"/></returns>
-		List<EnrollContact> GetUniqueContactInfo(List<EnrollInfo> enrollInfo);
-
-		/// <summary>
 		/// Takes a collection of <see cref="TblSchoolEnroll"/> objects, and transforms it into a a collection 
 		/// of <see cref="EnrollInfo"/> with a foreign key to the <see cref="EnrollStudent"/> Table.
 		/// </summary>

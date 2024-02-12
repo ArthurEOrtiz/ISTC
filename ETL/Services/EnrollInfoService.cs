@@ -19,48 +19,6 @@ namespace ETL.Services
 			return _transferContext.EnrollInfo.ToList();
 		}
 
-		public List<EnrollContact> GetUniqueContactInfo(List<EnrollInfo> studentInfo)
-		{
-			return studentInfo
-				.GroupBy(si => new
-				{
-					si.EnrollStudentID,
-					si.JobTitle,
-					si.Employer,
-					si.EmailAddr,
-					si.AddrStreet,
-					si.AddrSteNmbr,
-					si.AddrCity,
-					si.AddrState,
-					si.AddrZip,
-					si.TelAc,
-					si.TelPrfx,
-					si.TelNmbr,
-					si.FaxAc,
-					si.FaxPrfx,
-					si.FaxNmbr
-				})
-				.Select(group => new EnrollContact
-				{
-					EnrollStudentID = group.Key.EnrollStudentID,
-					JobTitle = group.Key.JobTitle,
-					Employer = group.Key.Employer,
-					EmailAddr = group.Key.EmailAddr,
-					AddrStreet = group.Key.AddrStreet,
-					AddrSteNmbr = group.Key.AddrSteNmbr,
-					AddrCity = group.Key.AddrCity,
-					AddrState = group.Key.AddrState,
-					AddrZip = group.Key.AddrZip,
-					TelAc = group.Key.TelAc,
-					TelPrfx = group.Key.TelPrfx,
-					TelNmbr = group.Key.TelNmbr,
-					FaxAc = group.Key.FaxAc,
-					FaxPrfx = group.Key.FaxPrfx,
-					FaxNmbr = group.Key.FaxNmbr
-				})
-				.ToList();
-		}
-
 		public List<EnrollInfo> tblSchoolEnrollToEnrollInfo(List<TblSchoolEnroll> tblSchoolEnrolls, List<EnrollStudent> students)
 		{
 
