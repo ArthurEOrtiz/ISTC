@@ -4,7 +4,7 @@ using ETL.Transfer.Models;
 
 namespace ETL.Services
 {
-	internal class CourseService : ICourseService
+	internal class CourseInfoService : ICourseInfoService
 	{
 		public List<CourseInfo> tblSchoolCourseToCourseInfo(List<TblSchoolCourse> tblSchoolCourses)
 		{

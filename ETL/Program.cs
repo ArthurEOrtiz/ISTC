@@ -38,7 +38,7 @@ class Program
 				services.AddTransient<IEnrollInfoService, EnrollInfoService>();
 				services.AddTransient<IEnrollContactService, EnrollContactService>();
 				services.AddTransient<IEnrollHistoryService, EnrollHistoryService>();
-				services.AddTransient<ICourseService, CourseService>();
+				services.AddTransient<ICourseInfoService, CourseInfoService>();
 			})
 			.Build();
 
@@ -54,7 +54,7 @@ class Program
 			var enrollInfoService = serviceProvider.GetRequiredService<IEnrollInfoService>();
 			var enrollContactService = serviceProvider.GetRequiredService<IEnrollContactService>();
 			var enrollHistoryService = serviceProvider.GetRequiredService<IEnrollHistoryService>();
-			var courseService = serviceProvider.GetRequiredService<ICourseService>();
+			var courseService = serviceProvider.GetRequiredService<ICourseInfoService>();
 			var processLogger = new ProgressLogger();
 
 			//Step 0: Start with a clean slate when needed. 
@@ -151,12 +151,13 @@ class Program
 			 * So far in my observation, there is 16575 instances of students enrolled in courses, however, 
 			 * In tblSchoolHistory there is 24769 records of students completing courses. Also, SchoolType can be
 			 * 'r' for regional 's' for summer, and 'w' for winter. An anomaly in tblSchoolCourses, there are 4
-			 * rows of '1'. 
+			 * rows of '1'. Also, the way tables are joined in the ColdFusion application, it changes the values
+			 * oc sSeq/seq can change in a way i might not understand or unpredictable. I'll have to import the 
+			 * rest of the tables lower case and trim them, and try to emulate what the previous application 
+			 * did. 
 			 */
 
-
 			// First, lets get tblSchoolCourse data in here and lowercase and trim it. 
-
 			var tblSchoolCourses = extractService.GetTblSchoolCourse();
 			Console.WriteLine($"{tblSchoolCourses.Count} rows in tblSchoolCourses, press enter to lowercase and trim records.");
 

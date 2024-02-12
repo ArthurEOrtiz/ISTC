@@ -3,7 +3,7 @@ using ETL.Transfer.Models;
 
 namespace ETL.Interfaces
 {
-	internal interface ICourseService
+	internal interface ICourseInfoService
 	{
 		/// <summary>
 		/// Converts a <see cref="List{T}"/> of <see cref="TblSchoolCourse"/> to a <see cref="List{T}"/> of <see cref="CourseInfo"/>
