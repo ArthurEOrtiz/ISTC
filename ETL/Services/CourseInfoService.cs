@@ -1,35 +1,25 @@
 ﻿using ETL.Extract.Models;
 using ETL.Interfaces;
-using ETL.Transfer.DataAccess;
 using ETL.Transfer.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ETL.Services
 {
-	internal class CourseService : ICourseService
+	internal class CourseInfoService : ICourseInfoService
 	{
-		private readonly TransferContext _transferContext;
-
-		public CourseService(TransferContext transferContext) 
-		{
-			_transferContext = transferContext;
-		}
-
 		public List<CourseInfo> tblSchoolCourseToCourseInfo(List<TblSchoolCourse> tblSchoolCourses)
 		{
-			List<CourseInfo> courseInfoList = new();
+			List<CourseInfo> courseInfoList = new ();
 
 			foreach (var tblSchoolCourse in tblSchoolCourses)
 			{
-				CourseInfo courseInfo = new CourseInfo 
+				CourseInfo courseInfo = new()
 				{ 
 					CDateSchool = tblSchoolCourse.CDateSchool,
 					CSchoolType = tblSchoolCourse.CSchoolType,
 					CSSeq = tblSchoolCourse.CSseq,
-					CSeq = tblSchoolCourse.CSeq,
+					CSeq = tblSchoolCourse.CSseq,
 					CName = tblSchoolCourse.CName,
 					CRoom = tblSchoolCourse.CRoom,
-					CDesc = tblSchoolCourse.CDesc,
 					CLink = tblSchoolCourse.CLink,
 					CTime = tblSchoolCourse.CTime,
 					Cwkday1 = tblSchoolCourse.Cwkday1,
@@ -53,21 +43,5 @@ namespace ETL.Services
 			return courseInfoList;
 		}
 
-		public List<CourseInfo> GetAllCoursesBySchoolType(string schoolType)
-		{
-			if (string.IsNullOrEmpty(schoolType))
-			{
-				throw new ArgumentNullException(nameof(schoolType));
-			}
-
-			if (schoolType != "r" && schoolType != "s" && schoolType != "w")
-			{
-				throw new ArgumentException("Invalid school type, Allowed values are 'r' 's' or 'w'");
-			}
-
-			return _transferContext.CourseInfo
-				.Where(record => record.CSchoolType == schoolType)
-				.ToList();
-		}
 	}
 }

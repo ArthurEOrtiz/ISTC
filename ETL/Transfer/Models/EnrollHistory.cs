@@ -3,16 +3,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ETL.Transfer.Models
 {
-	public class StudentHistory
+	public class EnrollHistory
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		[Column("student_history_ID")]
-		public int StudentHistoryID { get; set; }
+		[Column("Enroll_history_ID")]
+		public int EnrollHistoryID { get; set; }
 
-		[ForeignKey("Student")]
-		[Column("student_ID")]
-		public int StudentID { get; set; }
+		[ForeignKey("EnrollStudent")]
+		[Column("enroll_student_ID")]
+		public int EnrollStudentID { get; set; }
 
 		public DateTime? DateRegistered { get; set; }
 		public DateTime DateSchool {  get; set; }
@@ -21,6 +21,6 @@ namespace ETL.Transfer.Models
 		public int? CSeq { get; set; }	
 
 		// Navigation property to student. 
-		public Student student { get; set; } = null!;
+		public EnrollStudent EnrollStudent { get; set; } = null!;
 	}
 }

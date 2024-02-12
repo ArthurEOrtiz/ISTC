@@ -7,11 +7,10 @@ namespace ETL.Transfer.DataAccess
 	{
 		public TransferContext(DbContextOptions<TransferContext> options) : base(options) { }
 
-		public DbSet<Student> Students { get; set; } = null!;
-		public DbSet<StudentInfo> StudentInfo { get; set; } = null!;
-		public DbSet<ContactInfo> ContactInfo { get; set; } = null!;
-		public DbSet<CourseHistory> CourseHistory { get; set; } = null!;
-		public DbSet<StudentHistory> StudentHistory { get; set; } = null!;
+		public DbSet<EnrollStudent> EnrollStudents { get; set; } = null!;
+		public DbSet<EnrollInfo> EnrollInfo { get; set; } = null!;
+		public DbSet<EnrollContact> EnrollContacts { get; set; } = null!;
+		public DbSet<EnrollHistory> EnrollHistory { get; set; } = null!;
 		public DbSet<CourseInfo> CourseInfo { get; set; } = null!;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)

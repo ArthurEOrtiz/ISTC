@@ -4,6 +4,7 @@ using ETL.Transfer.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ETL.Migrations
 {
     [DbContext(typeof(TransferContext))]
-    partial class TransferContextModelSnapshot : ModelSnapshot
+    [Migration("20240209223656_ChangeTableNames")]
+    partial class ChangeTableNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,91 +24,157 @@ namespace ETL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("ETL.Transfer.Models.CourseInfo", b =>
+            modelBuilder.Entity("ETL.Transfer.Models.CourseHistory", b =>
                 {
-                    b.Property<int>("CourseInfoID")
+                    b.Property<int>("CourseHistoryID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("enroll_contact_ID");
+                        .HasColumnName("course_history_ID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseInfoID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseHistoryID"), 1L, 1);
 
-                    b.Property<string>("CAllow")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool?>("C01")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("CAttendCredit")
-                        .HasColumnType("int");
+                    b.Property<bool?>("C02")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("CCertType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool?>("C03")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime>("CDateSchool")
+                    b.Property<bool?>("C04")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C05")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C06")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C07")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C08")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C09")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C10")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C11")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C12")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C13")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C14")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C15")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C16")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C17")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C18")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C19")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C20")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C21")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C22")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C23")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C24")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C25")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C26")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C27")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C28")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C29")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C30")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C31")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C32")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C33")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C34")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C35")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C36")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C37")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C38")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C39")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("C40")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("DateRegistered")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CDesc")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("DateSchool")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("CFullCredit")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CMaxStudents")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CPabclass")
+                    b.Property<string>("SchoolType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CRoom")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CSSeq")
+                    b.Property<int>("Seq")
                         .HasColumnType("int");
 
-                    b.Property<string>("CSchoolType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("StudentID")
+                        .HasColumnType("int")
+                        .HasColumnName("student_ID");
 
-                    b.Property<int>("CSeq")
-                        .HasColumnType("int");
+                    b.HasKey("CourseHistoryID");
 
-                    b.Property<string>("CTime")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasIndex("StudentID");
 
-                    b.Property<string>("Cprereq")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cwkday1")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cwkday2")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cwkday3")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cwkday4")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cwkday5")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cwkday6")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cwkday7")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CourseInfoID");
-
-                    b.ToTable("CourseInfo");
+                    b.ToTable("CourseHistory");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.EnrollContact", b =>
@@ -140,10 +208,6 @@ namespace ETL.Migrations
                     b.Property<string>("Employer")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EnrollStudentID")
-                        .HasColumnType("int")
-                        .HasColumnName("enroll_student_ID");
-
                     b.Property<string>("FaxAc")
                         .HasColumnType("nvarchar(max)");
 
@@ -156,6 +220,10 @@ namespace ETL.Migrations
                     b.Property<string>("JobTitle")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("StudentID")
+                        .HasColumnType("int")
+                        .HasColumnName("student_ID");
+
                     b.Property<string>("TelAc")
                         .HasColumnType("nvarchar(max)");
 
@@ -167,9 +235,9 @@ namespace ETL.Migrations
 
                     b.HasKey("EnrollContactID");
 
-                    b.HasIndex("EnrollStudentID");
+                    b.HasIndex("StudentID");
 
-                    b.ToTable("EnrollContacts");
+                    b.ToTable("EnrollContact");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.EnrollHistory", b =>
@@ -190,10 +258,6 @@ namespace ETL.Migrations
                     b.Property<DateTime>("DateSchool")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("EnrollStudentID")
-                        .HasColumnType("int")
-                        .HasColumnName("enroll_student_ID");
-
                     b.Property<string>("SchoolType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -201,21 +265,25 @@ namespace ETL.Migrations
                     b.Property<int>("Seq")
                         .HasColumnType("int");
 
+                    b.Property<int>("StudentID")
+                        .HasColumnType("int")
+                        .HasColumnName("student_ID");
+
                     b.HasKey("EnrollHistoryID");
 
-                    b.HasIndex("EnrollStudentID");
+                    b.HasIndex("StudentID");
 
                     b.ToTable("EnrollHistory");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.EnrollInfo", b =>
                 {
-                    b.Property<int>("EnrollInfoID")
+                    b.Property<int>("EnrollInfoId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("enroll_info_ID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EnrollInfoID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EnrollInfoId"), 1L, 1);
 
                     b.Property<string>("AddrCity")
                         .HasColumnType("nvarchar(max)");
@@ -365,10 +433,6 @@ namespace ETL.Migrations
                     b.Property<string>("Employer")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EnrollStudentID")
-                        .HasColumnType("int")
-                        .HasColumnName("enroll_student_ID");
-
                     b.Property<string>("FaxAc")
                         .HasColumnType("nvarchar(max)");
 
@@ -388,6 +452,10 @@ namespace ETL.Migrations
                     b.Property<int>("Seq")
                         .HasColumnType("int");
 
+                    b.Property<int>("StudentID")
+                        .HasColumnType("int")
+                        .HasColumnName("student_ID");
+
                     b.Property<string>("TelAc")
                         .HasColumnType("nvarchar(max)");
 
@@ -397,77 +465,86 @@ namespace ETL.Migrations
                     b.Property<string>("TelPrfx")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("EnrollInfoID");
+                    b.HasKey("EnrollInfoId");
 
-                    b.HasIndex("EnrollStudentID");
+                    b.HasIndex("StudentID");
 
                     b.ToTable("EnrollInfo");
                 });
 
-            modelBuilder.Entity("ETL.Transfer.Models.EnrollStudent", b =>
+            modelBuilder.Entity("ETL.Transfer.Models.Student", b =>
                 {
-                    b.Property<int>("EnrollStudentID")
+                    b.Property<int>("StudentID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("enroll_student_ID");
+                        .HasColumnName("student_ID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EnrollStudentID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentID"), 1L, 1);
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("first_name");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("last_name");
 
-                    b.HasKey("EnrollStudentID");
+                    b.HasKey("StudentID");
 
-                    b.ToTable("EnrollStudents");
+                    b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("ETL.Transfer.Models.CourseHistory", b =>
+                {
+                    b.HasOne("ETL.Transfer.Models.Student", "student")
+                        .WithMany("CourseHistory")
+                        .HasForeignKey("StudentID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("student");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.EnrollContact", b =>
                 {
-                    b.HasOne("ETL.Transfer.Models.EnrollStudent", "EnrollStudent")
-                        .WithMany("EnrollContacts")
-                        .HasForeignKey("EnrollStudentID")
+                    b.HasOne("ETL.Transfer.Models.Student", "student")
+                        .WithMany("ContactInfo")
+                        .HasForeignKey("StudentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EnrollStudent");
+                    b.Navigation("student");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.EnrollHistory", b =>
                 {
-                    b.HasOne("ETL.Transfer.Models.EnrollStudent", "EnrollStudent")
-                        .WithMany("EnrollHistory")
-                        .HasForeignKey("EnrollStudentID")
+                    b.HasOne("ETL.Transfer.Models.Student", "student")
+                        .WithMany()
+                        .HasForeignKey("StudentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EnrollStudent");
+                    b.Navigation("student");
                 });
 
             modelBuilder.Entity("ETL.Transfer.Models.EnrollInfo", b =>
                 {
-                    b.HasOne("ETL.Transfer.Models.EnrollStudent", "EnrollStudent")
-                        .WithMany("EnrollInfo")
-                        .HasForeignKey("EnrollStudentID")
+                    b.HasOne("ETL.Transfer.Models.Student", "student")
+                        .WithMany("StudentInfo")
+                        .HasForeignKey("StudentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EnrollStudent");
+                    b.Navigation("student");
                 });
 
-            modelBuilder.Entity("ETL.Transfer.Models.EnrollStudent", b =>
+            modelBuilder.Entity("ETL.Transfer.Models.Student", b =>
                 {
-                    b.Navigation("EnrollContacts");
+                    b.Navigation("ContactInfo");
 
-                    b.Navigation("EnrollHistory");
+                    b.Navigation("CourseHistory");
 
-                    b.Navigation("EnrollInfo");
+                    b.Navigation("StudentInfo");
                 });
 #pragma warning restore 612, 618
         }

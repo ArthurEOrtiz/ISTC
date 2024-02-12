@@ -7,7 +7,7 @@ namespace ETL.Transfer.Models
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		[Column("course_info_ID")]
+		[Column("enroll_contact_ID")]
 		public int CourseInfoID { get; set; }
 		public string CSchoolType { get; set; } = null!;
 		public DateTime CDateSchool { get; set; }

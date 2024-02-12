@@ -3,16 +3,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ETL.Transfer.Models
 {
-	public class ContactInfo
+	public class EnrollContact
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		[Column("contact_info_ID")]
-		public int ContactInfoID { get; set; }
+		[Column("enroll_contact_ID")]
+		public int EnrollContactID { get; set; }
 
-		[ForeignKey("Student")]
-		[Column("student_ID")]
-		public int StudentID { get; set; }
+		[ForeignKey("EnrollStudent")]
+		[Column("enroll_student_ID")]
+		public int EnrollStudentID { get; set; }
 
 		public string? JobTitle { get; set; }
 		public string? Employer { get; set; }
@@ -30,7 +30,7 @@ namespace ETL.Transfer.Models
 		public string? FaxNmbr { get; set; }
 
 		// Navigation property to student 
-		public Student student { get; set; } = null!;
+		public EnrollStudent EnrollStudent { get; set; } = null!;
 
 	}
 }
