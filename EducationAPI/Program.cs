@@ -9,9 +9,7 @@ var options =
 	builder.Configuration.GetSection(nameof(EducationProgramDataBaseOptions))
 		.Get<EducationProgramDataBaseOptions>();
 
-string connectionString = options.ConnectionString;
-
-ConfigureServices(builder, connectionString);
+ConfigureServices(builder, options.ConnectionString);
 
 WebApplication app = builder.Build();
 
