@@ -370,3 +370,4 @@ FodyWeavers.xsd
 /ETL/Documents/DataExports/Student_History_02.csv
 /ETL/Documents/DataExports/Student_History_01.csv
 /educationui/package-lock.json
+/EducationAPI/appsettings.Development.json
