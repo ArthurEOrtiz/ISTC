@@ -63,7 +63,6 @@ class Program
 			transferService.DeleteAllRecords(transferContext.EnrollStudents);
 			transferService.DeleteAllRecords(transferContext.EnrollInfo);
 			transferService.DeleteAllRecords(transferContext.EnrollContacts);
-			transferService.DeleteAllRecords(transferContext.CourseHistory);
 			transferService.DeleteAllRecords(transferContext.EnrollHistory);
 			//transferService.DeleteAllRecords(transferContext.CourseInfo);
 

@@ -10,9 +10,8 @@ namespace ETL.Transfer.DataAccess
 		public DbSet<EnrollStudent> EnrollStudents { get; set; } = null!;
 		public DbSet<EnrollInfo> EnrollInfo { get; set; } = null!;
 		public DbSet<EnrollContact> EnrollContacts { get; set; } = null!;
-		public DbSet<CourseHistory> CourseHistory { get; set; } = null!;
 		public DbSet<EnrollHistory> EnrollHistory { get; set; } = null!;
-		public DbSet<EnrollContact> CourseInfo { get; set; } = null!;
+		public DbSet<CourseInfo> CourseInfo { get; set; } = null!;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
