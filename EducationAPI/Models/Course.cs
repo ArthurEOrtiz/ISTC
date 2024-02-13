@@ -9,8 +9,7 @@ namespace EducationAPI.Models
 	/// It also tracks attendance and completion credits. 
 	/// If the admin assigns this course to a topic, it should have 
 	/// a topic id, null if otherwise. 
-	/// The admin can assign an location to the course, or, say in the
-	/// instance this course is online, can be null. 
+	/// The admin can assign an location to the course.
 	/// A course can have one or many classes that represent day, or 
 	/// days the class is being held. 
 	/// </summary>
