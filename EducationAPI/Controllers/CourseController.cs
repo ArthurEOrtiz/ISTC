@@ -22,7 +22,9 @@ namespace EducationAPI.Controllers
 		[HttpGet(Name = "GetCourseById")]
 		public async Task<ActionResult<Course>> GetCourseById(int id)
 		{
-			var course = await _educationProgramContext.Courses.FindAsync(id);
+			var course = await _educationProgramContext.Courses
+				.Include(c => c.Classes)
+				.FirstOrDefaultAsync(c => c.CourseId ==id);
 
 			if (course == null)
 			{
@@ -37,24 +39,7 @@ namespace EducationAPI.Controllers
 		{
 			try
 			{
-				//Initialize a new instance of a location model 
-				Location location = new();
-				// Set some default values if needed 
-				location.City = "Boise";
-				location.State = "Idaho";
-				// add the location instance to the parent course. 
-				course.Location = location;
-
-				// Initialize a new instance of a class model 
-				Class @class = new();
-				// Set some default values for non-nullable properties.
-				@class.ScheduleStart = DateTime.Now;
-				@class.ScheduleEnd = DateTime.Now;
-
-				// add the single class instance to parent course. 
-				course.Classes.Add(@class);
-
-				// add the course to the dB context 
+				
 				_educationProgramContext.Courses.Add(course);
 				await _educationProgramContext.SaveChangesAsync();
 

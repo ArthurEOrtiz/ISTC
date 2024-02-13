@@ -21,9 +21,6 @@ namespace EducationAPI.Models
 		public DateTime ScheduleStart { get; set; }
 
 		public DateTime ScheduleEnd { get; set; }
-
-		[JsonIgnore]
-		public virtual Course Course { get; set; } = null!;
 	
 		public virtual ICollection<Attendance>? Attendances { get; set; }
 	}
