@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace EducationAPI.Models
 {
@@ -21,6 +22,7 @@ namespace EducationAPI.Models
 
 		public DateTime ScheduleEnd { get; set; }
 
+		[JsonIgnore]
 		public virtual Course Course { get; set; } = null!;
 	
 		public virtual ICollection<Attendance>? Attendances { get; set; }

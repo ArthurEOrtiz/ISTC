@@ -24,25 +24,27 @@ namespace EducationAPI.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int CourseId { get; set; }
 
+		[Required]
 		[MaxLength(50)]
-		public string? Title { get; set; }
+		public string Title { get; set; } = null!;
 
 		[MaxLength(255)]
 		public string? Description { get; set; }
 
-		[Range(0,100)]
+		[Range(0, 100)]
 		public int AttendanceCredit { get; set; }
 
-		[Range(0,100)]	
+		[Range(0, 100)]
 		public int CompletionCredit { get; set; }
 
 		public DateTime? EnrollmentDeadline { get; set; }
 
+		[Required]
 		[EmailAddress]
 		public string InstructorEmail { get; set; } = null!;
 
-		[Url]
-		public string pdf { get; set; } = null!;
+		[FileExtensions(Extensions = "pdf", ErrorMessage = "The file must be a PDF.")]
+		public string? Pdf { get; set; }
 
 		public int LocationId { get; set; }
 
@@ -53,7 +55,7 @@ namespace EducationAPI.Models
 
 		[ForeignKey("TopicId")]
 		public Topic? Topic { get; set; }
-		
+
 		public virtual ICollection<Class> Classes { get; set; }
 	}
 }

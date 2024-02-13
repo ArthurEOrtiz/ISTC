@@ -6,23 +6,6 @@
 --WHERE hLastName = 'ABEGGLEN' AND
 --hFirstName = 'DIANE'
 
---This return 950 rows 
---SELECT DISTINCT hName 
---FROM tblSchoolHistory
---ORDER BY hNAME
-
--- this returns 977 rows
---SELECT DISTINCT hLastName, hFirstName
---FROM tblSchoolHistory
---ORDER BY hLastName
-
--- this returns 989 rows 
---SELECT DISTINCT hLastName, hFirstName, hEmployer
---FROM tblSchoolHistory
---ORDER BY hLastName
-
-
-
 /*
 	Here are some of Glenn's stupid fucking queries 
 	Recordset1
@@ -79,12 +62,32 @@
 --WHERE hEMPLOYER = 'WASHINGTON' AND
 --hLastName = 'BARDAN' AND
 --hFirstName = 'KAYTLYNN'
---ORDER BY hDateSchool
+--ORDER BY hDateSchool;
 
-SELECT tblSchoolHistory. *
-From tblSchoolhistory 
-WHERE 
-	hEmployer = 'RETIRED' AND 
-	hlastname = 'ABEGGLEN' AND 
-	hfirstname = 'DIANE' AND
-	hSchoolType = 'r';
+--SELECT tblSchoolHistory. *
+--From tblSchoolhistory 
+--WHERE 
+--	hEmployer = 'RETIRED' AND 
+--	hlastname = 'ABEGGLEN' AND 
+--	hfirstname = 'DIANE' AND
+--	hSchoolType = 'r';
+
+--SELECT DISTINCT hNAME
+--FROM tblSchoolHistory
+-- 950 rows
+
+--SELECT DISTINCT hLastName, hFirstName
+--FROM tblSchoolHistory
+-- 977 rows, with nulls about 7 in the last name 1 with firstname name 
+
+--SELECT tblSchoolHistory.*
+--FROM tblSchoolHistory
+--WHERE hEmailAddr IS NOT NULL
+--18466 rows
+
+SELECT tblSchoolHistory.*
+FROM tblSchoolHistory
+--WHERE hEmailAddr IS NULL
+-- 6303 rows
+
+

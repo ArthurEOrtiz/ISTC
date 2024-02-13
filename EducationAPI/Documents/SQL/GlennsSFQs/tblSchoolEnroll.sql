@@ -72,9 +72,6 @@
 
 SELECT tblSchoolEnroll.*
 FROM tblSchoolEnroll
-WHERE 
-	SchoolType = 'r' AND 
-	Seq = 1 AND 
-	c02 = 1
+
 
 
