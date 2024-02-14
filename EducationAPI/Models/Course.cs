@@ -37,6 +37,8 @@ namespace EducationAPI.Models
 		[Range(0, 100)]
 		public int CompletionCredit { get; set; }
 
+		public int MaxAttendance {  get; set; }
+
 		public DateTime? EnrollmentDeadline { get; set; }
 
 		public string? InstructorName { get; set; }
