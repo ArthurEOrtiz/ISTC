@@ -1,4 +1,4 @@
-import EditCoursesMenu from "@/app/admin/editcourses/EditCoursesMenu";
+import EditCoursesMenu from "./EditCourseMenu";
 
 export default function EditCoursesLayout({
     children,

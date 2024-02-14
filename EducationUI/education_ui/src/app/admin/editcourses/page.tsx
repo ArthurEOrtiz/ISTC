@@ -2,9 +2,9 @@ import React from 'react'
 
 const EditCourses = () => {
   return (
-    <div>
+    <main>
       <h1>Add or Edit Courses</h1>
-    </div>
+    </main>
   )
 }
 

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 
 export default function CourseForm() {
   const [formState, setFormState] = useState({
@@ -19,21 +19,116 @@ export default function CourseForm() {
     });
   };
 
+  function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    e.preventDefault();
+    console.log("Button clicked");
+  };
+
   const handleSubmit = (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     // Handle form submission here
   };
+  
+  
+  function handleCreditInput(event: FormEvent<HTMLInputElement>): void {
+    console.log("Input event fired");
+    };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-8 bg-white rounded-xl shadow-md">
-      <input type="text" name="title" placeholder="Title" onChange={handleChange} className="input input-bordered" />
-      <textarea name="description" placeholder="Description" onChange={handleChange} className="textarea textarea-bordered"></textarea>
-      <input type="text" name="attendanceCredit" placeholder="Attendance Credit" onChange={handleChange} className="input input-bordered" />
-      <input type="text" name="completionCredit" placeholder="Completion Credit" onChange={handleChange} className="input input-bordered" />
-      <input type="date" name="enrollmentDeadline" placeholder="Enrollment Deadline" onChange={handleChange} className="input input-bordered" />
-      <input type="text" name="instructorName" placeholder="Instructor Name" onChange={handleChange} className="input input-bordered" />
-      <input type="email" name="instructorEmail" placeholder="Instructor Email" onChange={handleChange} className="input input-bordered" />
-      <button type="submit" className="btn btn-primary">Submit</button>
+    <form onSubmit={handleSubmit}>
+      
+      <div className="p-1">
+        <label className="form-control w-full max-w-xs">
+          <div className="label">
+            <span className="label-text">Course Title</span>
+          </div>
+          <input 
+            type="text"
+            className="input input-bordered w-full max-w-xs" />
+        </label>
+      </div>
+
+      <div className="p-1">
+        <label className="form-control w-full max-w-xs">
+          <div className="label">
+            <span className="label-text">Description</span>
+          </div>
+          <textarea 
+            className="textarea textarea-bordered w-full max-w-xs" />
+        </label>
+      </div>
+
+      <div className="p-1">
+        <label className="form-control w-full max-w-xs">
+          <div className="label">
+            <span className="label-text">Attendance Credit</span>
+          </div>
+          <input 
+            type="text"
+            className="input input-bordered w-full max-w-xs"
+            value={formState.attendanceCredit}
+            onChange={handleCreditInput}
+          />
+        </label>
+      </div>
+
+      <div className="p-1">
+        <label className="form-control w-full max-w-xs">
+          <div className="label">
+            <span className="label-text">Completion Credit</span>
+          </div>
+          <input 
+            type="number"
+            className="input input-bordered w-full max-w-xs" />
+        </label>
+      </div>
+
+      <div className="p-1">
+        <label className="form-control w-full max-w-xs">
+          <div className="label">
+            <span className="label-text">Enrollment Deadline</span>
+          </div>
+          <input 
+            type="date"
+            className="input input-bordered w-full max-w-xs" />
+        </label>
+      </div>
+
+      <div className="p-1">
+        <label className="form-control w-full max-w-xs">
+          <div className="label">
+            <span className="label-text">Instructor Name</span>
+          </div>
+          <input 
+            type="text"
+            className="input input-bordered w-full max-w-xs" />
+        </label>
+      </div>
+
+      <div className="p-1">
+        <label className="form-control w-full max-w-xs">
+          <div className="label">
+            <span className="label-text">Instructor Email</span>
+          </div>
+          <input 
+            type="email"
+            className="input input-bordered w-full max-w-xs" />
+        </label>
+      </div>
+
+      <div className="p-1">
+        <button 
+          type="submit" 
+          className="btn btn-primary"
+          onClick={handleClick}
+          >
+          Submit
+        </button>
+      </div>
+
     </form>
   );
 }
+
+
+ 
