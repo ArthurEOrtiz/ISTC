@@ -3,26 +3,20 @@ import React from 'react';
 
 const Header: React.FC = () => {
     return (
-        <header className="flex justify-between items-center p-5 bg-blue-500">
+        <header className="flex justify-between items-center p-5 bg-primary">
             <h1 className="text-white text-2xl">Property Tax Education</h1>
             <nav>
                 <ul className="flex space-x-4">
                     <li>
-                        <Link href="/" className="curser-pointer text-white">
+                        <Link href="/" className="text-white">
                             Home
                         </Link>
                     </li>
                     <li>
-                        <Link href="/login" className="curser-pointer text-white">
-                            Login
+                        <Link href="/admin" className="text-white">
+                            Admin
                         </Link>
                     </li>
-                    <li>
-                        <Link href="/about" className="curser-pointer text-white">
-                            About
-                        </Link>
-                    </li>
-
                 </ul>
             </nav>
         </header>

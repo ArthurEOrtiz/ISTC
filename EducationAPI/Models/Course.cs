@@ -39,6 +39,8 @@ namespace EducationAPI.Models
 
 		public DateTime? EnrollmentDeadline { get; set; }
 
+		public string? InstructorName { get; set; }
+
 		[Required]
 		[EmailAddress]
 		public string InstructorEmail { get; set; } = null!;

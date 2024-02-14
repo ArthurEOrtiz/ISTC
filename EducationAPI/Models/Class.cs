@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace EducationAPI.Models
 {
 	public class Class
 	{
-		public Class() 
-		{ 
+		public Class()
+		{
 			Attendances = new HashSet<Attendance>();
 		}
 
@@ -21,7 +20,7 @@ namespace EducationAPI.Models
 		public DateTime ScheduleStart { get; set; }
 
 		public DateTime ScheduleEnd { get; set; }
-	
+
 		public virtual ICollection<Attendance>? Attendances { get; set; }
 	}
 }
