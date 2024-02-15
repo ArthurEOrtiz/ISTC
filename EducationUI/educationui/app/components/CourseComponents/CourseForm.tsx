@@ -560,7 +560,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                 >
                     Continue To Add Classes
                 </button>
-                {!isFormValid && <p className="text-red-500 text-xs italic">Please fill out all required fields.</p>}
+                {!isFormValid && <p className="text-red-500 text-xs italic w-1/2">Please fill out all required fields.</p>}
             </div>
         </form>
   )
