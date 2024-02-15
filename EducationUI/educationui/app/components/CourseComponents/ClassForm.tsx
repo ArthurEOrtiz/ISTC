@@ -1,5 +1,6 @@
 'use client';
 import { CourseFormData } from '@/app/shared/types/sharedTypes';
+import CourseCard from './CourseCard';
 
 interface ClassFromProps {
     courseFormData: CourseFormData | null;
@@ -8,10 +9,9 @@ interface ClassFromProps {
 const ClassForm : React.FC<ClassFromProps> = ({courseFormData}) => {
 
     return(
-        <div>
-            <h1>Class Form</h1>
-            <p>{courseFormData?.title}</p>
-        </div>
+        <>
+        <CourseCard courseFormData={courseFormData} />
+        </>
     );
 }
 
