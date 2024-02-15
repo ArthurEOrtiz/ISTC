@@ -1,9 +1,30 @@
 'use client';
 import React, { FormEvent, FocusEvent, useState } from 'react';
 
-const CourseForm = () => {
-    const [courseNameTouched, setCourseNameTouched] = useState<boolean>(false);
-    const [isCourseNameValid, setIsCourseNameValid] = useState<boolean>(false);
+interface FormData {
+    title: string;
+    description: string;
+    instructorName: string;
+    instructorEmail: string;
+    attendanceCredit: number;
+    completionCredit: number;
+    maxAttendance: number;
+    enrollmentDeadline: string;
+    pdf: string;
+    locationDescription: string;
+    room: string;
+    remoteLink: string;
+    addressLine1: string;
+    addressLine2: string;
+    city: string;
+    state: string;
+    postalCode: string;
+
+}
+
+const CourseForm = ({ onSubmit }: {onSubmit: (formData: FormData) => void}) => {
+    const [titleTouched, setTitleTouched] = useState<boolean>(false);
+    const [istitleValid, setIsTitleValid] = useState<boolean>(false);
     const [emailTouched, setEmailTouched] = useState<boolean>(false);  
     const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
     const [instructorNameTouched, setInstructorNameTouched] = useState<boolean>(false);
@@ -21,9 +42,39 @@ const CourseForm = () => {
     const [isAddressLine1Valid, setIsAddressLine1Valid] = useState<boolean>(false);
     const [cityTouched, setCityTouched] = useState<boolean>(false);
     const [isCityValid, setIsCityValid] = useState<boolean>(false);
-    const [zipTouched, setZipTouched] = useState<boolean>(false);
-    const [isZipValid, setIsZipValid] = useState<boolean>(false);
+    const [postalCodeTouched, setPostalCodeTouched] = useState<boolean>(false);
+    const [isPostalCodeValid, setIsPostalCodeValid] = useState<boolean>(false);
+    const [formData, setFormData] = useState<FormData>({
+        title: '',
+        description: '',
+        instructorName: '',
+        instructorEmail: '',
+        attendanceCredit: 0,
+        completionCredit: 0,
+        maxAttendance: 0,
+        enrollmentDeadline: '',
+        pdf: '',
+        locationDescription: '',
+        room: '',
+        remoteLink: '',
+        addressLine1: '',
+        addressLine2: '',
+        city: '',
+        state: '',
+        postalCode: '',
+    });
 
+    const handleChange = (event: FormEvent<HTMLInputElement>): void => {
+        const { id, value } = event.currentTarget;
+        setFormData((prev) => ({
+            ...prev,
+            [id]: value }));
+    }
+
+    const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
+        event.preventDefault();
+        onSubmit(formData);
+    }
 
     const handleIntInput = (event: FormEvent<HTMLInputElement>, minValue: number, maxValue: number): void => {
         const inputValue = event.currentTarget.value;
@@ -46,12 +97,12 @@ const CourseForm = () => {
         }
     }
     
-    const handleZipInput = (event: FormEvent<HTMLInputElement>): void => {
+    const handlePostalCodeInput = (event: FormEvent<HTMLInputElement>): void => {
         handleIntInput(event, 0, 99999);
     }
     
     const handleCreditInput = (event: FormEvent<HTMLInputElement>): void => {
-        handleIntInput(event, 1, 100);
+        handleIntInput(event, 0, 100);
     }
 
     const handleMaxAttendanceInput = (event: FormEvent<HTMLInputElement>): void => {
@@ -59,10 +110,10 @@ const CourseForm = () => {
     }
 
     
-    const handleCourseNameBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
-        setCourseNameTouched(true);
+    const handleCourseTitleBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
+        setTitleTouched(true);
         const isValid = event.target.value.length > 0;
-        setIsCourseNameValid(isValid);
+        setIsTitleValid(isValid);
     }
 
     const handleEmailBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
@@ -98,7 +149,7 @@ const CourseForm = () => {
 
     const validateCompletionCredit = (value: string): boolean => {
         const parsedValue = parseInt(value);
-        return parsedValue > attendanceCredit 
+        return parsedValue >= attendanceCredit 
     }
 
     const handleMaxAttendanceBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
@@ -130,13 +181,13 @@ const CourseForm = () => {
         setIsCityValid(isValid);
     }
 
-    const handleZipBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
-        setZipTouched(true);
+    const handlePostalCodeBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
+        setPostalCodeTouched(true);
         const isValid = event.target.value.length > 0;
-        setIsZipValid(isValid);
+        setIsPostalCodeValid(isValid);
     }
 
-    const isFormValid = isCourseNameValid && isEmailValid && isInstructorNameValid && isAttendanceCreditValid && isCompletionCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid && isAddressLine1Valid && isCityValid  && isZipValid;
+    const isFormValid = istitleValid && isEmailValid && isInstructorNameValid && isAttendanceCreditValid && isCompletionCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid && isAddressLine1Valid && isCityValid  && isPostalCodeValid;
 
     return (
         <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
@@ -144,30 +195,32 @@ const CourseForm = () => {
             <div className="mb-4">
                 <label
                     className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="courseName"
+                    htmlFor="title"
                 >
-                    Course Name
+                    Title
                 </label>
                 <input
-                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isCourseNameValid && courseNameTouched? 'border-red-500' : ''}`}
-                    id="courseName"
+                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!istitleValid && titleTouched? 'border-red-500' : ''}`}
+                    id="title"
                     type="text"
-                    placeholder="Course Name"
-                    onBlur={handleCourseNameBlur}
+                    placeholder="Title"
+                    value = {formData.title}
+                    onChange = {handleChange}
+                    onBlur={handleCourseTitleBlur}
                 />
-                {!isCourseNameValid && courseNameTouched && <p className="text-red-500 text-xs italic">Please enter a course name.</p>}
+                {!istitleValid && titleTouched && <p className="text-red-500 text-xs italic">Please enter a Title.</p>}
             </div>
 
             <div className="mb-4">
                 <label
                     className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="courseDescription"
+                    htmlFor="description"
                 >
                     Course Description
                 </label>
                 <textarea
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="courseDescription"
+                    id="description"
                     placeholder="Optional"
                 />
             </div>
@@ -185,7 +238,9 @@ const CourseForm = () => {
                         className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isInstructorNameValid && instructorNameTouched ? 'border-red-500' : ''}`}
                         id="instructorName"
                         type="text"
-                        placeholder="John Smith"
+                        placeholder="John Doe"
+                        value = {formData.instructorName}
+                        onChange = {handleChange}
                         onBlur={handleInstructorNameBlur}
                     />
                     {!isInstructorNameValid && instructorNameTouched && <p className="text-red-500 text-xs italic">Please enter an instructor name.</p>}
@@ -203,6 +258,8 @@ const CourseForm = () => {
                         id="instructorEmail"
                         type="email"
                         placeholder="valid@Email.com"
+                        value = {formData.instructorEmail}
+                        onChange = {handleChange}
                         onBlur={handleEmailBlur}
                     />
                     {!isEmailValid && emailTouched && <p className="text-red-500 text-xs italic">Please enter a valid email.</p>}
@@ -225,6 +282,8 @@ const CourseForm = () => {
                         type="text"
                         onInput={handleCreditInput}
                         placeholder="1-100"
+                        value = {formData.attendanceCredit}
+                        onChange = {handleChange}
                         onBlur={handleAttendanceCreditBlur}
                     />
                     {!isAttendanceCreditValid && attendanceCreditTouched && <p className="text-red-500 text-xs italic">Please enter a valid attendance credit.</p>}
@@ -243,6 +302,8 @@ const CourseForm = () => {
                         type="text"
                         onInput={handleCreditInput}
                         placeholder="1-100"
+                        value = {formData.completionCredit}
+                        onChange = {handleChange}
                         onBlur={handleCompletionCreditBlur}
                     />
                     {!isCompletionCreditValid && completionCreditTouched && <p className="text-red-500 text-xs italic">Please enter a valid completion credit.</p>}
@@ -261,6 +322,8 @@ const CourseForm = () => {
                         type="text"
                         onInput={handleMaxAttendanceInput}
                         placeholder="1-999"
+                        value = {formData.maxAttendance}
+                        onChange = {handleChange}
                         onBlur={handleMaxAttendanceBlur}
                     />
                     {!isMaxAttendanceValid && maxAttendanceTouched && <p className="text-red-500 text-xs italic">Please enter a valid max attendance.</p>}
@@ -281,6 +344,8 @@ const CourseForm = () => {
                         id="enrollmentDeadline"
                         min = {new Date().toISOString().split('T')[0]}
                         type="date"
+                        value = {formData.enrollmentDeadline}
+                        onChange = {handleChange}
                         onBlur={handleEnrollmentDeadlineBlur}
                     />
                     {!isEnrollmentDeadlineValid && enrollmentDeadlineTouched && <p className="text-red-500 text-xs italic">Please enter a valid enrollment deadline.</p>}
@@ -298,6 +363,8 @@ const CourseForm = () => {
                         id="pdf"
                         type="text"
                         placeholder='PDF URL, Optional'
+                        value = {formData.pdf}
+                        onChange = {handleChange}
                     />
                 </div>
 
@@ -315,6 +382,8 @@ const CourseForm = () => {
                     id="locationDescription"
                     type="text"
                     placeholder="Optional"
+                    value = {formData.locationDescription}
+                    onChange = {handleChange}
                 />
             </div>
 
@@ -347,6 +416,8 @@ const CourseForm = () => {
                         id="remoteLink"
                         type="url"
                         placeholder="https://zoom.us/j/1234567890?pwd=abc123"
+                        value = {formData.remoteLink}
+                        onChange = {handleChange}
                     />
                 </div>
 
@@ -364,6 +435,8 @@ const CourseForm = () => {
                     id="addressLine1"
                     type="text"
                     placeholder="123 Main St"
+                    value = {formData.addressLine1}
+                    onChange = {handleChange}
                     onBlur={handleAddressLine1Blur}
                 />
                 {!isAddressLine1Valid && addressLine1Touched && <p className="text-red-500 text-xs italic">Please enter an address.</p>}
@@ -381,6 +454,8 @@ const CourseForm = () => {
                     id="addressLine2"
                     type="text"
                     placeholder="Optional"
+                    value = {formData.addressLine2}
+                    onChange = {handleChange}
                 />
             </div>
 
@@ -398,6 +473,8 @@ const CourseForm = () => {
                         id="city"
                         type="text"
                         placeholder="Boise"
+                        value = {formData.city}
+                        onChange = {handleChange}
                         onBlur = {handleCityBlur}
                     />
                     {!isCityValid && cityTouched && <p className="text-red-500 text-xs italic">Please enter a city.</p>}
@@ -471,19 +548,21 @@ const CourseForm = () => {
                 <div className="mb-4 w-1/2 pl-2">
                     <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="zip"
+                        htmlFor="postalCode"
                     >
-                        Zip
+                        Zip Code
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isZipValid && zipTouched ? 'border-red-500' : ''}`}
-                        id="zip"
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isPostalCodeValid && postalCodeTouched ? 'border-red-500' : ''}`}
+                        id="postalCode"
                         type="text"
-                        onInput = {handleZipInput}
                         placeholder="83706"
-                        onBlur = {handleZipBlur}
+                        onInput = {handlePostalCodeInput}
+                        value = {formData.postalCode}
+                        onChange = {handleChange}
+                        onBlur = {handlePostalCodeBlur}
                     />
-                    {!isZipValid && zipTouched && <p className="text-red-500 text-xs italic">Please enter a valid zip.</p>}
+                    {!isPostalCodeValid && postalCodeTouched && <p className="text-red-500 text-xs italic">Please enter a valid Zip Code.</p>}
                 </div>  
             </div>
 
@@ -491,7 +570,7 @@ const CourseForm = () => {
             <div className="flex items-center justify-between">
                 <button
                     className={`bg-blue-500  text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'}`}
-                    type="button"
+                    type="submit"
                     disabled={!isFormValid}
                 >
                     Continue To Add Classes
