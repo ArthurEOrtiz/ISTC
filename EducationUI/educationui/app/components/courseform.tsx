@@ -1,28 +1,12 @@
 'use client';
 import React, { FormEvent, FocusEvent, useState } from 'react';
+import { FormData } from '@/app/shared/types/sharedTypes';
 
-interface FormData {
-    title: string;
-    description: string;
-    instructorName: string;
-    instructorEmail: string;
-    attendanceCredit: number;
-    completionCredit: number;
-    maxAttendance: number;
-    enrollmentDeadline: string;
-    pdf: string;
-    locationDescription: string;
-    room: string;
-    remoteLink: string;
-    addressLine1: string;
-    addressLine2: string;
-    city: string;
-    state: string;
-    postalCode: string;
-
+interface CourseFormProps {
+    onSubmit: (formData: FormData) => void;
 }
 
-const CourseForm = ({ onSubmit }: {onSubmit: (formData: FormData) => void}) => {
+const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formData: FormData) => void}) => {
     const [titleTouched, setTitleTouched] = useState<boolean>(false);
     const [istitleValid, setIsTitleValid] = useState<boolean>(false);
     const [emailTouched, setEmailTouched] = useState<boolean>(false);  
@@ -73,6 +57,7 @@ const CourseForm = ({ onSubmit }: {onSubmit: (formData: FormData) => void}) => {
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
+
         onSubmit(formData);
     }
 
@@ -190,7 +175,7 @@ const CourseForm = ({ onSubmit }: {onSubmit: (formData: FormData) => void}) => {
     const isFormValid = istitleValid && isEmailValid && isInstructorNameValid && isAttendanceCreditValid && isCompletionCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid && isAddressLine1Valid && isCityValid  && isPostalCodeValid;
 
     return (
-        <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
 
             <div className="mb-4">
                 <label
@@ -575,6 +560,7 @@ const CourseForm = ({ onSubmit }: {onSubmit: (formData: FormData) => void}) => {
                 >
                     Continue To Add Classes
                 </button>
+                {!isFormValid && <p className="text-red-500 text-xs italic">Please fill out all required fields.</p>}
             </div>
         </form>
   )
