@@ -9,7 +9,9 @@ interface ClassNavigationProps {
 
 const ClassNavigation : React.FC<ClassNavigationProps> = ({onBack}) => {
     return (
-        <button onClick={onBack}>Back to Course Information</button>
+        <button
+        className = "btn btn-primary text-white mt-3 mb-3" 
+        onClick={onBack}>Back to Course Information</button>
     );
 }
 
