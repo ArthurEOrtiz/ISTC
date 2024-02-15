@@ -1,5 +1,5 @@
 'use client';
-import React, { FormEvent, FocusEvent, useState } from 'react';
+import React, { FormEvent, FocusEvent, useState, useEffect } from 'react';
 import { CourseFormData } from '@/app/shared/types/sharedTypes';
 
 interface CourseFormProps {
@@ -28,25 +28,32 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
     const [isCityValid, setIsCityValid] = useState<boolean>(false);
     const [postalCodeTouched, setPostalCodeTouched] = useState<boolean>(false);
     const [isPostalCodeValid, setIsPostalCodeValid] = useState<boolean>(false);
-    const [formData, setFormData] = useState<CourseFormData>({
-        title: '',
-        description: '',
-        instructorName: '',
-        instructorEmail: '',
-        attendanceCredit: 0,
-        completionCredit: 0,
-        maxAttendance: 0,
-        enrollmentDeadline: '',
-        pdf: '',
-        locationDescription: '',
-        room: '',
-        remoteLink: '',
-        addressLine1: '',
-        addressLine2: '',
-        city: '',
-        state: 'ID',
-        postalCode: '',
+    const [formData, setFormData] = useState<CourseFormData>(() => {
+        const saveFormData = localStorage.getItem('courseFormData');
+        return saveFormData ? JSON.parse(saveFormData) : {
+            title: '',
+            description: '',
+            instructorName: '',
+            instructorEmail: '',
+            attendanceCredit: '',
+            completionCredit: '',
+            maxAttendance: '',
+            enrollmentDeadline: '',
+            pdf: '',
+            locationDescription: '',
+            room: '',
+            remoteLink: '',
+            addressLine1: '',
+            addressLine2: '',
+            city: '',
+            state: 'ID',
+            postalCode: ''
+        };
     });
+
+    useEffect(() => {
+        localStorage.setItem('courseFormData', JSON.stringify(formData));
+    }, [formData]);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
         const { id, value } = event.currentTarget;
