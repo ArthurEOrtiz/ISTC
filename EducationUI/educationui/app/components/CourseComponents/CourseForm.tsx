@@ -44,16 +44,17 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
         addressLine1: '',
         addressLine2: '',
         city: '',
-        state: '',
+        state: 'ID',
         postalCode: '',
     });
 
-    const handleChange = (event: FormEvent<HTMLInputElement>): void => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
         const { id, value } = event.currentTarget;
         setFormData((prev) => ({
             ...prev,
-            [id]: value }));
-    }
+            [id]: value
+        }));
+    };
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
@@ -207,6 +208,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     id="description"
                     placeholder="Optional"
+                    value = {formData.description}
+                    onChange = {handleChange}
                 />
             </div>
 
@@ -386,6 +389,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                         id="room"
                         type="text"
                         placeholder="Optional"
+                        value = {formData.room}
+                        onChange = {handleChange}
                     />
                 </div>
 
@@ -476,6 +481,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="state"
                         defaultValue="ID" // Default value set to Idaho
+                        onChange = {handleChange}
+                        value = {formData.state}
                     >
                         <option value="AL">Alabama</option>
                         <option value="AK">Alaska</option>
