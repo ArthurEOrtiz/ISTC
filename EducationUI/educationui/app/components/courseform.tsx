@@ -344,7 +344,7 @@ const CourseForm = () => {
                     </label>
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="courseLink"
+                        id="remoteLink"
                         type="url"
                         placeholder="https://zoom.us/j/1234567890?pwd=abc123"
                     />
