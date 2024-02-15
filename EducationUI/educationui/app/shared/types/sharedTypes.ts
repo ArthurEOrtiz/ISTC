@@ -1,4 +1,4 @@
-export interface FormData {
+export interface CourseFormData {
     title: string;
     description: string;
     instructorName: string;

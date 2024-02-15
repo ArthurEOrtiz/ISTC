@@ -1,12 +1,12 @@
 'use client';
 import React, { FormEvent, FocusEvent, useState } from 'react';
-import { FormData } from '@/app/shared/types/sharedTypes';
+import { CourseFormData } from '@/app/shared/types/sharedTypes';
 
 interface CourseFormProps {
-    onSubmit: (formData: FormData) => void;
+    onSubmit: (formData: CourseFormData) => void;
 }
 
-const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formData: FormData) => void}) => {
+const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formData: CourseFormData) => void}) => {
     const [titleTouched, setTitleTouched] = useState<boolean>(false);
     const [istitleValid, setIsTitleValid] = useState<boolean>(false);
     const [emailTouched, setEmailTouched] = useState<boolean>(false);  
@@ -28,7 +28,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
     const [isCityValid, setIsCityValid] = useState<boolean>(false);
     const [postalCodeTouched, setPostalCodeTouched] = useState<boolean>(false);
     const [isPostalCodeValid, setIsPostalCodeValid] = useState<boolean>(false);
-    const [formData, setFormData] = useState<FormData>({
+    const [formData, setFormData] = useState<CourseFormData>({
         title: '',
         description: '',
         instructorName: '',
