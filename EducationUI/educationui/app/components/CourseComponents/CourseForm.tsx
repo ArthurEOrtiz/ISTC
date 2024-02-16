@@ -1,7 +1,6 @@
 'use client';
 import React, { FormEvent, FocusEvent, useState, useEffect } from 'react';
 import { CourseFormData } from '@/app/shared/types/sharedTypes';
-import { init } from 'next/dist/compiled/webpack/webpack';
 
 interface CourseFormProps {
     onSubmit: (formData: CourseFormData) => void;
@@ -29,13 +28,13 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
         postalCode: ''
     }
 
-const [formData, setFormData] = useState<CourseFormData>(() => {
-    let savedFormData;
-    if (typeof localStorage !== 'undefined') {
-        savedFormData = localStorage.getItem('courseFormData');
-    }
-    return savedFormData ? JSON.parse(savedFormData) : initialFormData;
-});
+    const [formData, setFormData] = useState<CourseFormData>(() => {
+        let savedFormData;
+        if (typeof localStorage !== 'undefined') {
+            savedFormData = localStorage.getItem('courseFormData');
+        }
+        return savedFormData ? JSON.parse(savedFormData) : initialFormData;
+    });
 
     const validatEamil = (email: any) => {
         const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
