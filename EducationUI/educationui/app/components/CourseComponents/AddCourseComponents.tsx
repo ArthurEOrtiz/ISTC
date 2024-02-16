@@ -11,6 +11,7 @@ const AddCourseComponent: React.FC = () => {
     const [isCourseFormVisible, setIsCourseFormVisible] = useState<boolean>(true);
     const [classes, setClasses] = useState<JSX.Element[]>([]);
     const [classDate, setClassDate] = useState<Date>(new Date());
+    const [startTime, setStartTime] = useState<string>("09:00");
 
     const handleFormSubmit = (courseFormData: CourseFormData) =>{
         setCourseFormData(courseFormData);
@@ -30,23 +31,19 @@ const AddCourseComponent: React.FC = () => {
         } else {
             nextClassDate = new Date(new Date(classDate.getTime() + 86400000));
         }
+
         setClassDate(nextClassDate);
 
         const newClass = <NewClass
                             key={classes.length}
                             scheduleDate={nextClassDate} 
+                            startTime={startTime}
                             onDelete={() => deleteClass(classes.length)} 
-                            onDateChange={handleClassDateChange}/>;
+                            onDateChange={handleClassDateChange}
+                            onStartTimeChange={handleStartTimeChange}/>;
 
         setClasses(previousClasses => [...previousClasses, newClass]);
     };
-
-    const handleClassesChange = (isEmpty: boolean) => {
-        if (isEmpty) {
-            console.log("All classes are deleted");
-            setClassDate(new Date()); // Reset classDate to today if all classes are deleted
-        }
-    }
 
     const deleteClass = (index: number) => {
         const updatedClasses = [...classes];
@@ -63,6 +60,10 @@ const AddCourseComponent: React.FC = () => {
         setClassDate(date);
     };
 
+    const handleStartTimeChange = (time: string) => {
+        setStartTime(time);
+    }
+
 
     return (
         <>
@@ -70,7 +71,7 @@ const AddCourseComponent: React.FC = () => {
                 (<CourseForm onSubmit={handleFormSubmit}/>) :
                 (<>
                     <NewClassMenu onBack={handleBackToCourseForm} onAddClass={addClass} />
-                    <ClassForm courseFormData={courseFormData} classes={classes} onClassesChange={handleClassesChange} />
+                    <ClassForm courseFormData={courseFormData} classes={classes}/>
                 </>)
             }
         </>

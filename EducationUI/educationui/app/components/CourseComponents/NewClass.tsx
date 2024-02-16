@@ -1,18 +1,18 @@
 // NewClass.tsx
 import { time } from 'console';
 import React, { useState } from 'react';
+import { start } from 'repl';
 
 interface NewClassProps {
     scheduleDate: Date; // Prop to receive the class date
+    startTime: string; // Prop to receive the start time
     onDelete: () => void; // Prop to receive the delete event
     onDateChange: (date: Date) => void; // Prop to receive the date change event
     onStartTimeChange: (time: string) => void; // Prop to receive the start time change event
 }
 
 
-const NewClass: React.FC<NewClassProps> = ({ scheduleDate, onDelete, onDateChange, onStartTimeChange }) => {
-    // const [isVisible, setIsVisible] = useState<boolean>(true);
-    const [startTime, setStartTime] = useState<string>(); // Set the default start time to 09:00
+const NewClass: React.FC<NewClassProps> = ({ scheduleDate, startTime, onDelete, onDateChange, onStartTimeChange }) => {
     const handleRemoveClick = () => {
         onDelete();
     };
@@ -22,9 +22,8 @@ const NewClass: React.FC<NewClassProps> = ({ scheduleDate, onDelete, onDateChang
     }
 
     const handleStartTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const startTime = event.target.value;
-        onStartTimeChange(startTime);
-        setStartTime(startTime);
+        const startClassTime = event.target.value;
+        onStartTimeChange(startClassTime);
     }
 
 
@@ -61,7 +60,7 @@ const NewClass: React.FC<NewClassProps> = ({ scheduleDate, onDelete, onDateChang
                         name="startTime"
                         id="startTime"
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        defaultValue="09:00"
+                        defaultValue={startTime}
                         onChange={handleStartTimeChange}
                     />
                 </div>

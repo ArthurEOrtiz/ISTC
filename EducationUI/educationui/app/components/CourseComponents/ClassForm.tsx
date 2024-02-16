@@ -6,14 +6,14 @@ import CourseCard from './CourseCard';
 interface ClassFormProps {
     courseFormData: CourseFormData | null;
     classes: JSX.Element[];
-    onClassesChange: (isEmpty: boolean) => void;
+    //onClassesChange: (isEmpty: boolean) => void;
 }
 
-const ClassForm: React.FC<ClassFormProps> = ({ courseFormData, classes, onClassesChange }) => {
+const ClassForm: React.FC<ClassFormProps> = ({ courseFormData, classes }) => {
 
-    useEffect(() => {
-        onClassesChange(classes.length === 0);
-    }, [onClassesChange]);
+    // useEffect(() => {
+    //     onClassesChange(classes.length === 0);
+    // }, [onClassesChange]);
 
 
     return (
