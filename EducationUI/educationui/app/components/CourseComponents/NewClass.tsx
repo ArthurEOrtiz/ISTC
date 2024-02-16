@@ -1,7 +1,5 @@
 // NewClass.tsx
-import { time } from 'console';
 import React, { useEffect, useState } from 'react';
-import { start } from 'repl';
 
 interface NewClassProps {
     scheduleDate: Date; // Prop to receive the class date
@@ -12,7 +10,6 @@ interface NewClassProps {
     onStartTimeChange: (time: string) => void; // Prop to receive the start time change event
     onEndTimeChange: (time: string) => void; // Prop to receive the end time change event
 }
-
 
 const NewClass: React.FC<NewClassProps> = ({ scheduleDate, startTime, endTime,  onDelete, onDateChange, onStartTimeChange, onEndTimeChange }) => {
     const [classDate, setClassDate] = useState(scheduleDate);

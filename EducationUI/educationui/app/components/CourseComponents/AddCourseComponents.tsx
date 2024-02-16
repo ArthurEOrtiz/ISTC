@@ -41,11 +41,7 @@ const AddCourseComponent: React.FC = () => {
             endTime: endTime,
         };
 
-        setClasses(previousClasses => {
-            const updatedClasses = [...previousClasses, newClass];
-            console.log(updatedClasses);
-            return updatedClasses;
-                            }); // TODO: Refactor after testing. 
+        setClasses(previousClasses => [...previousClasses, newClass]); // TODO: Refactor after testing. 
     };
 
     const deleteClass = (index: number) => {
@@ -54,7 +50,6 @@ const AddCourseComponent: React.FC = () => {
             if (updatedClasses.length === 0) {
                 setClassDate(new Date()); // Reset classDate to today if all classes are deleted
             }
-            console.log(updatedClasses);
             return updatedClasses;
         });
     };
