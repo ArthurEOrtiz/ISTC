@@ -2,7 +2,7 @@
 import CourseForm from './CourseForm';
 import ClassForm from './ClassForm';
 import { CourseFormData } from '@/app/shared/types/sharedTypes';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import NewClassMenu from './NewClassMenu';
 
 const AddCourseComponent: React.FC = () => {    
@@ -12,7 +12,6 @@ const AddCourseComponent: React.FC = () => {
     const [classDate, setClassDate] = useState<Date>(new Date());
     const [startTime, setStartTime] = useState<string>("09:00");
     const [endTime, setEndTime] = useState<string>("17:00");
-    const classListRef = useRef<HTMLDivElement>(null);
 
     const handleFormSubmit = (courseFormData: CourseFormData) =>{
         setCourseFormData(courseFormData);
@@ -42,7 +41,6 @@ const AddCourseComponent: React.FC = () => {
         };
 
         setClasses(previousClasses => [...previousClasses, newClass]);
-
     };
 
     const deleteClass = (index: number) => {
