@@ -1,6 +1,6 @@
 // NewClass.tsx
 import { time } from 'console';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { start } from 'repl';
 
 interface NewClassProps {
@@ -15,22 +15,43 @@ interface NewClassProps {
 
 
 const NewClass: React.FC<NewClassProps> = ({ scheduleDate, startTime, endTime,  onDelete, onDateChange, onStartTimeChange, onEndTimeChange }) => {
+    const [classDate, setClassDate] = useState(scheduleDate);
+    const [start, setStart] = useState(startTime);
+    const [end, setEnd] = useState(endTime)
+
+    useEffect(() => {
+        setClassDate(scheduleDate);
+    }, [scheduleDate]);
+
+    useEffect(() => {
+        setStart(startTime);
+    }, [startTime]);
+
+    useEffect(() => {
+        setEnd(endTime);
+    }, [endTime]);
+    
+    
     const handleRemoveClick = () => {
         onDelete();
     };
 
     const handleClassDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onDateChange(new Date(event.target.value));
+        const date = new Date(event.target.value);
+        setClassDate(date);
+        onDateChange(date);
     }
 
     const handleStartTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const startClassTime = event.target.value;
-        onStartTimeChange(startClassTime);
+        const time = event.target.value;
+        setStart(time);
+        onStartTimeChange(time);
     }
 
     const handleEndTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const endClassTime = event.target.value;
-        onEndTimeChange(endClassTime);
+        const time = event.target.value;
+        setEnd(time);
+        onEndTimeChange(time);
     }
 
 
@@ -53,7 +74,7 @@ const NewClass: React.FC<NewClassProps> = ({ scheduleDate, startTime, endTime,  
                         name="classDate"
                         id="classDate"
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        defaultValue={scheduleDate.toISOString().split('T')[0]}
+                        value={classDate.toISOString().split('T')[0]}
                         onChange= {handleClassDateChange}
                         min={new Date().toISOString().split('T')[0]}
                     />
@@ -67,7 +88,7 @@ const NewClass: React.FC<NewClassProps> = ({ scheduleDate, startTime, endTime,  
                         name="startTime"
                         id="startTime"
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        defaultValue={startTime}
+                        value={start}
                         onChange={handleStartTimeChange}
                     />
                 </div>
@@ -80,7 +101,7 @@ const NewClass: React.FC<NewClassProps> = ({ scheduleDate, startTime, endTime,  
                         name="endTime"
                         id="endTime"
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        defaultValue={endTime}
+                        value={end}
                         onChange = {handleEndTimeChange}
                     />
                 </div>

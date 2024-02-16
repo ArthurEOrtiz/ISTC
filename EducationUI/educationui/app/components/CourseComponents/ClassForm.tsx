@@ -1,20 +1,18 @@
-// ClassForm.tsx
-import React, { useEffect } from 'react';
+import React from 'react';
 import { CourseFormData } from '@/app/shared/types/sharedTypes';
 import CourseCard from './CourseCard';
+import NewClass from './NewClass';
 
 interface ClassFormProps {
     courseFormData: CourseFormData | null;
-    classes: JSX.Element[];
-    //onClassesChange: (isEmpty: boolean) => void;
+    classes: { scheduleDate: Date; startTime: string; endTime: string; }[];
+    onDeleteClass: (index: number) => void;
+    onClassDateChange: (date: Date) => void;
+    onStartTimeChange: (time: string) => void;
+    onEndTimeChange: (time: string) => void;
 }
 
-const ClassForm: React.FC<ClassFormProps> = ({ courseFormData, classes }) => {
-
-    // useEffect(() => {
-    //     onClassesChange(classes.length === 0);
-    // }, [onClassesChange]);
-
+const ClassForm: React.FC<ClassFormProps> = ({ courseFormData, classes, onDeleteClass, onClassDateChange, onStartTimeChange, onEndTimeChange }) => {
 
     return (
         <>
@@ -24,7 +22,15 @@ const ClassForm: React.FC<ClassFormProps> = ({ courseFormData, classes }) => {
             <div>
                 {classes.map((classItem, index) => (
                     <div key={index} className="mb-4">
-                        {classItem}
+                        <NewClass 
+                            scheduleDate={classItem.scheduleDate} 
+                            startTime={classItem.startTime} 
+                            endTime={classItem.endTime}
+                            onDelete={() => onDeleteClass(index)}
+                            onDateChange={onClassDateChange}
+                            onStartTimeChange={onStartTimeChange}
+                            onEndTimeChange={onEndTimeChange}
+                        />
                     </div>
                 ))}
             </div>

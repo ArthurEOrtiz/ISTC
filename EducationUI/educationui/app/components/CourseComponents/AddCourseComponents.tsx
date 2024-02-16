@@ -9,7 +9,7 @@ import NewClassMenu from './NewClassMenu';
 const AddCourseComponent: React.FC = () => {    
     const [courseFormData, setCourseFormData] = useState<CourseFormData | null>(null); 
     const [isCourseFormVisible, setIsCourseFormVisible] = useState<boolean>(true);
-    const [classes, setClasses] = useState<JSX.Element[]>([]);
+    const [classes, setClasses] = useState<{ scheduleDate: Date; startTime: string; endTime: string; }[]>([]);
     const [classDate, setClassDate] = useState<Date>(new Date());
     const [startTime, setStartTime] = useState<string>("09:00");
     const [endTime, setEndTime] = useState<string>("17:00");
@@ -35,22 +35,17 @@ const AddCourseComponent: React.FC = () => {
 
         setClassDate(nextClassDate);
 
-        const newClass = <NewClass
-                            key={classes.length}
-                            scheduleDate={nextClassDate} 
-                            startTime={startTime}
-                            endTime={endTime}
-                            onDelete={() => deleteClass(classes.length)} 
-                            onDateChange={handleClassDateChange}
-                            onStartTimeChange={handleStartTimeChange}
-                            onEndTimeChange={handleEndTimeChange}/>;
+        const newClass = {
+            scheduleDate: nextClassDate,
+            startTime: startTime,
+            endTime: endTime,
+        };
 
         setClasses(previousClasses => {
             const updatedClasses = [...previousClasses, newClass];
             console.log(updatedClasses);
             return updatedClasses;
-                            });
-
+                            }); // TODO: Refactor after testing. 
     };
 
     const deleteClass = (index: number) => {
@@ -63,7 +58,6 @@ const AddCourseComponent: React.FC = () => {
             return updatedClasses;
         });
     };
-    
 
     const handleClassDateChange = (date: Date) => {
         setClassDate(date);
@@ -83,7 +77,14 @@ const AddCourseComponent: React.FC = () => {
                 (<CourseForm onSubmit={handleFormSubmit}/>) :
                 (<>
                     <NewClassMenu onBack={handleBackToCourseForm} onAddClass={addClass} />
-                    <ClassForm courseFormData={courseFormData} classes={classes}/>
+                    <ClassForm 
+                        courseFormData={courseFormData} 
+                        classes={classes} 
+                        onDeleteClass={deleteClass} 
+                        onClassDateChange={handleClassDateChange}
+                        onStartTimeChange={handleStartTimeChange}
+                        onEndTimeChange={handleEndTimeChange}
+                    />
                 </>)
             }
         </>
