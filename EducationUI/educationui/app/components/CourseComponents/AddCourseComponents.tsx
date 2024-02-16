@@ -12,6 +12,7 @@ const AddCourseComponent: React.FC = () => {
     const [classes, setClasses] = useState<JSX.Element[]>([]);
     const [classDate, setClassDate] = useState<Date>(new Date());
     const [startTime, setStartTime] = useState<string>("09:00");
+    const [endTime, setEndTime] = useState<string>("17:00");
 
     const handleFormSubmit = (courseFormData: CourseFormData) =>{
         setCourseFormData(courseFormData);
@@ -38,9 +39,11 @@ const AddCourseComponent: React.FC = () => {
                             key={classes.length}
                             scheduleDate={nextClassDate} 
                             startTime={startTime}
+                            endTime={endTime}
                             onDelete={() => deleteClass(classes.length)} 
                             onDateChange={handleClassDateChange}
-                            onStartTimeChange={handleStartTimeChange}/>;
+                            onStartTimeChange={handleStartTimeChange}
+                            onEndTimeChange={handleEndTimeChange}/>;
 
         setClasses(previousClasses => [...previousClasses, newClass]);
     };
@@ -62,6 +65,10 @@ const AddCourseComponent: React.FC = () => {
 
     const handleStartTimeChange = (time: string) => {
         setStartTime(time);
+    }
+
+    const handleEndTimeChange = (time: string) => {
+        setEndTime(time);
     }
 
 

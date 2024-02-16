@@ -6,13 +6,15 @@ import { start } from 'repl';
 interface NewClassProps {
     scheduleDate: Date; // Prop to receive the class date
     startTime: string; // Prop to receive the start time
+    endTime: string; // Prop to receive the end time
     onDelete: () => void; // Prop to receive the delete event
     onDateChange: (date: Date) => void; // Prop to receive the date change event
     onStartTimeChange: (time: string) => void; // Prop to receive the start time change event
+    onEndTimeChange: (time: string) => void; // Prop to receive the end time change event
 }
 
 
-const NewClass: React.FC<NewClassProps> = ({ scheduleDate, startTime, onDelete, onDateChange, onStartTimeChange }) => {
+const NewClass: React.FC<NewClassProps> = ({ scheduleDate, startTime, endTime,  onDelete, onDateChange, onStartTimeChange, onEndTimeChange }) => {
     const handleRemoveClick = () => {
         onDelete();
     };
@@ -24,6 +26,11 @@ const NewClass: React.FC<NewClassProps> = ({ scheduleDate, startTime, onDelete, 
     const handleStartTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const startClassTime = event.target.value;
         onStartTimeChange(startClassTime);
+    }
+
+    const handleEndTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const endClassTime = event.target.value;
+        onEndTimeChange(endClassTime);
     }
 
 
@@ -73,7 +80,8 @@ const NewClass: React.FC<NewClassProps> = ({ scheduleDate, startTime, onDelete, 
                         name="endTime"
                         id="endTime"
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        defaultValue="17:00"
+                        defaultValue={endTime}
+                        onChange = {handleEndTimeChange}
                     />
                 </div>
             </div>
