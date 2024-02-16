@@ -1,13 +1,23 @@
+// NewClass.tsx
 import React, { useState } from 'react';
 
-interface ClassFromProps {}
+interface NewClassProps {
+    scheduleDate: Date; // Prop to receive the class date
+    onDelete: () => void; // Prop to receive the delete event
+    onDateChange: (date: Date) => void; // Prop to receive the date change event
+}
 
-const NewClass: React.FC<ClassFromProps> = () => {
+const NewClass: React.FC<NewClassProps> = ({ scheduleDate, onDelete, onDateChange }) => {
     const [isVisible, setIsVisible] = useState(true);
 
     const handleRemoveClick = () => {
-        setIsVisible(false);
+        onDelete();
     };
+
+    const handleClassDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        onDateChange(new Date(event.target.value));
+    }
+
 
     return isVisible ? (
         <div className="bg-white shadow-md rounded-md p-4 relative">
@@ -22,12 +32,14 @@ const NewClass: React.FC<ClassFromProps> = () => {
                     <label htmlFor="classDate" className="block text-gray-700 text-sm font-bold mb-2">
                         Class Date
                     </label>
+                    {/* Set the default value of the class date input field */}
                     <input
                         type="date"
                         name="classDate"
                         id="classDate"
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        defaultValue={new Date().toISOString().split('T')[0]}
+                        defaultValue={scheduleDate.toISOString().split('T')[0]}
+                        onChange= {handleClassDateChange}
                         min={new Date().toISOString().split('T')[0]}
                     />
                 </div>

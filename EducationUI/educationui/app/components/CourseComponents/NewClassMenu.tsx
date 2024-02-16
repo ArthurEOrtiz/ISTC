@@ -1,11 +1,11 @@
 'use client';
 
-interface ClassNavigationProps {
+interface NewClassMenuProps {
     onBack: () => void;
     onAddClass: () => void;
 }
 
-const ClassNavigation : React.FC<ClassNavigationProps> = ({onBack, onAddClass}) => {
+const NewClassMenu : React.FC<NewClassMenuProps> = ({onBack, onAddClass}) => {
     return (
         <div className="flex justify-between">
         <button
@@ -24,4 +24,4 @@ const ClassNavigation : React.FC<ClassNavigationProps> = ({onBack, onAddClass}) 
     );
 }
 
-export default ClassNavigation;
+export default NewClassMenu;
