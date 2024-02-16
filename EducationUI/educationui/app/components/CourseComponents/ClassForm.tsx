@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { CourseFormData } from '@/app/shared/types/sharedTypes';
 import CourseCard from './CourseCard';
 import NewClass from './NewClass';
@@ -14,8 +14,16 @@ interface ClassFormProps {
 
 const ClassForm: React.FC<ClassFormProps> = ({ courseFormData, classes, onDeleteClass, onClassDateChange, onStartTimeChange, onEndTimeChange }) => {
 
+    useEffect(() => {
+        // Scroll to the bottom of the window after classes change
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }, [classes]);
+
     return (
-        <>
+        <div>
             <div className="mb-3">
                 <CourseCard courseFormData={courseFormData} />
             </div>
@@ -34,7 +42,7 @@ const ClassForm: React.FC<ClassFormProps> = ({ courseFormData, classes, onDelete
                     </div>
                 ))}
             </div>
-        </>
+        </div>
     );
 }
 

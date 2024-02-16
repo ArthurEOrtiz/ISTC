@@ -2,8 +2,7 @@
 import CourseForm from './CourseForm';
 import ClassForm from './ClassForm';
 import { CourseFormData } from '@/app/shared/types/sharedTypes';
-import { useState } from 'react';
-import NewClass from './NewClass';
+import { useRef, useState } from 'react';
 import NewClassMenu from './NewClassMenu';
 
 const AddCourseComponent: React.FC = () => {    
@@ -13,6 +12,7 @@ const AddCourseComponent: React.FC = () => {
     const [classDate, setClassDate] = useState<Date>(new Date());
     const [startTime, setStartTime] = useState<string>("09:00");
     const [endTime, setEndTime] = useState<string>("17:00");
+    const classListRef = useRef<HTMLDivElement>(null);
 
     const handleFormSubmit = (courseFormData: CourseFormData) =>{
         setCourseFormData(courseFormData);
@@ -41,7 +41,8 @@ const AddCourseComponent: React.FC = () => {
             endTime: endTime,
         };
 
-        setClasses(previousClasses => [...previousClasses, newClass]); // TODO: Refactor after testing. 
+        setClasses(previousClasses => [...previousClasses, newClass]);
+
     };
 
     const deleteClass = (index: number) => {
@@ -67,11 +68,10 @@ const AddCourseComponent: React.FC = () => {
     }
 
     return (
-        <>
+        <div >
             {isCourseFormVisible ? 
                 (<CourseForm onSubmit={handleFormSubmit}/>) :
-                (<>
-                    <NewClassMenu onBack={handleBackToCourseForm} onAddClass={addClass} />
+                (<div>
                     <ClassForm 
                         courseFormData={courseFormData} 
                         classes={classes} 
@@ -80,9 +80,13 @@ const AddCourseComponent: React.FC = () => {
                         onStartTimeChange={handleStartTimeChange}
                         onEndTimeChange={handleEndTimeChange}
                     />
-                </>)
+                    <div>
+                        <NewClassMenu onBack={handleBackToCourseForm} onAddClass={addClass} />
+                    </div>
+                    
+                </div>)
             }
-        </>
+        </div>
         
     );
 }
