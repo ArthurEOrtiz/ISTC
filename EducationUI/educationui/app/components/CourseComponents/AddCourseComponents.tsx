@@ -45,19 +45,25 @@ const AddCourseComponent: React.FC = () => {
                             onStartTimeChange={handleStartTimeChange}
                             onEndTimeChange={handleEndTimeChange}/>;
 
-        setClasses(previousClasses => [...previousClasses, newClass]);
+        setClasses(previousClasses => {
+            const updatedClasses = [...previousClasses, newClass];
+            console.log(updatedClasses);
+            return updatedClasses;
+                            });
+
     };
 
     const deleteClass = (index: number) => {
-        const updatedClasses = [...classes];
-        updatedClasses.splice(index, 1);
-        setClasses(updatedClasses);
-        if (updatedClasses.length === 0)
-        {
-            setClassDate(new Date()); // Reset classDate to today if all classes are deleted
-        }
-       
-    }
+        setClasses(previousClasses => {
+            const updatedClasses = previousClasses.filter((_, i) => i !== index);
+            if (updatedClasses.length === 0) {
+                setClassDate(new Date()); // Reset classDate to today if all classes are deleted
+            }
+            console.log(updatedClasses);
+            return updatedClasses;
+        });
+    };
+    
 
     const handleClassDateChange = (date: Date) => {
         setClassDate(date);
@@ -70,7 +76,6 @@ const AddCourseComponent: React.FC = () => {
     const handleEndTimeChange = (time: string) => {
         setEndTime(time);
     }
-
 
     return (
         <>
