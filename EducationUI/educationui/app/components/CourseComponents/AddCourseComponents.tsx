@@ -1,10 +1,11 @@
 'use client';
 import CourseForm from './CourseForm';
 import ClassForm from './ClassForm';
-import { CourseFormData } from '@/app/shared/types/sharedTypes';
+import { Course, ClassSchedule, CourseFormData } from '@/app/shared/types/sharedTypes';
 import { useState } from 'react';
 import NewClassMenu from './NewClassMenu';
 import ConfirmationDialog from '../ConfirmationDialog';
+import axios from 'axios';
 
 const AddCourseComponent: React.FC = () => {    
     const [courseFormData, setCourseFormData] = useState<CourseFormData | null>(null); 
@@ -77,10 +78,48 @@ const AddCourseComponent: React.FC = () => {
     }
 
     const handleConfirmSave = () => {   
-        console.log(courseFormData);
-        console.log(classes);
         setShowConfirmationDialog(false);
+        const transformedClasses = transformClasses();
+        const combinedData = combineData(transformedClasses);
+        console.log(combinedData);
     }
+
+    const transformClasses = (): ClassSchedule[] => {
+        const transformedClasses = classes.map(({ scheduleDate, startTime, endTime }) => ({
+            ScheduleStart: new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), startTime.split(':')[0], startTime.split(':')[1]).toISOString(),
+            ScheduleEnd: new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), endTime.split(':')[0], endTime.split(':')[1]).toISOString()
+        }));
+        return transformedClasses;
+    };
+    
+
+    const combineData = (transformedClasses : ClassSchedule []) : Course => {
+        return {
+            title: courseFormData?.title ||'',
+            description: courseFormData?.description ||'',
+            attendanceCredit: courseFormData?.attendanceCredit || 0,
+            completionCredit: courseFormData?.completionCredit || 0,
+            maxAttendance: courseFormData?.maxAttendance || 0,
+            enrollmentDeadline: courseFormData?.enrollmentDeadline ||'',
+            instructorName: courseFormData?.instructorName ||'',
+            instructorEmail: courseFormData?.instructorEmail ||'',
+            pdf: courseFormData?.pdf ||'',
+            location: 
+            {
+                description: courseFormData?.locationDescription ||'',
+                room : courseFormData?.room ||'',
+                remoteLink: courseFormData?.remoteLink ||'',
+                addressLine1: courseFormData?.addressLine1 ||'',
+                addressLine2: courseFormData?.addressLine2 ||'',
+                city: courseFormData?.city ||'',
+                state: courseFormData?.state ||'',
+                postalCode: courseFormData?.postalCode ||'',
+            },
+            classes: transformedClasses
+        };
+    }
+
+    
 
     return (
         <div>
@@ -100,7 +139,6 @@ const AddCourseComponent: React.FC = () => {
                     </div>
                 </div>)
             }
-            {/* Confirmation dialog */}
             {showConfirmationDialog && (
                 <ConfirmationDialog
                     title="Save Course"
