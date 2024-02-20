@@ -81,7 +81,6 @@ const AddCourseComponent: React.FC = () => {
         setShowConfirmationDialog(false);
         const transformedClasses = transformClasses();
         const combinedData = combineData(transformedClasses);
-        console.log('Combined data', combinedData)
         handleSaveToApi(combinedData);
     }
 
