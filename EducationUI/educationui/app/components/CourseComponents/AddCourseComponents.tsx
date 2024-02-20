@@ -65,6 +65,11 @@ const AddCourseComponent: React.FC = () => {
         setEndTime(time);
     }
 
+    function onSaveCourse(): void {
+        console.log(courseFormData);
+        console.log(classes);
+    }
+
     return (
         <div >
             {isCourseFormVisible ? 
@@ -79,7 +84,7 @@ const AddCourseComponent: React.FC = () => {
                         onEndTimeChange={handleEndTimeChange}
                     />
                     <div>
-                        <NewClassMenu onBack={handleBackToCourseForm} onAddClass={addClass} />
+                        <NewClassMenu onBack={handleBackToCourseForm} onAddClass={addClass} onSaveCourse={onSaveCourse}/>
                     </div>
                     
                 </div>)

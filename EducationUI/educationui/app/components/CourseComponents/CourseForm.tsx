@@ -1,6 +1,7 @@
 'use client';
 import React, { FormEvent, FocusEvent, useState, useEffect } from 'react';
 import { CourseFormData } from '@/app/shared/types/sharedTypes';
+import CharacterCounter from '../CharacterCounter';
 
 interface CourseFormProps {
     onSubmit: (formData: CourseFormData) => void;
@@ -100,10 +101,24 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
         const { id, value } = event.currentTarget;
-        setFormData((prev) => ({
-            ...prev,
-            [id]: value
-        }));
+
+        // speciail case for description
+        let updatedValue = value;
+        if (id === "description" && value.length > 255) {
+            updatedValue = value.substring(0, 255);
+
+            setFormData((prev) => ({
+                ...prev,
+                [id]: updatedValue
+            }));
+
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [id]: updatedValue
+            }));
+        }
+  
     };
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
@@ -258,6 +273,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                     value = {formData.description}
                     onChange = {handleChange}
                 />
+                <CharacterCounter value={formData.description} limit={255} />
             </div>
 
             <div className="flex justify-between">
