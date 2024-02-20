@@ -235,9 +235,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
         isPostalCodeValid;
 
     return (
-        <>
-        <button onClick={() => localStorage.clear()}>Clear Local Storage</button>
-
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
 
             <div className="mb-4">
@@ -632,7 +629,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                 {!isFormValid && <p className="text-red-500 text-xs italic w-1/2">Please fill out all required fields.</p>}
             </div>
         </form>
-        </>
   )
 }
 

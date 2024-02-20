@@ -137,6 +137,7 @@ const AddCourseComponent: React.FC = () => {
     const handleSaveToApi = async (combinedData: Course) => {
         try {
             const response = await axios.post('https://localhost:7144/course', combinedData);
+            localStorage.removeItem('courseFormData');
             console.log('Course saved successfully', response);
         } catch (error) {
             console.error('Error saving course', error);
