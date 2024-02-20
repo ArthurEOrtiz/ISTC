@@ -12,6 +12,7 @@ const AddCourseComponent: React.FC = () => {
     const [classDate, setClassDate] = useState<Date>(new Date());
     const [startTime, setStartTime] = useState<string>("09:00");
     const [endTime, setEndTime] = useState<string>("17:00");
+    const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
 
     const handleFormSubmit = (courseFormData: CourseFormData) =>{
         setCourseFormData(courseFormData);
@@ -65,33 +66,55 @@ const AddCourseComponent: React.FC = () => {
         setEndTime(time);
     }
 
-    function onSaveCourse(): void {
+    const onSaveCourse = (): void  => {
+        console.log("Save course");
+        setShowConfirmationDialog(true);
+    }
+
+    const handleCancelSave = () => {
+        setShowConfirmationDialog(false);
+    }
+
+    const handleConfirmSave = () => {   
         console.log(courseFormData);
         console.log(classes);
+        setShowConfirmationDialog(false);
     }
 
     return (
-        <div >
-            {isCourseFormVisible ? 
-                (<CourseForm onSubmit={handleFormSubmit}/>) :
+        <div>
+            {isCourseFormVisible ?
+                (<CourseForm onSubmit={handleFormSubmit} />) :
                 (<div>
-                    <ClassForm 
-                        courseFormData={courseFormData} 
-                        classes={classes} 
-                        onDeleteClass={deleteClass} 
+                    <ClassForm
+                        courseFormData={courseFormData}
+                        classes={classes}
+                        onDeleteClass={deleteClass}
                         onClassDateChange={handleClassDateChange}
                         onStartTimeChange={handleStartTimeChange}
                         onEndTimeChange={handleEndTimeChange}
                     />
                     <div>
-                        <NewClassMenu onBack={handleBackToCourseForm} onAddClass={addClass} onSaveCourse={onSaveCourse}/>
+                        <NewClassMenu onBack={handleBackToCourseForm} onAddClass={addClass} onSaveCourse={onSaveCourse} />
                     </div>
-                    
                 </div>)
             }
+            {/* Confirmation dialog */}
+            {showConfirmationDialog && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="absolute inset-0 bg-black opacity-50"></div>
+                    <div className="bg-white p-8 rounded-lg z-50">
+                        <h2 className="text-xl font-semibold mb-4">Are you sure you want to save?</h2>
+                        <div className="flex justify-between">
+                            <button onClick={handleConfirmSave} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">Yes</button>
+                            <button onClick={handleCancelSave} className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">No</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
-        
     );
+    
 }
 
 export default AddCourseComponent
