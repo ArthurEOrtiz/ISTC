@@ -19,22 +19,49 @@ namespace EducationAPI.Controllers
 			_logger = logger;
 		}
 
-		[HttpGet(Name = "GetCourseById")]
-		public async Task<ActionResult<Course>> GetCourseById(int id)
+		[HttpGet("GetAllCoursesWithClasses")]
+		public async Task<ActionResult<List<Course>>> GetAllCoursesWithClasses()
 		{
-			var course = await _educationProgramContext.Courses
-				.Include(c => c.Classes)
-				.FirstOrDefaultAsync(c => c.CourseId ==id);
-
-			if (course == null)
+			try
 			{
-				return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				var courses =  await _educationProgramContext.Courses
+					.Include(c => c.Classes)
+					.ToListAsync();
+				return courses;
 			}
-
-			return course;
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetAllCourses()");
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
 		}
 
-		[HttpPost(Name = "PostCourse")]
+		[HttpGet("GetCourseById")]
+		public async Task<ActionResult<Course>> GetCourseById(int id)
+		{
+			try
+			{
+				var course = await _educationProgramContext.Courses
+						.Include(c => c.Classes)
+						.FirstOrDefaultAsync(c => c.CourseId == id);
+
+				if (course == null)
+				{
+					_logger.LogInformation(0, "GetCourseById({Id}), Called", id);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				return course;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetCourseById({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+
+		[HttpPost("PostCourse")]
 		public async Task<ActionResult> PostCourse(Course course)
 		{
 			try
@@ -46,14 +73,9 @@ namespace EducationAPI.Controllers
 				// Should return a 201 status code. 
 				return new CreatedAtActionResult(nameof(GetCourseById), "Course", new { id = course.CourseId }, course);
 			}
-			catch (DbUpdateException ex)
-			{
-				_logger.LogError($"Database update error: {ex.Message}\n{ex.InnerException}");
-				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-			}
 			catch (Exception ex)
 			{
-				_logger.LogError($"Error occurred: {ex.Message}\n{ex.InnerException}");
+				_logger.LogError(ex, "PostCourse({Course})", course);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
