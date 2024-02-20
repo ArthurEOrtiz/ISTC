@@ -81,17 +81,33 @@ const AddCourseComponent: React.FC = () => {
         setShowConfirmationDialog(false);
         const transformedClasses = transformClasses();
         const combinedData = combineData(transformedClasses);
-        console.log(combinedData);
+        console.log('Combined data', combinedData)
+        handleSaveToApi(combinedData);
     }
 
     const transformClasses = (): ClassSchedule[] => {
-        const transformedClasses = classes.map(({ scheduleDate, startTime, endTime }) => ({
-            ScheduleStart: new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), startTime.split(':')[0], startTime.split(':')[1]).toISOString(),
-            ScheduleEnd: new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), endTime.split(':')[0], endTime.split(':')[1]).toISOString()
-        }));
+        const transformedClasses = classes.map(({ scheduleDate, startTime, endTime }) => {
+            // Convert scheduleDate string to Date object
+            const date = new Date(scheduleDate);
+            
+            // Split startTime and endTime strings into hours and minutes
+            const [startHour, startMinute] = startTime.split(':').map(Number);
+            const [endHour, endMinute] = endTime.split(':').map(Number);
+    
+            // Set hours and minutes for start and end times
+            const scheduleStart = new Date(date);
+            scheduleStart.setUTCHours(startHour, startMinute, 0, 0);
+    
+            const scheduleEnd = new Date(date);
+            scheduleEnd.setUTCHours(endHour, endMinute, 0, 0);
+    
+            return {
+                ScheduleStart: scheduleStart.toISOString(),
+                ScheduleEnd: scheduleEnd.toISOString()
+            };
+        });
         return transformedClasses;
     };
-    
 
     const combineData = (transformedClasses : ClassSchedule []) : Course => {
         return {
@@ -119,7 +135,14 @@ const AddCourseComponent: React.FC = () => {
         };
     }
 
-    
+    const handleSaveToApi = async (combinedData: Course) => {
+        try {
+            const response = await axios.post('https://localhost:7144/course', combinedData);
+            console.log('Course saved successfully', response);
+        } catch (error) {
+            console.error('Error saving course', error);
+        }
+    }
 
     return (
         <div>
@@ -153,3 +176,5 @@ const AddCourseComponent: React.FC = () => {
 }
 
 export default AddCourseComponent
+
+
