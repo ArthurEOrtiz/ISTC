@@ -1,4 +1,4 @@
-export default async function CourseDetail ({params}: {
+export default function CourseDetail ({params}: {
     params: {
         courseId: string
     };
@@ -6,6 +6,7 @@ export default async function CourseDetail ({params}: {
     return (
         <div>
             <h1>Course Details {params.courseId}</h1>
+
         </div>
   );
 }

@@ -40,7 +40,6 @@ const ClassForm: React.FC<ClassFormProps> = ({ courseFormData, classes, onDelete
         }
     );
 
-
     useEffect(() => {
         // Scroll to the bottom of the window after classes change
         window.scrollTo({

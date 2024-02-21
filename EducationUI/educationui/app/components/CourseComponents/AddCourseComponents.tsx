@@ -6,6 +6,7 @@ import { useState } from 'react';
 import NewClassMenu from './NewClassMenu';
 import ConfirmationDialog from '../ConfirmationDialog';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const AddCourseComponent: React.FC = () => {    
     const [courseFormData, setCourseFormData] = useState<CourseFormData | null>(null); 
@@ -15,6 +16,7 @@ const AddCourseComponent: React.FC = () => {
     const [startTime, setStartTime] = useState<string>("09:00");
     const [endTime, setEndTime] = useState<string>("17:00");
     const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
+    const router = useRouter();
 
     const handleFormSubmit = (courseFormData: CourseFormData) =>{
         setCourseFormData(courseFormData);
@@ -143,6 +145,7 @@ const AddCourseComponent: React.FC = () => {
             const response = await axios.post('https://localhost:7144/course/postcourse', combinedData);
             localStorage.removeItem('courseFormData');
             console.log('Course saved successfully', response);
+            router.push('/admin/editcourse/edit/')
         } catch (error) {
             console.error('Error saving course', error);
         }
