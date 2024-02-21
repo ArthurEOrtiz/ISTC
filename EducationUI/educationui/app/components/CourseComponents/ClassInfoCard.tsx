@@ -1,13 +1,14 @@
 'use client';
 import { ClassSchedule } from "@/app/shared/types/sharedTypes";
+import { useState } from "react";
 
 interface ClassInfoCardProps {
     classSchedule: ClassSchedule;
-    onEdit: (classSchedule: ClassSchedule) => void; 
 };
 
-const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onEdit}) => {
-    
+const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
+    const [editClass, setEditClass] = useState<Boolean>(false);
+
     const getStartDate = (date: string) => {
         const startDate = new Date(date);
         const formattedDate = startDate.toLocaleDateString(
@@ -31,9 +32,18 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onEdit}) =>
         );
         return formattedTime;
     }
+
+    const handleEdit = () => {
+        setEditClass(true);
+    }
+
+    const handleSave = () => {
+        setEditClass(false);
+    }
         
-    return (
-        <div className="card w-1/2 bg-base-100 shadow-xl m-2">
+    if (!editClass) {
+        return (
+            <div className="card w-1/2 bg-base-100 shadow-xl m-2">
             <div className="card-body">
                 <label className="text-1xl font-bold" htmlFor="date">Date</label>
                 <p id="date" className="text-base">{getStartDate(classSchedule.scheduleStart)}</p>
@@ -49,14 +59,24 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onEdit}) =>
                 </div>
                 <div className="card-actions justify-end">
                     <button
-                    onClick= {() => onEdit(classSchedule)}
+                    onClick= {handleEdit}
                     className="btn btn-primary text-white">
                         Edit
                     </button>
                 </div>
             </div>
         </div>
-    );
+        )
+    } else
+    {
+        return(
+            <>
+                <p>EDITCOURSE</p>
+                <button onClick={handleSave} className="btn btn-primary text-white">Save Changes</button>
+            </>
+        )
+        
+    }
 }
 
 export default ClassInfoCard;
