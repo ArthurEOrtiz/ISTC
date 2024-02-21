@@ -15,7 +15,7 @@ export async function getAllCoursesWithClasses() {
 }
 
 export async function getCourseById(courseId) {
-    const url = `https://localhost:7144/Course/GetCourseById/${courseId}`;
+    const url = `https://localhost:7144/Course/GetCourseById?id=${courseId}`;
     const httpAgent = new https.Agent({ rejectUnauthorized: false});
     const response = await fetch(url, {
         method: 'GET',
