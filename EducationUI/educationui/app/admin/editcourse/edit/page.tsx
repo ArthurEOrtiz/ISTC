@@ -1,31 +1,20 @@
 import React from 'react';
-import https from 'https';
-import fetch from 'node-fetch';
-
-async function getAllCoursesWithClasses() {
-    const url = 'https://localhost:7144/Course/GetAllCoursesWithClasses';
-    const httpAgent = new https.Agent({ rejectUnauthorized: false});
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'accept': 'text/plain'},
-        agent: httpAgent,
-    });
-
-
-    return response.json();
-}
+import { getAllCoursesWithClasses } from '@/Utilities/api';
+import { Course } from '@/app/shared/types/sharedTypes';
+import CourseList from '@/app/components/CourseComponents/CourseList';
 
 const EditCourse: React.FC = async () => {
-    const courseList = await getAllCoursesWithClasses();
+    const courseJson = await getAllCoursesWithClasses();
+    const courses = courseJson as Course[];
+
     return (
-        <>
-            {JSON.stringify(courseList)}
-        </>
+        <CourseList courses={courses}/>
     );
 };
 
 export default EditCourse;
+
+
 
 
 

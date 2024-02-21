@@ -1,7 +1,17 @@
+import https from 'https';
+import fetch from 'node-fetch';
+
 export async function getAllCoursesWithClasses() {
-    const response = await fetch('https://localhost:7144/course/getAllCoursesWithClasses');
-    if (!response.ok) {
-        throw new Error('Failed to fetch courses');
-    }
+    const url = 'https://localhost:7144/Course/GetAllCoursesWithClasses';
+    const httpAgent = new https.Agent({ rejectUnauthorized: false});
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'accept': 'text/plain'},
+        agent: httpAgent,
+    });
+
+    console.log(response);
+
     return response.json();
 }
