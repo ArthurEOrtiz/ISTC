@@ -20,6 +20,7 @@ export interface CourseFormData {
 }
 
 export interface Location {
+    locationId: number | null;
     description: string;
     room: string;
     remoteLink: string;
@@ -31,11 +32,14 @@ export interface Location {
   }
   
 export interface ClassSchedule {
+    classId: number | null;
+    courseId: number | null;
     ScheduleStart: string;
     ScheduleEnd: string;
   }
   
 export interface Course {
+    courseId: number | null;
     title: string;
     description: string;
     attendanceCredit: number;

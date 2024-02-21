@@ -101,6 +101,8 @@ const AddCourseComponent: React.FC = () => {
             scheduleEnd.setUTCHours(endHour, endMinute, 0, 0);
     
             return {
+                classId: 0,
+                courseId: 0,
                 ScheduleStart: scheduleStart.toISOString(),
                 ScheduleEnd: scheduleEnd.toISOString()
             };
@@ -110,6 +112,7 @@ const AddCourseComponent: React.FC = () => {
 
     const combineData = (transformedClasses : ClassSchedule []) : Course => {
         return {
+            courseId: 0,
             title: courseFormData?.title ||'',
             description: courseFormData?.description ||'',
             attendanceCredit: courseFormData?.attendanceCredit || 0,
@@ -121,6 +124,7 @@ const AddCourseComponent: React.FC = () => {
             pdf: courseFormData?.pdf ||'',
             location: 
             {
+                locationId: 0,
                 description: courseFormData?.locationDescription ||'',
                 room : courseFormData?.room ||'',
                 remoteLink: courseFormData?.remoteLink ||'',
