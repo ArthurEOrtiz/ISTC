@@ -1,4 +1,5 @@
 export interface CourseFormData {
+    courseId: number | null,
     title: string;
     description: string;
     instructorName: string;
@@ -16,7 +17,6 @@ export interface CourseFormData {
     city: string;
     state: string;
     postalCode: string;
-
 }
 
 export interface Location {

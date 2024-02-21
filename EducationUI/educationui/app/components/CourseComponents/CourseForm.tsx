@@ -10,6 +10,7 @@ interface CourseFormProps {
 const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formData: CourseFormData) => void}) => {
     
     const initialFormData : CourseFormData  = {
+        courseId: null,
         title: '',
         description: '',
         instructorName: '',
