@@ -2,16 +2,17 @@
 import React from 'react';
 import { Course } from '@/app/shared/types/sharedTypes';
 import CourseCard from './EditCourseCard';
+import { useRouter } from 'next/navigation';
 
 interface CourseListProps {
     courses: Course[];
 }
 
-
 const CourseList: React.FC<CourseListProps> = ({courses}) => {
+    const router = useRouter();
 
     function handleOnEdit(course: Course): void {
-        console.log('Edit course', course);
+        router.push(`/admin/editcourse/course/${course.courseId}`);
     }
 
     return (
