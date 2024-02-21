@@ -13,8 +13,3 @@ const EditCourse: React.FC = async () => {
 };
 
 export default EditCourse;
-
-
-
-
-

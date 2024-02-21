@@ -11,7 +11,5 @@ export async function getAllCoursesWithClasses() {
         agent: httpAgent,
     });
 
-    console.log(response);
-
     return response.json();
 }
