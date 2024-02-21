@@ -12,7 +12,7 @@ const CourseList: React.FC<CourseListProps> = ({courses}) => {
     const router = useRouter();
 
     function handleOnEdit(course: Course): void {
-        router.push(`/admin/editcourse/course/${course.courseId}`);
+        router.push(`/admin/editcourse/edit/course/${course.courseId}`);
     }
 
     return (

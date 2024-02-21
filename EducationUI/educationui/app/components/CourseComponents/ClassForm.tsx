@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Course, CourseFormData } from '@/app/shared/types/sharedTypes';
-import CourseCard from './CourseCard';
 import NewClass from './NewClass';
+import CourseInfoCard from './CourseInfoCard';
 
 interface ClassFormProps {
     courseFormData: CourseFormData | null;
@@ -85,7 +85,7 @@ const ClassForm: React.FC<ClassFormProps> = ({ courseFormData, classes, onDelete
     return (
         <div>
             <div className="mb-3">
-                <CourseCard course={course} />
+                <CourseInfoCard course={course} />
             </div>
             <div>
                 {classes.map((classItem, index) => (

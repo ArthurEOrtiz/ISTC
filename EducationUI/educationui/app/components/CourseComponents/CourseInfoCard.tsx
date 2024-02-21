@@ -5,7 +5,7 @@ interface CourseCardProps {
 };
 
 
-const CourseCard : React.FC<CourseCardProps> = ({course}) => {
+const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
     return(
         <div className="bg-white shadow-md rounded-md p-4">
             <div className="mb-2">
@@ -63,4 +63,4 @@ const CourseCard : React.FC<CourseCardProps> = ({course}) => {
     );
 }
 
-export default CourseCard;
+export default CourseInfoCard;

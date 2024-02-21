@@ -43,6 +43,7 @@ namespace EducationAPI.Controllers
 			{
 				var course = await _educationProgramContext.Courses
 						.Include(c => c.Classes)
+						.Include(c => c.Location)
 						.FirstOrDefaultAsync(c => c.CourseId == id);
 
 				if (course == null)
