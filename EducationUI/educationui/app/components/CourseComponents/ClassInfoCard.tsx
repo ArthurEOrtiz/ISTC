@@ -1,10 +1,13 @@
+'use client';
 import { ClassSchedule } from "@/app/shared/types/sharedTypes";
 
 interface ClassInfoCardProps {
     classSchedule: ClassSchedule;
+    onEdit: (classSchedule: ClassSchedule) => void; 
 };
 
-const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
+const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onEdit}) => {
+    
     const getStartDate = (date: string) => {
         const startDate = new Date(date);
         const formattedDate = startDate.toLocaleDateString(
@@ -28,14 +31,13 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
         );
         return formattedTime;
     }
-
         
     return (
-        <div className="card w-full bg-base-100 shadow-xl m-2">
+        <div className="card w-1/2 bg-base-100 shadow-xl m-2">
             <div className="card-body">
                 <label className="text-1xl font-bold" htmlFor="date">Date</label>
                 <p id="date" className="text-base">{getStartDate(classSchedule.scheduleStart)}</p>
-                <div className="flex justify-between"> {/* Container for Start Time and End Time */}
+                <div className="flex justify-between">
                     <div>
                         <label className="text-1xl font-bold" htmlFor="startTime">Start Time</label>
                         <p id="startTime" className="text-base">{getTime(classSchedule.scheduleStart)}</p>
@@ -44,6 +46,13 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
                         <label className="text-1xl font-bold" htmlFor="endTime">End Time</label>
                         <p id="endTime" className="text-base">{getTime(classSchedule.scheduleEnd)}</p>
                     </div>
+                </div>
+                <div className="card-actions justify-end">
+                    <button
+                    onClick= {() => onEdit(classSchedule)}
+                    className="btn btn-primary text-white">
+                        Edit
+                    </button>
                 </div>
             </div>
         </div>
