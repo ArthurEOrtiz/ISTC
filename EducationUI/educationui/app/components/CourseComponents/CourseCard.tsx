@@ -34,6 +34,30 @@ const CourseCard : React.FC<CourseCardProps> = ({courseFormData}) => {
                 <div className="w-full px-1 mb-2">
                     <p><strong>PDF:</strong> {courseFormData?.pdf}</p>
                 </div>
+                <div className="w-full px-1 mb-2">
+                    <p><strong>Location:</strong> {courseFormData?.locationDescription}</p>
+                </div>
+                <div className="w-full px-1 mb-2">
+                    <p><strong>Room:</strong> {courseFormData?.room}</p>
+                </div>
+                <div className="w-full px-1 mb-2">
+                    <p><strong>Remote Link:</strong> {courseFormData?.remoteLink}</p>
+                </div>
+                <div className="w-full px-1 mb-2">
+                    <p><strong>Address Line 1:</strong> {courseFormData?.addressLine1}</p>
+                </div>
+                <div className="w-full px-1 mb-2">
+                    <p><strong>Address Line 2:</strong> {courseFormData?.addressLine2}</p>
+                </div>
+                <div className="w-full sm:w-1/2 px-1 mb-2">
+                    <p><strong>City:</strong> {courseFormData?.city}</p>
+                </div>
+                <div className="w-full sm:w-1/2 px-1 mb-2">
+                    <p><strong>State:</strong> {courseFormData?.state}</p>
+                </div>
+                <div className="w-full sm:w-1/2 px-1 mb-2">
+                    <p><strong>Zip:</strong> {courseFormData?.postalCode}</p>
+                </div>
             </div>
         </div>
     );
