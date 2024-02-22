@@ -28,7 +28,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             </div>
             <div className = "flex flex-wrap justify-center gap-2">
                 {course.classes.map((classSchedule) => (
-                    <ClassInfoCard key={classSchedule.classId} classSchedule={classSchedule} onEdit={handleEdit} />
+                    <ClassInfoCard key={classSchedule.classId} classSchedule={classSchedule} />
                 ))}
             </div>
             

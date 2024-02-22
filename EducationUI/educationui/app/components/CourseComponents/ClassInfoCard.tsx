@@ -1,6 +1,7 @@
 'use client';
 import { ClassSchedule } from "@/app/shared/types/sharedTypes";
-import { useState } from "react";
+import axios from "axios";
+import { ChangeEvent, useState } from "react";
 
 interface ClassInfoCardProps {
     classSchedule: ClassSchedule;
@@ -8,6 +9,8 @@ interface ClassInfoCardProps {
 
 const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
     const [editClass, setEditClass] = useState<Boolean>(false);
+    const [oldClassSchedule, setOldClassSchedule ] = useState<ClassSchedule>(classSchedule);
+    const [editedClassSchedule, setEditedClassSchedule] = useState<ClassSchedule>(classSchedule);
 
     const getStartDate = (date: string) => {
         const startDate = new Date(date);
@@ -22,6 +25,14 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
         return formattedDate;
     }
 
+    const formatStringToDate = (dateString: string) => {
+        const dateObject = new Date(dateString);
+        const year = dateObject.getFullYear();
+        const month = (dateObject.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+        const day = dateObject.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     const getTime = (date: string) => {
         const startTime = new Date(date);
         const formattedTime = startTime.toLocaleTimeString(
@@ -33,48 +44,158 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
         return formattedTime;
     }
 
+    const formatTime = (time: string) => {
+        const timeObject = new Date(time);
+        const hours = timeObject.getHours().toString().padStart(2, '0'); // Ensure two digits for hours
+        const minutes = timeObject.getMinutes().toString().padStart(2, '0'); // Ensure two digits for minutes
+        return `${hours}:${minutes}`;
+    }
+    
+
     const handleEdit = () => {
         setEditClass(true);
     }
 
-    const handleSave = () => {
-        setEditClass(false);
+    const handleSave = async () => {
+        try {
+           
+            const url = `https://localhost:7144/Class/EditClassById?id=${editedClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
+            const response = await axios.post(url);
+            console.log('Course saved successfully', response);
+            setEditClass(false);
+            setOldClassSchedule(editedClassSchedule);
+
+        } catch (error) {
+            console.error('Error saving course', error);
+        }
     }
+
+    const handleCancel = () => {
+        setEditClass(false);
+        setEditedClassSchedule(oldClassSchedule);
+    }
+
+    const handleStartDateChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const newStartDate = event.target.value;
+        const oldStartDate = editedClassSchedule.scheduleStart;
+        // I just need to update the date part of the string
+        const oldStartTime = oldStartDate.split('T')[1];
+        const newStartDateTime = `${newStartDate}T${oldStartTime}`;
+        //console.log(newStartDateTime);
+
+        setEditedClassSchedule((prevState) => ({
+            ...prevState,
+            scheduleStart: newStartDateTime,
+        }));
+
+    }
+
+    const handleStartTimeChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const newStartTime = event.target.value;
+        const oldStartDate = editedClassSchedule.scheduleStart;
+        // I just need to update the time part of the string
+        const newStartDateTime = `${oldStartDate.split('T')[0]}T${newStartTime}`;
+        //console.log(newStartDateTime);
         
+        setEditedClassSchedule((prevState) => ({
+            ...prevState,
+            scheduleStart: newStartDateTime,
+        }));
+
+    }
+
+    const handleEndTimeChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const newEndTime = event.target.value;
+        const oldEndDate = editedClassSchedule.scheduleEnd;
+        // I just need to update the time part of the string
+        const newEndDateTime = `${oldEndDate.split('T')[0]}T${newEndTime}`;
+        //console.log(newEndDateTime);
+        
+        setEditedClassSchedule((prevState) => ({
+            ...prevState,
+            scheduleEnd: newEndDateTime,
+        }));
+
+    }
+
     if (!editClass) {
         return (
             <div className="card w-1/2 bg-base-100 shadow-xl m-2">
-            <div className="card-body">
-                <label className="text-1xl font-bold" htmlFor="date">Date</label>
-                <p id="date" className="text-base">{getStartDate(classSchedule.scheduleStart)}</p>
-                <div className="flex justify-between">
-                    <div>
-                        <label className="text-1xl font-bold" htmlFor="startTime">Start Time</label>
-                        <p id="startTime" className="text-base">{getTime(classSchedule.scheduleStart)}</p>
+                <div className="card-body">
+                    <label className="text-1xl font-bold" htmlFor="date">Date</label>
+                    <p id="date" className="text-base">{getStartDate(oldClassSchedule.scheduleStart)}</p>
+                    <div className="flex justify-between">
+                        <div>
+                            <label className="text-1xl font-bold" htmlFor="startTime">Start Time</label>
+                            <p id="startTime" className="text-base">{getTime(oldClassSchedule.scheduleStart)}</p>
+                        </div>
+                        <div>
+                            <label className="text-1xl font-bold" htmlFor="endTime">End Time</label>
+                            <p id="endTime" className="text-base">{getTime(oldClassSchedule.scheduleEnd)}</p>
+                        </div>
                     </div>
-                    <div>
-                        <label className="text-1xl font-bold" htmlFor="endTime">End Time</label>
-                        <p id="endTime" className="text-base">{getTime(classSchedule.scheduleEnd)}</p>
+                    <div className="card-actions justify-end">
+                        <button
+                        onClick= {handleEdit}
+                        className="btn btn-primary text-white">
+                            Edit
+                        </button>
                     </div>
                 </div>
-                <div className="card-actions justify-end">
-                    <button
-                    onClick= {handleEdit}
-                    className="btn btn-primary text-white">
-                        Edit
-                    </button>
-                </div>
-            </div>
         </div>
-        )
+        );
     } else
     {
+
+
         return(
-            <>
-                <p>EDITCOURSE</p>
-                <button onClick={handleSave} className="btn btn-primary text-white">Save Changes</button>
-            </>
-        )
+            <div className="card w-1/2 bg-base-100 shadow-xl m-2">
+                <div className="card-body">
+                    <label className="text-1xl font-bold" htmlFor="date">Date</label>
+                    <input 
+                        type="date"
+                        id="date" 
+                        className="text-base"
+                        onChange = {handleStartDateChange}
+                        defaultValue={formatStringToDate(editedClassSchedule.scheduleStart)}/>
+
+                    <div className="flex justify-between">
+                        <div>
+                            <label className="text-1xl font-bold" htmlFor="startTime">Start Time</label>
+                            <input 
+                                type="time" 
+                                id="startTime" 
+                                className="text-base" 
+                                onChange = {handleStartTimeChange}
+                                defaultValue={formatTime(editedClassSchedule.scheduleStart)}/>
+                        </div>
+                        <div>
+                            <label className="text-1xl font-bold" htmlFor="endTime">End Time</label>
+                            <input 
+                                type="time" 
+                                id="endTime" 
+                                className="text-base" 
+                                onChange = {handleEndTimeChange}
+                                defaultValue={formatTime(editedClassSchedule.scheduleEnd)}/>
+                        </div>
+                    </div>
+                    <div className="card-actions justify-end">
+
+                        <button
+                        onClick= {handleCancel}
+                        className="btn btn-warning">
+                            Cancel
+                        </button>
+
+                        <button
+                        onClick= {handleSave}
+                        className="btn btn-primary text-white">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
         
     }
 }

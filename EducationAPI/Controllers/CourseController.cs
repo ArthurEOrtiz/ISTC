@@ -67,7 +67,6 @@ namespace EducationAPI.Controllers
 		{
 			try
 			{
-				
 				_educationProgramContext.Courses.Add(course);
 				await _educationProgramContext.SaveChangesAsync();
 
