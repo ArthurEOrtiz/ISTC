@@ -19,6 +19,13 @@ namespace EducationAPI.Controllers
 			_logger = logger;
 		}
 
+		/// <summary>
+		/// Gets all Course records from the data base. 
+		/// </summary>
+		/// <returns>
+		/// <see cref="List{T}"/> of <see cref="Course"/> with a <see cref="List{T}"/> of children 
+		/// <see cref="Class"/>
+		/// </returns>
 		[HttpGet("GetAllCoursesWithClasses")]
 		public async Task<ActionResult<List<Course>>> GetAllCoursesWithClasses()
 		{
@@ -36,6 +43,16 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Gets a Course record by Id
+		/// </summary>
+		/// <param name="id">
+		///	<see cref="Course.CourseId"/>
+		///	</param>
+		/// <returns>
+		/// <see cref="Course"/> with a <see cref="List{T}"/> of children <see cref="Class"/> and the child
+		/// <see cref="Location"/>
+		/// </returns>
 		[HttpGet("GetCourseById")]
 		public async Task<ActionResult<Course>> GetCourseById(int id)
 		{
@@ -61,7 +78,15 @@ namespace EducationAPI.Controllers
 			}
 		}
 
-
+		/// <summary>
+		/// Gives the end user the ability to add a Course record to the database.
+		/// </summary>
+		/// <param name="course">
+		/// A single instance of <see cref="Course"/> 
+		/// </param>
+		/// <returns>
+		/// The instance of <see cref="Course"/> Created. 
+		/// </returns>
 		[HttpPost("PostCourse")]
 		public async Task<ActionResult> PostCourse(Course course)
 		{
@@ -79,7 +104,6 @@ namespace EducationAPI.Controllers
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
-
 
 	}
 }
