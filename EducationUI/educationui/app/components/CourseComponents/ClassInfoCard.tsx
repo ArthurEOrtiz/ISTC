@@ -150,15 +150,32 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
     if (!editClass || !oldClassSchedule) {
         return (
             <div className="card w-1/2 bg-base-100 shadow-xl m-2">
+
                 <div className="card-body">
+
                     <div className="flex justify-between">
+
                         <div className="flex items-center">
-                            <label className="text-1xl font-bold mr-1" htmlFor="date">Date:</label>
-                            <p id="date" className="text-base">{getStartDate(oldClassSchedule.scheduleStart)}</p>
+                            <label
+                                className="text-1xl font-bold mr-1"
+                                htmlFor="date">
+                                    Date:
+                            </label>
+                            <p id="date" className="text-base">
+                                {getStartDate(oldClassSchedule.scheduleStart)}
+                            </p>
                         </div>
+
+
                         <div className="flex items-center">
-                            <label className="text-1xl font-bold mr-1" htmlFor="classId">Class Id:</label>
-                            <p id="classId" className="text-base">{oldClassSchedule.classId}</p>                                        
+                            <label 
+                                className="text-1xl font-bold mr-1"
+                                htmlFor="classId">
+                                    Class Id:
+                            </label>
+                            <p id="classId" className="text-base">
+                                {oldClassSchedule.classId}
+                            </p>
                         </div>
  
                     </div>
@@ -181,8 +198,10 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
                             Edit
                         </button>
                     </div>
+
                 </div>
-        </div>
+
+            </div>
         );
     } else
     {

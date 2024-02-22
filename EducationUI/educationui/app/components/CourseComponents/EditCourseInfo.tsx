@@ -21,14 +21,20 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
 
     const handleOnClassAdd = (): void => {
         const today = new Date();
-        const todayAt9AMString = today.setHours(9, 0, 0, 0).toString();
-        const todayAt5PMString = today.setHours(17, 0, 0, 0).toString();
+        today.setHours(9,0,0,0 );
+        const todayAt9AMString = '2024-04-26T09:00:00'
+
+        today.setHours(17,0,0,0);
+        const todayAt5PMString = '2024-04-26T17:00:00'
+
+        console.log(todayAt9AMString);
+        console.log(todayAt5PMString);
+        console.log(classes);
 
         const newClassSchedule: ClassSchedule = {
-            classId: 0,
             courseId: course.courseId,
-            ScheduleStart: todayAt9AMString,
-            ScheduleEnd: todayAt5PMString
+            scheduleStart: todayAt9AMString,
+            scheduleEnd: todayAt5PMString
         }
 
         // Disable edit mode for all other classes 
