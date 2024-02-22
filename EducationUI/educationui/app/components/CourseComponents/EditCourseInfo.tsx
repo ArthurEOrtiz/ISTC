@@ -10,12 +10,32 @@ interface EditCourseInfoProps {
 
 const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => { 
     const [classes, setClasses] = useState<ClassSchedule[]>(course.classes);
+    const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
 
-    function handleOnClassInfoCardDelete(id: number | null): void {
+    const handleOnClassInfoCardDelete = (id: number | null): void => {
         if (id === null) {
             setClasses(prevClasses => prevClasses.filter(classSchedule => classSchedule.classId !== id))
             window.location.reload();
         }
+    }
+
+    const handleOnClassAdd = (): void => {
+        const today = new Date();
+        const todayAt9AMString = today.setHours(9, 0, 0, 0).toString();
+        const todayAt5PMString = today.setHours(17, 0, 0, 0).toString();
+
+        const newClassSchedule: ClassSchedule = {
+            classId: 0,
+            courseId: course.courseId,
+            ScheduleStart: todayAt9AMString,
+            ScheduleEnd: todayAt5PMString
+        }
+
+        // Disable edit mode for all other classes 
+        setEditModeIndex(null);
+        // Add the new class with edit mode enabled 
+        setClasses(prevClasses => [...prevClasses, newClassSchedule]);
+        setEditModeIndex(classes.length);
     }
 
     return (
@@ -31,7 +51,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                             Edit Course Information
                     </button>
                     <button 
-                        className="btn btn-primary text-white m-1">
+                        className="btn btn-error text-white m-1">
                             Delete Course
                     </button>
                     <button
@@ -48,15 +68,19 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 <div className="p-4">
                     <h1 className="p-s text-3xl text-center font-bold">Classes</h1>
                 </div>
-                <div className = "flex flex-wrap justify-center gap-2">
-                    {classes.map((classSchedule) => (
-                        <ClassInfoCard key={classSchedule.classId} classSchedule={classSchedule} onDelete={handleOnClassInfoCardDelete} />
+                <div className="flex flex-wrap justify-center gap-2">
+                    {classes.map((classSchedule, index) => (
+                        <ClassInfoCard 
+                            key={classSchedule.classId}
+                            classSchedule={classSchedule}
+                            onDelete={handleOnClassInfoCardDelete}
+                            editMode={index === editModeIndex} />
                     ))}
                 </div>
                 <div className="navbar  w-1/2 rounded-xl">
                     <button 
                         className="btn btn-primary text-white m-1"
-                        onClick={() => {}}>
+                        onClick={handleOnClassAdd}>
                             Add Class
                     </button>
                 </div>

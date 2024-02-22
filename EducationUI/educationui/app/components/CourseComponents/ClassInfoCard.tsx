@@ -1,22 +1,33 @@
 'use client';
 import { ClassSchedule } from "@/app/shared/types/sharedTypes";
 import axios from "axios";
-import { on } from "events";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, use, useEffect, useState } from "react";
 
 interface ClassInfoCardProps {
-    classSchedule: ClassSchedule;
+    classSchedule: ClassSchedule | null;
     onDelete: (id: number | null) => void;
-
+    editMode: boolean;
 };
 
-const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete}) => {
+const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, editMode}) => {
     const [editClass, setEditClass] = useState<Boolean>(false);
-    const [oldClassSchedule, setOldClassSchedule ] = useState<ClassSchedule>(classSchedule);
-    const [editedClassSchedule, setEditedClassSchedule] = useState<ClassSchedule>(classSchedule);
+    const [oldClassSchedule, setOldClassSchedule ] = useState<ClassSchedule |null >(classSchedule);
+    const [editedClassSchedule, setEditedClassSchedule] = useState<ClassSchedule | null>(classSchedule);
     const [deleted, setDeleted] = useState<Boolean>(false);
 
-    const getStartDate = (date: string) => {
+    useEffect(() => {
+        if (editMode) {
+            setEditClass(true);
+        }   
+    }
+    , [editMode]);
+
+    const getStartDate = (date: string | null) => {
+        
+        if (date === null) {
+            return null;
+        }
+
         const startDate = new Date(date);
         const formattedDate = startDate.toLocaleDateString(
             'en-US', {
@@ -55,7 +66,6 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete}) 
         return `${hours}:${minutes}`;
     }
     
-
     const handleEdit = () => {
         setEditClass(true);
     }
@@ -137,12 +147,23 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete}) 
         return null;
     }
 
-    if (!editClass) {
+    if (!editClass || !oldClassSchedule) {
         return (
             <div className="card w-1/2 bg-base-100 shadow-xl m-2">
                 <div className="card-body">
-                    <label className="text-1xl font-bold" htmlFor="date">Date</label>
-                    <p id="date" className="text-base">{getStartDate(oldClassSchedule.scheduleStart)}</p>
+                    <div className="flex justify-between">
+                        <div className="flex items-center">
+                            <label className="text-1xl font-bold mr-1" htmlFor="date">Date:</label>
+                            <p id="date" className="text-base">{getStartDate(oldClassSchedule.scheduleStart)}</p>
+                        </div>
+                        <div className="flex items-center">
+                            <label className="text-1xl font-bold mr-1" htmlFor="classId">Class Id:</label>
+                            <p id="classId" className="text-base">{oldClassSchedule.classId}</p>                                        
+                        </div>
+ 
+                    </div>
+                    
+
                     <div className="flex justify-between">
                         <div>
                             <label className="text-1xl font-bold" htmlFor="startTime">Start Time</label>
@@ -200,13 +221,13 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete}) 
 
                         <button
                         onClick = {handleDelete}
-                        className="btn btn-danger">
+                        className="btn btn-error text-white">
                             Delete
                         </button>
 
                         <button
                         onClick= {handleCancel}
-                        className="btn btn-warning">
+                        className="btn btn-warning text-white">
                             Cancel
                         </button>
 
