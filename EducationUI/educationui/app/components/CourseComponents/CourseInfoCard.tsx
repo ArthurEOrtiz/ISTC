@@ -7,7 +7,7 @@ interface CourseCardProps {
 
 const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
     return(
-        <div className="bg-white shadow-md rounded-md p-4">
+        <div className="bg-white shadow-md rounded-xl p-4">
             <div className="mb-2">
                 <h1 className="text-xl font-bold">{course?.title}</h1>
                 <p><strong>Description:</strong> {course?.description}</p>

@@ -1,16 +1,20 @@
 'use client';
 import { ClassSchedule } from "@/app/shared/types/sharedTypes";
 import axios from "axios";
+import { on } from "events";
 import { ChangeEvent, useState } from "react";
 
 interface ClassInfoCardProps {
     classSchedule: ClassSchedule;
+    onDelete: (id: number | null) => void;
+
 };
 
-const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
+const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete}) => {
     const [editClass, setEditClass] = useState<Boolean>(false);
     const [oldClassSchedule, setOldClassSchedule ] = useState<ClassSchedule>(classSchedule);
     const [editedClassSchedule, setEditedClassSchedule] = useState<ClassSchedule>(classSchedule);
+    const [deleted, setDeleted] = useState<Boolean>(false);
 
     const getStartDate = (date: string) => {
         const startDate = new Date(date);
@@ -58,10 +62,9 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
 
     const handleSave = async () => {
         try {
-           
             const url = `https://localhost:7144/Class/EditClassById?id=${editedClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
             const response = await axios.post(url);
-            console.log('Course saved successfully', response);
+            //console.log('Course saved successfully', response);
             setEditClass(false);
             setOldClassSchedule(editedClassSchedule);
 
@@ -73,6 +76,18 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
     const handleCancel = () => {
         setEditClass(false);
         setEditedClassSchedule(oldClassSchedule);
+    }
+
+    const handleDelete = async () => {
+        try {
+            const url = `https://localhost:7144/Class/DeleteClassById?id=${editedClassSchedule.classId}`;
+            const response = await axios.delete(url);
+            //console.log('Course deleted successfully', response);
+            onDelete(editedClassSchedule.classId);
+            setDeleted(true);
+        } catch (error) {
+            console.error('Error saving course', error);
+        }
     }
 
     const handleStartDateChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -118,6 +133,10 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
 
     }
 
+    if (deleted) {
+        return null;
+    }
+
     if (!editClass) {
         return (
             <div className="card w-1/2 bg-base-100 shadow-xl m-2">
@@ -146,8 +165,6 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
         );
     } else
     {
-
-
         return(
             <div className="card w-1/2 bg-base-100 shadow-xl m-2">
                 <div className="card-body">
@@ -180,6 +197,12 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule}) => {
                         </div>
                     </div>
                     <div className="card-actions justify-end">
+
+                        <button
+                        onClick = {handleDelete}
+                        className="btn btn-danger">
+                            Delete
+                        </button>
 
                         <button
                         onClick= {handleCancel}

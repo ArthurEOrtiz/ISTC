@@ -73,6 +73,31 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpDelete("DeleteClassById")]
+		public async Task<IActionResult> DeleteClassById(int id)
+		{
+			try
+			{
+				var existingClass = await _educationProgramContext.Classes
+						.FirstOrDefaultAsync(c => c.ClassId == id);
+
+				if (existingClass == null)
+				{
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_educationProgramContext.Classes.Remove(existingClass);
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("DeleteClassById({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "DeleteClassById({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
 
 	}
 }

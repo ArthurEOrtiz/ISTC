@@ -1,6 +1,4 @@
 import { getCourseById } from "@/Utilities/api";
-import ClassInfoCard from "@/app/components/CourseComponents/ClassInfoCard";
-import CourseCard from "@/app/components/CourseComponents/CourseInfoCard";
 import EditCourseInfo from "@/app/components/CourseComponents/EditCourseInfo";
 import { Course } from "@/app/shared/types/sharedTypes";
 
