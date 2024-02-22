@@ -75,8 +75,8 @@ const ClassForm: React.FC<ClassFormProps> = ({ courseFormData, classes, onDelete
                 classes: classes.map(classItem => ({
                     classId: null,
                     courseId: null,
-                    ScheduleStart: classItem.scheduleDate.toISOString(),
-                    ScheduleEnd: classItem.scheduleDate.toISOString()
+                    scheduleStart: classItem.scheduleDate.toISOString(),
+                    scheduleEnd: classItem.scheduleDate.toISOString()
                 }))
             });
         }

@@ -105,8 +105,8 @@ const AddCourseComponent: React.FC = () => {
             return {
                 classId: 0,
                 courseId: 0,
-                ScheduleStart: scheduleStart.toISOString(),
-                ScheduleEnd: scheduleEnd.toISOString()
+                scheduleStart: scheduleStart.toISOString(),
+                scheduleEnd: scheduleEnd.toISOString()
             };
         });
         return transformedClasses;

@@ -12,8 +12,13 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const [classes, setClasses] = useState<ClassSchedule[]>(course.classes);
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
 
-     // Sort the classes array by scheduleStart date
-    //const sortedClasses = [...classes].sort((a, b) => new Date(a.scheduleStart).getTime() - new Date(b.scheduleStart).getTime());
+    const sortClassesByDate = () => {
+        const sortedClasses = [...classes].sort((a, b) => {
+            return new Date(a.scheduleStart).getTime() - new Date(b.scheduleStart).getTime();
+        });
+        setClasses(sortedClasses);
+    }
+
 
     const handleOnClassInfoCardDelete = (id: number | null): void => {
         if (id === null) {
@@ -29,9 +34,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
        
         today.setUTCHours(17,0,0,0);
         const todayAt5PMString = today.toISOString().slice(0, -1);
-
-        console.log(todayAt9AMString);
-        console.log(todayAt5PMString);
 
 
         const newClassSchedule: ClassSchedule = {

@@ -34,8 +34,8 @@ export interface Location {
 export interface ClassSchedule {
     classId: number | null;
     courseId: number | null;
-    ScheduleStart: string;
-    ScheduleEnd: string;
+    scheduleStart: string;
+    scheduleEnd: string;
   }
   
 export interface Course {
