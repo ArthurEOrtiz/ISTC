@@ -44,7 +44,7 @@ namespace EducationAPI.Controllers
 		}
 
 		[HttpPost("EditClassById")]
-		public async Task<ActionResult> EditCourseById(int id, DateTime newScheduleStart, DateTime newScheduleStop)
+		public async Task<ActionResult> EditClassById(int id, DateTime newScheduleStart, DateTime newScheduleStop)
 		{
 			try
 			{

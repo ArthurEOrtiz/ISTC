@@ -72,12 +72,23 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
 
     const handleSave = async () => {
         try {
-            const url = `https://localhost:7144/Class/EditClassById?id=${editedClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
+            let url : string = '';
+            if (oldClassSchedule?.classId == null) {
+                url = `https://localhost:7144/Course/AddClassByCourseId?courseId=${oldClassSchedule.courseId}&newStartDate=${editedClassSchedule.scheduleStart}&newEndDate=${editedClassSchedule.scheduleEnd}`;
+        
+            }
+            else if (oldClassSchedule?.classId != null)
+            {
+                url = `https://localhost:7144/Class/EditClassById?id=${editedClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
+                
+            }
+            console.log(url);
             const response = await axios.post(url);
-            //console.log('Course saved successfully', response);
+            console.log('Course saved successfully', response);
+            //console.log("Course saved successfully")
             setEditClass(false);
             setOldClassSchedule(editedClassSchedule);
-
+            //window.location.reload();
         } catch (error) {
             console.error('Error saving course', error);
         }
@@ -214,7 +225,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
                         id="date" 
                         className="text-base"
                         onChange = {handleStartDateChange}
-                        defaultValue={formatStringToDate(editedClassSchedule.scheduleStart)}/>
+                        defaultValue={formatStringToDate(oldClassSchedule.scheduleStart)}/>
 
                     <div className="flex justify-between">
                         <div>
@@ -224,7 +235,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
                                 id="startTime" 
                                 className="text-base" 
                                 onChange = {handleStartTimeChange}
-                                defaultValue={formatTime(editedClassSchedule.scheduleStart)}/>
+                                defaultValue={formatTime(oldClassSchedule.scheduleStart)}/>
                         </div>
                         <div>
                             <label className="text-1xl font-bold" htmlFor="endTime">End Time</label>
@@ -233,7 +244,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
                                 id="endTime" 
                                 className="text-base" 
                                 onChange = {handleEndTimeChange}
-                                defaultValue={formatTime(editedClassSchedule.scheduleEnd)}/>
+                                defaultValue={formatTime(oldClassSchedule.scheduleEnd)}/>
                         </div>
                     </div>
                     <div className="card-actions justify-end">

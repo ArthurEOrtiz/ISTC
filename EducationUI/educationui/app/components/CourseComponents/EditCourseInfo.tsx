@@ -12,24 +12,27 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const [classes, setClasses] = useState<ClassSchedule[]>(course.classes);
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
 
+     // Sort the classes array by scheduleStart date
+    //const sortedClasses = [...classes].sort((a, b) => new Date(a.scheduleStart).getTime() - new Date(b.scheduleStart).getTime());
+
     const handleOnClassInfoCardDelete = (id: number | null): void => {
         if (id === null) {
             setClasses(prevClasses => prevClasses.filter(classSchedule => classSchedule.classId !== id))
-            window.location.reload();
+            //window.location.reload();
         }
     }
 
     const handleOnClassAdd = (): void => {
         const today = new Date();
-        today.setHours(9,0,0,0 );
-        const todayAt9AMString = '2024-04-26T09:00:00'
-
-        today.setHours(17,0,0,0);
-        const todayAt5PMString = '2024-04-26T17:00:00'
+        today.setUTCHours(9,0,0,0);
+        const todayAt9AMString = today.toISOString().slice(0, -1);
+       
+        today.setUTCHours(17,0,0,0);
+        const todayAt5PMString = today.toISOString().slice(0, -1);
 
         console.log(todayAt9AMString);
         console.log(todayAt5PMString);
-        console.log(classes);
+
 
         const newClassSchedule: ClassSchedule = {
             courseId: course.courseId,
@@ -43,6 +46,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         setClasses(prevClasses => [...prevClasses, newClassSchedule]);
         setEditModeIndex(classes.length);
     }
+
+   
 
     return (
         <div>
@@ -77,7 +82,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 <div className="flex flex-wrap justify-center gap-2">
                     {classes.map((classSchedule, index) => (
                         <ClassInfoCard 
-                            key={classSchedule.classId}
+                            key={index}
                             classSchedule={classSchedule}
                             onDelete={handleOnClassInfoCardDelete}
                             editMode={index === editModeIndex} />
