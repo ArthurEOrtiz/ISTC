@@ -68,6 +68,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     }
     
     const handleEdit = () => {
+        console.log('Edit Class', oldClassSchedule.classId);
         setEditClass(true);
     }
 

@@ -8,21 +8,15 @@ interface EditCourseInfoProps {
     course: Course;
 }
 
-
-
 const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => { 
+
+    // Initializing Logic 
     const sortClassesByDate = (classes : ClassSchedule[]): ClassSchedule[] => {
         const sortedClasses = [...classes].sort((a, b) => {
             return new Date(a.scheduleStart).getTime() - new Date(b.scheduleStart).getTime();
         });
         return sortedClasses;
     }
-
-    const [classes, setClasses] = useState<ClassSchedule[]>(sortClassesByDate(course.classes));
-    const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
-
-
-    
 
     const areClassesOrderedByDate = (): boolean => {
         for (let i = 0; i < classes.length - 1; i++) {
@@ -34,6 +28,22 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         }
         return true;
     }
+
+    const [classes, setClasses] = useState<ClassSchedule[]>(sortClassesByDate(course.classes));
+    const [areClassesOrdered, setAreClassesOrdered] = useState<boolean>(areClassesOrderedByDate());
+    const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
+    
+    useEffect(() => { 
+        console.log("Classes Updated")
+        console.log(classes)
+        if (!areClassesOrdered) {
+            setClasses(sortClassesByDate(classes));
+            console.log("Classes Sorted")
+            console.log(classes)
+        }
+    }
+    , [classes]);
+
 
     const handleOnClassInfoCardDelete = (id: number | null): void => {
         if (id === null) {
