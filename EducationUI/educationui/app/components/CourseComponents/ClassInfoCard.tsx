@@ -1,18 +1,19 @@
 'use client';
 import { ClassSchedule } from "@/app/shared/types/sharedTypes";
 import axios from "axios";
-import { ChangeEvent, use, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 interface ClassInfoCardProps {
-    classSchedule: ClassSchedule | null;
+    classSchedule: ClassSchedule;
+    onAdd: () => void;
     onDelete: (id: number | null) => void;
     editMode: boolean;
 };
 
-const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, editMode}) => {
+const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDelete, editMode}) => {
     const [editClass, setEditClass] = useState<Boolean>(false);
-    const [oldClassSchedule, setOldClassSchedule ] = useState<ClassSchedule |null >(classSchedule);
-    const [editedClassSchedule, setEditedClassSchedule] = useState<ClassSchedule | null>(classSchedule);
+    const [oldClassSchedule, setOldClassSchedule ] = useState<ClassSchedule>(classSchedule);
+    const [editedClassSchedule, setEditedClassSchedule] = useState<ClassSchedule>(classSchedule);
     const [deleted, setDeleted] = useState<Boolean>(false);
 
     useEffect(() => {
@@ -88,6 +89,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
             //console.log("Course saved successfully")
             setEditClass(false);
             setOldClassSchedule(editedClassSchedule);
+            onAdd();
             //window.location.reload();
         } catch (error) {
             console.error('Error saving course', error);
@@ -95,8 +97,15 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
     }
 
     const handleCancel = () => {
-        setEditClass(false);
-        setEditedClassSchedule(oldClassSchedule);
+        if (oldClassSchedule.classId != null)
+        {
+            setEditClass(false);
+            setEditedClassSchedule(oldClassSchedule);
+        } else
+        {
+            onDelete(null);
+        }
+        
     }
 
     const handleDelete = async () => {
@@ -219,7 +228,9 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
         return(
             <div className="card w-1/2 bg-base-100 shadow-xl m-2">
                 <div className="card-body">
-                    <label className="text-1xl font-bold" htmlFor="date">Date</label>
+                    <label className="text-1xl font-bold" htmlFor="date">
+                        Date
+                    </label>
                     <input 
                         type="date"
                         id="date" 
@@ -229,7 +240,9 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
 
                     <div className="flex justify-between">
                         <div>
-                            <label className="text-1xl font-bold" htmlFor="startTime">Start Time</label>
+                            <label className="text-1xl font-bold mr-1" htmlFor="startTime">
+                                Start Time
+                            </label>
                             <input 
                                 type="time" 
                                 id="startTime" 
@@ -238,7 +251,9 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
                                 defaultValue={formatTime(oldClassSchedule.scheduleStart)}/>
                         </div>
                         <div>
-                            <label className="text-1xl font-bold" htmlFor="endTime">End Time</label>
+                            <label className="text-1xl font-bold mr-1" htmlFor="endTime">
+                                End Time
+                            </label>
                             <input 
                                 type="time" 
                                 id="endTime" 
@@ -250,21 +265,21 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onDelete, e
                     <div className="card-actions justify-end">
 
                         <button
-                        onClick = {handleDelete}
-                        className="btn btn-error text-white">
-                            Delete
+                            onClick = {handleDelete}
+                            className="btn btn-error text-white">
+                                Delete
                         </button>
 
                         <button
-                        onClick= {handleCancel}
-                        className="btn btn-warning text-white">
-                            Cancel
+                            onClick= {handleCancel}
+                            className="btn btn-warning text-white">
+                                Cancel
                         </button>
 
                         <button
-                        onClick= {handleSave}
-                        className="btn btn-primary text-white">
-                            Save
+                            onClick= {handleSave}
+                            className="btn btn-primary text-white">
+                                Save
                         </button>
                     </div>
                 </div>

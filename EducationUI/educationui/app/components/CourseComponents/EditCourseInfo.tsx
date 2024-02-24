@@ -2,23 +2,38 @@
 import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 
 interface EditCourseInfoProps {
     course: Course;
 }
 
-const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => { 
-    const [classes, setClasses] = useState<ClassSchedule[]>(course.classes);
-    const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
 
-    const sortClassesByDate = () => {
+
+const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => { 
+    const sortClassesByDate = (classes : ClassSchedule[]): ClassSchedule[] => {
         const sortedClasses = [...classes].sort((a, b) => {
             return new Date(a.scheduleStart).getTime() - new Date(b.scheduleStart).getTime();
         });
-        setClasses(sortedClasses);
+        return sortedClasses;
     }
 
+    const [classes, setClasses] = useState<ClassSchedule[]>(sortClassesByDate(course.classes));
+    const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
+
+
+    
+
+    const areClassesOrderedByDate = (): boolean => {
+        for (let i = 0; i < classes.length - 1; i++) {
+            const currentClass = classes[i];
+            const nextClass = classes[i + 1];
+            if (new Date(currentClass.scheduleStart).getTime() > new Date(nextClass.scheduleStart).getTime()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     const handleOnClassInfoCardDelete = (id: number | null): void => {
         if (id === null) {
@@ -37,6 +52,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
 
 
         const newClassSchedule: ClassSchedule = {
+            classId: null,
             courseId: course.courseId,
             scheduleStart: todayAt9AMString,
             scheduleEnd: todayAt5PMString
@@ -47,6 +63,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         // Add the new class with edit mode enabled 
         setClasses(prevClasses => [...prevClasses, newClassSchedule]);
         setEditModeIndex(classes.length);
+    }
+
+    const handleOnClassAdded = (): void => {
+        console.log("Class Added")
+        console.log(classes)
     }
 
    
@@ -79,13 +100,16 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             
             <div className="flex flex-col items-center">
                 <div className="p-4">
-                    <h1 className="p-s text-3xl text-center font-bold">Classes</h1>
+                    <h1 className="p-s text-3xl text-center font-bold">
+                        Classes
+                    </h1>
                 </div>
                 <div className="flex flex-wrap justify-center gap-2">
                     {classes.map((classSchedule, index) => (
                         <ClassInfoCard 
                             key={index}
                             classSchedule={classSchedule}
+                            onAdd={handleOnClassAdded}
                             onDelete={handleOnClassInfoCardDelete}
                             editMode={index === editModeIndex} />
                     ))}
