@@ -22,6 +22,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         for (let i = 0; i < classes.length - 1; i++) {
             const currentClass = classes[i];
             const nextClass = classes[i + 1];
+            //console.log(new Date(currentClass.scheduleStart), new Date(nextClass.scheduleStart)); // Add this line
             if (new Date(currentClass.scheduleStart).getTime() > new Date(nextClass.scheduleStart).getTime()) {
                 return false;
             }
@@ -34,13 +35,18 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
     
     useEffect(() => { 
-        console.log("Classes Updated")
+        //console.log("Classes Updated")
         console.log(classes)
-        if (!areClassesOrdered) {
+        if (!areClassesOrderedByDate()) {
             setClasses(sortClassesByDate(classes));
             console.log("Classes Sorted")
             console.log(classes)
         }
+    }
+    , [classes]);
+
+    useEffect(() => {
+        console.log("Updated Classes", classes);
     }
     , [classes]);
 
@@ -75,9 +81,24 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         setEditModeIndex(classes.length);
     }
 
-    const handleOnClassAdded = (): void => {
-        console.log("Class Added")
-        console.log(classes)
+    const handleOnClassAdded = (updatedClassSchedule: ClassSchedule | null): void => {
+        // TODO: first check and see if the next class is equal to any other class
+        // if it is, then update that class with new class info
+        if (updatedClassSchedule !==  null) {
+            // console.log("Class Edited", updatedClassSchedule);
+            // console.log(updatedClassSchedule.scheduleStart);
+            // console.log(updatedClassSchedule.scheduleEnd);
+            // //window.location.reload();
+
+            const index = classes.findIndex(classSchedule => classSchedule.classId === updatedClassSchedule.classId);
+            //console.log("Index", index);
+            if (index !== -1) {
+                const newClasses = [...classes];
+                newClasses[index] = updatedClassSchedule;
+                setClasses(newClasses);
+            }
+        }
+
     }
 
    
@@ -117,7 +138,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 <div className="flex flex-wrap justify-center gap-2">
                     {classes.map((classSchedule, index) => (
                         <ClassInfoCard 
-                            key={index}
+                            key={classSchedule.classId}
                             classSchedule={classSchedule}
                             onAdd={handleOnClassAdded}
                             onDelete={handleOnClassInfoCardDelete}

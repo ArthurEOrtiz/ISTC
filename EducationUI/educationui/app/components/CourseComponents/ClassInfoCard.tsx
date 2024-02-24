@@ -5,7 +5,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 
 interface ClassInfoCardProps {
     classSchedule: ClassSchedule;
-    onAdd: () => void;
+    onAdd: (updatedClassSchdedule : ClassSchedule | null) => void;
     onDelete: (id: number | null) => void;
     editMode: boolean;
 };
@@ -68,7 +68,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     }
     
     const handleEdit = () => {
-        console.log('Edit Class', oldClassSchedule.classId);
+        //console.log('Edit Class', oldClassSchedule.classId);
         setEditClass(true);
     }
 
@@ -82,16 +82,19 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
             else if (oldClassSchedule?.classId != null)
             {
                 url = `https://localhost:7144/Class/EditClassById?id=${editedClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
+
+                console.log(url);
+                const response = await axios.post(url);
+                console.log('Course saved successfully', response);
+                
+                ;
                 
             }
-            console.log(url);
-            const response = await axios.post(url);
-            console.log('Course saved successfully', response);
-            //console.log("Course saved successfully")
-            setEditClass(false);
+            
             setOldClassSchedule(editedClassSchedule);
-            onAdd();
-            //window.location.reload();
+            onAdd(editedClassSchedule)
+            setEditClass(false);
+
         } catch (error) {
             console.error('Error saving course', error);
         }
