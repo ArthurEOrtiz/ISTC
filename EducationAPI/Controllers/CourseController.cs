@@ -105,43 +105,43 @@ namespace EducationAPI.Controllers
 			}
 		}
 
-		[HttpPost("AddClassByCourseId")]
-		public async Task<ActionResult> AddClassByCourseId(int courseId, DateTime newStartDate, DateTime newEndDate)
-		{
-			try
-			{
-				var course = await _educationProgramContext.Courses
-				.FirstOrDefaultAsync();
+		//[HttpPost("AddClassByCourseId")]
+		//public async Task<ActionResult> AddClassByCourseId(int courseId, DateTime newStartDate, DateTime newEndDate)
+		//{
+		//	try
+		//	{
+		//		var course = await _educationProgramContext.Courses
+		//		.FirstOrDefaultAsync();
 
-				if (course == null)
-				{
-					_logger.LogError("No Record Found, AddClassByCourseId({CourseId}, {NewStartDate}, {NewEndDate}", courseId, newStartDate, newEndDate);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
-				}
+		//		if (course == null)
+		//		{
+		//			_logger.LogError("No Record Found, AddClassByCourseId({CourseId}, {NewStartDate}, {NewEndDate}", courseId, newStartDate, newEndDate);
+		//			return new StatusCodeResult((int)HttpStatusCode.NotFound);
+		//		}
 
-				Class newClass = new()
-				{
-					CourseId = courseId,
-					ScheduleStart = newStartDate,
-					ScheduleEnd = newEndDate,
-				};
+		//		Class newClass = new()
+		//		{
+		//			CourseId = courseId,
+		//			ScheduleStart = newStartDate,
+		//			ScheduleEnd = newEndDate,
+		//		};
 
-				_educationProgramContext.Classes.Add(newClass);
+		//		_educationProgramContext.Classes.Add(newClass);
 
-				await _educationProgramContext.SaveChangesAsync();
+		//		await _educationProgramContext.SaveChangesAsync();
 
-				_logger.LogInformation("AddClassByCourseId({CourseId}, {NewStartDate}, {NewEndDate}", courseId, newStartDate, newEndDate);
-				return new StatusCodeResult((int)HttpStatusCode.OK);
+		//		_logger.LogInformation("AddClassByCourseId({CourseId}, {NewStartDate}, {NewEndDate}", courseId, newStartDate, newEndDate);
+		//		return new StatusCodeResult((int)HttpStatusCode.OK);
 
 
-			} 
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "AddClassByCourseId({CourseId}, {NewStartDate}, {NewEndDate}", courseId, newStartDate, newEndDate);
-				return new StatusCodeResult((int)(HttpStatusCode.InternalServerError));
-			}
+		//	} 
+		//	catch (Exception ex)
+		//	{
+		//		_logger.LogError(ex, "AddClassByCourseId({CourseId}, {NewStartDate}, {NewEndDate}", courseId, newStartDate, newEndDate);
+		//		return new StatusCodeResult((int)(HttpStatusCode.InternalServerError));
+		//	}
 
-		}
+		//}
 
 	}
 }

@@ -68,7 +68,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     }
     
     const handleEdit = () => {
-        //console.log('Edit Class', oldClassSchedule.classId);
+        console.log('Edit Class', oldClassSchedule.classId);
         setEditClass(true);
     }
 
@@ -76,23 +76,34 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
         try {
             let url : string = '';
             if (oldClassSchedule?.classId == null) {
-                url = `https://localhost:7144/Course/AddClassByCourseId?courseId=${oldClassSchedule.courseId}&newStartDate=${editedClassSchedule.scheduleStart}&newEndDate=${editedClassSchedule.scheduleEnd}`;
+                url = `https://localhost:7144/Class/AddClassByCourseId?courseId=${oldClassSchedule.courseId}&newStartDate=${editedClassSchedule.scheduleStart}&newEndDate=${editedClassSchedule.scheduleEnd}`;
+                console.log(url);
+                const response = await axios.post(url);
+
+                if (response.status !== 201) {
+                    console.error('Error saving course', response);
+                }
+
+                if (response.data != null) {
+                    //console.log("response data", response.data);
+                    const newClass: ClassSchedule = response.data;
+                    setOldClassSchedule(newClass);
+                    onAdd(newClass);
+                }
         
             }
             else if (oldClassSchedule?.classId != null)
             {
-                url = `https://localhost:7144/Class/EditClassById?id=${editedClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
+                url = `https://localhost:7144/Class/EditClassById?id=${oldClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
 
-                console.log(url);
+                //console.log(url);
                 const response = await axios.post(url);
                 console.log('Course saved successfully', response);
-                
-                ;
-                
+                setOldClassSchedule(editedClassSchedule);
+                onAdd(editedClassSchedule);
             }
+
             
-            setOldClassSchedule(editedClassSchedule);
-            onAdd(editedClassSchedule)
             setEditClass(false);
 
         } catch (error) {

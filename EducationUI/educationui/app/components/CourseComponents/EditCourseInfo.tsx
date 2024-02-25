@@ -31,7 +31,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     const [classes, setClasses] = useState<ClassSchedule[]>(sortClassesByDate(course.classes));
-    const [areClassesOrdered, setAreClassesOrdered] = useState<boolean>(areClassesOrderedByDate());
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
     
     useEffect(() => { 
@@ -39,16 +38,16 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         console.log(classes)
         if (!areClassesOrderedByDate()) {
             setClasses(sortClassesByDate(classes));
-            console.log("Classes Sorted")
-            console.log(classes)
+            // console.log("Classes Sorted")
+            // console.log(classes)
         }
     }
     , [classes]);
 
-    useEffect(() => {
-        console.log("Updated Classes", classes);
-    }
-    , [classes]);
+    // useEffect(() => {
+    //     console.log("Updated Classes", classes);
+    // }
+    // , [classes]);
 
 
     const handleOnClassInfoCardDelete = (id: number | null): void => {
@@ -82,22 +81,16 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     const handleOnClassAdded = (updatedClassSchedule: ClassSchedule | null): void => {
-        // TODO: first check and see if the next class is equal to any other class
-        // if it is, then update that class with new class info
+        console.log("Updated Class Schedule", updatedClassSchedule);
         if (updatedClassSchedule !==  null) {
-            // console.log("Class Edited", updatedClassSchedule);
-            // console.log(updatedClassSchedule.scheduleStart);
-            // console.log(updatedClassSchedule.scheduleEnd);
-            // //window.location.reload();
-
             const index = classes.findIndex(classSchedule => classSchedule.classId === updatedClassSchedule.classId);
-            //console.log("Index", index);
             if (index !== -1) {
                 const newClasses = [...classes];
                 newClasses[index] = updatedClassSchedule;
                 setClasses(newClasses);
             }
         }
+
 
     }
 

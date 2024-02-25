@@ -99,5 +99,44 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpPost("AddClassByCourseId")]
+		public async Task<ActionResult> AddClassByCourseId(int courseId, DateTime newStartDate, DateTime newEndDate)
+		{
+			try
+			{
+				var course = await _educationProgramContext.Courses
+				.FirstOrDefaultAsync();
+
+				if (course == null)
+				{
+					_logger.LogError("No Record Found, AddClassByCourseId({CourseId}, {NewStartDate}, {NewEndDate}", courseId, newStartDate, newEndDate);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				Class newClass = new()
+				{
+					CourseId = courseId,
+					ScheduleStart = newStartDate,
+					ScheduleEnd = newEndDate,
+				};
+
+				_educationProgramContext.Classes.Add(newClass);
+
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("AddClassByCourseId({CourseId}, {NewStartDate}, {NewEndDate}", courseId, newStartDate, newEndDate);
+				//return new StatusCodeResult((int)HttpStatusCode.OK);
+				return new CreatedAtActionResult(nameof(GetClassById), "Class", new {id = newClass.ClassId }, newClass);
+
+
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "AddClassByCourseId({CourseId}, {NewStartDate}, {NewEndDate}", courseId, newStartDate, newEndDate);
+				return new StatusCodeResult((int)(HttpStatusCode.InternalServerError));
+			}
+
+		}
+
 	}
 }
