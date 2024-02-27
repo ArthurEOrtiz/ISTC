@@ -15,14 +15,24 @@ export async function getAllCoursesWithClasses() {
 }
 
 export async function getCourseById(courseId) {
-    const url = `https://localhost:7144/Course/GetCourseById?id=${courseId}`;
-    const httpAgent = new https.Agent({ rejectUnauthorized: false});
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'accept': 'text/plain'},
-        agent: httpAgent,
-    });
+    try {
+        const url = `https://localhost:7144/Course/GetCourseById?id=${courseId}`;
+        const httpAgent = new https.Agent({ rejectUnauthorized: false });
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'accept': 'text/plain'
+            },
+            agent: httpAgent,
+        });
 
-    return response.json();
+        if (!response.ok) {
+            throw new Error('Failed to fetch course');
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Error fetching course:', error);
+        throw error;
+    }
 }
