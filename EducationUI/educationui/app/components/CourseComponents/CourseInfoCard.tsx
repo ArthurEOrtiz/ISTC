@@ -24,7 +24,23 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
             ...prevState,
             [name]: value
         }));
-    }
+    };
+
+    const handleLocationInputChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+        parentKey: keyof Course['location']
+    ) => {
+        const { name, value } = e.target;
+        
+        setEditCourse((prevEditCourse) => ({
+            ...prevEditCourse,
+            location: {
+                ...prevEditCourse.location,
+                [parentKey]: value,
+            },
+        }));
+    };
+    
 
     const toggleEditMode = () => {
         setEditMode(prevEditMode => !prevEditMode);
@@ -70,12 +86,11 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         />
                         : course?.description}</p>
-
             </div>
 
             <div className="flex flex-wrap -mx-1">
                 <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Instructor:</strong> {editMode?
+                    <p><strong>Instructor:</strong> {editMode ?
                         <input
                             type="text"
                             name="instructorName"
@@ -95,7 +110,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                             : course?.instructorEmail}</p>
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Attendance Credit:</strong> {editMode?
+                    <p><strong>Attendance Credit:</strong> {editMode ?
                         <input
                             type="text"
                             name="attendanceCredit"
@@ -105,7 +120,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                             : course?.attendanceCredit}</p> 
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Completion Credit:</strong> {editMode?
+                    <p><strong>Completion Credit:</strong> {editMode ?
                         <input
                             type="text"
                             name="completionCredit"
@@ -115,7 +130,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                             : course?.completionCredit}</p>
                 </div>
                 <div className="w-full sm:w-1/2  px-1 mb-2">
-                    <p><strong>Max Attendance:</strong> {editMode?
+                    <p><strong>Max Attendance:</strong> {editMode ?
                         <input
                             type="text"
                             name="maxAttendance"
@@ -125,7 +140,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                             : course?.maxAttendance}</p>
                 </div>
                 <div className="w-full sm:w-1/2  px-1 mb-2">
-                    <p><strong>Enrollment Deadline:</strong> {editMode?
+                    <p><strong>Enrollment Deadline:</strong> {editMode ?
                         <input
                             type="date"
                             name="enrollmentDeadline"
@@ -135,31 +150,94 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                             : formatEnrollmentDeadline(course?.enrollmentDeadline)}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
-                    <p><strong>PDF:</strong> {course?.pdf}</p>
+                    <p><strong>PDF:</strong> {editMode ?
+                        <input
+                            type="text"
+                            name="pdf"
+                            defaultValue={editCourse?.pdf}
+                            onChange={handleInputChange}
+                            className="border border-gray-300 rounded"/>
+                            : course?.pdf}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
-                    <p><strong>Location:</strong> {course?.location?.description}</p>
+                    <p><strong>Location:</strong> {editMode ? 
+                        <input
+                            type="text"
+                            name="locationDescription"
+                            defaultValue={editCourse?.location?.description}
+                            onChange={(e) => handleLocationInputChange(e, 'description')}
+                            className="border border-gray-300 rounded w-1/2"/>
+                            : course?.location?.description}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
-                    <p><strong>Room:</strong> {course?.location?.room}</p>
+                    <p><strong>Room:</strong> {editMode ?
+                        <input
+                            type="text"
+                            name="locationRoom"
+                            defaultValue={editCourse?.location?.room}
+                            onChange={(e) => handleLocationInputChange(e, "room")}
+                            className="border border-gray-300 rounded"/>
+                            : course?.location?.description}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
-                    <p><strong>Remote Link:</strong> {course?.location?.remoteLink}</p>
+                    <p><strong>Remote Link:</strong> {editMode ? 
+                        <input
+                            type="url"
+                            name="locationUrl"
+                            defaultValue={editCourse?.location?.remoteLink}
+                            onChange={(e)=> handleLocationInputChange(e, "remoteLink")}
+                            className="border border-gray-300 rounded w-1/2" />
+                            : course?.location?.remoteLink}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
-                    <p><strong>Address Line 1:</strong> {course?.location?.addressLine1}</p>
+                    <p><strong>Address Line 1:</strong> {editMode ?
+                        <input
+                            type="text"
+                            name="locationAddressLine1"
+                            defaultValue={editCourse?.location?.addressLine1}
+                            onChange={(e) => handleLocationInputChange(e, "addressLine1")}
+                            className="border border-gray-300 rounded w-1/2" />
+                            : course?.location?.addressLine1}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
-                    <p><strong>Address Line 2:</strong> {course?.location?.addressLine2}</p>
+                    <p><strong>Address Line 2:</strong> {editMode ?
+                        <input
+                            type="text"
+                            name="locationAddressLine2"
+                            defaultValue={editCourse?.location?.addressLine2}
+                            onChange={(e) => handleLocationInputChange(e, "addressLine2")}
+                            className="border border-gray-300 rounded w-1/2" />
+                            : course?.location?.addressLine2}</p>
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>City:</strong> {course?.location?.city}</p>
+                    <p><strong>City:</strong> {editMode ?
+                        <input 
+                            type="text"
+                            name="locationCity"
+                            defaultValue={editCourse?.location?.city}
+                            onChange={(e) => handleLocationInputChange(e, "city")}
+                            className="border border-gray-300 rounded" />
+                            : course?.location?.city}</p>
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>State:</strong> {course?.location?.state}</p>
+                    <p><strong>State:</strong> {editMode ?
+                        <input
+                            type="text"
+                            name="locationState"
+                            defaultValue={editCourse?.location?.state}
+                            onChange={(e) => handleLocationInputChange(e, "state")}
+                            className="border border-gray-300 rounded" />
+                            : course?.location?.state}</p>
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Zip:</strong> {course?.location?.postalCode}</p>
+                    <p><strong>Zip:</strong> {editMode ?
+                        <input
+                            type="text"
+                            name="locationZip"
+                            defaultValue={editCourse?.location?.postalCode}
+                            onChange={(e) => handleLocationInputChange(e, "postalCode")}
+                            className="border border-gray-300 rounded" />
+                            : course?.location?.postalCode}</p>
                 </div>
             </div>
             <button 
