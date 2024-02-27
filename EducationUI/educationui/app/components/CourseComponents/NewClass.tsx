@@ -65,7 +65,6 @@ const NewClass: React.FC<NewClassProps> = ({ scheduleDate, startTime, endTime,  
                     <label htmlFor="classDate" className="block text-gray-700 text-sm font-bold mb-2">
                         Class Date
                     </label>
-                    {/* Set the default value of the class date input field */}
                     <input
                         type="date"
                         name="classDate"

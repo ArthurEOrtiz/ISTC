@@ -14,4 +14,5 @@ DaisyUI
 React
 Next.js
 ESLint
+Axios
 

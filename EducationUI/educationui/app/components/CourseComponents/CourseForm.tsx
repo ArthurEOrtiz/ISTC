@@ -1,6 +1,7 @@
 'use client';
 import React, { FormEvent, FocusEvent, useState, useEffect } from 'react';
 import { CourseFormData } from '@/app/shared/types/sharedTypes';
+import CharacterCounter from '../CharacterCounter';
 
 interface CourseFormProps {
     onSubmit: (formData: CourseFormData) => void;
@@ -9,6 +10,7 @@ interface CourseFormProps {
 const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formData: CourseFormData) => void}) => {
     
     const initialFormData : CourseFormData  = {
+        courseId: null,
         title: '',
         description: '',
         instructorName: '',
@@ -100,10 +102,24 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
         const { id, value } = event.currentTarget;
-        setFormData((prev) => ({
-            ...prev,
-            [id]: value
-        }));
+
+        // speciail case for description
+        let updatedValue = value;
+        if (id === "description" && value.length > 255) {
+            updatedValue = value.substring(0, 255);
+
+            setFormData((prev) => ({
+                ...prev,
+                [id]: updatedValue
+            }));
+
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [id]: updatedValue
+            }));
+        }
+  
     };
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
@@ -220,9 +236,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
         isPostalCodeValid;
 
     return (
-        <>
-        <button onClick={() => localStorage.clear()}>Clear Local Storage</button>
-
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
 
             <div className="mb-4">
@@ -258,6 +271,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                     value = {formData.description}
                     onChange = {handleChange}
                 />
+                <CharacterCounter value={formData.description} limit={255} />
             </div>
 
             <div className="flex justify-between">
@@ -616,7 +630,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                 {!isFormValid && <p className="text-red-500 text-xs italic w-1/2">Please fill out all required fields.</p>}
             </div>
         </form>
-        </>
   )
 }
 
