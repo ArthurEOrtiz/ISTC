@@ -12,6 +12,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
+
         setEditCourse(prevState => ({
             ...prevState,
             [name]: value
@@ -40,6 +41,13 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
             },
         }));
     };
+
+    const handleNumericInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (!/\d/.test(e.key) && e.key !== "Backspace" && e.key !== "Delete" && e.key !== "ArrowUp" && e.key !== "ArrowDown" && e.key !== "Tab") {
+            e.preventDefault();
+        }
+    };
+    
     
 
     const toggleEditMode = () => {
@@ -124,30 +132,35 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                 <div className="w-full sm:w-1/2 px-1 mb-2">
                     <p><strong>Attendance Credit:</strong> {editMode ?
                         <input
-                            type="text"
+                            type="number"
                             name="attendanceCredit"
                             defaultValue={editCourse?.attendanceCredit}
                             onChange={handleInputChange}
-                            className="border border-gray-300 rounded"/>
-                            : course?.attendanceCredit}</p> 
+                            onKeyDown={handleNumericInput}
+                            className="border border-gray-300 rounded"
+                        />
+                        : course?.attendanceCredit}</p>
                 </div>
+
                 <div className="w-full sm:w-1/2 px-1 mb-2">
                     <p><strong>Completion Credit:</strong> {editMode ?
                         <input
-                            type="text"
+                            type="number"
                             name="completionCredit"
                             defaultValue={editCourse?.completionCredit}
                             onChange={handleInputChange}
+                            onKeyDown={handleNumericInput}
                             className="border border-gray-300 rounded" />
                             : course?.completionCredit}</p>
                 </div>
                 <div className="w-full sm:w-1/2  px-1 mb-2">
                     <p><strong>Max Attendance:</strong> {editMode ?
                         <input
-                            type="text"
+                            type="number"
                             name="maxAttendance"
                             defaultValue={editCourse?.maxAttendance}
                             onChange={handleInputChange}
+                            onKeyDown={handleNumericInput}
                             className="border border-gray-300 rounded"/>
                             : course?.maxAttendance}</p>
                 </div>
@@ -248,6 +261,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                             name="locationZip"
                             defaultValue={editCourse?.location?.postalCode}
                             onChange={(e) => handleLocationInputChange(e, "postalCode")}
+                            onKeyDown={handleNumericInput}
                             className="border border-gray-300 rounded" />
                             : course?.location?.postalCode}</p>
                 </div>
