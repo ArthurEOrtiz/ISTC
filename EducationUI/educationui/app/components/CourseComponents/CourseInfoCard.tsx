@@ -52,7 +52,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
         <div className="bg-white shadow-md rounded-xl p-4">
 
             <div className="mb-2">
-                <h1 className="text-xl font-bold">{editMode ?
+                <h1 className="text-xl font-bold"> {editMode ?
                     <input
                         type="text"
                         name="title"
@@ -62,7 +62,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                 
                     /> : course?.title}</h1>
 
-                <p><strong>Description:</strong>{editMode ?
+                <p><strong>Description:</strong> {editMode ?
                     <textarea
                         name="description"
                         defaultValue={editCourse?.description}
@@ -75,22 +75,64 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
 
             <div className="flex flex-wrap -mx-1">
                 <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Instructor:</strong></p>
+                    <p><strong>Instructor:</strong> {editMode?
+                        <input
+                            type="text"
+                            name="instructorName"
+                            defaultValue={editCourse?.instructorName}
+                            onChange={handleInputChange}
+                            className="border border-gray-300 rounded"/>
+                            : course?.instructorName}</p>
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Email:</strong> {course?.instructorEmail}</p>
+                    <p><strong>Email:</strong> {editMode?
+                        <input
+                            type="email"
+                            name="instructorEmail"
+                            defaultValue={editCourse?.instructorEmail}
+                            onChange={handleInputChange}
+                            className="border border-gray-300 rounded"/>
+                            : course?.instructorEmail}</p>
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Attendance Credit:</strong> {course?.attendanceCredit}</p>
+                    <p><strong>Attendance Credit:</strong> {editMode?
+                        <input
+                            type="text"
+                            name="attendanceCredit"
+                            defaultValue={editCourse?.attendanceCredit}
+                            onChange={handleInputChange}
+                            className="border border-gray-300 rounded"/>
+                            : course?.attendanceCredit}</p> 
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Completion Credit:</strong> {course?.completionCredit}</p>
+                    <p><strong>Completion Credit:</strong> {editMode?
+                        <input
+                            type="text"
+                            name="completionCredit"
+                            defaultValue={editCourse?.completionCredit}
+                            onChange={handleInputChange}
+                            className="border border-gray-300 rounded" />
+                            : course?.completionCredit}</p>
                 </div>
                 <div className="w-full sm:w-1/2  px-1 mb-2">
-                    <p><strong>Max Attendance:</strong> {course?.maxAttendance}</p>
+                    <p><strong>Max Attendance:</strong> {editMode?
+                        <input
+                            type="text"
+                            name="maxAttendance"
+                            defaultValue={editCourse?.maxAttendance}
+                            onChange={handleInputChange}
+                            className="border border-gray-300 rounded"/>
+                            : course?.maxAttendance}</p>
                 </div>
                 <div className="w-full sm:w-1/2  px-1 mb-2">
-                    <p><strong>Enrollment Deadline:</strong> {formatEnrollmentDeadline(course?.enrollmentDeadline)}</p>
+                    <p><strong>Enrollment Deadline:</strong> {editMode?
+                        <input
+                            type="date"
+                            name="enrollmentDeadline"
+                            defaultValue={editCourse?.enrollmentDeadline}
+                            onChange={handleInputChange}
+                            className="border border-gray-300 rounded"/>
+                            : formatEnrollmentDeadline(course?.enrollmentDeadline)}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
                     <p><strong>PDF:</strong> {course?.pdf}</p>
