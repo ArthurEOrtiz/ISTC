@@ -88,7 +88,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
 
     const handleOnCourseInfoEdit = (): void => {
         const dialog : HTMLDialogElement = document.getElementById("editCourseInfoDialog") as HTMLDialogElement;
-     
         dialog.showModal();
 
     }
@@ -151,10 +150,15 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         <div>
             <dialog id="editCourseInfoDialog" className="modal modal-bottom, sm:modal-middle">
                 <div className="modal-box">
-                    <h3 className="font-bold text-lg"> EDIT COURSE DIALOG</h3>
+                    <h3 className="font-bold text-lg"> Edit Course Information </h3>
+                    <CourseInfoCard course={courseInfo} />
                     <div className="modal-action">
                         <form method="dialog">
-                            <button className="btn btn-primary">Save</button>
+                            <div className="flex flex-row gap-2 ">
+                                <button className="btn btn-primary text-white">Save</button>
+                                <button className="btn btn-primary text-white">Go Back</button>
+                            </div>
+                            
                         </form>
                     </div>
                 </div>
