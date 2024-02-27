@@ -90,11 +90,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 setClasses(newClasses);
             }
         }
-
-
     }
-
-   
 
     return (
         <div>

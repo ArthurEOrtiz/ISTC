@@ -77,7 +77,6 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
             let url : string = '';
             if (oldClassSchedule?.classId == null) {
                 url = `https://localhost:7144/Class/AddClassByCourseId?courseId=${oldClassSchedule.courseId}&newStartDate=${editedClassSchedule.scheduleStart}&newEndDate=${editedClassSchedule.scheduleEnd}`;
-                console.log(url);
                 const response = await axios.post(url);
 
                 if (response.status !== 201) {
@@ -95,15 +94,14 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
             else if (oldClassSchedule?.classId != null)
             {
                 url = `https://localhost:7144/Class/EditClassById?id=${oldClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
-
-                //console.log(url);
                 const response = await axios.post(url);
-                console.log('Course saved successfully', response);
+                if (response.status !== 200) {
+                    console.error('Error saving course', response);
+                    return;
+                }
                 setOldClassSchedule(editedClassSchedule);
                 onAdd(editedClassSchedule);
             }
-
-            
             setEditClass(false);
 
         } catch (error) {
