@@ -80,9 +80,6 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
     
         return `${year}-${month}-${day}`;
     };
-    
-    
-    
 
     return(
         <div className="bg-white shadow-md rounded-xl p-4">
