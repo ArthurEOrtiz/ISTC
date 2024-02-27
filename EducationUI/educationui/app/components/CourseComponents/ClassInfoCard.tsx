@@ -77,30 +77,44 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
             let url : string = '';
             if (oldClassSchedule?.classId == null) {
                 url = `https://localhost:7144/Class/AddClassByCourseId?courseId=${oldClassSchedule.courseId}&newStartDate=${editedClassSchedule.scheduleStart}&newEndDate=${editedClassSchedule.scheduleEnd}`;
-                const response = await axios.post(url);
+                
+                try {
+                    const response = await axios.post(url);
 
-                if (response.status !== 201) {
-                    console.error('Error saving course', response);
-                }
+                    if (response.status !== 201) {
+                        throw new Error('Error saving course');
+                    }
 
-                if (response.data != null) {
-                    //console.log("response data", response.data);
-                    const newClass: ClassSchedule = response.data;
-                    setOldClassSchedule(newClass);
-                    onAdd(newClass);
+                    if (response.data != null) {
+                        //console.log("response data", response.data);
+                        const newClass: ClassSchedule = response.data;
+                        setOldClassSchedule(newClass);
+                        onAdd(newClass);
+                    }
+
+                } catch (error) {
+                    console.error('Error saving course', error);
                 }
         
             }
             else if (oldClassSchedule?.classId != null)
             {
                 url = `https://localhost:7144/Class/EditClassById?id=${oldClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
-                const response = await axios.post(url);
-                if (response.status !== 200) {
-                    console.error('Error saving course', response);
-                    return;
+                
+                try {
+                    const response = await axios.post(url);
+                    
+                    if (response.status !== 200) {
+                        throw new Error('Error saving course');
+                    }
+                    
+                    setOldClassSchedule(editedClassSchedule);
+                    onAdd(editedClassSchedule);
+
+                } catch (error) {
+                    console.error('Error saving course', error);
                 }
-                setOldClassSchedule(editedClassSchedule);
-                onAdd(editedClassSchedule);
+                
             }
             setEditClass(false);
 
@@ -122,14 +136,23 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     }
 
     const handleDelete = async () => {
+
         try {
             const url = `https://localhost:7144/Class/DeleteClassById?id=${editedClassSchedule.classId}`;
+            
             const response = await axios.delete(url);
-            //console.log('Course deleted successfully', response);
+
+            if (response.status !== 200) {
+                throw new Error('Error Deleting Class');
+            }
+
             onDelete(editedClassSchedule.classId);
             setDeleted(true);
+
         } catch (error) {
-            console.error('Error saving course', error);
+
+            console.error('Error Deleting Class', error);
+
         }
     }
 
