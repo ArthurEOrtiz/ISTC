@@ -61,6 +61,18 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
         const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         return deadlineDate.toLocaleDateString('en-US', options);
     };
+
+    const formatDate = (dateString: string | undefined): string => {
+        if (!dateString) return ''; // Handle case when dateString is undefined
+    
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+    
+        return `${year}-${month}-${day}`;
+    };
+    
     
     
 
@@ -144,7 +156,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                         <input
                             type="date"
                             name="enrollmentDeadline"
-                            defaultValue={editCourse?.enrollmentDeadline}
+                            defaultValue={formatDate(editCourse?.enrollmentDeadline)}
                             onChange={handleInputChange}
                             className="border border-gray-300 rounded"/>
                             : formatEnrollmentDeadline(course?.enrollmentDeadline)}</p>
