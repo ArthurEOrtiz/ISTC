@@ -22,7 +22,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         for (let i = 0; i < classes.length - 1; i++) {
             const currentClass = classes[i];
             const nextClass = classes[i + 1];
-            //console.log(new Date(currentClass.scheduleStart), new Date(nextClass.scheduleStart)); // Add this line
             if (new Date(currentClass.scheduleStart).getTime() > new Date(nextClass.scheduleStart).getTime()) {
                 return false;
             }
@@ -30,30 +29,24 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         return true;
     }
 
+    // Constants
+    const [courseInfo, setCourseInfo] = useState<Course>(course);
     const [classes, setClasses] = useState<ClassSchedule[]>(sortClassesByDate(course.classes));
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
     
     useEffect(() => { 
-        //console.log("Classes Updated")
-        console.log(classes)
+        //console.log(classes)  // Keep for debugging   
         if (!areClassesOrderedByDate()) {
             setClasses(sortClassesByDate(classes));
-            // console.log("Classes Sorted")
-            // console.log(classes)
         }
     }
     , [classes]);
 
-    // useEffect(() => {
-    //     console.log("Updated Classes", classes);
-    // }
-    // , [classes]);
 
-
+    // Event Handlers
     const handleOnClassInfoCardDelete = (id: number | null): void => {
-        if (id === null) {
+        if (id !== null) {
             setClasses(prevClasses => prevClasses.filter(classSchedule => classSchedule.classId !== id))
-            //window.location.reload();
         }
     }
 
@@ -80,6 +73,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         setEditModeIndex(classes.length);
     }
 
+
     const handleOnClassAdded = (updatedClassSchedule: ClassSchedule | null): void => {
         console.log("Updated Class Schedule", updatedClassSchedule);
         if (updatedClassSchedule !==  null) {
@@ -92,7 +86,15 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         }
     }
 
+    const handleOnCourseInfoEdit = (): void => {
+        const dialog = document.getElementById("editCourseInfoDialog");
+        if (dialog !== null) {
+            dialog.showModal();
+        }
+    }
+
     return (
+        <>
         <div>
 
             <div className="flex flex-col items-center">
@@ -101,7 +103,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 </div>
                 <div className="navbar  w-1/2 rounded-xl flex justify-center">
                     <button 
-                        className="btn btn-primary text-white m-1">
+                        className="btn btn-primary text-white m-1"
+                        onClick={handleOnCourseInfoEdit}>
                             Edit Course Information
                     </button>
                     <button 
@@ -144,6 +147,21 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             </div>
             
         </div>
+                          
+        <div>
+            <dialog id="editCourseInfoDialog" class="modal modal-bottom, sm:modal-middle">
+                <div class="modal-box">
+                    <h3 class="font-bold text-lg"> EDIT COURSE DIALOG</h3>
+                    <div class="modal-action">
+                        <form method="dialog">
+                            <button class="btn btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </dialog>
+        </div>
+        </>
+        
   );
 }
 
