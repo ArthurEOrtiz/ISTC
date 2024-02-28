@@ -15,7 +15,7 @@ namespace EducationAPI.Models
 		public int TopicId { get; set; }
 
 		[MaxLength(50)]
-		public string? Title { get; set; }
+		public string Title { get; set; } = null!;
 
 		[MaxLength(255)]
 		public string? Description { get; set; }

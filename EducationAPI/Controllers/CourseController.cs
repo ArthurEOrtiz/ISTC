@@ -65,7 +65,7 @@ namespace EducationAPI.Controllers
 
 				if (course == null)
 				{
-					_logger.LogInformation(0, "GetCourseById({Id}), Called", id);
+					_logger.LogError("GetCourseById({Id}), Record not found!", id);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -95,6 +95,7 @@ namespace EducationAPI.Controllers
 				_educationProgramContext.Courses.Add(course);
 				await _educationProgramContext.SaveChangesAsync();
 
+				_logger.LogInformation("PostCourse{Course}, called", course);
 				// Should return a 201 status code. 
 				return new CreatedAtActionResult(nameof(GetCourseById), "Course", new { id = course.CourseId }, course);
 			}
