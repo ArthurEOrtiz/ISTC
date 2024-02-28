@@ -4,6 +4,7 @@ using EducationAPI.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EducationAPI.Migrations
 {
     [DbContext(typeof(EducationProgramContext))]
-    partial class EducationProgramContextModelSnapshot : ModelSnapshot
+    [Migration("20240228161350_TopicsTitleNonNullable")]
+    partial class TopicsTitleNonNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,42 +23,6 @@ namespace EducationAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("CourseTopic", b =>
-                {
-                    b.Property<int>("CoursesCourseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TopicsTopicId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PeriodEnd")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("PeriodEnd");
-
-                    b.Property<DateTime>("PeriodStart")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("PeriodStart");
-
-                    b.HasKey("CoursesCourseId", "TopicsTopicId");
-
-                    b.HasIndex("TopicsTopicId");
-
-                    b.ToTable("CourseTopic");
-
-                    b.ToTable(tb => tb.IsTemporal(ttb =>
-                        {
-                            ttb
-                                .HasPeriodStart("PeriodStart")
-                                .HasColumnName("PeriodStart");
-                            ttb
-                                .HasPeriodEnd("PeriodEnd")
-                                .HasColumnName("PeriodEnd");
-                        }
-                    ));
-                });
 
             modelBuilder.Entity("EducationAPI.Models.Attendance", b =>
                 {
@@ -261,9 +227,14 @@ namespace EducationAPI.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("TopicId")
+                        .HasColumnType("int");
+
                     b.HasKey("CourseId");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("TopicId");
 
                     b.ToTable("Courses", (string)null);
 
@@ -449,21 +420,6 @@ namespace EducationAPI.Migrations
                     ));
                 });
 
-            modelBuilder.Entity("CourseTopic", b =>
-                {
-                    b.HasOne("EducationAPI.Models.Course", null)
-                        .WithMany()
-                        .HasForeignKey("CoursesCourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EducationAPI.Models.Topic", null)
-                        .WithMany()
-                        .HasForeignKey("TopicsTopicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("EducationAPI.Models.Attendance", b =>
                 {
                     b.HasOne("EducationAPI.Models.Class", "Class")
@@ -500,7 +456,13 @@ namespace EducationAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EducationAPI.Models.Topic", "Topic")
+                        .WithMany("Courses")
+                        .HasForeignKey("TopicId");
+
                     b.Navigation("Location");
+
+                    b.Navigation("Topic");
                 });
 
             modelBuilder.Entity("EducationAPI.Models.Student", b =>
@@ -527,6 +489,11 @@ namespace EducationAPI.Migrations
             modelBuilder.Entity("EducationAPI.Models.Student", b =>
                 {
                     b.Navigation("Attendances");
+                });
+
+            modelBuilder.Entity("EducationAPI.Models.Topic", b =>
+                {
+                    b.Navigation("Courses");
                 });
 #pragma warning restore 612, 618
         }

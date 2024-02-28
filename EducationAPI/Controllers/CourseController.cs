@@ -26,14 +26,34 @@ namespace EducationAPI.Controllers
 		/// <see cref="List{T}"/> of <see cref="Course"/> with a <see cref="List{T}"/> of children 
 		/// <see cref="Class"/>
 		/// </returns>
-		[HttpGet("GetAllCoursesWithClasses")]
-		public async Task<ActionResult<List<Course>>> GetAllCoursesWithClasses()
+		[HttpGet("GetAllCourses")]
+		public async Task<ActionResult<List<Course>>> GetAllCourses()
 		{
 			try
 			{
-				var courses =  await _educationProgramContext.Courses
-					.Include(c => c.Classes)
-					.ToListAsync();
+				var courses = await  _educationProgramContext.Courses
+					.Select(c => new Course
+					{
+						CourseId = c.CourseId,
+						Title = c.Title,
+						Description = c.Description,
+						AttendanceCredit = c.AttendanceCredit,
+						CompletionCredit = c.CompletionCredit,
+						MaxAttendance = c.MaxAttendance,
+						EnrollmentDeadline = c.EnrollmentDeadline,
+						InstructorEmail = c.InstructorEmail,
+						InstructorName = c.InstructorName,
+						Pdf = c.Pdf,
+						Location = c.Location,
+						Topics = c.Topics.Select(t => new Topic
+						{
+							TopicId = t.TopicId,
+							Title = t.Title,
+							Description = t.Description
+						}).ToList(),
+						Classes = c.Classes.ToList(),
+					}).ToListAsync();
+
 				return courses;
 			}
 			catch (Exception ex)
@@ -60,12 +80,13 @@ namespace EducationAPI.Controllers
 			{
 				var course = await _educationProgramContext.Courses
 						.Include(c => c.Classes)
+						.Include(c => c.Topics)
 						.Include(c => c.Location)
 						.FirstOrDefaultAsync(c => c.CourseId == id);
 
 				if (course == null)
 				{
-					_logger.LogInformation(0, "GetCourseById({Id}), Called", id);
+					_logger.LogError("GetCourseById({Id}), Record not found!", id);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -95,6 +116,7 @@ namespace EducationAPI.Controllers
 				_educationProgramContext.Courses.Add(course);
 				await _educationProgramContext.SaveChangesAsync();
 
+				_logger.LogInformation("PostCourse{Course}, called", course);
 				// Should return a 201 status code. 
 				return new CreatedAtActionResult(nameof(GetCourseById), "Course", new { id = course.CourseId }, course);
 			}

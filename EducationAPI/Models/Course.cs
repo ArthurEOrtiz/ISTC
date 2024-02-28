@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EducationAPI.Models
 {
 	/// <summary>
-	/// Represent a course in available for the user to sign up for. 
+	/// Represent a course that are available for the user to sign up for. 
 	/// A Course has properties that give it a title and description.
 	/// It also tracks attendance and completion credits. 
 	/// If the admin assigns this course to a topic, it should have 
@@ -18,6 +18,7 @@ namespace EducationAPI.Models
 		public Course()
 		{
 			Classes = new HashSet<Class>();
+			Topics = new HashSet<Topic>();	
 		}
 
 		[Key]
@@ -52,13 +53,10 @@ namespace EducationAPI.Models
 
 		public int LocationId { get; set; }
 
-		public int? TopicId { get; set; }
-
 		[ForeignKey("LocationId")]
 		public virtual Location Location { get; set; } = null!;
 
-		[ForeignKey("TopicId")]
-		public Topic? Topic { get; set; }
+		public virtual ICollection<Topic> Topics { get; set; }
 
 		public virtual ICollection<Class> Classes { get; set; }
 	}

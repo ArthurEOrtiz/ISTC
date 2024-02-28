@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 
 namespace EducationAPI.Models
 {
@@ -15,11 +16,12 @@ namespace EducationAPI.Models
 		public int TopicId { get; set; }
 
 		[MaxLength(50)]
-		public string? Title { get; set; }
+		public string Title { get; set; } = null!;
 
 		[MaxLength(255)]
 		public string? Description { get; set; }
 
 		public virtual ICollection<Course> Courses { get; set; }
+
 	}
 }

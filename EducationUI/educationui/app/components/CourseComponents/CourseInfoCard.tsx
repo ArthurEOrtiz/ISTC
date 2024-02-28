@@ -47,8 +47,6 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
             e.preventDefault();
         }
     };
-    
-    
 
     const toggleEditMode = () => {
         setEditMode(prevEditMode => !prevEditMode);

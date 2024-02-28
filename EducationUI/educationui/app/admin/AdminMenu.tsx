@@ -14,6 +14,11 @@ const AdminMenu: React.FC = () => {
                 </Link>
             </li>
             <li>
+                <Link href="/admin/edittopics" className="text-white">
+                    Add/Edit Topics
+                </Link>
+            </li>
+            <li>
                 <Link href="/admin/attendance" className="text-white">
                     Attendance
                 </Link>
