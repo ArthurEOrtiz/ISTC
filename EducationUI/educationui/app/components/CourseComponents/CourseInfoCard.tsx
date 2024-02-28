@@ -1,12 +1,14 @@
 import { Course } from "@/app/shared/types/sharedTypes";
+import { on } from "events";
 import { useState } from "react";
 
 interface CourseCardProps {
     course : Course; 
+    onSave: (course: Course) => void;
 };
 
 
-const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
+const CourseInfoCard : React.FC<CourseCardProps> = ({course, onSave}) => {
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editCourse, setEditCourse] = useState<Course>(course);
 
@@ -55,8 +57,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
         }
 
         if (editMode) {
-            // Save the course
-            console.log(editCourse);
+            onSave(editCourse);
         }
     }
 
