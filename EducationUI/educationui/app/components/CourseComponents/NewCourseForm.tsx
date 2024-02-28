@@ -69,14 +69,14 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
     // Handlers
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(course);
+        console.log("New Course Form", course);
         onSubmit(course);
 
     }
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
-
+    
         if (id.startsWith('location.')) {
             // Handle nested location fields
             const locationField = id.split('.')[1];
@@ -95,6 +95,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
             }));
         }
     }
+    
 
     const handleIntInput = (event: FormEvent<HTMLInputElement>, minValue: number, maxValue: number): void => {
         const inputValue = event.currentTarget.value;
@@ -387,13 +388,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
             <div className="mb-4">
                 <label
                     className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="locationDescription"
+                    htmlFor="location.description"
                 >
                     Location Description
                 </label>
                 <input
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="locationDescription"
+                    id="location.description"
                     type="text"
                     placeholder="Optional"
                     defaultValue = {course?.location?.description}
@@ -406,13 +407,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                 <div className="mb-4 w-1/2 pr-2">
                     <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="room"
+                        htmlFor="location.room"
                         >
                         Room
                     </label>
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="room"
+                        id="location.room"
                         type="text"
                         placeholder="Optional"
                         defaultValue = {course?.location?.room}
@@ -423,13 +424,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                 <div className="mb-4 w-1/2 pl-2">
                     <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="remoteLink"
+                        htmlFor="location.remoteLink"
                     >
                         Remote Link
                     </label>
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="remoteLink"
+                        id="location.remoteLink"
                         type="url"
                         placeholder="https://zoom.us/j/1234567890?pwd=abc123"
                         defaultValue = {course?.location?.remoteLink}
@@ -442,13 +443,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
             <div className="mb-4">
                 <label
                     className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="addressLine1"
+                    htmlFor="location.addressLine1"
                 >
                     Address Line 1
                 </label>
                 <input
                     className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isAddressLine1Valid && addressLine1Touched ? 'border-red-500' : ''}`}
-                    id="addressLine1"
+                    id="location.addressLine1"
                     type="text"
                     placeholder="123 Main St"
                     defaultValue = {course?.location?.addressLine1}
@@ -461,13 +462,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
             <div className="mb-4">
                 <label
                     className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="addressLine2"
+                    htmlFor="location.addressLine2"
                 >
                     Address Line 2
                 </label>
                 <input
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
-                    id="addressLine2"
+                    id="location.addressLine2"
                     type="text"
                     placeholder="Optional"
                     defaultValue = {course?.location?.addressLine2}
@@ -480,13 +481,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                 <div className="mb-4 w-1/2 pr-2">
                     <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="city"
+                        htmlFor="location.city"
                         >
                         City
                     </label>
                     <input
                         className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isCityValid && cityTouched ? 'border-red-500' : ''}`}
-                        id="city"
+                        id="location.city"
                         type="text"
                         placeholder="Boise"
                         defaultValue = {course?.location?.city}
@@ -499,13 +500,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                 <div className="mb-4 w-1/2 pl-2">
                     <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="state"
+                        htmlFor="location.state"
                     >
                         State
                     </label>
                     <select
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="state"
+                        id="location.state"
                         onChange = {handleChange}
                         defaultValue = {course?.location?.state}
                     >
@@ -565,13 +566,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                 <div className="mb-4 w-1/2 pl-2">
                     <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="postalCode"
+                        htmlFor="location.postalCode"
                     >
                         Zip Code
                     </label>
                     <input
                         className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isPostalCodeValid && postalCodeTouched ? 'border-red-500' : ''}`}
-                        id="postalCode"
+                        id="location.postalCode"
                         type="text"
                         placeholder="83706"
                         onInput = {handlePostalCodeInput}

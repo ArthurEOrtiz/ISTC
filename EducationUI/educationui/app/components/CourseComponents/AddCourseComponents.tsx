@@ -8,6 +8,7 @@ const AddCourseComponent: React.FC = () => {
     const [course, setCourse] = useState<Course>();
 
     const handleNewCourseFormOnSubmit = (course: Course) => {
+        console.log("AddCourseComponent.handleNewCourseFormOnSubmit: course: ", course);
         setCourse(course);
     }
 
