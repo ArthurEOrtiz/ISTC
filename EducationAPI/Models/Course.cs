@@ -18,6 +18,7 @@ namespace EducationAPI.Models
 		public Course()
 		{
 			Classes = new HashSet<Class>();
+			Topics = new HashSet<Topic>();	
 		}
 
 		[Key]
@@ -52,13 +53,10 @@ namespace EducationAPI.Models
 
 		public int LocationId { get; set; }
 
-		public int? TopicId { get; set; }
-
 		[ForeignKey("LocationId")]
 		public virtual Location Location { get; set; } = null!;
 
-		[ForeignKey("TopicId")]
-		public Topic? Topic { get; set; }
+		public virtual ICollection<Topic> Topics { get; set; }
 
 		public virtual ICollection<Class> Classes { get; set; }
 	}

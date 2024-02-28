@@ -2,7 +2,7 @@
 import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -86,14 +86,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         }
     }
 
-    const handleOnCourseInfoEdit = (): void => {
-        const dialog : HTMLDialogElement = document.getElementById("editCourseInfoDialog") as HTMLDialogElement;
-        dialog.showModal();
-
-    }
 
     return (
-        <>
         <div>
 
             <div className="flex flex-col items-center">
@@ -101,11 +95,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     <h1 className="p-s text-3xl text-center font-bold"> Course Id: {course.courseId}</h1>
                 </div>
                 <div className="navbar  w-1/2 rounded-xl flex justify-center">
-                    <button 
-                        className="btn btn-primary text-white m-1"
-                        onClick={handleOnCourseInfoEdit}>
-                            Edit Course Information
-                    </button>
+                    
                     <button 
                         className="btn btn-error text-white m-1">
                             Delete Course
@@ -147,24 +137,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             
         </div>
                           
-        <div>
-            <dialog id="editCourseInfoDialog" className="modal modal-bottom, sm:modal-middle">
-                <div className="modal-box">
-                    <h3 className="font-bold text-lg"> Edit Course Information </h3>
-                    <CourseInfoCard course={courseInfo} />
-                    <div className="modal-action">
-                        <form method="dialog">
-                            <div className="flex flex-row gap-2 ">
-                                <button className="btn btn-primary text-white">Save</button>
-                                <button className="btn btn-primary text-white">Go Back</button>
-                            </div>
-                            
-                        </form>
-                    </div>
-                </div>
-            </dialog>
-        </div>
-        </>
+ 
         
   );
 }

@@ -26,13 +26,15 @@ namespace EducationAPI.Controllers
 		/// <see cref="List{T}"/> of <see cref="Course"/> with a <see cref="List{T}"/> of children 
 		/// <see cref="Class"/>
 		/// </returns>
-		[HttpGet("GetAllCoursesWithClasses")]
-		public async Task<ActionResult<List<Course>>> GetAllCoursesWithClasses()
+		[HttpGet("GetAllCourses")]
+		public async Task<ActionResult<List<Course>>> GetAllCourses()
 		{
 			try
 			{
 				var courses =  await _educationProgramContext.Courses
 					.Include(c => c.Classes)
+					.Include(c => c.Topics)
+					.Include(c => c.Location)
 					.ToListAsync();
 				return courses;
 			}
@@ -60,6 +62,7 @@ namespace EducationAPI.Controllers
 			{
 				var course = await _educationProgramContext.Courses
 						.Include(c => c.Classes)
+						.Include(c => c.Topics)
 						.Include(c => c.Location)
 						.FirstOrDefaultAsync(c => c.CourseId == id);
 

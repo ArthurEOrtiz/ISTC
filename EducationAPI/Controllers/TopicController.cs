@@ -25,7 +25,6 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var topic = await _educationProgramContext.Topics
-					.Include(t => t.Courses)
 					.FirstOrDefaultAsync(t => t.TopicId == id);
 
 				if (topic == null)
@@ -62,5 +61,33 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+
+		[HttpPost("AddTopicToCourse")]
+		public async Task<ActionResult> AddTopicToCourse(int topicId, int courseId)
+		{
+			try
+			{
+				var topic = await _educationProgramContext.Topics.FindAsync(topicId);
+				var course = await _educationProgramContext.Courses.FindAsync(courseId);
+
+				if (topic == null || course == null)
+				{
+					_logger.LogError("AddTopicToCourse({TopicId}, {CourseId})", topicId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				course.Topics.Add(topic);
+				_educationProgramContext.Entry(course).State = EntityState.Modified;
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("Topic with ID {TopicId} added to Course with ID {CourseId}", topicId, courseId);
+				return new StatusCodeResult((int)HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "AddTopicToCourse({TopicId}, {CourseId})", topicId, courseId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
 	}
 }
