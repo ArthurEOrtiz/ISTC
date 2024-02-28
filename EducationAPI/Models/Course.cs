@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EducationAPI.Models
 {
 	/// <summary>
-	/// Represent a course in available for the user to sign up for. 
+	/// Represent a course that are available for the user to sign up for. 
 	/// A Course has properties that give it a title and description.
 	/// It also tracks attendance and completion credits. 
 	/// If the admin assigns this course to a topic, it should have 
