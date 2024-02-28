@@ -77,7 +77,6 @@ namespace EducationAPI.Controllers
 				}
 
 				course.Topics.Add(topic);
-				_educationProgramContext.Entry(course).State = EntityState.Modified;
 				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("Topic with ID {TopicId} added to Course with ID {CourseId}", topicId, courseId);

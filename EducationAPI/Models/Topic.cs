@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 
 namespace EducationAPI.Models
 {
@@ -7,6 +8,7 @@ namespace EducationAPI.Models
 	{
 		public Topic()
 		{
+			Courses = new HashSet<Course>();
 		}
 
 		[Key]
@@ -18,6 +20,8 @@ namespace EducationAPI.Models
 
 		[MaxLength(255)]
 		public string? Description { get; set; }
+
+		public virtual ICollection<Course> Courses { get; set; }
 
 	}
 }

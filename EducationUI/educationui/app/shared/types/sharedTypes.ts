@@ -36,6 +36,7 @@ export interface ClassSchedule {
     courseId: number | null;
     scheduleStart: string;
     scheduleEnd: string;
+    attendance: Attendance[] | null;
   }
   
 export interface Course {
@@ -50,6 +51,43 @@ export interface Course {
     instructorEmail: string;
     pdf: string;
     location: Location;
+    topics: Topic[] | null;
     classes: ClassSchedule[];
   }
   
+  export interface Topic {
+    topicId: number | null;
+    title: string | null;
+    description: string | null;
+  }
+
+  export interface Attendance {
+    attendanceId: number | null;
+    attended: boolean;
+    studentId: number | null;
+    classId: number | null;
+    
+  }
+
+  export interface Student {
+    studentId: number | null;
+    firstName: string;
+    lastName: string;
+    middleName: string | null;
+    accumulatedCredit: number;
+    appraisalCertified: boolean;
+    mappingCertified: boolean;
+    contact: Contact;
+    attendances: Attendance[] | null;
+  }
+
+  export interface Contact {
+    contactId: number | null;
+    email: string;
+    phone: string | null;
+    addressLine1: string | null;
+    addressLine2: string | null;
+    state: string | null;
+    city: string | null;
+    zip: string | null;
+  }

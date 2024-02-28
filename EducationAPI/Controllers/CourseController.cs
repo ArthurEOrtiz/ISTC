@@ -31,11 +31,29 @@ namespace EducationAPI.Controllers
 		{
 			try
 			{
-				var courses =  await _educationProgramContext.Courses
-					.Include(c => c.Classes)
-					.Include(c => c.Topics)
-					.Include(c => c.Location)
-					.ToListAsync();
+				var courses = await  _educationProgramContext.Courses
+					.Select(c => new Course
+					{
+						CourseId = c.CourseId,
+						Title = c.Title,
+						Description = c.Description,
+						AttendanceCredit = c.AttendanceCredit,
+						CompletionCredit = c.CompletionCredit,
+						MaxAttendance = c.MaxAttendance,
+						EnrollmentDeadline = c.EnrollmentDeadline,
+						InstructorEmail = c.InstructorEmail,
+						InstructorName = c.InstructorName,
+						Pdf = c.Pdf,
+						Location = c.Location,
+						Topics = c.Topics.Select(t => new Topic
+						{
+							TopicId = t.TopicId,
+							Title = t.Title,
+							Description = t.Description
+						}).ToList(),
+						Classes = c.Classes.ToList(),
+					}).ToListAsync();
+
 				return courses;
 			}
 			catch (Exception ex)
