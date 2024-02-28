@@ -11,21 +11,29 @@ interface NewClassProps {
 }
 
 const NewClass: React.FC<NewClassProps> = ({ scheduleStart, scheduleEnd,  onDelete, onDateChange, onStartTimeChange, onEndTimeChange }) => {
-    const [classDate, setClassDate] = useState(scheduleStart);
-    const [start, setStart] = useState(scheduleStart);
-    const [end, setEnd] = useState(scheduleEnd);
+    const [classDate, setClassDate] = useState('');
+    const [start, setStart] = useState('');
+    const [end, setEnd] = useState('');
 
     useEffect(() => {
-        setClassDate(scheduleStart);
+        // Extract date and time components from schedulStart. 
+        const startDate = new Date(scheduleStart);
+        const startDateString = startDate.toISOString().split('T')[0];
+        const startTimeString = startDate.toTimeString().slice(0, 5);
+
+        setClassDate(startDateString);
+        setStart(startTimeString);
     }, [scheduleStart]);
 
     useEffect(() => {
-        setStart(scheduleStart);
+        // Extract date and time components from schedulEnd. 
+        const endDate = new Date(scheduleEnd);
+        const endTimeString = endDate.toTimeString().slice(0, 5);
+
+        setEnd(endTimeString);
     }, [scheduleEnd]);
 
-    useEffect(() => {
-        setEnd(scheduleEnd);
-    }, [scheduleEnd]);
+
     
     
     const handleRemoveClick = () => {

@@ -10,6 +10,7 @@ const AddCourseComponent: React.FC = () => {
 
     // Event Handlers this component. 
     const handleAddClass = () => {
+        
         // Create a Date object for today
         const today = new Date();
     
@@ -40,6 +41,8 @@ const AddCourseComponent: React.FC = () => {
                 classes: [...course.classes, newClass]
             });
         }
+
+        console.log("AddCourseComponent.handleAddClass: course", course); // REMOVE AFTER DEBUGGING
     };
     
 
@@ -52,6 +55,17 @@ const AddCourseComponent: React.FC = () => {
     const handleCourseInfoCardOnSave = (course: Course) => {
         console.log("AddCourseComponent.handleCourseInfoCardOnSave: course: ", course);
         setCourse(course);
+    }
+
+    const handleNewClassOnDelete = (index: number) => {
+        console.log("AddCourseComponent.handleNewClassOnDelete: index: ", index);
+        if (course) {
+            const newClasses = course.classes.filter((classItem, classIndex) => classIndex !== index);
+            setCourse({
+                ...course,
+                classes: newClasses
+            });
+        }
     }
 
     
@@ -74,7 +88,7 @@ const AddCourseComponent: React.FC = () => {
                                     key={index}
                                     scheduleStart={classItem.scheduleStart}
                                     scheduleEnd={classItem.scheduleEnd}
-                                    onDelete={() => console.log("Delete class")}
+                                    onDelete={() => handleNewClassOnDelete(index)}
                                     onDateChange={(date: string) => console.log("Date changed to: ", date)}
                                     onStartTimeChange={(time: string) => console.log("Start time changed to: ", time)}
                                     onEndTimeChange={(time: string) => console.log("End time changed to: ", time)}

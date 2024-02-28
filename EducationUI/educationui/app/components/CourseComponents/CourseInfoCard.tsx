@@ -198,7 +198,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onSave}) => {
                             defaultValue={editCourse?.location?.room}
                             onChange={(e) => handleLocationInputChange(e, "room")}
                             className="border border-gray-300 rounded"/>
-                            : course?.location?.description}</p>
+                            : course?.location?.room}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
                     <p><strong>Remote Link:</strong> {editMode ? 
