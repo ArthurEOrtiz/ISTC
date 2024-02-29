@@ -17,12 +17,12 @@ const AddCourseComponent: React.FC = () => {
         // Set hours and minutes for the start time (9 am)
         const startHour = 9;
         const startMinutes = 0;
-        const scheduleStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), startHour, startMinutes).toISOString();
+        const scheduleStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), startHour, startMinutes);
     
         // Set hours and minutes for the end time (5 pm)
         const endHour = 17; // 5 pm in 24-hour format
         const endMinutes = 0;
-        const scheduleEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), endHour, endMinutes).toISOString();
+        const scheduleEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), endHour, endMinutes);
     
         // Create the new class object
         const newClass: ClassSchedule = {
@@ -32,17 +32,15 @@ const AddCourseComponent: React.FC = () => {
             scheduleEnd: scheduleEnd,
             attendance: [],
         };
-    
-         // Update the course state by adding the new class to the classes array only if 
-         // the course state is not undefined.
+        
+        // Update the course state by adding the new class to the classes array only if 
+        // the course state is not undefined.
         if (course) {
             setCourse({
                 ...course,
                 classes: [...course.classes, newClass]
             });
         }
-
-        console.log("AddCourseComponent.handleAddClass: course", course); // REMOVE AFTER DEBUGGING
     };
     
 
@@ -60,12 +58,46 @@ const AddCourseComponent: React.FC = () => {
     const handleNewClassOnDelete = (index: number) => {
         console.log("AddCourseComponent.handleNewClassOnDelete: index: ", index);
         if (course) {
-            const newClasses = course.classes.filter((classItem, classIndex) => classIndex !== index);
+            const newClasses = [...course.classes];
+            console.log("AddCourseComponent.handleNewClassOnDelete: newClasses: ", newClasses);
+            newClasses.splice(index, 1); // Remove the class at the specified index
+            console.log("AddCourseComponent.handleNewClassOnDelete: newClasses: ", newClasses);
+            // setCourse({
+            //     ...course,
+            //     classes: newClasses
+            // });
+        }
+    }
+
+    const handleNewClassOnScheduleStartChange = (index: number, date: Date) => {
+        console.log("AddCourseComponent.handleNewClassOnDateChange: index: ", index, " date: ", date);
+        // if (course) {
+        //     console.log("AddCourseComponent.handleNewClassOnDateChange: course: ", course);
+        // } else {
+        //     console.log("AddCourseComponent.handleNewClassOnDateChange: course is undefined");
+        // }
+
+        if (course) {
+            const newClasses = [...course.classes];
+            newClasses[index].scheduleStart = date;
             setCourse({
                 ...course,
                 classes: newClasses
             });
         }
+    }
+
+
+    const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
+        console.log("AddCourseComponent.handleNewClassOnDateChange: index: ", index, " date: ", date);
+        // if (course) {
+        //     const newClasses = [...course.classes];
+        //     newClasses[index].scheduleEnd = date;
+        //     setCourse({
+        //         ...course,
+        //         classes: newClasses
+        //     });
+        // }
     }
 
     
@@ -83,15 +115,14 @@ const AddCourseComponent: React.FC = () => {
                     <div>
                         {course.classes.map((classItem, index) => (
                             
-                            <div className="mt-2">
+                            <div className="mt-2" key="index"> 
                                 <NewClass
                                     key={index}
                                     scheduleStart={classItem.scheduleStart}
                                     scheduleEnd={classItem.scheduleEnd}
                                     onDelete={() => handleNewClassOnDelete(index)}
-                                    onDateChange={(date: string) => console.log("Date changed to: ", date)}
-                                    onStartTimeChange={(time: string) => console.log("Start time changed to: ", time)}
-                                    onEndTimeChange={(time: string) => console.log("End time changed to: ", time)}
+                                    onScheduleStartChange={(date: string) => handleNewClassOnScheduleStartChange(index, date)}
+                                    onScheduleEndChange={(date: string) => handleNewClassOnScheduleEndChange(index, date)}
                                 />
                             </div>
                             ))
@@ -101,6 +132,12 @@ const AddCourseComponent: React.FC = () => {
                                 className="btn btn-primary text-white"
                                 onClick={handleAddClass}
                             > Add Class </button>
+                        </div>
+                        <div className = "mt-2">
+                            <button
+                                className="btn btn-primary text-white"
+                                onClick={() => console.log("Course: ", course)}
+                            > Test Course </button>
                         </div>
                     </div>
                 </>
