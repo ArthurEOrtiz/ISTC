@@ -10,38 +10,50 @@ const AddCourseComponent: React.FC = () => {
 
     // Event Handlers this component. 
     const handleAddClass = () => {
-        
-        // Create a Date object for today
         const today = new Date();
     
-        // Set hours and minutes for the start time (9 am)
-        const startHour = 9;
-        const startMinutes = 0;
-        const scheduleStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), startHour, startMinutes);
+        let scheduleStart;
+        let scheduleEnd;
     
-        // Set hours and minutes for the end time (5 pm)
-        const endHour = 17; // 5 pm in 24-hour format
-        const endMinutes = 0;
-        const scheduleEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), endHour, endMinutes);
+        if (course && course.classes.length > 0) {
+            // If there are existing classes, get the last class's end time
+            const lastClassEnd = new Date(course.classes[course.classes.length - 1].scheduleEnd);
+            
+            // Increment the date by one day
+            const nextDay = new Date(lastClassEnd);
+            nextDay.setDate(nextDay.getDate() + 1);
+    
+            // Set the start time to 9 AM of the next day
+            scheduleStart = new Date(nextDay.getFullYear(), nextDay.getMonth(), nextDay.getDate(), 9, 0);
+    
+            // Set the end time to 5 PM of the same day
+            scheduleEnd = new Date(nextDay.getFullYear(), nextDay.getMonth(), nextDay.getDate(), 17, 0);
+        } else {
+            // If there are no existing classes, set the start time to 9 AM of today
+            scheduleStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 0);
+            
+            // Set the end time to 5 PM of today
+            scheduleEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 17, 0);
+        }
     
         // Create the new class object
-        const newClass: ClassSchedule = {
+        const newClass = {
             classId: null,
             courseId: null,
             scheduleStart: scheduleStart,
             scheduleEnd: scheduleEnd,
             attendance: [],
         };
-        
-        // Update the course state by adding the new class to the classes array only if 
-        // the course state is not undefined.
+    
+        // Update the course state by adding the new class to the classes array
         if (course) {
             setCourse({
                 ...course,
-                classes: [...course.classes, newClass]
+                classes: [...course.classes, newClass],
             });
         }
     };
+    
     
 
     // Event Handlers for Components
@@ -71,12 +83,6 @@ const AddCourseComponent: React.FC = () => {
 
     const handleNewClassOnScheduleStartChange = (index: number, date: Date) => {
         console.log("AddCourseComponent.handleNewClassOnDateChange: index: ", index, " date: ", date);
-        // if (course) {
-        //     console.log("AddCourseComponent.handleNewClassOnDateChange: course: ", course);
-        // } else {
-        //     console.log("AddCourseComponent.handleNewClassOnDateChange: course is undefined");
-        // }
-
         if (course) {
             const newClasses = [...course.classes];
             newClasses[index].scheduleStart = date;
@@ -90,14 +96,14 @@ const AddCourseComponent: React.FC = () => {
 
     const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
         console.log("AddCourseComponent.handleNewClassOnDateChange: index: ", index, " date: ", date);
-        // if (course) {
-        //     const newClasses = [...course.classes];
-        //     newClasses[index].scheduleEnd = date;
-        //     setCourse({
-        //         ...course,
-        //         classes: newClasses
-        //     });
-        // }
+        if (course) {
+            const newClasses = [...course.classes];
+            newClasses[index].scheduleEnd = date;
+            setCourse({
+                ...course,
+                classes: newClasses
+            });
+        }
     }
 
     
