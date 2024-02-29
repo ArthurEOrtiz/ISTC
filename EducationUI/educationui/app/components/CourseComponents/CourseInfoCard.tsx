@@ -101,6 +101,14 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         />
                         : course?.description}</p>
+                <p><strong>Topics:</strong> {course?.topics?.map((topic, index) => (
+                    <span key={index}>
+                        {topic.title}
+                        {index !== (course?.topics?.length ?? 0) - 1 && ', '}
+                    </span>
+                ))}
+                </p>
+
             </div>
 
             <div className="flex flex-wrap -mx-1">

@@ -8,7 +8,7 @@ import SelectTopicModal from '../TopicsComponents/SelectTopicModal';
 
 const AddCourseComponent: React.FC = () => {    
     const [course, setCourse] = useState<Course>();
-    const [topic , setTopic] = useState<Topic>();
+    const [topics , setTopics] = useState<Topic[]>([]);
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
     
     useEffect(() => {
@@ -131,9 +131,16 @@ const AddCourseComponent: React.FC = () => {
         setShowSelectTopicModal(false);
     }
 
-    const handleSelectTopicModalOnSelect = (topic: Topic) => {
+    const handleSelectTopicModalOnSelect = (topic: Topic[]) => {
         console.log("AddCourseComponent.handleSelectTopicModalOnSelect: topic: ", topic);
-        setTopic(topic);
+        
+        if (course) {
+            setCourse({
+                ...course,
+                topics: topic
+            });
+        }
+
     }
 
     return (
@@ -186,7 +193,8 @@ const AddCourseComponent: React.FC = () => {
                 <SelectTopicModal 
                     open={showSelectTopicModal} 
                     onClose={handleSelectTopicModalOnClose} 
-                    onSelect={(topic: Topic) => handleSelectTopicModalOnSelect(topic)}  
+                    onSelect={(topic: Topic[]) => handleSelectTopicModalOnSelect(topic)} 
+                    topics={course?.topics || []} 
                     /> 
             )}
 
