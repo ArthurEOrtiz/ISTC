@@ -19,6 +19,21 @@ namespace EducationAPI.Controllers
 			_logger = logger;
 		}
 
+		[HttpGet("GetAllTopics")]
+		public async Task<ActionResult<List<Topic>>> GetAllTopics()
+		{
+			try
+			{
+				_logger.LogInformation("GetAllTopics() Called");
+				return await _educationProgramContext.Topics.ToListAsync();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetAllTopics()");
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 		[HttpGet("GetTopicById")]
 		public async Task<ActionResult<Topic>> GetTopicById(int id)
 		{
@@ -29,10 +44,11 @@ namespace EducationAPI.Controllers
 
 				if (topic == null)
 				{
-					_logger.LogError("GetTopicById{Id}, Record not found!", id);
+					_logger.LogError("GetTopicById({Id}), Record not found!", id);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
+				_logger.LogInformation("GetTopicBy({Id}) Called", id);
 				return topic;
 
 			}

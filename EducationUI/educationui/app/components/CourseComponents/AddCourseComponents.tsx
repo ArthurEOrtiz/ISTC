@@ -1,12 +1,15 @@
 'use client';
-import { Course } from '@/app/shared/types/sharedTypes';
+import { Course, Topic } from '@/app/shared/types/sharedTypes';
 import { useEffect, useState } from 'react';
 import NewCourseForm from './NewCourseForm';
 import CourseInfoCard from './CourseInfoCard';
 import NewClass from './NewClass';
+import SelectTopicModal from '../TopicsComponents/SelectTopicModal';
 
 const AddCourseComponent: React.FC = () => {    
     const [course, setCourse] = useState<Course>();
+    const [topic , setTopic] = useState<Topic>();
+    const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
     
     useEffect(() => {
         window.scrollTo({
@@ -15,7 +18,6 @@ const AddCourseComponent: React.FC = () => {
         });
     }
     , [course?.classes.length]);
-
 
     // Event Handlers this component. 
     const handleAddClass = () => {
@@ -63,7 +65,18 @@ const AddCourseComponent: React.FC = () => {
         };
     };
 
+    const handleAddTopic = () => {
+        /*
+        I need a way for the user to assign a topic to the course.
+        The user should be able to create a new topic or select an existing topic.
+        The best way to accomplish this would probably be with a modal. 
+        */
+        setShowSelectTopicModal(true);
+    }
+
     // Event Handlers for Components
+
+    // NewCourseForm
     const handleNewCourseFormOnSubmit = (course: Course) => {
         // console.log("AddCourseComponent.handleNewCourseFormOnSubmit: course: ", course);
         setCourse(course);
@@ -100,7 +113,6 @@ const AddCourseComponent: React.FC = () => {
         }
     }
 
-
     const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
         // console.log("AddCourseComponent.handleNewClassOnDateChange: index: ", index, " date: ", date);
         if (course) {
@@ -113,6 +125,17 @@ const AddCourseComponent: React.FC = () => {
         }
     }
 
+    // SelectTopicModal
+
+    const handleSelectTopicModalOnClose = () => {
+        setShowSelectTopicModal(false);
+    }
+
+    const handleSelectTopicModalOnSelect = (topic: Topic) => {
+        console.log("AddCourseComponent.handleSelectTopicModalOnSelect: topic: ", topic);
+        setTopic(topic);
+    }
+
     return (
         <>
             {course === undefined ? (
@@ -120,6 +143,12 @@ const AddCourseComponent: React.FC = () => {
             ) : (
                 
                 <>
+                    <div className="mb-2">
+                        <button 
+                            className="btn btn-primary text-white"
+                            onClick={handleAddTopic}
+                        >Add Topic</button>
+                    </div>
                     <div>
                         <CourseInfoCard course={course} onApply={handleCourseInfoCardOnApply} />
                     </div>
@@ -141,18 +170,26 @@ const AddCourseComponent: React.FC = () => {
                             <button
                                 className="btn btn-primary text-white"
                                 onClick={handleAddClass}
-                            > Add Class </button>
+                            >Add Class</button>
                         </div>
                         <div className = "mt-2">
                             <button
                                 className="btn btn-primary text-white"
                                 onClick={() => console.log("Course: ", course)}
-                            > Test Course </button>
+                            >Test Course</button>
                         </div>
                     </div>
                 </>
 
             )}
+            {showSelectTopicModal && (
+                <SelectTopicModal 
+                    open={showSelectTopicModal} 
+                    onClose={handleSelectTopicModalOnClose} 
+                    onSelect={(topic: Topic) => handleSelectTopicModalOnSelect(topic)}  
+                    /> 
+            )}
+
         </>
     );
 }
