@@ -10,7 +10,7 @@ interface NewClassProps {
     onScheduleEndChange: (date: Date) => void; // Prop to receive the schedule end change event
 }
 
-const NewClass: React.FC<NewClassProps> = ({ scheduleStart, scheduleEnd,  onDelete, onScheduleStartChange, onScheduleEndChange }) => {
+const NewClass: React.FC<NewClassProps> = ({scheduleStart, scheduleEnd,  onDelete, onScheduleStartChange, onScheduleEndChange }) => {
     // console.log("NewClass.scheduleStart: ", scheduleStart);
     // console.log("NewClass.scheduleEnd: ", scheduleEnd);
     
@@ -23,8 +23,6 @@ const NewClass: React.FC<NewClassProps> = ({ scheduleStart, scheduleEnd,  onDele
         const startDate = new Date(scheduleStart);
         const startDateString = startDate.toISOString().split('T')[0];
         const startTimeString = startDate.toTimeString().split(' ')[0].slice(0, 5);
-;
-
 
         setClassDate(startDateString);
         setStart(startTimeString);
@@ -37,9 +35,6 @@ const NewClass: React.FC<NewClassProps> = ({ scheduleStart, scheduleEnd,  onDele
 
         setEnd(endTimeString);
     }, [scheduleEnd]);
-
-
-    
     
     const handleRemoveClick = () => {
         onDelete();
@@ -65,9 +60,6 @@ const NewClass: React.FC<NewClassProps> = ({ scheduleStart, scheduleEnd,  onDele
         const combinedDateTime = new Date(`${classDate}T${time}:00`);
         onScheduleEndChange(combinedDateTime);
     }
-
-
-
 
     return (
         <div className="bg-white shadow-md rounded-md p-4 relative">

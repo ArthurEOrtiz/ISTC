@@ -1,12 +1,21 @@
 'use client';
-import { ClassSchedule, Course } from '@/app/shared/types/sharedTypes';
-import { useState } from 'react';
+import { Course } from '@/app/shared/types/sharedTypes';
+import { useEffect, useState } from 'react';
 import NewCourseForm from './NewCourseForm';
 import CourseInfoCard from './CourseInfoCard';
 import NewClass from './NewClass';
 
 const AddCourseComponent: React.FC = () => {    
     const [course, setCourse] = useState<Course>();
+    
+    useEffect(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth"
+        });
+    }
+    , [course?.classes.length]);
+
 
     // Event Handlers this component. 
     const handleAddClass = () => {
@@ -51,19 +60,17 @@ const AddCourseComponent: React.FC = () => {
                 ...course,
                 classes: [...course.classes, newClass],
             });
-        }
+        };
     };
-    
-    
 
     // Event Handlers for Components
     const handleNewCourseFormOnSubmit = (course: Course) => {
-        console.log("AddCourseComponent.handleNewCourseFormOnSubmit: course: ", course);
+        // console.log("AddCourseComponent.handleNewCourseFormOnSubmit: course: ", course);
         setCourse(course);
     }
 
-    const handleCourseInfoCardOnSave = (course: Course) => {
-        console.log("AddCourseComponent.handleCourseInfoCardOnSave: course: ", course);
+    const handleCourseInfoCardOnApply = (course: Course) => {
+        console.log("AddCourseComponent.handleCourseInfoCardOnApply: course: ", course);
         setCourse(course);
     }
 
@@ -71,18 +78,18 @@ const AddCourseComponent: React.FC = () => {
         console.log("AddCourseComponent.handleNewClassOnDelete: index: ", index);
         if (course) {
             const newClasses = [...course.classes];
-            console.log("AddCourseComponent.handleNewClassOnDelete: newClasses: ", newClasses);
+            // console.log("AddCourseComponent.handleNewClassOnDelete: newClasses: ", newClasses);
             newClasses.splice(index, 1); // Remove the class at the specified index
-            console.log("AddCourseComponent.handleNewClassOnDelete: newClasses: ", newClasses);
-            // setCourse({
-            //     ...course,
-            //     classes: newClasses
-            // });
+            // console.log("AddCourseComponent.handleNewClassOnDelete: newClasses: ", newClasses);
+            setCourse({
+                ...course,
+                classes: newClasses
+            });
         }
     }
 
     const handleNewClassOnScheduleStartChange = (index: number, date: Date) => {
-        console.log("AddCourseComponent.handleNewClassOnDateChange: index: ", index, " date: ", date);
+        // console.log("AddCourseComponent.handleNewClassOnDateChange: index: ", index, " date: ", date);
         if (course) {
             const newClasses = [...course.classes];
             newClasses[index].scheduleStart = date;
@@ -95,7 +102,7 @@ const AddCourseComponent: React.FC = () => {
 
 
     const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
-        console.log("AddCourseComponent.handleNewClassOnDateChange: index: ", index, " date: ", date);
+        // console.log("AddCourseComponent.handleNewClassOnDateChange: index: ", index, " date: ", date);
         if (course) {
             const newClasses = [...course.classes];
             newClasses[index].scheduleEnd = date;
@@ -106,8 +113,6 @@ const AddCourseComponent: React.FC = () => {
         }
     }
 
-    
-
     return (
         <>
             {course === undefined ? (
@@ -116,19 +121,18 @@ const AddCourseComponent: React.FC = () => {
                 
                 <>
                     <div>
-                        <CourseInfoCard course={course} onSave={handleCourseInfoCardOnSave} />
+                        <CourseInfoCard course={course} onApply={handleCourseInfoCardOnApply} />
                     </div>
                     <div>
                         {course.classes.map((classItem, index) => (
                             
-                            <div className="mt-2" key="index"> 
+                            <div className="mt-2" key={index}> 
                                 <NewClass
-                                    key={index}
                                     scheduleStart={classItem.scheduleStart}
                                     scheduleEnd={classItem.scheduleEnd}
                                     onDelete={() => handleNewClassOnDelete(index)}
-                                    onScheduleStartChange={(date: string) => handleNewClassOnScheduleStartChange(index, date)}
-                                    onScheduleEndChange={(date: string) => handleNewClassOnScheduleEndChange(index, date)}
+                                    onScheduleStartChange={(date: Date) => handleNewClassOnScheduleStartChange(index, date)}
+                                    onScheduleEndChange={(date: Date) => handleNewClassOnScheduleEndChange(index, date)}
                                 />
                             </div>
                             ))
