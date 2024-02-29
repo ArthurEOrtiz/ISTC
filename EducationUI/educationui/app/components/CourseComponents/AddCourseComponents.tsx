@@ -5,10 +5,10 @@ import NewCourseForm from './NewCourseForm';
 import CourseInfoCard from './CourseInfoCard';
 import NewClass from './NewClass';
 import SelectTopicModal from '../TopicsComponents/SelectTopicModal';
+import axios from 'axios';
 
 const AddCourseComponent: React.FC = () => {    
     const [course, setCourse] = useState<Course>();
-    const [topics , setTopics] = useState<Topic[]>([]);
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
     
     useEffect(() => {
@@ -49,8 +49,8 @@ const AddCourseComponent: React.FC = () => {
     
         // Create the new class object
         const newClass = {
-            classId: null,
-            courseId: null,
+            classId: 0,
+            courseId: 0,
             scheduleStart: scheduleStart,
             scheduleEnd: scheduleEnd,
             attendance: [],
@@ -74,6 +74,22 @@ const AddCourseComponent: React.FC = () => {
         setShowSelectTopicModal(true);
     }
 
+
+
+    const handleSaveCourse = async () => {
+        try {
+            // Perform the POST request to save the course
+            const response = await axios.post("https://localhost:7144/Course/PostCourse", course);
+
+            // Log the response or handle it as needed
+            console.log("Response from server:", response);
+        } catch (error) {
+            // Log and handle any errors
+            console.error("Error saving course:", error);
+        }
+    };
+
+
     // Event Handlers for Components
 
     // NewCourseForm
@@ -87,6 +103,7 @@ const AddCourseComponent: React.FC = () => {
         setCourse(course);
     }
 
+    // NewClass
     const handleNewClassOnDelete = (index: number) => {
         console.log("AddCourseComponent.handleNewClassOnDelete: index: ", index);
         if (course) {
@@ -126,13 +143,12 @@ const AddCourseComponent: React.FC = () => {
     }
 
     // SelectTopicModal
-
     const handleSelectTopicModalOnClose = () => {
         setShowSelectTopicModal(false);
     }
 
     const handleSelectTopicModalOnSelect = (topic: Topic[]) => {
-        console.log("AddCourseComponent.handleSelectTopicModalOnSelect: topic: ", topic);
+        //console.log("AddCourseComponent.handleSelectTopicModalOnSelect: topic: ", topic);
         
         if (course) {
             setCourse({
@@ -150,12 +166,21 @@ const AddCourseComponent: React.FC = () => {
             ) : (
                 
                 <>
-                    <div className="mb-2">
-                        <button 
-                            className="btn btn-primary text-white"
-                            onClick={handleAddTopic}
-                        >Add Topic</button>
+                    <div className="navbar bg-primary text-primary-content rounded-xl border  mb-2">
+                            <button 
+                                className="btn btn-ghost text-white"
+                                onClick={handleAddTopic}
+                            >Add/Edit Topic</button>
+                     
+                
+                            <button
+                                className="btn btn-ghost text-white"
+                                onClick={handleSaveCourse}
+                            >Save Course</button>
+                   
                     </div>
+
+                    
                     <div>
                         <CourseInfoCard course={course} onApply={handleCourseInfoCardOnApply} />
                     </div>

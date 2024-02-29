@@ -113,12 +113,27 @@ namespace EducationAPI.Controllers
 		{
 			try
 			{
+				// Create a copy of the topics collection
+				var topicsCopy = course.Topics.ToList();
+
+				// Check if any of the topics in the request already exist in the database
+				foreach (var topic in topicsCopy)
+				{
+					var existingTopic = await _educationProgramContext.Topics.FirstOrDefaultAsync(t => t.TopicId == topic.TopicId);
+					if (existingTopic != null)
+					{
+						// If the topic already exists, just link it to the course
+						course.Topics.Remove(topic);
+						course.Topics.Add(existingTopic);
+					}
+				}
+
 				_educationProgramContext.Courses.Add(course);
 				await _educationProgramContext.SaveChangesAsync();
 
-				_logger.LogInformation("PostCourse{Course}, called", course);
+				_logger.LogInformation("PostCourse {Course} called", course);
 				// Should return a 201 status code. 
-				return new CreatedAtActionResult(nameof(GetCourseById), "Course", new { id = course.CourseId }, course);
+				return new StatusCodeResult((int)HttpStatusCode.OK);
 			}
 			catch (Exception ex)
 			{
@@ -126,6 +141,8 @@ namespace EducationAPI.Controllers
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
+
+
 
 	}
 }

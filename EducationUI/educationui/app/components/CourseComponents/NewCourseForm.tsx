@@ -39,7 +39,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
     const [isPostalCodeValid, setIsPostalCodeValid] = useState<boolean>(true);
 
     const [course , setCourse] = useState<Course>({
-        courseId: null,
+        courseId: 0,
         title: '',
         description: '',
         attendanceCredit: 0,
@@ -50,7 +50,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
         instructorEmail: '',
         pdf: '',
         location: {
-            locationId: null,
+            locationId: 0,
             description: '',
             room: '',
             remoteLink: '',
