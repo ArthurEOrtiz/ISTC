@@ -66,11 +66,6 @@ const AddCourseComponent: React.FC = () => {
     };
 
     const handleAddTopic = () => {
-        /*
-        I need a way for the user to assign a topic to the course.
-        The user should be able to create a new topic or select an existing topic.
-        The best way to accomplish this would probably be with a modal. 
-        */
         setShowSelectTopicModal(true);
     }
 

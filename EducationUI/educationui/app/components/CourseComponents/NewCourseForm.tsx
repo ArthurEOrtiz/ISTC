@@ -9,34 +9,34 @@ interface NewCourseFormProps {
 
 const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
     const [titleTouched, setTitleTouched] = useState<boolean>(false);
-    const [istitleValid, setIsTitleValid] = useState<boolean>(true);
+    const [istitleValid, setIsTitleValid] = useState<boolean>();
 
     const [emailTouched, setEmailTouched] = useState<boolean>(false);  
-    const [isEmailValid, setIsEmailValid] = useState<boolean>(true);
+    const [isEmailValid, setIsEmailValid] = useState<boolean>();
 
     const [instructorNameTouched, setInstructorNameTouched] = useState<boolean>(false);
-    const [isInstructorNameValid, setIsInstructorNameValid] = useState<boolean>(true);
+    const [isInstructorNameValid, setIsInstructorNameValid] = useState<boolean>();
 
     const [attendanceCreditTouched, setAttendanceCreditTouched] = useState<boolean>(false);
-    const [isAttendanceCreditValid, setIsAttendanceCreditValid] = useState<boolean>(true);
+    const [isAttendanceCreditValid, setIsAttendanceCreditValid] = useState<boolean>();
 
     const [completionCreditTouched, setCompletionCreditTouched] = useState<boolean>(false);
-    const [isCompletionCreditValid, setIsCompletionCreditValid] = useState<boolean>(true);
+    const [isCompletionCreditValid, setIsCompletionCreditValid] = useState<boolean>();
 
     const [maxAttendanceTouched, setMaxAttendanceTouched] = useState<boolean>(false);
-    const [isMaxAttendanceValid, setIsMaxAttendanceValid] = useState<boolean>(true);
+    const [isMaxAttendanceValid, setIsMaxAttendanceValid] = useState<boolean>();
 
     const [enrollmentDeadlineTouched, setEnrollmentDeadlineTouched] = useState<boolean>(false);
-    const [isEnrollmentDeadlineValid, setIsEnrollmentDeadlineValid] = useState<boolean>(true);
+    const [isEnrollmentDeadlineValid, setIsEnrollmentDeadlineValid] = useState<boolean>();
 
     const [addressLine1Touched, setAddressLine1Touched] = useState<boolean>(false);
-    const [isAddressLine1Valid, setIsAddressLine1Valid] = useState<boolean>(true);
+    const [isAddressLine1Valid, setIsAddressLine1Valid] = useState<boolean>();
 
     const [cityTouched, setCityTouched] = useState<boolean>(false);
-    const [isCityValid, setIsCityValid] = useState<boolean>(true);
+    const [isCityValid, setIsCityValid] = useState<boolean>();
 
     const [postalCodeTouched, setPostalCodeTouched] = useState<boolean>(false);
-    const [isPostalCodeValid, setIsPostalCodeValid] = useState<boolean>(true);
+    const [isPostalCodeValid, setIsPostalCodeValid] = useState<boolean>();
 
     const [course , setCourse] = useState<Course>({
         courseId: 0,
@@ -77,7 +77,14 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
     
-        if (id.startsWith('location.')) {
+        if (id === 'description') {
+            // Limit description to 255 characters
+            const truncatedValue = value.slice(0, 255);
+            setCourse((prevCourse) => ({
+                ...prevCourse,
+                description: truncatedValue,
+            }));
+        } else if (id.startsWith('location.')) {
             // Handle nested location fields
             const locationField = id.split('.')[1];
             setCourse((prevCourse) => ({
@@ -94,7 +101,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                 [id]: value,
             }));
         }
-    }
+    };
     
 
     const handleIntInput = (event: FormEvent<HTMLInputElement>, minValue: number, maxValue: number): void => {
@@ -151,7 +158,6 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
         const isValid = completionCreditValue >= attendanceCreditValue;
         setIsCompletionCreditValid(isValid);
     }
-    
 
     const handleMaxAttendanceInput = (event: FormEvent<HTMLInputElement>): void => {
         handleIntInput(event, 1, 999);
@@ -235,6 +241,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     id="description"
                     placeholder="Optional"
                     value = {course?.description}
+                    maxLength={255}
                     onChange = {handleChange}
                 />
                 <CharacterCounter value={course.description} limit={255} />
