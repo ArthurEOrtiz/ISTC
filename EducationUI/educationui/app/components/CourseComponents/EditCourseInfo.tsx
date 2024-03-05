@@ -30,7 +30,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     // Constants
-    const [courseInfo, setCourseInfo] = useState<Course>(course);
     const [classes, setClasses] = useState<ClassSchedule[]>(sortClassesByDate(course.classes));
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
     
@@ -59,29 +58,53 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     const handleOnClassAdd = (): void => {
-        const today = new Date();
-        today.setUTCHours(16,0,0,0);
-        const todayAt9AMString = today
-        console.log("9am String ", todayAt9AMString)
-       
-        today.setUTCHours(24,0,0,0);
-        const todayAt5PMString = today
-        console.log("5pm String ", todayAt5PMString)
+        if (classes.length === 0 || classes === null) {
+            const today = new Date();
+
+            today.setUTCHours(16,0,0,0);
+            const todayAt9AM = new Date(today)
+            //console.log("9am String ", todayAt9AM)
+           
+            today.setUTCHours(24,0,0,0);
+            const todayAt5PM = new Date(today) 
+            //console.log("5pm String ", todayAt5PM)
 
 
-        const newClassSchedule: ClassSchedule = {
-            classId: 0,
-            courseId: course.courseId,
-            scheduleStart: todayAt9AMString,
-            scheduleEnd: todayAt5PMString,
-            attendance: []
+            const newClassSchedule: ClassSchedule = {
+                classId: null,
+                courseId: course.courseId,
+                scheduleStart: todayAt9AM,
+                scheduleEnd: todayAt5PM,
+                attendance: []
+            }
+            //console.log(newClassSchedule)
+            setClasses([newClassSchedule]);
+            setEditModeIndex(0);
+
+        } else {
+
+            const lastClass = classes[classes.length - 1];
+            const scheduleStartPlusOneDay = new Date(`${lastClass.scheduleStart}Z`);
+            scheduleStartPlusOneDay.setDate(scheduleStartPlusOneDay.getDate() + 1);
+            const scheduleEndPlusOneDay = new Date(`${lastClass.scheduleEnd}Z`);
+            scheduleEndPlusOneDay.setDate(scheduleEndPlusOneDay.getDate() + 1);
+
+            const newClassSchedule: ClassSchedule = {
+                classId: null,
+                courseId: course.courseId,
+                scheduleStart: new Date(scheduleStartPlusOneDay),
+                scheduleEnd: new Date(scheduleEndPlusOneDay),
+                attendance: []
+            }
+            console.log(newClassSchedule)
+            //Disable edit mode for all other classes 
+            // setEditModeIndex(null);
+            // Add the new class with edit mode enabled 
+            // setClasses(prevClasses => [...prevClasses, newClassSchedule]);
         }
 
-        console.log(newClassSchedule)
-        // // Disable edit mode for all other classes 
-        // setEditModeIndex(null);
-        // // Add the new class with edit mode enabled 
-        // setClasses(prevClasses => [...prevClasses, newClassSchedule]);
+        
+     
         // setEditModeIndex(classes.length);
     }
 
@@ -118,7 +141,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </button>
                 </div>
                 <div className="p-4">
-                    <CourseInfoCard course={course} onSave={handleOnCourseInfoCardSave} />
+                    <CourseInfoCard course={course} onApply={handleOnCourseInfoCardSave} />
                 </div>
             </div>
             
@@ -148,6 +171,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                         className="btn btn-primary text-white m-1"
                         onClick={()=> console.log(course)}>
                             Test Course
+                    </button>
+                    <button
+                        className="btn btn-primary text-white m-1"
+                        onClick={()=> console.log(classes)}>
+                            Test Classes
                     </button>
                 </div>
             </div>

@@ -23,7 +23,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     }
     , [editMode]);
 
-    const getStartDate = (date: string | null) => {
+    const getStartDate = (date: Date | null) => {
         
         if (date === null) {
             return null;
@@ -43,7 +43,9 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     }
 
     const formatStringToDate = (dateString: string) => {
-        const dateObject = new Date(dateString);
+        //console.log(dateString); // Date String is in UTC
+        const dateObject = new Date(`${dateString}z`);
+        //console.log(dateObject);
         const year = dateObject.getFullYear();
         const month = (dateObject.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
         const day = dateObject.getDate().toString().padStart(2, '0');
@@ -63,14 +65,14 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     }
 
     const formatTime = (time: string) => {
-        const timeObject = new Date(time);
+        const timeObject = new Date(`${time}z`);
         const hours = timeObject.getHours().toString().padStart(2, '0'); // Ensure two digits for hours
         const minutes = timeObject.getMinutes().toString().padStart(2, '0'); // Ensure two digits for minutes
         return `${hours}:${minutes}`;
     }
     
     const handleEdit = () => {
-        console.log('Edit Class', oldClassSchedule.classId);
+        //console.log('Edit Class', oldClassSchedule.classId);
         setEditClass(true);
     }
 
@@ -160,43 +162,43 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
 
     const handleStartDateChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const newStartDate = event.target.value;
-        const oldStartDate = editedClassSchedule.scheduleStart;
+        const oldStartDate = editedClassSchedule.scheduleStart.toString();
+
         // I just need to update the date part of the string
         const oldStartTime = oldStartDate.split('T')[1];
         const newStartDateTime = `${newStartDate}T${oldStartTime}`;
-        //console.log(newStartDateTime);
 
         setEditedClassSchedule((prevState) => ({
             ...prevState,
-            scheduleStart: newStartDateTime,
+            scheduleStart: newStartDateTime as unknown as Date, 
         }));
 
     }
 
     const handleStartTimeChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const newStartTime = event.target.value;
-        const oldStartDate = editedClassSchedule.scheduleStart;
-        // I just need to update the time part of the string
-        const newStartDateTime = `${oldStartDate.split('T')[0]}T${newStartTime}`;
-        //console.log(newStartDateTime);
-        
+        const oldStartDate = editedClassSchedule.scheduleStart.toString();
+
+        // The old start date is in UTC and the new start time is in local time. 
+        const newStartTimeObject = new Date(`${oldStartDate.split('T')[0]}T${newStartTime}`);
+        const newStartTimeString = newStartTimeObject.toISOString().slice(0, -5);
+
         setEditedClassSchedule((prevState) => ({
             ...prevState,
-            scheduleStart: newStartDateTime,
+            scheduleStart: newStartTimeString as unknown as Date,
         }));
-
     }
 
     const handleEndTimeChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const newEndTime = event.target.value;
-        const oldEndDate = editedClassSchedule.scheduleEnd;
+        const oldEndDate = editedClassSchedule.scheduleEnd.toString();
         // I just need to update the time part of the string
-        const newEndDateTime = `${oldEndDate.split('T')[0]}T${newEndTime}`;
-        //console.log(newEndDateTime);
+        const newEndTimeObject = new Date(`${oldEndDate.split('T')[0]}T${newEndTime}`);
+        const newEndTimeString = newEndTimeObject.toISOString().slice(0, -5);
         
         setEditedClassSchedule((prevState) => ({
             ...prevState,
-            scheduleEnd: newEndDateTime,
+            scheduleEnd: newEndTimeString as unknown as Date,
         }));
 
     }
