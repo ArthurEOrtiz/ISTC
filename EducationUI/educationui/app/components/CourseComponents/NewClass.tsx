@@ -1,5 +1,5 @@
+
 'use client';
-import { on } from 'events';
 import React, { useEffect, useState } from 'react';
 
 
@@ -11,6 +11,19 @@ interface NewClassProps {
     onScheduleEndChange: (date: Date) => void; // Prop to receive the schedule end change event
 }
 
+
+/**
+ * Represents a component for creating a new class during course creation.
+ * A thing to remember is that this will save to the database in UTC time, not local time.
+ * This is a default behavior of the Date object in JavaScript.
+ *
+ * @component
+ * @param {Date} props.scheduleStart - The schedule start date.
+ * @param {Date} props.scheduleEnd - The schedule end date.
+ * @param {Function} props.onDelete - The delete event handler.
+ * @param {Function} props.onScheduleStartChange - The schedule start change event handler.
+ * @param {Function} props.onScheduleEndChange - The schedule end change event handler.
+ */
 const NewClass: React.FC<NewClassProps> = ({scheduleStart, scheduleEnd,  onDelete, onScheduleStartChange, onScheduleEndChange }) => {
     const [classDate, setClassDate] = useState('');
     const [start, setStart] = useState('');
@@ -41,7 +54,6 @@ const NewClass: React.FC<NewClassProps> = ({scheduleStart, scheduleEnd,  onDelet
     };
 
     const handleClassDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        // if the date is in invalid than `date` will be and emty string.
         const date = event.target.value;
     
         if (!date) {
