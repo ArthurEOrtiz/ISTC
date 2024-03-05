@@ -8,7 +8,16 @@ interface CourseCardProps {
 }
 
 const CourseCard : React.FC<CourseCardProps> = ({course, onEdit}) => {
+  
+  const formatToMountainTime = (utcDate: Date): string => {
 
+    const inputDate =  `${utcDate}z`  
+    const localTime = new Date(inputDate)
+
+    const mountainTime = localTime.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'America/Denver'})
+
+    return mountainTime;
+  }
 
   return (
     <div className="card-body">
@@ -24,17 +33,16 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit}) => {
       ) : (
         <p>None</p>
       )}
-
       
       {course.classes && course.classes.length > 0 ? (
         <div className="flex justify-between">
           <div>
             <p className="text-1xl font-bold">Start Date</p>
-            <p>{new Date(course.classes[0].scheduleStart).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'America/Denver'})}</p>
+            <p>{formatToMountainTime(course.classes[0].scheduleStart)}</p>
           </div>
           <div>
             <p className="text-1xl font-bold">End Date</p>
-            <p>{new Date(course.classes[course.classes.length - 1].scheduleEnd).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'America/Denver'})}</p>
+            <p>{formatToMountainTime(course.classes[course.classes.length - 1].scheduleEnd)}</p>
           </div>
         </div>
       ) : (

@@ -229,6 +229,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     type="text"
                     placeholder="Title"
                     value = {course?.title}
+                    maxLength={50}
                     onChange = {handleChange}
                     onBlur={handleCourseTitleBlur}
                 />
@@ -268,6 +269,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         type="text"
                         placeholder="John Doe"
                         value = {course?.instructorName}
+                        maxLength={50}
                         onChange = {handleChange}
                         onBlur={handleInstructorNameBlur}
                     />
@@ -410,6 +412,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     id="location.description"
                     type="text"
                     placeholder="Optional"
+                    maxLength={50}
                     defaultValue = {course?.location?.description}
                     onChange = {handleChange}
                 />
@@ -429,6 +432,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         id="location.room"
                         type="text"
                         placeholder="Optional"
+                        maxLength={50}
                         defaultValue = {course?.location?.room}
                         onChange = {handleChange}
                     />
@@ -466,6 +470,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     type="text"
                     placeholder="123 Main St"
                     defaultValue = {course?.location?.addressLine1}
+                    maxLength={50}
                     onChange = {handleChange}
                     onBlur={handleAddressLine1Blur}
                 />
@@ -484,6 +489,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     id="location.addressLine2"
                     type="text"
                     placeholder="Optional"
+                    maxLength={50}
                     defaultValue = {course?.location?.addressLine2}
                     onChange = {handleChange}
                 />
