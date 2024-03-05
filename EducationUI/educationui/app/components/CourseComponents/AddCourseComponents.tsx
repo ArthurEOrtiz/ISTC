@@ -69,6 +69,8 @@ const AddCourseComponent: React.FC = () => {
             scheduleEnd: scheduleEnd,
             attendance: [],
         };
+
+        console.log("AddCourseComponent.handleAddClass: newClass: ", newClass);
     
         // Update the course state by adding the new class to the classes array
         if (course) {

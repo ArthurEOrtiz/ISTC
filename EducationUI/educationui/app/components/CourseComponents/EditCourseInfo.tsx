@@ -60,25 +60,29 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
 
     const handleOnClassAdd = (): void => {
         const today = new Date();
-        today.setUTCHours(9,0,0,0);
-        const todayAt9AMString = today.toISOString().slice(0, -1);
+        today.setUTCHours(16,0,0,0);
+        const todayAt9AMString = today
+        console.log("9am String ", todayAt9AMString)
        
-        today.setUTCHours(17,0,0,0);
-        const todayAt5PMString = today.toISOString().slice(0, -1);
+        today.setUTCHours(24,0,0,0);
+        const todayAt5PMString = today
+        console.log("5pm String ", todayAt5PMString)
 
 
         const newClassSchedule: ClassSchedule = {
-            classId: null,
+            classId: 0,
             courseId: course.courseId,
             scheduleStart: todayAt9AMString,
-            scheduleEnd: todayAt5PMString
+            scheduleEnd: todayAt5PMString,
+            attendance: []
         }
 
-        // Disable edit mode for all other classes 
-        setEditModeIndex(null);
-        // Add the new class with edit mode enabled 
-        setClasses(prevClasses => [...prevClasses, newClassSchedule]);
-        setEditModeIndex(classes.length);
+        console.log(newClassSchedule)
+        // // Disable edit mode for all other classes 
+        // setEditModeIndex(null);
+        // // Add the new class with edit mode enabled 
+        // setClasses(prevClasses => [...prevClasses, newClassSchedule]);
+        // setEditModeIndex(classes.length);
     }
 
 
@@ -139,6 +143,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                         className="btn btn-primary text-white m-1"
                         onClick={handleOnClassAdd}>
                             Add Class
+                    </button>
+                    <button
+                        className="btn btn-primary text-white m-1"
+                        onClick={()=> console.log(course)}>
+                            Test Course
                     </button>
                 </div>
             </div>

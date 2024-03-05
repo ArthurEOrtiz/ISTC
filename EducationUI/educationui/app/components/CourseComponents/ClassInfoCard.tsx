@@ -29,13 +29,14 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
             return null;
         }
 
-        const startDate = new Date(date);
-        const formattedDate = startDate.toLocaleDateString(
+        const localDateTime = new Date(`${date}Z`);
+
+        const formattedDate = localDateTime.toLocaleDateString(
             'en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
-                weekday: 'long'
+                weekday: 'long',
             }
         );
         return formattedDate;
@@ -50,11 +51,12 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     }
 
     const getTime = (date: string) => {
-        const startTime = new Date(date);
+        const startTime = new Date(`${date}z`);
         const formattedTime = startTime.toLocaleTimeString(
             'en-US', {
                 hour: 'numeric',
-                minute: 'numeric'
+                minute: 'numeric',
+                timeZone: 'America/Denver'
             }
         );
         return formattedTime;
