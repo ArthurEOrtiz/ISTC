@@ -64,9 +64,9 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
         classes: []
     });
 
-    // const isFormValid = istitleValid && isEmailValid && isInstructorNameValid && isAttendanceCreditValid && isCompletionCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid && isAddressLine1Valid && isCityValid && isPostalCodeValid;
+    const isFormValid = istitleValid && isEmailValid && isInstructorNameValid && isAttendanceCreditValid && isCompletionCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid && isAddressLine1Valid && isCityValid && isPostalCodeValid;
 
-    const isFormValid = true // remove after testing
+    // const isFormValid = true // remove after testing
 
     // Handlers
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -102,7 +102,6 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
             }));
         }
     };
-    
 
     const handleIntInput = (event: FormEvent<HTMLInputElement>, minValue: number, maxValue: number): void => {
         const inputValue = event.currentTarget.value;
@@ -131,7 +130,6 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
             }
         }
     };
-    
     
     const handleCourseTitleBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setTitleTouched(true);
