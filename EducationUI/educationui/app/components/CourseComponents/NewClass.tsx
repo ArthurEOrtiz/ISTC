@@ -1,4 +1,5 @@
 'use client';
+import { on } from 'events';
 import React, { useEffect, useState } from 'react';
 
 
@@ -11,12 +12,10 @@ interface NewClassProps {
 }
 
 const NewClass: React.FC<NewClassProps> = ({scheduleStart, scheduleEnd,  onDelete, onScheduleStartChange, onScheduleEndChange }) => {
-    // console.log("NewClass.scheduleStart: ", scheduleStart);
-    // console.log("NewClass.scheduleEnd: ", scheduleEnd);
-    
     const [classDate, setClassDate] = useState('');
     const [start, setStart] = useState('');
     const [end, setEnd] = useState('');
+
 
     useEffect(() => {
         // Extract date and time components from schedulStart. 
@@ -36,15 +35,27 @@ const NewClass: React.FC<NewClassProps> = ({scheduleStart, scheduleEnd,  onDelet
         setEnd(endTimeString);
     }, [scheduleEnd]);
     
+    // Handlers 
     const handleRemoveClick = () => {
         onDelete();
     };
 
     const handleClassDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        // if the date is in invalid than `date` will be and emty string.
         const date = event.target.value;
-        setClassDate(date);
-        const combinedDateTime = new Date(`${date}T${start}:00`);
-        onScheduleStartChange(combinedDateTime);
+    
+        if (!date) {
+
+            event.target.value = new Date(classDate).toISOString().split('T')[0];
+            return;
+
+        } else {
+            setClassDate(date);
+            const combinedStartDateTime = new Date(`${date}T${start}:00`);
+            const combinedEndDateTime = new Date(`${date}T${end}:00`);
+            onScheduleStartChange(combinedStartDateTime);
+            onScheduleEndChange(combinedEndDateTime);
+        }
     }
 
     const handleStartTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,3 +127,5 @@ const NewClass: React.FC<NewClassProps> = ({scheduleStart, scheduleEnd,  onDelet
 };
 
 export default NewClass;
+
+

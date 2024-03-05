@@ -64,14 +64,14 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
         classes: []
     });
 
-    const isFormValid = istitleValid && isEmailValid && isInstructorNameValid && isAttendanceCreditValid && isCompletionCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid && isAddressLine1Valid && isCityValid && isPostalCodeValid;
+    // const isFormValid = istitleValid && isEmailValid && isInstructorNameValid && isAttendanceCreditValid && isCompletionCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid && isAddressLine1Valid && isCityValid && isPostalCodeValid;
+
+    const isFormValid = true // remove after testing
 
     // Handlers
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("New Course Form", course);
         onSubmit(course);
-
     }
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -106,24 +106,32 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
     const handleIntInput = (event: FormEvent<HTMLInputElement>, minValue: number, maxValue: number): void => {
         const inputValue = event.currentTarget.value;
-        const parsedValue = parseInt(inputValue);
         const prevValue = event.currentTarget.getAttribute('data-prev-value');
     
-        if (inputValue === '') {
+        // Remove any non-alphanumeric characters
+        const sanitizedValue = inputValue.replace(/[^0-9]/g, '');
+    
+        if (sanitizedValue === '') {
             // If input is empty, clear the previous value attribute
             event.currentTarget.removeAttribute('data-prev-value');
-        } else if (isNaN(parsedValue) || parsedValue < minValue || parsedValue > maxValue) {
-            // If input is incorrect, restore the previous value if available
-            if (prevValue !== null) {
-                event.currentTarget.value = prevValue;
-            } else {
-                event.currentTarget.value = '';
-            }
         } else {
-            // Store the current value as the previous value
-            event.currentTarget.setAttribute('data-prev-value', inputValue);
+            const parsedValue = parseInt(sanitizedValue);
+    
+            if (isNaN(parsedValue) || parsedValue < minValue || parsedValue > maxValue) {
+                // If input is incorrect, restore the previous value if available
+                if (prevValue !== null) {
+                    event.currentTarget.value = prevValue;
+                } else {
+                    event.currentTarget.value = '';
+                }
+            } else {
+                // Store the current value as the previous value
+                event.currentTarget.setAttribute('data-prev-value', sanitizedValue);
+                event.currentTarget.value = sanitizedValue;
+            }
         }
-    }
+    };
+    
     
     const handleCourseTitleBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setTitleTouched(true);

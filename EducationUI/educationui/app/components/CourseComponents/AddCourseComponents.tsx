@@ -6,10 +6,15 @@ import CourseInfoCard from './CourseInfoCard';
 import NewClass from './NewClass';
 import SelectTopicModal from '../TopicsComponents/SelectTopicModal';
 import axios from 'axios';
+import ConfirmationModal from '../ConfirmationModal';
+import { useRouter } from 'next/navigation';
 
 const AddCourseComponent: React.FC = () => {    
     const [course, setCourse] = useState<Course>();
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
+    const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
+    const router = useRouter();
     
     useEffect(() => {
         window.scrollTo({
@@ -25,10 +30,11 @@ const AddCourseComponent: React.FC = () => {
     
         let scheduleStart;
         let scheduleEnd;
-    
+        
+
         if (course && course.classes.length > 0) {
             // If there are existing classes, get the last class's end time
-            const lastClassEnd = new Date(course.classes[course.classes.length - 1].scheduleEnd);
+            const lastClassEnd = new Date(course.classes[course.classes.length - 1].scheduleStart);
             
             // Increment the date by one day
             const nextDay = new Date(lastClassEnd);
@@ -69,19 +75,8 @@ const AddCourseComponent: React.FC = () => {
         setShowSelectTopicModal(true);
     }
 
-
-
     const handleSaveCourse = async () => {
-        try {
-            // Perform the POST request to save the course
-            const response = await axios.post("https://localhost:7144/Course/PostCourse", course);
-
-            // Log the response or handle it as needed
-            console.log("Response from server:", response);
-        } catch (error) {
-            // Log and handle any errors
-            console.error("Error saving course:", error);
-        }
+        setShowConfirmationModal(true);
     };
 
 
@@ -94,13 +89,13 @@ const AddCourseComponent: React.FC = () => {
     }
 
     const handleCourseInfoCardOnApply = (course: Course) => {
-        console.log("AddCourseComponent.handleCourseInfoCardOnApply: course: ", course);
+        //console.log("AddCourseComponent.handleCourseInfoCardOnApply: course: ", course);
         setCourse(course);
     }
 
     // NewClass
     const handleNewClassOnDelete = (index: number) => {
-        console.log("AddCourseComponent.handleNewClassOnDelete: index: ", index);
+        //console.log("AddCourseComponent.handleNewClassOnDelete: index: ", index);
         if (course) {
             const newClasses = [...course.classes];
             // console.log("AddCourseComponent.handleNewClassOnDelete: newClasses: ", newClasses);
@@ -152,6 +147,45 @@ const AddCourseComponent: React.FC = () => {
             });
         }
 
+    }
+
+    // ConfirmationModal
+    const handleConfirmationModalOnConfirm = async () => {
+        //console.log("AddCourseComponent.handleConfirmationModalOnConfirm");
+        setIsSaving(true);
+        
+        try {
+            setShowConfirmationModal(false);
+            await saveCourseToDatabase();
+
+        } catch (error) {
+            throw new Error(error as string);
+        } finally {
+            router.push('/admin/editcourse/edit');
+            // this might not do anything. 
+            setIsSaving(false);
+            setCourse(undefined);
+        }
+    }
+
+
+    const handleConfirmationModalOnCancel = () => {
+        setShowConfirmationModal(false);
+    }
+
+    // Additional Methods
+
+    const saveCourseToDatabase = async () => {
+        try {
+            // Perform the POST request to save the course
+            const response = await axios.post("https://localhost:7144/Course/PostCourse", course);
+
+            if (response.status !== 200) {
+                throw new Error(`Failed to save course. Status: ${response.status} - ${response.statusText}`);
+            } 
+        } catch (error) {
+            throw new Error(error as string);
+        }
     }
 
     return (
@@ -209,6 +243,7 @@ const AddCourseComponent: React.FC = () => {
                 </>
 
             )}
+            {/* Dialogs - also known as Modals - and the saving spinner */}
             {showSelectTopicModal && (
                 <SelectTopicModal 
                     open={showSelectTopicModal} 
@@ -217,6 +252,24 @@ const AddCourseComponent: React.FC = () => {
                     topics={course?.topics || []} 
                     /> 
             )}
+            {showConfirmationModal && (
+                <ConfirmationModal 
+                    title={'Save Course'} 
+                    message={'Are you sure you want to save this course to the database?'} 
+                    onConfirm={handleConfirmationModalOnConfirm} 
+                    onCancel={handleConfirmationModalOnCancel}
+                />
+            )}
+            {isSaving && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="absolute inset-0 bg-black opacity-50"></div>
+                    <div className="bg-white p-8 rounded-lg z-50">
+                        <h2 className="text-xl font-semibold mb-4">Saving Course...</h2>
+                        <span className="loading loading-spinner text-primary"></span>
+                    </div>
+                </div>
+                )
+            } 
 
         </>
     );
