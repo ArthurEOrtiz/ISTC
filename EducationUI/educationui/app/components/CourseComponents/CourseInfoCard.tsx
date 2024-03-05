@@ -3,10 +3,11 @@ import { useState } from "react";
 
 interface CourseCardProps {
     course : Course; 
+    onApply: (course: Course) => void;
 };
 
 
-const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
+const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editCourse, setEditCourse] = useState<Course>(course);
 
@@ -55,8 +56,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
         }
 
         if (editMode) {
-            // Save the course
-            console.log(editCourse);
+            onApply(editCourse);
         }
     }
 
@@ -101,6 +101,14 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         />
                         : course?.description}</p>
+                <p><strong>Topics:</strong> {course?.topics?.map((topic, index) => (
+                    <span key={index}>
+                        {topic.title}
+                        {index !== (course?.topics?.length ?? 0) - 1 && ', '}
+                    </span>
+                ))}
+                </p>
+
             </div>
 
             <div className="flex flex-wrap -mx-1">
@@ -197,7 +205,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
                             defaultValue={editCourse?.location?.room}
                             onChange={(e) => handleLocationInputChange(e, "room")}
                             className="border border-gray-300 rounded"/>
-                            : course?.location?.description}</p>
+                            : course?.location?.room}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
                     <p><strong>Remote Link:</strong> {editMode ? 
@@ -264,7 +272,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course}) => {
             <button 
                 className="btn btn-primary text-white m-1"
                 onClick={toggleEditMode}>
-                    {editMode ? 'Save' : 'Edit'}
+                    {editMode ? 'Apply' : 'Edit'}
             </button>
         </div>
     );

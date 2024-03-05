@@ -1,171 +1,146 @@
 'use client';
-import React, { FormEvent, FocusEvent, useState, useEffect } from 'react';
-import { CourseFormData } from '@/app/shared/types/sharedTypes';
-import CharacterCounter from '../CharacterCounter';
+import { Course, Location, Topic } from "@/app/shared/types/sharedTypes";
+import { ChangeEvent, FocusEvent, FormEvent, useState } from "react";
+import CharacterCounter from "../CharacterCounter";
 
-interface CourseFormProps {
-    onSubmit: (formData: CourseFormData) => void;
+interface NewCourseFormProps {
+    onSubmit: (course : Course) => void;
 }
 
-const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formData: CourseFormData) => void}) => {
-    
-    const initialFormData : CourseFormData  = {
-        courseId: null,
+const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
+    const [titleTouched, setTitleTouched] = useState<boolean>(false);
+    const [istitleValid, setIsTitleValid] = useState<boolean>();
+
+    const [emailTouched, setEmailTouched] = useState<boolean>(false);  
+    const [isEmailValid, setIsEmailValid] = useState<boolean>();
+
+    const [instructorNameTouched, setInstructorNameTouched] = useState<boolean>(false);
+    const [isInstructorNameValid, setIsInstructorNameValid] = useState<boolean>();
+
+    const [attendanceCreditTouched, setAttendanceCreditTouched] = useState<boolean>(false);
+    const [isAttendanceCreditValid, setIsAttendanceCreditValid] = useState<boolean>();
+
+    const [completionCreditTouched, setCompletionCreditTouched] = useState<boolean>(false);
+    const [isCompletionCreditValid, setIsCompletionCreditValid] = useState<boolean>();
+
+    const [maxAttendanceTouched, setMaxAttendanceTouched] = useState<boolean>(false);
+    const [isMaxAttendanceValid, setIsMaxAttendanceValid] = useState<boolean>();
+
+    const [enrollmentDeadlineTouched, setEnrollmentDeadlineTouched] = useState<boolean>(false);
+    const [isEnrollmentDeadlineValid, setIsEnrollmentDeadlineValid] = useState<boolean>();
+
+    const [addressLine1Touched, setAddressLine1Touched] = useState<boolean>(false);
+    const [isAddressLine1Valid, setIsAddressLine1Valid] = useState<boolean>();
+
+    const [cityTouched, setCityTouched] = useState<boolean>(false);
+    const [isCityValid, setIsCityValid] = useState<boolean>();
+
+    const [postalCodeTouched, setPostalCodeTouched] = useState<boolean>(false);
+    const [isPostalCodeValid, setIsPostalCodeValid] = useState<boolean>();
+
+    const [course , setCourse] = useState<Course>({
+        courseId: 0,
         title: '',
         description: '',
-        instructorName: '',
-        instructorEmail: '',
         attendanceCredit: 0,
         completionCredit: 0,
         maxAttendance: 0,
         enrollmentDeadline: '',
+        instructorName: '',
+        instructorEmail: '',
         pdf: '',
-        locationDescription: '',
-        room: '',
-        remoteLink: '',
-        addressLine1: '',
-        addressLine2: '',
-        city: '',
-        state: 'ID',
-        postalCode: ''
-    }
-
-    const [formData, setFormData] = useState<CourseFormData>(() => {
-        let savedFormData;
-        if (typeof localStorage !== 'undefined') {
-            savedFormData = localStorage.getItem('courseFormData');
-        }
-        return savedFormData ? JSON.parse(savedFormData) : initialFormData;
+        location: {
+            locationId: 0,
+            description: '',
+            room: '',
+            remoteLink: '',
+            addressLine1: '',
+            addressLine2: '',
+            city: '',
+            state: 'ID',
+            postalCode: ''
+        },
+        topics: [],
+        classes: []
     });
 
-    const validatEamil = (email: any) => {
-        const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(email);
+    // const isFormValid = istitleValid && isEmailValid && isInstructorNameValid && isAttendanceCreditValid && isCompletionCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid && isAddressLine1Valid && isCityValid && isPostalCodeValid;
+
+    const isFormValid = true // remove after testing
+
+    // Handlers
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        onSubmit(course);
     }
 
-    const validateCompletionCredit = (value: string): boolean => {
-        const parsedValue = parseInt(value);
-        return parsedValue >= attendanceCredit 
-    }
-
-    const validateEnrollmentDeadline = (value: string): boolean => {
-        const selectedDate = new Date(value);
-        return selectedDate > new Date();
-    }
-
-    const [titleTouched, setTitleTouched] = useState<boolean>(initialFormData.title !== '');
-    const [istitleValid, setIsTitleValid] = useState<boolean>(initialFormData.title !== '');
-
-    const [emailTouched, setEmailTouched] = useState<boolean>(initialFormData.instructorEmail !== '');  
-    const [isEmailValid, setIsEmailValid] = useState<boolean>(validatEamil(initialFormData.instructorEmail));
-
-    const [instructorNameTouched, setInstructorNameTouched] = useState<boolean>(initialFormData.instructorName !== '');
-    const [isInstructorNameValid, setIsInstructorNameValid] = useState<boolean>(initialFormData.instructorName !== '');
-
-    const [attendanceCreditTouched, setAttendanceCreditTouched] = useState<boolean>(initialFormData.attendanceCredit !== 0);
-    const [isAttendanceCreditValid, setIsAttendanceCreditValid] = useState<boolean>(initialFormData.attendanceCredit !== 0);
-
-    const [attendanceCredit, setAttendanceCredit] = useState<number>(0);
-
-    const [completionCreditTouched, setCompletionCreditTouched] = useState<boolean>(initialFormData.completionCredit !== 0);
-    const [isCompletionCreditValid, setIsCompletionCreditValid] = useState<boolean>(initialFormData.completionCredit >= attendanceCredit);
-
-    const [maxAttendanceTouched, setMaxAttendanceTouched] = useState<boolean>(initialFormData.maxAttendance !== 0);
-    const [isMaxAttendanceValid, setIsMaxAttendanceValid] = useState<boolean>(initialFormData.maxAttendance !== 0);
-
-    const [enrollmentDeadlineTouched, setEnrollmentDeadlineTouched] = useState<boolean>(initialFormData.enrollmentDeadline !== '');
-    const [isEnrollmentDeadlineValid, setIsEnrollmentDeadlineValid] = useState<boolean>(validateEnrollmentDeadline(initialFormData.enrollmentDeadline));
-
-    const [addressLine1Touched, setAddressLine1Touched] = useState<boolean>(initialFormData.addressLine1 !== '');
-    const [isAddressLine1Valid, setIsAddressLine1Valid] = useState<boolean>(initialFormData.addressLine1 !== '');
-
-    const [cityTouched, setCityTouched] = useState<boolean>(initialFormData.city !== '');
-    const [isCityValid, setIsCityValid] = useState<boolean>(initialFormData.city !== '');
-
-    const [postalCodeTouched, setPostalCodeTouched] = useState<boolean>(initialFormData.postalCode !== '');
-    const [isPostalCodeValid, setIsPostalCodeValid] = useState<boolean>(initialFormData.postalCode !== '');
-
-    useEffect(() => {
-        localStorage.setItem('courseFormData', JSON.stringify(formData));
-
-        setIsTitleValid(formData.title !== '');
-        setIsEmailValid(validatEamil(formData.instructorEmail));
-        setIsInstructorNameValid(formData.instructorName !== '');
-        setIsAttendanceCreditValid(formData.attendanceCredit !== 0);
-        setIsCompletionCreditValid(validateCompletionCredit(formData.completionCredit.toString()));
-        setIsMaxAttendanceValid(formData.maxAttendance !== 0);
-        setIsEnrollmentDeadlineValid(validateEnrollmentDeadline(formData.enrollmentDeadline));
-        setIsAddressLine1Valid(formData.addressLine1 !== '');
-        setIsCityValid(formData.city !== '');
-        setIsPostalCodeValid(formData.postalCode !== '');
-    }, [formData]);
-
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
-        const { id, value } = event.currentTarget;
-
-        // speciail case for description
-        let updatedValue = value;
-        if (id === "description" && value.length > 255) {
-            updatedValue = value.substring(0, 255);
-
-            setFormData((prev) => ({
-                ...prev,
-                [id]: updatedValue
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { id, value } = e.target;
+    
+        if (id === 'description') {
+            // Limit description to 255 characters
+            const truncatedValue = value.slice(0, 255);
+            setCourse((prevCourse) => ({
+                ...prevCourse,
+                description: truncatedValue,
             }));
-
+        } else if (id.startsWith('location.')) {
+            // Handle nested location fields
+            const locationField = id.split('.')[1];
+            setCourse((prevCourse) => ({
+                ...prevCourse,
+                location: {
+                    ...prevCourse.location,
+                    [locationField]: value,
+                },
+            }));
         } else {
-            setFormData((prev) => ({
-                ...prev,
-                [id]: updatedValue
+            // Handle other top-level fields
+            setCourse((prevCourse) => ({
+                ...prevCourse,
+                [id]: value,
             }));
         }
-  
     };
-
-    const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
-        event.preventDefault();
-
-        onSubmit(formData);
-    }
+    
 
     const handleIntInput = (event: FormEvent<HTMLInputElement>, minValue: number, maxValue: number): void => {
         const inputValue = event.currentTarget.value;
-        const parsedValue = parseInt(inputValue);
         const prevValue = event.currentTarget.getAttribute('data-prev-value');
     
-        if (inputValue === '') {
+        // Remove any non-alphanumeric characters
+        const sanitizedValue = inputValue.replace(/[^0-9]/g, '');
+    
+        if (sanitizedValue === '') {
             // If input is empty, clear the previous value attribute
             event.currentTarget.removeAttribute('data-prev-value');
-        } else if (isNaN(parsedValue) || parsedValue < minValue || parsedValue > maxValue) {
-            // If input is incorrect, restore the previous value if available
-            if (prevValue !== null) {
-                event.currentTarget.value = prevValue;
-            } else {
-                event.currentTarget.value = '';
-            }
         } else {
-            // Store the current value as the previous value
-            event.currentTarget.setAttribute('data-prev-value', inputValue);
+            const parsedValue = parseInt(sanitizedValue);
+    
+            if (isNaN(parsedValue) || parsedValue < minValue || parsedValue > maxValue) {
+                // If input is incorrect, restore the previous value if available
+                if (prevValue !== null) {
+                    event.currentTarget.value = prevValue;
+                } else {
+                    event.currentTarget.value = '';
+                }
+            } else {
+                // Store the current value as the previous value
+                event.currentTarget.setAttribute('data-prev-value', sanitizedValue);
+                event.currentTarget.value = sanitizedValue;
+            }
         }
-    }
+    };
     
-    const handlePostalCodeInput = (event: FormEvent<HTMLInputElement>): void => {
-        handleIntInput(event, 0, 99999);
-    }
-    
-    const handleCreditInput = (event: FormEvent<HTMLInputElement>): void => {
-        handleIntInput(event, 0, 100);
-    }
-
-    const handleMaxAttendanceInput = (event: FormEvent<HTMLInputElement>): void => {
-        handleIntInput(event, 1, 999);
-    }
-
     
     const handleCourseTitleBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setTitleTouched(true);
-        const isValid = event.target.value.length > 0;
-        setIsTitleValid(isValid);
+        setIsTitleValid(!!event.target.value);
+    }
+
+    const handleInstructorNameBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
+        setInstructorNameTouched(true);
+        setIsInstructorNameValid(!!event.target.value);
     }
 
     const handleEmailBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
@@ -174,29 +149,31 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
         setIsEmailValid(isValid);
     }
 
-    const handleInstructorNameBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
-        setInstructorNameTouched(true);
-        const isValid = event.target.value.length > 0;
-        setIsInstructorNameValid(isValid);
+    const handleCreditInput = (event: FormEvent<HTMLInputElement>): void => {
+        handleIntInput(event, 0, 100);
     }
 
     const handleAttendanceCreditBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setAttendanceCreditTouched(true);
         const isValid = event.target.value.length > 0;
-        setIsAttendanceCreditValid(isValid);
-        const parsedValue = parseInt(event.target.value);
-        setAttendanceCredit(parsedValue);
+        setIsAttendanceCreditValid(isValid); 
     }
 
     const handleCompletionCreditBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setCompletionCreditTouched(true);
-        const isValid = validateCompletionCredit(event.target.value);
+        const completionCreditValue = parseInt(event.target.value);
+        const attendanceCreditValue = course.attendanceCredit;
+        const isValid = completionCreditValue >= attendanceCreditValue;
         setIsCompletionCreditValid(isValid);
+    }
+
+    const handleMaxAttendanceInput = (event: FormEvent<HTMLInputElement>): void => {
+        handleIntInput(event, 1, 999);
     }
 
     const handleMaxAttendanceBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setMaxAttendanceTouched(true);
-        const isValid = event.target.value.length > 0;
+        const isValid = event.target.value !== '' && parseInt(event.target.value) > 0 && parseInt(event.target.value) <= 999;
         setIsMaxAttendanceValid(isValid);
     }
 
@@ -208,32 +185,35 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
 
     const handleAddressLine1Blur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setAddressLine1Touched(true);
-        const isValid = event.target.value.length > 0;
-        setIsAddressLine1Valid(isValid);
+        setIsAddressLine1Valid(!!event.target.value);
     }
 
     const handleCityBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setCityTouched(true);
-        const isValid = event.target.value.length > 0;
-        setIsCityValid(isValid);
+        setIsCityValid(!!event.target.value);
+    }
+
+    const handlePostalCodeInput = (event: FormEvent<HTMLInputElement>): void => {
+        handleIntInput(event, 0, 99999);
     }
 
     const handlePostalCodeBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setPostalCodeTouched(true);
-        const isValid = event.target.value.length > 0;
+        const isValid = event.target.value !== '' && parseInt(event.target.value) > 0 && parseInt(event.target.value) <= 99999;
         setIsPostalCodeValid(isValid);
     }
 
-    const isFormValid = istitleValid &&
-        isEmailValid && 
-        isInstructorNameValid && 
-        isAttendanceCreditValid &&
-        isCompletionCreditValid && 
-        isMaxAttendanceValid &&
-        isEnrollmentDeadlineValid &&
-        isAddressLine1Valid &&
-        isCityValid && 
-        isPostalCodeValid;
+    // helper validation methods.
+    const validatEamil = (email: any) => {
+        const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    }
+
+    const validateEnrollmentDeadline = (value: string): boolean => {
+        const selectedDate = new Date(value);
+        return selectedDate > new Date();
+    }
+
 
     return (
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
@@ -250,7 +230,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                     id="title"
                     type="text"
                     placeholder="Title"
-                    value = {formData.title}
+                    value = {course?.title}
                     onChange = {handleChange}
                     onBlur={handleCourseTitleBlur}
                 />
@@ -268,10 +248,11 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     id="description"
                     placeholder="Optional"
-                    value = {formData.description}
+                    value = {course?.description}
+                    maxLength={255}
                     onChange = {handleChange}
                 />
-                <CharacterCounter value={formData.description} limit={255} />
+                <CharacterCounter value={course.description} limit={255} />
             </div>
 
             <div className="flex justify-between">
@@ -288,7 +269,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                         id="instructorName"
                         type="text"
                         placeholder="John Doe"
-                        value = {formData.instructorName}
+                        value = {course?.instructorName}
                         onChange = {handleChange}
                         onBlur={handleInstructorNameBlur}
                     />
@@ -307,7 +288,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                         id="instructorEmail"
                         type="email"
                         placeholder="valid@Email.com"
-                        value = {formData.instructorEmail}
+                        value = {course?.instructorEmail}
                         onChange = {handleChange}
                         onBlur={handleEmailBlur}
                     />
@@ -331,7 +312,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                         type="text"
                         onInput={handleCreditInput}
                         placeholder="1-100"
-                        value = {formData.attendanceCredit}
+                        value = {course?.attendanceCredit}
                         onChange = {handleChange}
                         onBlur={handleAttendanceCreditBlur}
                     />
@@ -351,7 +332,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                         type="text"
                         onInput={handleCreditInput}
                         placeholder="1-100"
-                        value = {formData.completionCredit}
+                        value = {course?.completionCredit}
                         onChange = {handleChange}
                         onBlur={handleCompletionCreditBlur}
                     />
@@ -371,7 +352,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                         type="text"
                         onInput={handleMaxAttendanceInput}
                         placeholder="1-999"
-                        value = {formData.maxAttendance}
+                        value = {course?.maxAttendance}
                         onChange = {handleChange}
                         onBlur={handleMaxAttendanceBlur}
                     />
@@ -393,7 +374,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                         id="enrollmentDeadline"
                         min = {new Date().toISOString().split('T')[0]}
                         type="date"
-                        value = {formData.enrollmentDeadline}
+                        value = {course?.enrollmentDeadline}
                         onChange = {handleChange}
                         onBlur={handleEnrollmentDeadlineBlur}
                     />
@@ -412,7 +393,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                         id="pdf"
                         type="text"
                         placeholder='PDF URL, Optional'
-                        value = {formData.pdf}
+                        value = {course?.pdf}
                         onChange = {handleChange}
                     />
                 </div>
@@ -422,16 +403,16 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
             <div className="mb-4">
                 <label
                     className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="locationDescription"
+                    htmlFor="location.description"
                 >
                     Location Description
                 </label>
                 <input
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="locationDescription"
+                    id="location.description"
                     type="text"
                     placeholder="Optional"
-                    value = {formData.locationDescription}
+                    defaultValue = {course?.location?.description}
                     onChange = {handleChange}
                 />
             </div>
@@ -441,16 +422,16 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                 <div className="mb-4 w-1/2 pr-2">
                     <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="room"
+                        htmlFor="location.room"
                         >
                         Room
                     </label>
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="room"
+                        id="location.room"
                         type="text"
                         placeholder="Optional"
-                        value = {formData.room}
+                        defaultValue = {course?.location?.room}
                         onChange = {handleChange}
                     />
                 </div>
@@ -458,16 +439,16 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                 <div className="mb-4 w-1/2 pl-2">
                     <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="remoteLink"
+                        htmlFor="location.remoteLink"
                     >
                         Remote Link
                     </label>
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="remoteLink"
+                        id="location.remoteLink"
                         type="url"
                         placeholder="https://zoom.us/j/1234567890?pwd=abc123"
-                        value = {formData.remoteLink}
+                        defaultValue = {course?.location?.remoteLink}
                         onChange = {handleChange}
                     />
                 </div>
@@ -477,16 +458,16 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
             <div className="mb-4">
                 <label
                     className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="addressLine1"
+                    htmlFor="location.addressLine1"
                 >
                     Address Line 1
                 </label>
                 <input
                     className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isAddressLine1Valid && addressLine1Touched ? 'border-red-500' : ''}`}
-                    id="addressLine1"
+                    id="location.addressLine1"
                     type="text"
                     placeholder="123 Main St"
-                    value = {formData.addressLine1}
+                    defaultValue = {course?.location?.addressLine1}
                     onChange = {handleChange}
                     onBlur={handleAddressLine1Blur}
                 />
@@ -496,16 +477,16 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
             <div className="mb-4">
                 <label
                     className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="addressLine2"
+                    htmlFor="location.addressLine2"
                 >
                     Address Line 2
                 </label>
                 <input
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
-                    id="addressLine2"
+                    id="location.addressLine2"
                     type="text"
                     placeholder="Optional"
-                    value = {formData.addressLine2}
+                    defaultValue = {course?.location?.addressLine2}
                     onChange = {handleChange}
                 />
             </div>
@@ -515,16 +496,16 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                 <div className="mb-4 w-1/2 pr-2">
                     <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="city"
+                        htmlFor="location.city"
                         >
                         City
                     </label>
                     <input
                         className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isCityValid && cityTouched ? 'border-red-500' : ''}`}
-                        id="city"
+                        id="location.city"
                         type="text"
                         placeholder="Boise"
-                        value = {formData.city}
+                        defaultValue = {course?.location?.city}
                         onChange = {handleChange}
                         onBlur = {handleCityBlur}
                     />
@@ -534,15 +515,15 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                 <div className="mb-4 w-1/2 pl-2">
                     <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="state"
+                        htmlFor="location.state"
                     >
                         State
                     </label>
                     <select
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="state"
+                        id="location.state"
                         onChange = {handleChange}
-                        value = {formData.state}
+                        defaultValue = {course?.location?.state}
                     >
                         <option value="AL">Alabama</option>
                         <option value="AK">Alaska</option>
@@ -600,17 +581,17 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                 <div className="mb-4 w-1/2 pl-2">
                     <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="postalCode"
+                        htmlFor="location.postalCode"
                     >
                         Zip Code
                     </label>
                     <input
                         className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isPostalCodeValid && postalCodeTouched ? 'border-red-500' : ''}`}
-                        id="postalCode"
+                        id="location.postalCode"
                         type="text"
                         placeholder="83706"
                         onInput = {handlePostalCodeInput}
-                        value = {formData.postalCode}
+                        defaultValue = {course?.location?.postalCode}
                         onChange = {handleChange}
                         onBlur = {handlePostalCodeBlur}
                     />
@@ -630,11 +611,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ onSubmit }: {onSubmit: (formDat
                 {!isFormValid && <p className="text-red-500 text-xs italic w-1/2">Please fill out all required fields.</p>}
             </div>
         </form>
-  )
+  );
 }
 
-export default CourseForm
-
-
-
+export default NewCourseForm;
 

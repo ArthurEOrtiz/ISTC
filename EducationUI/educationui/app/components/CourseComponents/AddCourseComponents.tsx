@@ -1,187 +1,278 @@
 'use client';
-import CourseForm from './CourseForm';
-import ClassForm from './ClassForm';
-import { Course, ClassSchedule, CourseFormData } from '@/app/shared/types/sharedTypes';
-import { useState } from 'react';
-import NewClassMenu from './NewClassMenu';
-import ConfirmationDialog from '../ConfirmationDialog';
+import { Course, Topic } from '@/app/shared/types/sharedTypes';
+import { useEffect, useState } from 'react';
+import NewCourseForm from './NewCourseForm';
+import CourseInfoCard from './CourseInfoCard';
+import NewClass from './NewClass';
+import SelectTopicModal from '../TopicsComponents/SelectTopicModal';
 import axios from 'axios';
+import ConfirmationModal from '../ConfirmationModal';
 import { useRouter } from 'next/navigation';
 
 const AddCourseComponent: React.FC = () => {    
-    const [courseFormData, setCourseFormData] = useState<CourseFormData | null>(null); 
-    const [isCourseFormVisible, setIsCourseFormVisible] = useState<boolean>(true);
-    const [classes, setClasses] = useState<{ scheduleDate: Date; startTime: string; endTime: string; }[]>([]);
-    const [classDate, setClassDate] = useState<Date>(new Date());
-    const [startTime, setStartTime] = useState<string>("09:00");
-    const [endTime, setEndTime] = useState<string>("17:00");
-    const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
+    const [course, setCourse] = useState<Course>();
+    const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
+    const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const router = useRouter();
-
-    const handleFormSubmit = (courseFormData: CourseFormData) =>{
-        setCourseFormData(courseFormData);
-        setIsCourseFormVisible(false); 
+    
+    useEffect(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth"
+        });
     }
+    , [course?.classes.length]);
 
-    const handleBackToCourseForm = () => {
-        setIsCourseFormVisible(true);
-    }
-
-    const addClass = () => {
-        // Calculate the date for the new class
+    // Event Handlers this component. 
+    const handleAddClass = () => {
         const today = new Date();
-        let nextClassDate;
-        if (classes.length === 0) {
-            nextClassDate = today;
+    
+        let scheduleStart;
+        let scheduleEnd;
+        
+
+        if (course && course.classes.length > 0) {
+            // If there are existing classes, get the last class's end time
+            const lastClassEnd = new Date(course.classes[course.classes.length - 1].scheduleStart);
+            
+            // Increment the date by one day
+            const nextDay = new Date(lastClassEnd);
+            nextDay.setDate(nextDay.getDate() + 1);
+    
+            // Set the start time to 9 AM of the next day
+            scheduleStart = new Date(nextDay.getFullYear(), nextDay.getMonth(), nextDay.getDate(), 9, 0);
+    
+            // Set the end time to 5 PM of the same day
+            scheduleEnd = new Date(nextDay.getFullYear(), nextDay.getMonth(), nextDay.getDate(), 17, 0);
         } else {
-            nextClassDate = new Date(new Date(classDate.getTime() + 86400000));
+            // If there are no existing classes, set the start time to 9 AM of today
+            scheduleStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 0);
+            
+            // Set the end time to 5 PM of today
+            scheduleEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 17, 0);
+        }
+    
+        // Create the new class object
+        const newClass = {
+            classId: 0,
+            courseId: 0,
+            scheduleStart: scheduleStart,
+            scheduleEnd: scheduleEnd,
+            attendance: [],
+        };
+    
+        // Update the course state by adding the new class to the classes array
+        if (course) {
+            setCourse({
+                ...course,
+                classes: [...course.classes, newClass],
+            });
+        };
+    };
+
+    const handleAddTopic = () => {
+        setShowSelectTopicModal(true);
+    }
+
+    const handleSaveCourse = async () => {
+        setShowConfirmationModal(true);
+    };
+
+
+    // Event Handlers for Components
+
+    // NewCourseForm
+    const handleNewCourseFormOnSubmit = (course: Course) => {
+        // console.log("AddCourseComponent.handleNewCourseFormOnSubmit: course: ", course);
+        setCourse(course);
+    }
+
+    const handleCourseInfoCardOnApply = (course: Course) => {
+        //console.log("AddCourseComponent.handleCourseInfoCardOnApply: course: ", course);
+        setCourse(course);
+    }
+
+    // NewClass
+    const handleNewClassOnDelete = (index: number) => {
+        //console.log("AddCourseComponent.handleNewClassOnDelete: index: ", index);
+        if (course) {
+            const newClasses = [...course.classes];
+            // console.log("AddCourseComponent.handleNewClassOnDelete: newClasses: ", newClasses);
+            newClasses.splice(index, 1); // Remove the class at the specified index
+            // console.log("AddCourseComponent.handleNewClassOnDelete: newClasses: ", newClasses);
+            setCourse({
+                ...course,
+                classes: newClasses
+            });
+        }
+    }
+
+    const handleNewClassOnScheduleStartChange = (index: number, date: Date) => {
+        // console.log("AddCourseComponent.handleNewClassOnDateChange: index: ", index, " date: ", date);
+        if (course) {
+            const newClasses = [...course.classes];
+            newClasses[index].scheduleStart = date;
+            setCourse({
+                ...course,
+                classes: newClasses
+            });
+        }
+    }
+
+    const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
+        // console.log("AddCourseComponent.handleNewClassOnDateChange: index: ", index, " date: ", date);
+        if (course) {
+            const newClasses = [...course.classes];
+            newClasses[index].scheduleEnd = date;
+            setCourse({
+                ...course,
+                classes: newClasses
+            });
+        }
+    }
+
+    // SelectTopicModal
+    const handleSelectTopicModalOnClose = () => {
+        setShowSelectTopicModal(false);
+    }
+
+    const handleSelectTopicModalOnSelect = (topic: Topic[]) => {
+        //console.log("AddCourseComponent.handleSelectTopicModalOnSelect: topic: ", topic);
+        
+        if (course) {
+            setCourse({
+                ...course,
+                topics: topic
+            });
         }
 
-        setClassDate(nextClassDate);
-
-        const newClass = {
-            scheduleDate: nextClassDate,
-            startTime: startTime,
-            endTime: endTime,
-        };
-
-        setClasses(previousClasses => [...previousClasses, newClass]);
-    };
-
-    const deleteClass = (index: number) => {
-        setClasses(previousClasses => {
-            const updatedClasses = previousClasses.filter((_, i) => i !== index);
-            if (updatedClasses.length === 0) {
-                setClassDate(new Date()); // Reset classDate to today if all classes are deleted
-            }
-            return updatedClasses;
-        });
-    };
-
-    const handleClassDateChange = (date: Date) => {
-        setClassDate(date);
-    };
-
-    const handleStartTimeChange = (time: string) => {
-        setStartTime(time);
     }
 
-    const handleEndTimeChange = (time: string) => {
-        setEndTime(time);
-    }
-
-    const onSaveCourse = (): void  => {
-        console.log("Save course");
-        setShowConfirmationDialog(true);
-    }
-
-    const handleCancelSave = () => {
-        setShowConfirmationDialog(false);
-    }
-
-    const handleConfirmSave = () => {   
-        setShowConfirmationDialog(false);
-        const transformedClasses = transformClasses();
-        const combinedData = combineData(transformedClasses);
-        handleSaveToApi(combinedData);
-    }
-
-    const transformClasses = (): ClassSchedule[] => {
-        const transformedClasses = classes.map(({ scheduleDate, startTime, endTime }) => {
-            // Convert scheduleDate string to Date object
-            const date = new Date(scheduleDate);
-            
-            // Split startTime and endTime strings into hours and minutes
-            const [startHour, startMinute] = startTime.split(':').map(Number);
-            const [endHour, endMinute] = endTime.split(':').map(Number);
-    
-            // Set hours and minutes for start and end times
-            const scheduleStart = new Date(date);
-            scheduleStart.setUTCHours(startHour, startMinute, 0, 0);
-    
-            const scheduleEnd = new Date(date);
-            scheduleEnd.setUTCHours(endHour, endMinute, 0, 0);
-    
-            return {
-                classId: 0,
-                courseId: 0,
-                scheduleStart: scheduleStart.toISOString(),
-                scheduleEnd: scheduleEnd.toISOString()
-            };
-        });
-        return transformedClasses;
-    };
-
-    const combineData = (transformedClasses : ClassSchedule []) : Course => {
-        return {
-            courseId: 0,
-            title: courseFormData?.title ||'',
-            description: courseFormData?.description ||'',
-            attendanceCredit: courseFormData?.attendanceCredit || 0,
-            completionCredit: courseFormData?.completionCredit || 0,
-            maxAttendance: courseFormData?.maxAttendance || 0,
-            enrollmentDeadline: courseFormData?.enrollmentDeadline ||'',
-            instructorName: courseFormData?.instructorName ||'',
-            instructorEmail: courseFormData?.instructorEmail ||'',
-            pdf: courseFormData?.pdf ||'',
-            location: 
-            {
-                locationId: 0,
-                description: courseFormData?.locationDescription ||'',
-                room : courseFormData?.room ||'',
-                remoteLink: courseFormData?.remoteLink ||'',
-                addressLine1: courseFormData?.addressLine1 ||'',
-                addressLine2: courseFormData?.addressLine2 ||'',
-                city: courseFormData?.city ||'',
-                state: courseFormData?.state ||'',
-                postalCode: courseFormData?.postalCode ||'',
-            },
-            classes: transformedClasses
-        };
-    }
-
-    const handleSaveToApi = async (combinedData: Course) => {
+    // ConfirmationModal
+    const handleConfirmationModalOnConfirm = async () => {
+        //console.log("AddCourseComponent.handleConfirmationModalOnConfirm");
+        setIsSaving(true);
+        
         try {
-            const response = await axios.post('https://localhost:7144/course/postcourse', combinedData);
-            localStorage.removeItem('courseFormData');
-            console.log('Course saved successfully', response);
-            router.push('/admin/editcourse/edit/')
+            setShowConfirmationModal(false);
+            await saveCourseToDatabase();
+
         } catch (error) {
-            console.error('Error saving course', error);
+            throw new Error(error as string);
+        } finally {
+            router.push('/admin/editcourse/edit');
+            // this might not do anything. 
+            setIsSaving(false);
+            setCourse(undefined);
+        }
+    }
+
+
+    const handleConfirmationModalOnCancel = () => {
+        setShowConfirmationModal(false);
+    }
+
+    // Additional Methods
+
+    const saveCourseToDatabase = async () => {
+        try {
+            // Perform the POST request to save the course
+            const response = await axios.post("https://localhost:7144/Course/PostCourse", course);
+
+            if (response.status !== 200) {
+                throw new Error(`Failed to save course. Status: ${response.status} - ${response.statusText}`);
+            } 
+        } catch (error) {
+            throw new Error(error as string);
         }
     }
 
     return (
-        <div>
-            {isCourseFormVisible ?
-                (<CourseForm onSubmit={handleFormSubmit} />) :
-                (<div>
-                    <ClassForm
-                        courseFormData={courseFormData}
-                        classes={classes}
-                        onDeleteClass={deleteClass}
-                        onClassDateChange={handleClassDateChange}
-                        onStartTimeChange={handleStartTimeChange}
-                        onEndTimeChange={handleEndTimeChange}
-                    />
-                    <div>
-                        <NewClassMenu onBack={handleBackToCourseForm} onAddClass={addClass} onSaveCourse={onSaveCourse} />
+        <>
+            {course === undefined ? (
+                <NewCourseForm onSubmit={handleNewCourseFormOnSubmit}/>
+            ) : (
+                
+                <>
+                    <div className="navbar bg-primary text-primary-content rounded-xl border  mb-2">
+                            <button 
+                                className="btn btn-ghost text-white"
+                                onClick={handleAddTopic}
+                            >Add/Edit Topic</button>
+                     
+                
+                            <button
+                                className="btn btn-ghost text-white"
+                                onClick={handleSaveCourse}
+                            >Save Course</button>
+                   
                     </div>
-                </div>)
-            }
-            {showConfirmationDialog && (
-                <ConfirmationDialog
-                    title="Save Course"
-                    message="Are you sure you want to save the course?"
-                    onConfirm={handleConfirmSave}
-                    onCancel={handleCancelSave}
-                    />
+
+                    
+                    <div>
+                        <CourseInfoCard course={course} onApply={handleCourseInfoCardOnApply} />
+                    </div>
+                    <div>
+                        {course.classes.map((classItem, index) => (
+                            
+                            <div className="mt-2" key={index}> 
+                                <NewClass
+                                    scheduleStart={classItem.scheduleStart}
+                                    scheduleEnd={classItem.scheduleEnd}
+                                    onDelete={() => handleNewClassOnDelete(index)}
+                                    onScheduleStartChange={(date: Date) => handleNewClassOnScheduleStartChange(index, date)}
+                                    onScheduleEndChange={(date: Date) => handleNewClassOnScheduleEndChange(index, date)}
+                                />
+                            </div>
+                            ))
+                        }
+                        <div className = "mt-2">
+                            <button
+                                className="btn btn-primary text-white"
+                                onClick={handleAddClass}
+                            >Add Class</button>
+                        </div>
+                        <div className = "mt-2">
+                            <button
+                                className="btn btn-primary text-white"
+                                onClick={() => console.log("Course: ", course)}
+                            >Test Course</button>
+                        </div>
+                    </div>
+                </>
+
             )}
-        </div>
+            {/* Dialogs - also known as Modals - and the saving spinner */}
+            {showSelectTopicModal && (
+                <SelectTopicModal 
+                    open={showSelectTopicModal} 
+                    onClose={handleSelectTopicModalOnClose} 
+                    onSelect={(topic: Topic[]) => handleSelectTopicModalOnSelect(topic)} 
+                    topics={course?.topics || []} 
+                    /> 
+            )}
+            {showConfirmationModal && (
+                <ConfirmationModal 
+                    title={'Save Course'} 
+                    message={'Are you sure you want to save this course to the database?'} 
+                    onConfirm={handleConfirmationModalOnConfirm} 
+                    onCancel={handleConfirmationModalOnCancel}
+                />
+            )}
+            {isSaving && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="absolute inset-0 bg-black opacity-50"></div>
+                    <div className="bg-white p-8 rounded-lg z-50">
+                        <h2 className="text-xl font-semibold mb-4">Saving Course...</h2>
+                        <span className="loading loading-spinner text-primary"></span>
+                    </div>
+                </div>
+                )
+            } 
+
+        </>
     );
-    
 }
 
-export default AddCourseComponent
-
-
+export default AddCourseComponent;

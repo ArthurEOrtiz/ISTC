@@ -1,13 +1,13 @@
 import React from 'react';
 
-interface ConfirmationDialogProps {
+interface ConfirmationModalProps {
     title: string;
     message: string;
     onConfirm: () => void;
     onCancel: () => void;
 }
 
-const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ title, message, onConfirm, onCancel }) => {
+const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ title, message, onConfirm, onCancel }) => {
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -23,4 +23,4 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ title, message,
     );
 };
 
-export default ConfirmationDialog;
+export default ConfirmationModal;

@@ -44,6 +44,14 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
 
 
     // Event Handlers
+
+    const handleOnCourseInfoCardSave = (updatedCourse: Course | null): void => {
+        console.log
+        
+        if (updatedCourse !== null) {
+            //setCourseInfo(updatedCourse);
+        }
+    }
     const handleOnClassInfoCardDelete = (id: number | null): void => {
         if (id !== null) {
             setClasses(prevClasses => prevClasses.filter(classSchedule => classSchedule.classId !== id))
@@ -106,7 +114,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </button>
                 </div>
                 <div className="p-4">
-                    <CourseInfoCard course={course} />
+                    <CourseInfoCard course={course} onSave={handleOnCourseInfoCardSave} />
                 </div>
             </div>
             
