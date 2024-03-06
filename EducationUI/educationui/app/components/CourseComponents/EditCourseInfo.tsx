@@ -51,7 +51,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     // Event Handlers
 
     const handleOnCourseInfoCardSave = (updatedCourse: Course | null): void => {
-        console.log
+        console.log("Updated Course", updatedCourse)
         
         if (updatedCourse !== null) {
             //setCourseInfo(updatedCourse);

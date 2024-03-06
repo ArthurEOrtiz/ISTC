@@ -1,6 +1,6 @@
 import Link from 'next/link'; 
 
-const EditCoursesMenu: React.FC = () => {
+const EditCourseNav: React.FC = () => {
     return (
         <ul className="menu bg-info-content lg:menu-horizontal w-full">
             <li>
@@ -17,4 +17,4 @@ const EditCoursesMenu: React.FC = () => {
     )
 }
 
-export default EditCoursesMenu;
+export default EditCourseNav;

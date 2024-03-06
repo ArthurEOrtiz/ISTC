@@ -1,14 +1,17 @@
-import EditCoursesMenu from "./EditCourseMenu";
+import EditCoursesNav from "./EditCourseNav";
 
-export default function EditCoursesLayout({
-    children,
-}: {
-    children: React.ReactNode
-}) {
-    return (
-        <section>
-            <EditCoursesMenu/>
-            {children}
-        </section>
-    );
+interface EditCoursesLayoutProps {
+    children: React.ReactNode;
 }
+
+const EditCoursesLayout: React.FC<EditCoursesLayoutProps> = ({ children }) => {
+    return (
+        <div>
+            <EditCoursesNav />
+            {children}
+        </div>
+    );
+};
+
+export default EditCoursesLayout;
+

@@ -23,7 +23,7 @@ export interface Location {
     locationId: number | null;
     description: string;
     room: string;
-    remoteLink: string;
+    remoteLink: string | null;
     addressLine1: string;
     addressLine2: string;
     city: string;
@@ -57,8 +57,8 @@ export interface Course {
   
   export interface Topic {
     topicId: number | null;
-    title: string | null;
-    description: string | null;
+    title: string;
+    description: string;
   }
 
   export interface Attendance {
