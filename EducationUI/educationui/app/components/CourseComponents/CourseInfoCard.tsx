@@ -1,5 +1,6 @@
 import { Course } from "@/app/shared/types/sharedTypes";
 import { useState } from "react";
+import CharacterCounter from "../CharacterCounter";
 
 interface CourseCardProps {
     course : Course; 
@@ -105,12 +106,16 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                     /> : course?.title}</h1>
 
                 <p><strong>Description:</strong> {editMode ?
+                    <>
                     <textarea
                         name="description"
+                        maxLength = {255}
                         defaultValue={editCourse?.description}
                         onChange={handleTextAreaChange}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         />
+                        <CharacterCounter value={editCourse.description} limit={255} />
+                    </>
                         : course?.description}</p>
                 <p><strong>Topics:</strong> {course?.topics?.map((topic, index) => (
                     <span key={index}>
@@ -128,6 +133,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="text"
                             name="instructorName"
+                            maxLength={50}
                             defaultValue={editCourse?.instructorName}
                             onChange={handleInputChange}
                             className="border border-gray-300 rounded"/>
@@ -223,7 +229,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="url"
                             name="locationUrl"
-                            defaultValue={editCourse?.location?.remoteLink}
+                            defaultValue={editCourse?.location?.remoteLink || ''}
                             onChange={(e)=> handleLocationInputChange(e, "remoteLink")}
                             className="border border-gray-300 rounded w-1/2" />
                             : course?.location?.remoteLink}</p>
@@ -233,6 +239,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="text"
                             name="locationAddressLine1"
+                            maxLength={50}
                             defaultValue={editCourse?.location?.addressLine1}
                             onChange={(e) => handleLocationInputChange(e, "addressLine1")}
                             className="border border-gray-300 rounded w-1/2" />
@@ -243,6 +250,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="text"
                             name="locationAddressLine2"
+                            maxLength={50}
                             defaultValue={editCourse?.location?.addressLine2}
                             onChange={(e) => handleLocationInputChange(e, "addressLine2")}
                             className="border border-gray-300 rounded w-1/2" />
@@ -253,6 +261,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input 
                             type="text"
                             name="locationCity"
+                            maxLength={50}
                             defaultValue={editCourse?.location?.city}
                             onChange={(e) => handleLocationInputChange(e, "city")}
                             className="border border-gray-300 rounded" />
@@ -263,6 +272,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="text"
                             name="locationState"
+                            maxLength={50}
                             defaultValue={editCourse?.location?.state}
                             onChange={(e) => handleLocationInputChange(e, "state")}
                             className="border border-gray-300 rounded" />
@@ -273,6 +283,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="text"
                             name="locationZip"
+                            maxLength={10}
                             defaultValue={editCourse?.location?.postalCode}
                             onChange={(e) => handleLocationInputChange(e, "postalCode")}
                             onKeyDown={handleNumericInput}
@@ -285,6 +296,14 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                 onClick={toggleEditMode}>
                     {editMode ? 'Apply' : 'Edit'}
             </button>
+
+            {editMode &&(
+                <button
+                    className="btn btn-warning text-white m-1"
+                    onClick={() => setEditMode(false)}>
+                        Cancel
+                </button>
+            )}
         </div>
     );
 }

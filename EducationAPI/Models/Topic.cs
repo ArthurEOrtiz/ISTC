@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
+using System.Text.Json.Serialization;
 
 namespace EducationAPI.Models
 {
@@ -21,6 +22,7 @@ namespace EducationAPI.Models
 		[MaxLength(255)]
 		public string? Description { get; set; }
 
+		[JsonIgnore]
 		public virtual ICollection<Course> Courses { get; set; }
 
 	}
