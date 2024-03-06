@@ -86,26 +86,29 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             const lastClass = classes[classes.length - 1];
             const scheduleStartPlusOneDay = new Date(`${lastClass.scheduleStart}Z`);
             scheduleStartPlusOneDay.setDate(scheduleStartPlusOneDay.getDate() + 1);
+            const newScheduleStart = scheduleStartPlusOneDay.toISOString().slice(0, -5);
             const scheduleEndPlusOneDay = new Date(`${lastClass.scheduleEnd}Z`);
+            
             scheduleEndPlusOneDay.setDate(scheduleEndPlusOneDay.getDate() + 1);
+            const newScheduleEnd = scheduleEndPlusOneDay.toISOString().slice(0, -5);
 
             const newClassSchedule: ClassSchedule = {
                 classId: null,
                 courseId: course.courseId,
-                scheduleStart: new Date(scheduleStartPlusOneDay),
-                scheduleEnd: new Date(scheduleEndPlusOneDay),
+                scheduleStart: newScheduleStart as unknown as Date,
+                scheduleEnd: newScheduleEnd as unknown as Date,
                 attendance: []
             }
             console.log(newClassSchedule)
-            //Disable edit mode for all other classes 
-            // setEditModeIndex(null);
+            // Disable edit mode for all other classes 
+            setEditModeIndex(null);
             // Add the new class with edit mode enabled 
-            // setClasses(prevClasses => [...prevClasses, newClassSchedule]);
+            setClasses(prevClasses => [...prevClasses, newClassSchedule]);
         }
 
         
      
-        // setEditModeIndex(classes.length);
+        setEditModeIndex(classes.length);
     }
 
 

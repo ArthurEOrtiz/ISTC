@@ -42,17 +42,15 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
         return formattedDate;
     }
 
-    const formatStringToDate = (dateString: string) => {
-        //console.log(dateString); // Date String is in UTC
+    const formatStringToDate = (dateString: Date) => {
         const dateObject = new Date(`${dateString}z`);
-        //console.log(dateObject);
         const year = dateObject.getFullYear();
         const month = (dateObject.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
         const day = dateObject.getDate().toString().padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
 
-    const getTime = (date: string) => {
+    const getTime = (date: Date) => {
         const startTime = new Date(`${date}z`);
         const formattedTime = startTime.toLocaleTimeString(
             'en-US', {
@@ -64,7 +62,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
         return formattedTime;
     }
 
-    const formatTime = (time: string) => {
+    const formatTime = (time: Date) => {
         const timeObject = new Date(`${time}z`);
         const hours = timeObject.getHours().toString().padStart(2, '0'); // Ensure two digits for hours
         const minutes = timeObject.getMinutes().toString().padStart(2, '0'); // Ensure two digits for minutes
@@ -90,9 +88,10 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
                     }
 
                     if (response.data != null) {
-                        //console.log("response data", response.data);
+                        console.log("response data", response.data);
                         const newClass: ClassSchedule = response.data;
                         setOldClassSchedule(newClass);
+                        setEditedClassSchedule(newClass);
                         onAdd(newClass);
                     }
 
@@ -179,7 +178,6 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
         const newStartTime = event.target.value;
         const oldStartDate = editedClassSchedule.scheduleStart.toString();
 
-        // The old start date is in UTC and the new start time is in local time. 
         const newStartTimeObject = new Date(`${oldStartDate.split('T')[0]}T${newStartTime}`);
         const newStartTimeString = newStartTimeObject.toISOString().slice(0, -5);
 
@@ -192,7 +190,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     const handleEndTimeChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const newEndTime = event.target.value;
         const oldEndDate = editedClassSchedule.scheduleEnd.toString();
-        // I just need to update the time part of the string
+        
         const newEndTimeObject = new Date(`${oldEndDate.split('T')[0]}T${newEndTime}`);
         const newEndTimeString = newEndTimeObject.toISOString().slice(0, -5);
         
