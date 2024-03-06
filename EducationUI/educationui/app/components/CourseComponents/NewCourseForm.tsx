@@ -53,7 +53,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
             locationId: 0,
             description: '',
             room: '',
-            remoteLink: '',
+            remoteLink: null,
             addressLine1: '',
             addressLine2: '',
             city: '',
@@ -450,7 +450,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         id="location.remoteLink"
                         type="url"
                         placeholder="https://zoom.us/j/1234567890?pwd=abc123"
-                        defaultValue = {course?.location?.remoteLink}
+                        defaultValue = {course?.location?.remoteLink || ''}
                         onChange = {handleChange}
                     />
                 </div>

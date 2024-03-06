@@ -23,7 +23,7 @@ export interface Location {
     locationId: number | null;
     description: string;
     room: string;
-    remoteLink: string;
+    remoteLink: string | null;
     addressLine1: string;
     addressLine2: string;
     city: string;

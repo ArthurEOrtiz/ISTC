@@ -8,7 +8,7 @@ interface NewTopicFormProps {
 
 const NewTopicForm: React.FC<NewTopicFormProps> = ({ onSubmit }) => {
     const [topic, setTopic] = useState<Topic>({
-        topicId: null,
+        topicId: 0,
         title: "",
         description: "",
     });
@@ -16,7 +16,7 @@ const NewTopicForm: React.FC<NewTopicFormProps> = ({ onSubmit }) => {
     const handleOnSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSubmit(topic);
-        setTopic({ topicId: null, title: "", description: "" });
+        setTopic({ topicId: 0, title: "", description: "" });
     };
 
     return (
