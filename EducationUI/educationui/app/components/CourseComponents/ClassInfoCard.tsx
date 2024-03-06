@@ -10,6 +10,16 @@ interface ClassInfoCardProps {
     editMode: boolean;
 };
 
+/**
+ * Renders a card component for displaying class information. This is used in the 
+ * EditCourseInfo component, so after the course has been made. This method handles the 
+ * time shift from UTC to local time.
+ * 
+ * @param classSchedule - The class schedule object.
+ * @param onAdd - Callback function to add a class schedule.
+ * @param onDelete - Callback function to delete a class schedule.
+ * @param editMode - Flag indicating whether the card is in edit mode.
+ */
 const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDelete, editMode}) => {
     const [editClass, setEditClass] = useState<Boolean>(false);
     const [oldClassSchedule, setOldClassSchedule ] = useState<ClassSchedule>(classSchedule);
@@ -23,52 +33,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     }
     , [editMode]);
 
-    const getStartDate = (date: Date | null) => {
-        
-        if (date === null) {
-            return null;
-        }
-
-        const localDateTime = new Date(`${date}Z`);
-
-        const formattedDate = localDateTime.toLocaleDateString(
-            'en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                weekday: 'long',
-            }
-        );
-        return formattedDate;
-    }
-
-    const formatStringToDate = (dateString: Date) => {
-        const dateObject = new Date(`${dateString}z`);
-        const year = dateObject.getFullYear();
-        const month = (dateObject.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-        const day = dateObject.getDate().toString().padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    const getTime = (date: Date) => {
-        const startTime = new Date(`${date}z`);
-        const formattedTime = startTime.toLocaleTimeString(
-            'en-US', {
-                hour: 'numeric',
-                minute: 'numeric',
-                timeZone: 'America/Denver'
-            }
-        );
-        return formattedTime;
-    }
-
-    const formatTime = (time: Date) => {
-        const timeObject = new Date(`${time}z`);
-        const hours = timeObject.getHours().toString().padStart(2, '0'); // Ensure two digits for hours
-        const minutes = timeObject.getMinutes().toString().padStart(2, '0'); // Ensure two digits for minutes
-        return `${hours}:${minutes}`;
-    }
-    
+    // Handlers
     const handleEdit = () => {
         //console.log('Edit Class', oldClassSchedule.classId);
         setEditClass(true);
@@ -127,35 +92,40 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     }
 
     const handleCancel = () => {
-        if (oldClassSchedule.classId != null)
-        {
+
+        if (oldClassSchedule?.classId == null) {
+            onDelete(null);
+            setDeleted(true);
+        } else {
             setEditClass(false);
             setEditedClassSchedule(oldClassSchedule);
-        } else
-        {
-            onDelete(null);
         }
-        
+
     }
 
     const handleDelete = async () => {
 
-        try {
-            const url = `https://localhost:7144/Class/DeleteClassById?id=${editedClassSchedule.classId}`;
-            
-            const response = await axios.delete(url);
+        if (oldClassSchedule.classId) {
+            try {
+                const url = `https://localhost:7144/Class/DeleteClassById?id=${editedClassSchedule.classId}`;
 
-            if (response.status !== 200) {
-                throw new Error('Error Deleting Class');
+                const response = await axios.delete(url);
+
+                if (response.status !== 200) {
+                    throw new Error('Error Deleting Class');
+                }
+
+                onDelete(editedClassSchedule.classId);
+                setDeleted(true);
+
+            } catch (error) {
+
+                console.error('Error Deleting Class', error);
+
             }
-
-            onDelete(editedClassSchedule.classId);
+        } else {
+            onDelete(null);
             setDeleted(true);
-
-        } catch (error) {
-
-            console.error('Error Deleting Class', error);
-
         }
     }
 
@@ -199,6 +169,53 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
             scheduleEnd: newEndTimeString as unknown as Date,
         }));
 
+    }
+
+    // Helper Methods
+    const getStartDate = (date: Date | null) => {
+        
+        if (date === null) {
+            return null;
+        }
+
+        const localDateTime = new Date(`${date}Z`);
+
+        const formattedDate = localDateTime.toLocaleDateString(
+            'en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long',
+            }
+        );
+        return formattedDate;
+    }
+
+    const formatStringToDate = (dateString: Date) => {
+        const dateObject = new Date(`${dateString}z`);
+        const year = dateObject.getFullYear();
+        const month = (dateObject.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+        const day = dateObject.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    const getTime = (date: Date) => {
+        const startTime = new Date(`${date}z`);
+        const formattedTime = startTime.toLocaleTimeString(
+            'en-US', {
+                hour: 'numeric',
+                minute: 'numeric',
+                timeZone: 'America/Denver'
+            }
+        );
+        return formattedTime;
+    }
+
+    const formatTime = (time: Date) => {
+        const timeObject = new Date(`${time}z`);
+        const hours = timeObject.getHours().toString().padStart(2, '0'); // Ensure two digits for hours
+        const minutes = timeObject.getMinutes().toString().padStart(2, '0'); // Ensure two digits for minutes
+        return `${hours}:${minutes}`;
     }
 
     if (deleted) {
