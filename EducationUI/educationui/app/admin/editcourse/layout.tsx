@@ -1,4 +1,4 @@
-import EditCoursesMenu from "./EditCourseMenu";
+import EditCoursesNav from "./EditCourseNav";
 
 export default function EditCoursesLayout({
     children,
@@ -7,7 +7,7 @@ export default function EditCoursesLayout({
 }) {
     return (
         <section>
-            <EditCoursesMenu/>
+            <EditCoursesNav/>
             {children}
         </section>
     );
