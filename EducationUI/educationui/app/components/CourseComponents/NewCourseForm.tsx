@@ -606,7 +606,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
             <div className="flex items-center justify-between">
                 <button
-                    className={`bg-blue-500  text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'}`}
+                    className={`btn btn-primary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : ''}`}
                     type="submit"
                     disabled={!isFormValid}
                 >
