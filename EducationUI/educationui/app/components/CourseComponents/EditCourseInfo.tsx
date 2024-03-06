@@ -30,7 +30,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     // Constants
-    //const [classes, setClasses] = useState<ClassSchedule[]>(sortClassesByDate(course.classes));
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
     const [courseInfo, setCourseInfo] = useState<Course>(course);
     
@@ -39,7 +38,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     // when the component is first rendered and when the classes are updated.
     useEffect(() => {   
         if (!areClassesOrderedByDate()) {
-            // setClasses(sortClassesByDate(classes));
             setCourseInfo(prevCourse => {
                 return {
                     ...prevCourse,
@@ -66,13 +64,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         
         if (updatedCourse !== null) {
             // Update the course with the new course data
-            // setCourse(updatedCourse);
+            setCourseInfo(updatedCourse);
         }
     }
 
     const handleOnClassInfoCardDelete = (id: number | null): void => {
         if (id !== null) {
-            //setClasses(prevClasses => prevClasses.filter(classSchedule => classSchedule.classId !== id))
             setCourseInfo(prevCourse => {
                 return {
                     ...prevCourse,
@@ -80,7 +77,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 }
             });
         } else {
-            // setClasses(prevClasses => prevClasses.slice(0, -1));
             setCourseInfo(prevCourse => {
                 return {
                     ...prevCourse,
@@ -116,8 +112,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             const index = courseInfo.classes.findIndex(classSchedule => classSchedule.classId === null);
             if (index !== -1) {
                 const newClasses = [...courseInfo.classes];
+                console.log("New Classes", newClasses);
                 newClasses[index] = updatedClassSchedule;
-                //setClasses(newClasses);
                 setCourseInfo(prevCourse => {
                     return {
                         ...prevCourse,
@@ -150,7 +146,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 attendance: []
             }
             //console.log(newClassSchedule)
-            // setClasses([newClassSchedule]);
             setCourseInfo(prevCourse => {
                 return {
                     ...prevCourse,
@@ -177,11 +172,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             scheduleEnd: newScheduleEnd as unknown as Date,
             attendance: []
         }
-        console.log(newClassSchedule)
         // Disable edit mode for all other classes 
         setEditModeIndex(null);
         // Add the new class with edit mode enabled 
-        // setClasses(prevClasses => [...prevClasses, newClassSchedule]);
         setCourseInfo(prevCourse => {
             return {
                 ...prevCourse,
@@ -204,7 +197,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                             Delete Course
                     </button>
                     <button
-                        className="btn btn-primary text-white m-1">
+                        className="btn btn-primary text-white m-1"
+                        onClick = {() => console.log(courseInfo)}>
                             Save All
                     </button>
                 </div>
@@ -237,14 +231,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </button>
                     <button
                         className="btn btn-primary text-white m-1"
-                        onClick={()=> console.log(course)}>
+                        onClick={()=> console.log(courseInfo)}>
                             Test Course
                     </button>
-                    {/* <button
-                        className="btn btn-primary text-white m-1"
-                        onClick={()=> console.log(classes)}>
-                            Test Classes
-                    </button> */}
                 </div>
             </div>
 

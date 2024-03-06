@@ -53,7 +53,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
                     }
 
                     if (response.data != null) {
-                        console.log("response data", response.data);
+                        //console.log("response data", response.data);
                         const newClass: ClassSchedule = response.data;
                         setOldClassSchedule(newClass);
                         setEditedClassSchedule(newClass);

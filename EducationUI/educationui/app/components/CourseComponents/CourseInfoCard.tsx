@@ -1,6 +1,7 @@
-import { Course } from "@/app/shared/types/sharedTypes";
+import { Course, Topic } from "@/app/shared/types/sharedTypes";
 import { useState } from "react";
 import CharacterCounter from "../CharacterCounter";
+import SelectTopicModal from "../TopicsComponents/SelectTopicModal";
 
 interface CourseCardProps {
     course : Course; 
@@ -11,6 +12,7 @@ interface CourseCardProps {
 const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editCourse, setEditCourse] = useState<Course>(course);
+    const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -50,8 +52,28 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
             e.preventDefault();
         }
     };
-    
 
+    const handleCancel = () => {
+        setEditCourse(course);
+        setEditMode(false);
+    }
+
+    const handleEditTopics = () => {
+        setShowSelectTopicModal(true);
+    };
+
+    const handleSelectTopicModalClose = () => {
+        setShowSelectTopicModal(false);
+    };
+
+    const handleSelectTopicaModalSelect = (topics: Topic[]) => {
+        setEditCourse((prevEditCourse) => ({
+            ...prevEditCourse,
+            topics: topics,
+        }));
+        setShowSelectTopicModal(false);
+    };
+    
     const toggleEditMode = () => {
         setEditMode(prevEditMode => !prevEditMode);
         if (!editMode) {
@@ -108,25 +130,44 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                 
                     /> : course?.title}</h1>
 
-                <p><strong>Description:</strong> {editMode ?
-                    <>
-                    <textarea
-                        name="description"
-                        maxLength = {255}
-                        defaultValue={editCourse?.description}
-                        onChange={handleTextAreaChange}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        />
-                        <CharacterCounter value={editCourse.description} limit={255} />
-                    </>
-                        : course?.description}</p>
-                <p><strong>Topics:</strong> {course?.topics?.map((topic, index) => (
-                    <span key={index}>
-                        {topic.title}
-                        {index !== (course?.topics?.length ?? 0) - 1 && ', '}
-                    </span>
-                ))}
-                </p>
+                <div className="mb-4 mt-1">
+
+                    <strong>Description:</strong> 
+
+                    {editMode ?
+                        <>
+                        <textarea
+                            name="description"
+                            maxLength = {255}
+                            defaultValue={editCourse?.description}
+                            onChange={handleTextAreaChange}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            />
+                            <CharacterCounter value={editCourse.description} limit={255} />
+                        </>
+                        : course?.description}
+                </div>
+
+                <div className="mb-4">
+
+                    <strong>Topics:</strong> 
+
+                    {editCourse?.topics?.map((topic, index) => (
+                        <span key={index}>
+                            {topic.title}
+                            {index !== (editCourse?.topics?.length ?? 0) - 1 && ', '}
+                        </span>
+                    ))}
+
+                    {editMode ?
+                        <button
+                            className="btn btn-xs btn-primary text-white ml-4"
+                            onClick={handleEditTopics}>
+                                ...Edit Topics
+                        </button>
+                        : ''}
+
+                </div>
 
             </div>
 
@@ -307,11 +348,24 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
             {editMode &&(
                 <button
                     className="btn btn-warning text-white m-1"
-                    onClick={() => setEditMode(false)}>
+                    onClick={handleCancel}>
                         Cancel
                 </button>
             )}
+
+            {showSelectTopicModal && (
+                <SelectTopicModal
+                    open={showSelectTopicModal}
+                    onClose={handleSelectTopicModalClose}
+                    onSelect={(topics: Topic[]) => {handleSelectTopicaModalSelect(topics)}}
+                    topics={editCourse?.topics || []}
+                />
+            )}
+
         </div>
+
+        
+
     );
 }
 
