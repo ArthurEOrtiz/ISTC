@@ -1,5 +1,6 @@
 import { Topic } from "@/app/shared/types/sharedTypes";
 import { useState } from "react";
+import CharacterCounter from "../CharacterCounter";
 
 interface NewTopicFormProps {
     onSubmit: (topic: Topic) => void;
@@ -44,11 +45,18 @@ const NewTopicForm: React.FC<NewTopicFormProps> = ({ onSubmit }) => {
                 </label>
                 <textarea
                     id="description"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
                     value={topic.description || ""}
                     onChange={(e) => setTopic({ ...topic, description: e.target.value })}
                 />
+                <CharacterCounter value={topic.description} limit={255}/>
             </div>
-            <button type="submit">Add Topic</button>
+            <button 
+                type="submit"
+                className="btn btn-primary text-white  mt-4"
+                >
+                    Add Topic
+            </button>
         </form>
     );
     
