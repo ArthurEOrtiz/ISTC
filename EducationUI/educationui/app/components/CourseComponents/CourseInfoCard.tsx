@@ -45,10 +45,12 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
     };
 
     const handleNumericInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (!/\d/.test(e.key) && e.key !== "Backspace" && e.key !== "Delete" && e.key !== "ArrowUp" && e.key !== "ArrowDown" && e.key !== "Tab") {
+        // Allow only arrow keys
+        if (!(e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "Tab" || e.key === "Backspace" || e.key === "Delete" || e.key === "Enter" || e.key === "Escape" || e.key === "Home" || e.key === "End" )) {
             e.preventDefault();
         }
     };
+    
 
     const toggleEditMode = () => {
         setEditMode(prevEditMode => !prevEditMode);
@@ -57,6 +59,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
         }
 
         if (editMode) {
+            //console.log(editCourse);
             onApply(editCourse);
         }
     }
@@ -154,6 +157,8 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="number"
                             name="attendanceCredit"
+                            min={0}
+                            max={editCourse?.completionCredit}
                             defaultValue={editCourse?.attendanceCredit}
                             onChange={handleInputChange}
                             onKeyDown={handleNumericInput}
@@ -167,6 +172,8 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="number"
                             name="completionCredit"
+                            min={course?.attendanceCredit}
+                            max={100}
                             defaultValue={editCourse?.completionCredit}
                             onChange={handleInputChange}
                             onKeyDown={handleNumericInput}
