@@ -2,7 +2,7 @@
 import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -30,18 +30,23 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     // Constants
-    const [courseInfo, setCourseInfo] = useState<Course>(course);
     const [classes, setClasses] = useState<ClassSchedule[]>(sortClassesByDate(course.classes));
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
     
-    useEffect(() => { 
-        //console.log(classes)  // Keep for debugging   
+    useEffect(() => {   
         if (!areClassesOrderedByDate()) {
             setClasses(sortClassesByDate(classes));
         }
     }
     , [classes]);
 
+    useEffect(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+    , [classes.length]);
 
     // Event Handlers
 
@@ -52,48 +57,96 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             //setCourseInfo(updatedCourse);
         }
     }
+
     const handleOnClassInfoCardDelete = (id: number | null): void => {
         if (id !== null) {
             setClasses(prevClasses => prevClasses.filter(classSchedule => classSchedule.classId !== id))
+        } else {
+            setClasses(prevClasses => prevClasses.slice(0, -1));
         }
     }
 
     const handleOnClassAdd = (): void => {
-        const today = new Date();
-        today.setUTCHours(9,0,0,0);
-        const todayAt9AMString = today.toISOString().slice(0, -1);
-       
-        today.setUTCHours(17,0,0,0);
-        const todayAt5PMString = today.toISOString().slice(0, -1);
+        const hasNullClass = classes.some(classSchedule => classSchedule.classId === null);
 
-
-        const newClassSchedule: ClassSchedule = {
-            classId: null,
-            courseId: course.courseId,
-            scheduleStart: todayAt9AMString,
-            scheduleEnd: todayAt5PMString
+        if (hasNullClass) {
+            const modal = document.getElementById('warning_modal') as HTMLDialogElement | null;
+            if (modal) {
+                modal.showModal();
+            }
+            return;
         }
 
-        // Disable edit mode for all other classes 
-        setEditModeIndex(null);
-        // Add the new class with edit mode enabled 
-        setClasses(prevClasses => [...prevClasses, newClassSchedule]);
+        if (classes.length === 0 || classes === null) {
+            addNewClass();
+
+        } else {
+            addNewClassPlusOneDay();
+        }
         setEditModeIndex(classes.length);
     }
-
 
     const handleOnClassAdded = (updatedClassSchedule: ClassSchedule | null): void => {
         console.log("Updated Class Schedule", updatedClassSchedule);
         if (updatedClassSchedule !==  null) {
-            const index = classes.findIndex(classSchedule => classSchedule.classId === updatedClassSchedule.classId);
+            const index = classes.findIndex(classSchedule => classSchedule.classId === null);
             if (index !== -1) {
                 const newClasses = [...classes];
                 newClasses[index] = updatedClassSchedule;
                 setClasses(newClasses);
+                setEditModeIndex(null);
             }
         }
     }
 
+    // Helper Methods 
+    const addNewClass = (): void => {
+        const today = new Date();
+
+            today.setUTCHours(16,0,0,0);
+            const todayAt9AM = new Date(today)
+            //console.log("9am String ", todayAt9AM)
+           
+            today.setUTCHours(24,0,0,0);
+            const todayAt5PM = new Date(today) 
+            //console.log("5pm String ", todayAt5PM)
+
+
+            const newClassSchedule: ClassSchedule = {
+                classId: null,
+                courseId: course.courseId,
+                scheduleStart: todayAt9AM,
+                scheduleEnd: todayAt5PM,
+                attendance: []
+            }
+            //console.log(newClassSchedule)
+            setClasses([newClassSchedule]);
+            setEditModeIndex(0);
+    }
+
+    const addNewClassPlusOneDay = (): void => {
+        const lastClass = classes[classes.length - 1];
+        const scheduleStartPlusOneDay = new Date(`${lastClass.scheduleStart}Z`);
+        scheduleStartPlusOneDay.setDate(scheduleStartPlusOneDay.getDate() + 1);
+        const newScheduleStart = scheduleStartPlusOneDay.toISOString().slice(0, -5);
+        const scheduleEndPlusOneDay = new Date(`${lastClass.scheduleEnd}Z`);
+        
+        scheduleEndPlusOneDay.setDate(scheduleEndPlusOneDay.getDate() + 1);
+        const newScheduleEnd = scheduleEndPlusOneDay.toISOString().slice(0, -5);
+
+        const newClassSchedule: ClassSchedule = {
+            classId: null,
+            courseId: course.courseId,
+            scheduleStart: newScheduleStart as unknown as Date,
+            scheduleEnd: newScheduleEnd as unknown as Date,
+            attendance: []
+        }
+        console.log(newClassSchedule)
+        // Disable edit mode for all other classes 
+        setEditModeIndex(null);
+        // Add the new class with edit mode enabled 
+        setClasses(prevClasses => [...prevClasses, newClassSchedule]);
+    }
 
     return (
         <div>
@@ -114,7 +167,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </button>
                 </div>
                 <div className="p-4">
-                    <CourseInfoCard course={course} onSave={handleOnCourseInfoCardSave} />
+                    <CourseInfoCard course={course} onApply={handleOnCourseInfoCardSave} />
                 </div>
             </div>
             
@@ -140,8 +193,31 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                         onClick={handleOnClassAdd}>
                             Add Class
                     </button>
+                    <button
+                        className="btn btn-primary text-white m-1"
+                        onClick={()=> console.log(course)}>
+                            Test Course
+                    </button>
+                    <button
+                        className="btn btn-primary text-white m-1"
+                        onClick={()=> console.log(classes)}>
+                            Test Classes
+                    </button>
                 </div>
             </div>
+
+            <dialog id="warning_modal" className="modal">
+                <div className="modal-box">
+                    <form method="dialog">
+                    {/* if there is a button in form, it will close the modal */}
+                    <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+                    <h3 className="font-bold text-lg text-error">ERROR!</h3>
+                    <p className="py-4">There is an unsaved new class, please save or remove class before adding a new class.</p>
+                </div>
+            </dialog>
+
+
             
         </div>
                           

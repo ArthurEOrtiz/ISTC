@@ -61,12 +61,23 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
     }
 
     const formatEnrollmentDeadline = (enrollmentDeadline: string | undefined | null): string => {
-        if (!enrollmentDeadline) return ''; // Handle case when enrollmentDeadline is undefined or null
+        if (!enrollmentDeadline) return '';
     
-        const deadlineDate = new Date(enrollmentDeadline);
-        const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        return deadlineDate.toLocaleDateString('en-US', options);
+        const utcDate = new Date(enrollmentDeadline);
+    
+        if (isNaN(utcDate.getTime())) {
+            throw new Error('Invalid date format');
+        }
+    
+        return utcDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            timeZone: 'UTC'
+        });
     };
+    
 
     const formatDate = (dateString: string | undefined): string => {
         if (!dateString) return ''; // Handle case when dateString is undefined

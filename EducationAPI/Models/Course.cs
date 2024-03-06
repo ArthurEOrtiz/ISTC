@@ -42,6 +42,7 @@ namespace EducationAPI.Models
 
 		public DateTime? EnrollmentDeadline { get; set; }
 
+		[MaxLength(50)]
 		public string? InstructorName { get; set; }
 
 		[Required]

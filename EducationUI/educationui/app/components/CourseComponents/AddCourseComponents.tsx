@@ -9,6 +9,14 @@ import axios from 'axios';
 import ConfirmationModal from '../ConfirmationModal';
 import { useRouter } from 'next/navigation';
 
+
+
+/**
+ * Component for adding a new course. 
+ * This component is under the CourseComponents folder, and is the central component for 
+ * creating a new course. It Contains the NewCourseForm, CourseInfoCard, NewClass, and Select
+ * TopicModal components.
+ */
 const AddCourseComponent: React.FC = () => {    
     const [course, setCourse] = useState<Course>();
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
@@ -61,6 +69,8 @@ const AddCourseComponent: React.FC = () => {
             scheduleEnd: scheduleEnd,
             attendance: [],
         };
+
+        console.log("AddCourseComponent.handleAddClass: newClass: ", newClass);
     
         // Update the course state by adding the new class to the classes array
         if (course) {
