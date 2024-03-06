@@ -2,7 +2,7 @@
 import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -33,13 +33,21 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const [classes, setClasses] = useState<ClassSchedule[]>(sortClassesByDate(course.classes));
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
     
-    useEffect(() => { 
-        //console.log(classes)  // Keep for debugging   
+    useEffect(() => {   
         if (!areClassesOrderedByDate()) {
             setClasses(sortClassesByDate(classes));
         }
     }
     , [classes]);
+
+    useEffect(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+    , [classes.length]);
+
 
 
     // Event Handlers
