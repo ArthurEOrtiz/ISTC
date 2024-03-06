@@ -198,7 +198,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </button>
                     <button
                         className="btn btn-primary text-white m-1"
-                        onClick = {() => console.log(courseInfo)}>
+                        onClick = {() => console.log(course)}>
                             Save All
                     </button>
                 </div>
