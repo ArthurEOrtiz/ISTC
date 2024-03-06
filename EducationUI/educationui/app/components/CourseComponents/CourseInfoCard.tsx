@@ -132,7 +132,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
 
                 <div className="mb-4 mt-1">
 
-                    <strong>Description:</strong> 
+                    <strong>Description: </strong> 
 
                     {editMode ?
                         <>
@@ -150,7 +150,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
 
                 <div className="mb-4">
 
-                    <strong>Topics:</strong> 
+                    <strong>Topics: </strong> 
 
                     {editCourse?.topics?.map((topic, index) => (
                         <span key={index}>

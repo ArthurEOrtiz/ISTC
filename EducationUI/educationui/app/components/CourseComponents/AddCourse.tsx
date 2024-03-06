@@ -206,15 +206,12 @@ const AddCourse: React.FC = () => {
             ) : (
                 
                 <>
-                    <div className="navbar bg-primary text-primary-content rounded-xl border  mb-2">
-                            <button 
-                                className="btn btn-ghost text-white"
-                                onClick={handleAddTopic}
-                            >Add/Edit Topic</button>
+                    <div >
+
                      
                 
                             <button
-                                className="btn btn-ghost text-white"
+                                className="btn btn-primary text-white mb-4"
                                 onClick={handleSaveCourse}
                             >Save Course</button>
                    
@@ -244,12 +241,12 @@ const AddCourse: React.FC = () => {
                                 onClick={handleAddClass}
                             >Add Class</button>
                         </div>
-                        <div className = "mt-2">
+                        {/* <div className = "mt-2">
                             <button
                                 className="btn btn-primary text-white"
                                 onClick={() => console.log("Course: ", course)}
                             >Test Course</button>
-                        </div>
+                        </div> */}
                     </div>
                 </>
 
