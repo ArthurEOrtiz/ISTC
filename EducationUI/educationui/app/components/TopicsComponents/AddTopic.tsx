@@ -7,6 +7,9 @@ import TopicInfoCard from "./TopicInfoCard";
 const AddTopic: React.FC = () => {
     const [topic, setTopic] = useState<Topic>();
 
+    const handleSaveTopic =  () => {
+        setTopic(undefined);
+    }
     const handleNewTopicFormOnSubmit = (topic: Topic) => {
         setTopic(topic);
     }
@@ -22,6 +25,12 @@ const AddTopic: React.FC = () => {
             ): (
                 <>
                     <TopicInfoCard topic={topic} onApply={handleTopicInfoCardOnApply} />
+                    <button 
+                        onClick={() => setTopic(undefined)}
+                        className="btn btn-primary text-white mt-4"
+                    >
+                        Save Topic
+                    </button>
                 </>
             )}
         </>
