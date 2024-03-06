@@ -2,7 +2,7 @@
 import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -19,9 +19,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     const areClassesOrderedByDate = (): boolean => {
-        for (let i = 0; i < classes.length - 1; i++) {
-            const currentClass = classes[i];
-            const nextClass = classes[i + 1];
+        for (let i = 0; i < courseInfo.classes.length - 1; i++) {
+            const currentClass = courseInfo.classes[i];
+            const nextClass = courseInfo.classes[i + 1];
             if (new Date(currentClass.scheduleStart).getTime() > new Date(nextClass.scheduleStart).getTime()) {
                 return false;
             }
@@ -30,44 +30,63 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     // Constants
-    const [classes, setClasses] = useState<ClassSchedule[]>(sortClassesByDate(course.classes));
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
+    const [courseInfo, setCourseInfo] = useState<Course>(course);
     
+    // Effects
+    // This will sort the classes by date if they are not already sorted
+    // when the component is first rendered and when the classes are updated.
     useEffect(() => {   
         if (!areClassesOrderedByDate()) {
-            setClasses(sortClassesByDate(classes));
+            setCourseInfo(prevCourse => {
+                return {
+                    ...prevCourse,
+                    classes: sortClassesByDate(prevCourse.classes)
+                }
+            });
         }
     }
-    , [classes]);
+    , [courseInfo.classes]);
 
+    // This will scroll to the bottom of the page when a new class is added.
     useEffect(() => {
         window.scrollTo({
             top: document.body.scrollHeight,
             behavior: 'smooth'
         });
     }
-    , [classes.length]);
+    , [courseInfo.classes.length]);
 
     // Event Handlers
 
     const handleOnCourseInfoCardSave = (updatedCourse: Course | null): void => {
-        console.log("Updated Course", updatedCourse)
+        //console.log("Updated Course", updatedCourse)
         
         if (updatedCourse !== null) {
-            //setCourseInfo(updatedCourse);
+            setCourseInfo(updatedCourse);
         }
     }
 
     const handleOnClassInfoCardDelete = (id: number | null): void => {
         if (id !== null) {
-            setClasses(prevClasses => prevClasses.filter(classSchedule => classSchedule.classId !== id))
+            setCourseInfo(prevCourse => {
+                return {
+                    ...prevCourse,
+                    classes: prevCourse.classes.filter(classSchedule => classSchedule.classId !== id)
+                }
+            });
         } else {
-            setClasses(prevClasses => prevClasses.slice(0, -1));
+            setCourseInfo(prevCourse => {
+                return {
+                    ...prevCourse,
+                    classes: prevCourse.classes.slice(0, -1)
+                }
+            });
         }
     }
 
     const handleOnClassAdd = (): void => {
-        const hasNullClass = classes.some(classSchedule => classSchedule.classId === null);
+        const hasNullClass = courseInfo.classes.some(classSchedule => classSchedule.classId === null);
 
         if (hasNullClass) {
             const modal = document.getElementById('warning_modal') as HTMLDialogElement | null;
@@ -77,23 +96,29 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             return;
         }
 
-        if (classes.length === 0 || classes === null) {
+        if (courseInfo.classes.length === 0 || courseInfo.classes === null) {
             addNewClass();
 
         } else {
             addNewClassPlusOneDay();
         }
-        setEditModeIndex(classes.length);
+        setEditModeIndex(courseInfo.classes.length);
     }
 
     const handleOnClassAdded = (updatedClassSchedule: ClassSchedule | null): void => {
         console.log("Updated Class Schedule", updatedClassSchedule);
         if (updatedClassSchedule !==  null) {
-            const index = classes.findIndex(classSchedule => classSchedule.classId === null);
+            const index = courseInfo.classes.findIndex(classSchedule => classSchedule.classId === null);
             if (index !== -1) {
-                const newClasses = [...classes];
+                const newClasses = [...courseInfo.classes];
+                console.log("New Classes", newClasses);
                 newClasses[index] = updatedClassSchedule;
-                setClasses(newClasses);
+                setCourseInfo(prevCourse => {
+                    return {
+                        ...prevCourse,
+                        classes: newClasses
+                    }
+                });
                 setEditModeIndex(null);
             }
         }
@@ -120,12 +145,17 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 attendance: []
             }
             //console.log(newClassSchedule)
-            setClasses([newClassSchedule]);
+            setCourseInfo(prevCourse => {
+                return {
+                    ...prevCourse,
+                    classes: [newClassSchedule]
+                }
+            });
             setEditModeIndex(0);
     }
 
     const addNewClassPlusOneDay = (): void => {
-        const lastClass = classes[classes.length - 1];
+        const lastClass = courseInfo.classes[courseInfo.classes.length - 1];
         const scheduleStartPlusOneDay = new Date(`${lastClass.scheduleStart}Z`);
         scheduleStartPlusOneDay.setDate(scheduleStartPlusOneDay.getDate() + 1);
         const newScheduleStart = scheduleStartPlusOneDay.toISOString().slice(0, -5);
@@ -141,11 +171,15 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             scheduleEnd: newScheduleEnd as unknown as Date,
             attendance: []
         }
-        console.log(newClassSchedule)
         // Disable edit mode for all other classes 
         setEditModeIndex(null);
         // Add the new class with edit mode enabled 
-        setClasses(prevClasses => [...prevClasses, newClassSchedule]);
+        setCourseInfo(prevCourse => {
+            return {
+                ...prevCourse,
+                classes: [...prevCourse.classes, newClassSchedule]
+            }
+        });
     }
 
     return (
@@ -153,7 +187,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
 
             <div className="flex flex-col items-center">
                 <div className="p-4">
-                    <h1 className="p-s text-3xl text-center font-bold"> Course Id: {course.courseId}</h1>
+                    <h1 className="p-s text-3xl text-center font-bold"> Course Id: {courseInfo.courseId}</h1>
                 </div>
                 <div className="navbar  w-1/2 rounded-xl flex justify-center">
                     
@@ -162,12 +196,13 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                             Delete Course
                     </button>
                     <button
-                        className="btn btn-primary text-white m-1">
+                        className="btn btn-primary text-white m-1"
+                        onClick = {() => console.log(course)}>
                             Save All
                     </button>
                 </div>
                 <div className="p-4">
-                    <CourseInfoCard course={course} onApply={handleOnCourseInfoCardSave} />
+                    <CourseInfoCard course={courseInfo} onApply={handleOnCourseInfoCardSave} />
                 </div>
             </div>
             
@@ -178,7 +213,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </h1>
                 </div>
                 <div className="flex flex-wrap justify-center gap-2">
-                    {classes.map((classSchedule, index) => (
+                    {courseInfo.classes.map((classSchedule, index) => (
                         <ClassInfoCard 
                             key={classSchedule.classId}
                             classSchedule={classSchedule}
@@ -195,13 +230,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </button>
                     <button
                         className="btn btn-primary text-white m-1"
-                        onClick={()=> console.log(course)}>
+                        onClick={()=> console.log(courseInfo)}>
                             Test Course
-                    </button>
-                    <button
-                        className="btn btn-primary text-white m-1"
-                        onClick={()=> console.log(classes)}>
-                            Test Classes
                     </button>
                 </div>
             </div>
