@@ -115,11 +115,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const handleOnClassAdded = (updatedClassSchedule: ClassSchedule | null): void => {
         console.log("Updated Class Schedule", updatedClassSchedule);
         if (updatedClassSchedule !==  null) {
-            const index = classes.findIndex(classSchedule => classSchedule.classId === updatedClassSchedule.classId);
+            const index = classes.findIndex(classSchedule => classSchedule.classId === null);
             if (index !== -1) {
                 const newClasses = [...classes];
                 newClasses[index] = updatedClassSchedule;
                 setClasses(newClasses);
+                setEditModeIndex(null);
             }
         }
     }
