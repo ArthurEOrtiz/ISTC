@@ -142,6 +142,66 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpPut("UpdateCourseById/{id}")]
+		public async Task<ActionResult<Course>> UpdateCourseById(int id, Course updatedCourse)
+		{
+			try
+			{
+				var existingCourse = await _educationProgramContext.Courses
+					.FirstOrDefaultAsync(c => c.CourseId == id);
+
+				if (existingCourse == null)
+				{
+					_logger.LogError("UpdateCourse({Id}), Course not found!", id);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_educationProgramContext.Entry(existingCourse).CurrentValues.SetValues(updatedCourse);
+
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("UpdateCourse {Id} called", id);
+				return existingCourse;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "UpdateCourse({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpDelete("DeleteCourseById/{id}")]
+		public async Task<ActionResult> DeleteCourseById(int id)
+		{
+			try
+			{
+				var existingCourse = await _educationProgramContext.Courses
+						.Include(c => c.Location)
+						.FirstOrDefaultAsync(c => c.CourseId == id);
+
+				if (existingCourse == null)
+				{
+					_logger.LogError("DeleteCourseById({Id}), Course not found!", id);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				if (existingCourse.Location != null)
+				{
+					_educationProgramContext.Locations.Remove(existingCourse.Location);
+				}
+
+				_educationProgramContext.Courses.Remove(existingCourse);
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("DeleteCourseById {Id} called", id);
+				return new StatusCodeResult((int)HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "RemoveCourseById({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
 
 
 	}

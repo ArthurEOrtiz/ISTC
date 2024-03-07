@@ -2,7 +2,11 @@
 import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
+import SavingModal from "../SavingModal";
+import axios from "axios";
+import ConfirmationModal from "../ConfirmationModal";
+import { useRouter } from "next/navigation";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -32,6 +36,10 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     // Constants
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
     const [courseInfo, setCourseInfo] = useState<Course>(course);
+    const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+    const router = useRouter();
     
     // Effects
     // This will sort the classes by date if they are not already sorted
@@ -56,6 +64,18 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         });
     }
     , [courseInfo.classes.length]);
+
+    // This will check if the course has been updated and set the unsaved changes flag.
+    useEffect(() => {
+        const courseString = JSON.stringify(course);
+        const courseInfoString = JSON.stringify(courseInfo);
+        if (courseString !== courseInfoString) {
+            setUnsavedChanges(true);
+        } else {
+            setUnsavedChanges(false);
+        }
+    }
+    , [courseInfo]);
 
     // Event Handlers
 
@@ -89,7 +109,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         const hasNullClass = courseInfo.classes.some(classSchedule => classSchedule.classId === null);
 
         if (hasNullClass) {
-            const modal = document.getElementById('warning_modal') as HTMLDialogElement | null;
+            const modal = document.getElementById('warning_modal_class') as HTMLDialogElement | null;
             if (modal) {
                 modal.showModal();
             }
@@ -120,9 +140,51 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     }
                 });
                 setEditModeIndex(null);
+                setUnsavedChanges(false);
             }
         }
     }
+
+    const handleSaveCourse = async () => {
+        console.log("Saving Course", courseInfo);
+        setIsSaving(true);
+        const url = `https://localhost:7144/Course/UpdateCourseById/${courseInfo.courseId}`;
+        try {
+            const response = await axios.put(url, courseInfo);
+            console.log("Response", response);
+            console.log("Response Data", response.data); 
+        }
+        catch (error) {
+            throw new Error("Error Saving Course", error as Error);
+        }
+        finally {
+            setIsSaving(false);
+            setUnsavedChanges(false);
+        }
+
+    }
+
+    const handleDeleteCourse = async () => {
+        setShowConfirmationModal(true);
+    }
+
+    const handleConfirmDeleteCourse = async () => {
+        console.log("Deleting Course", courseInfo);
+        setIsSaving(true);
+        const url = `https://localhost:7144/Course/DeleteCourseById/${courseInfo.courseId}`;
+        try {
+            const response = await axios.delete(url);
+            console.log("Response", response);
+            console.log("Response Data", response.data);
+        }
+        catch (error) {
+            console.log("Error", error);
+        }
+        finally {
+            router.push('/admin/editcourse/edit');
+        }
+    }
+
 
     // Helper Methods 
     const addNewClass = (): void => {
@@ -188,18 +250,26 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             <div className="flex flex-col items-center">
                 <div className="p-4">
                     <h1 className="p-s text-3xl text-center font-bold"> Course Id: {courseInfo.courseId}</h1>
+                    {unsavedChanges && (
+                        <div role="alert" className="alert alert-warning mt-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <span>Warning: Unsaved Changes detected!</span>
+                      </div>)}
                 </div>
                 <div className="navbar  w-1/2 rounded-xl flex justify-center">
                     
                     <button 
-                        className="btn btn-error text-white m-1">
+                        className="btn btn-error text-white mb-1 mr-1"
+                        onClick={handleDeleteCourse}>
                             Delete Course
                     </button>
                     <button
-                        className="btn btn-primary text-white m-1"
-                        onClick = {() => console.log(course)}>
-                            Save All
+                        className="btn btn-primary text-white mb-1"
+                        onClick = {handleSaveCourse}>
+                            Save Course
                     </button>
+
+                    
                 </div>
                 <div className="p-4">
                     <CourseInfoCard course={courseInfo} onApply={handleOnCourseInfoCardSave} />
@@ -228,15 +298,15 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                         onClick={handleOnClassAdd}>
                             Add Class
                     </button>
-                    <button
+                    {/* <button
                         className="btn btn-primary text-white m-1"
                         onClick={()=> console.log(courseInfo)}>
                             Test Course
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
-            <dialog id="warning_modal" className="modal">
+            <dialog id="warning_modal_class" className="modal">
                 <div className="modal-box">
                     <form method="dialog">
                     {/* if there is a button in form, it will close the modal */}
@@ -246,6 +316,19 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     <p className="py-4">There is an unsaved new class, please save or remove class before adding a new class.</p>
                 </div>
             </dialog>
+
+            {showConfirmationModal && (
+                <ConfirmationModal
+                    title={'Delete Course'}
+                    message={'Are you sure you want to delete this course?'}
+                    onConfirm={handleConfirmDeleteCourse}
+                    onCancel={() => setShowConfirmationModal(false)} />
+            )}
+
+
+            {isSaving && (
+                <SavingModal text={'Saving Course...'} />
+            )}
 
 
             

@@ -1,6 +1,6 @@
 'use client';
 import { Course, Topic } from '@/app/shared/types/sharedTypes';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import NewCourseForm from './NewCourseForm';
 import CourseInfoCard from './CourseInfoCard';
 import NewClass from './NewClass';
@@ -32,6 +32,8 @@ const AddCourse: React.FC = () => {
         });
     }
     , [course?.classes.length]);
+
+
 
     // Event Handlers this component. 
     const handleAddClass = () => {
@@ -81,10 +83,6 @@ const AddCourse: React.FC = () => {
             });
         };
     };
-
-    const handleAddTopic = () => {
-        setShowSelectTopicModal(true);
-    }
 
     const handleSaveCourse = async () => {
         setShowConfirmationModal(true);
@@ -179,7 +177,6 @@ const AddCourse: React.FC = () => {
         }
     }
 
-
     const handleConfirmationModalOnCancel = () => {
         setShowConfirmationModal(false);
     }
@@ -207,16 +204,11 @@ const AddCourse: React.FC = () => {
                 
                 <>
                     <div >
-
-                     
-                
                             <button
                                 className="btn btn-primary text-white mb-4"
                                 onClick={handleSaveCourse}
                             >Save Course</button>
-                   
                     </div>
-
                     
                     <div>
                         <CourseInfoCard course={course} onApply={handleCourseInfoCardOnApply} />
