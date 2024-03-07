@@ -2,7 +2,7 @@
 import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import SavingModal from "../SavingModal";
 import axios from "axios";
 
@@ -34,6 +34,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     // Constants
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
     const [courseInfo, setCourseInfo] = useState<Course>(course);
+    const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     
     // Effects
@@ -59,6 +60,17 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         });
     }
     , [courseInfo.classes.length]);
+
+    useEffect(() => {
+        const courseString = JSON.stringify(course);
+        const courseInfoString = JSON.stringify(courseInfo);
+        if (courseString !== courseInfoString) {
+            setUnsavedChanges(true);
+        } else {
+            setUnsavedChanges(false);
+        }
+    }
+    , [courseInfo]);
 
     // Event Handlers
 
@@ -123,6 +135,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     }
                 });
                 setEditModeIndex(null);
+                setUnsavedChanges(false);
             }
         }
     }
@@ -141,6 +154,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         }
         finally {
             setIsSaving(false);
+            setUnsavedChanges(false);
         }
 
     }
@@ -209,18 +223,25 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             <div className="flex flex-col items-center">
                 <div className="p-4">
                     <h1 className="p-s text-3xl text-center font-bold"> Course Id: {courseInfo.courseId}</h1>
+                    {unsavedChanges && (
+                        <div role="alert" className="alert alert-warning mt-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <span>Warning: Unsaved Changes detected!</span>
+                      </div>)}
                 </div>
                 <div className="navbar  w-1/2 rounded-xl flex justify-center">
                     
                     <button 
-                        className="btn btn-error text-white m-1">
+                        className="btn btn-error text-white mb-1 mr-1">
                             Delete Course
                     </button>
                     <button
-                        className="btn btn-primary text-white m-1"
+                        className="btn btn-primary text-white mb-1"
                         onClick = {handleSaveCourse}>
                             Save Course
                     </button>
+
+                    
                 </div>
                 <div className="p-4">
                     <CourseInfoCard course={courseInfo} onApply={handleOnCourseInfoCardSave} />
