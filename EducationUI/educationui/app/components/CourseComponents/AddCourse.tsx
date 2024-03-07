@@ -22,7 +22,6 @@ const AddCourse: React.FC = () => {
     const [course, setCourse] = useState<Course>();
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
-    const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const router = useRouter();
     

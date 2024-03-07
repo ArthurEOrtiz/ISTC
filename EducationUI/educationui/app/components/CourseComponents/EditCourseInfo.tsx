@@ -5,6 +5,8 @@ import ClassInfoCard from "./ClassInfoCard";
 import { use, useEffect, useState } from "react";
 import SavingModal from "../SavingModal";
 import axios from "axios";
+import ConfirmationModal from "../ConfirmationModal";
+import { useRouter } from "next/navigation";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -36,6 +38,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const [courseInfo, setCourseInfo] = useState<Course>(course);
     const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+    const router = useRouter();
     
     // Effects
     // This will sort the classes by date if they are not already sorted
@@ -105,7 +109,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         const hasNullClass = courseInfo.classes.some(classSchedule => classSchedule.classId === null);
 
         if (hasNullClass) {
-            const modal = document.getElementById('warning_modal') as HTMLDialogElement | null;
+            const modal = document.getElementById('warning_modal_class') as HTMLDialogElement | null;
             if (modal) {
                 modal.showModal();
             }
@@ -151,7 +155,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             console.log("Response Data", response.data); 
         }
         catch (error) {
-            console.log("Error", error);
+            throw new Error("Error Saving Course", error as Error);
         }
         finally {
             setIsSaving(false);
@@ -159,6 +163,28 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         }
 
     }
+
+    const handleDeleteCourse = async () => {
+        setShowConfirmationModal(true);
+    }
+
+    const handleConfirmDeleteCourse = async () => {
+        console.log("Deleting Course", courseInfo);
+        setIsSaving(true);
+        const url = `https://localhost:7144/Course/DeleteCourseById/${courseInfo.courseId}`;
+        try {
+            const response = await axios.delete(url);
+            console.log("Response", response);
+            console.log("Response Data", response.data);
+        }
+        catch (error) {
+            console.log("Error", error);
+        }
+        finally {
+            router.push('/admin/editcourse/edit');
+        }
+    }
+
 
     // Helper Methods 
     const addNewClass = (): void => {
@@ -233,7 +259,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 <div className="navbar  w-1/2 rounded-xl flex justify-center">
                     
                     <button 
-                        className="btn btn-error text-white mb-1 mr-1">
+                        className="btn btn-error text-white mb-1 mr-1"
+                        onClick={handleDeleteCourse}>
                             Delete Course
                     </button>
                     <button
@@ -279,7 +306,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 </div>
             </div>
 
-            <dialog id="warning_modal" className="modal">
+            <dialog id="warning_modal_class" className="modal">
                 <div className="modal-box">
                     <form method="dialog">
                     {/* if there is a button in form, it will close the modal */}
@@ -289,6 +316,15 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     <p className="py-4">There is an unsaved new class, please save or remove class before adding a new class.</p>
                 </div>
             </dialog>
+
+            {showConfirmationModal && (
+                <ConfirmationModal
+                    title={'Delete Course'}
+                    message={'Are you sure you want to delete this course?'}
+                    onConfirm={handleConfirmDeleteCourse}
+                    onCancel={() => setShowConfirmationModal(false)} />
+            )}
+
 
             {isSaving && (
                 <SavingModal text={'Saving Course...'} />

@@ -170,8 +170,8 @@ namespace EducationAPI.Controllers
 			}
 		}
 
-		[HttpDelete("RemoveCourseById/{id}")]
-		public async Task<ActionResult> RemoveCourseById(int id)
+		[HttpDelete("DeleteCourseById/{id}")]
+		public async Task<ActionResult> DeleteCourseById(int id)
 		{
 			try
 			{
@@ -181,7 +181,7 @@ namespace EducationAPI.Controllers
 
 				if (existingCourse == null)
 				{
-					_logger.LogError("RemoveCourseById({Id}), Course not found!", id);
+					_logger.LogError("DeleteCourseById({Id}), Course not found!", id);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -193,7 +193,7 @@ namespace EducationAPI.Controllers
 				_educationProgramContext.Courses.Remove(existingCourse);
 				await _educationProgramContext.SaveChangesAsync();
 
-				_logger.LogInformation("RemoveCourseById {Id} called", id);
+				_logger.LogInformation("DeleteCourseById {Id} called", id);
 				return new StatusCodeResult((int)HttpStatusCode.OK);
 			}
 			catch (Exception ex)
