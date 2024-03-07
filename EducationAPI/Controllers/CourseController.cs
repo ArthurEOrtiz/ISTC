@@ -170,6 +170,38 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpDelete("RemoveCourseById/{id}")]
+		public async Task<ActionResult> RemoveCourseById(int id)
+		{
+			try
+			{
+				var existingCourse = await _educationProgramContext.Courses
+						.Include(c => c.Location)
+						.FirstOrDefaultAsync(c => c.CourseId == id);
+
+				if (existingCourse == null)
+				{
+					_logger.LogError("RemoveCourseById({Id}), Course not found!", id);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				if (existingCourse.Location != null)
+				{
+					_educationProgramContext.Locations.Remove(existingCourse.Location);
+				}
+
+				_educationProgramContext.Courses.Remove(existingCourse);
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("RemoveCourseById {Id} called", id);
+				return new StatusCodeResult((int)HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "RemoveCourseById({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
 
 
 	}

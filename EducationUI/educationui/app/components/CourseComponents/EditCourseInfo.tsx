@@ -61,6 +61,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
     , [courseInfo.classes.length]);
 
+    // This will check if the course has been updated and set the unsaved changes flag.
     useEffect(() => {
         const courseString = JSON.stringify(course);
         const courseInfoString = JSON.stringify(courseInfo);
@@ -270,11 +271,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                         onClick={handleOnClassAdd}>
                             Add Class
                     </button>
-                    <button
+                    {/* <button
                         className="btn btn-primary text-white m-1"
                         onClick={()=> console.log(courseInfo)}>
                             Test Course
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
