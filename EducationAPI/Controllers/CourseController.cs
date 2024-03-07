@@ -142,6 +142,34 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpPut("UpdateCourseById/{id}")]
+		public async Task<ActionResult<Course>> UpdateCourseById(int id, Course updatedCourse)
+		{
+			try
+			{
+				var existingCourse = await _educationProgramContext.Courses
+					.FirstOrDefaultAsync(c => c.CourseId == id);
+
+				if (existingCourse == null)
+				{
+					_logger.LogError("UpdateCourse({Id}), Course not found!", id);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_educationProgramContext.Entry(existingCourse).CurrentValues.SetValues(updatedCourse);
+
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("UpdateCourse {Id} called", id);
+				return existingCourse;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "UpdateCourse({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 
 
 	}

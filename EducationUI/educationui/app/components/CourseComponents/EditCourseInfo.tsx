@@ -3,6 +3,8 @@ import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
 import { useEffect, useState } from "react";
+import SavingModal from "../SavingModal";
+import axios from "axios";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -32,6 +34,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     // Constants
     const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
     const [courseInfo, setCourseInfo] = useState<Course>(course);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     
     // Effects
     // This will sort the classes by date if they are not already sorted
@@ -124,6 +127,24 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         }
     }
 
+    const handleSaveCourse = async () => {
+        console.log("Saving Course", courseInfo);
+        setIsSaving(true);
+        const url = `https://localhost:7144/Course/UpdateCourseById/${courseInfo.courseId}`;
+        try {
+            const response = await axios.put(url, courseInfo);
+            console.log("Response", response);
+            console.log("Response Data", response.data); 
+        }
+        catch (error) {
+            console.log("Error", error);
+        }
+        finally {
+            setIsSaving(false);
+        }
+
+    }
+
     // Helper Methods 
     const addNewClass = (): void => {
         const today = new Date();
@@ -197,8 +218,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </button>
                     <button
                         className="btn btn-primary text-white m-1"
-                        onClick = {() => console.log(course)}>
-                            Save All
+                        onClick = {handleSaveCourse}>
+                            Save Course
                     </button>
                 </div>
                 <div className="p-4">
@@ -246,6 +267,10 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     <p className="py-4">There is an unsaved new class, please save or remove class before adding a new class.</p>
                 </div>
             </dialog>
+
+            {isSaving && (
+                <SavingModal text={'Saving Course...'} />
+            )}
 
 
             
