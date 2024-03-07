@@ -1,4 +1,5 @@
 'use client';
+import { AddClassByCourseId, EditClassById } from "@/Utilities/api";
 import { ClassSchedule } from "@/app/shared/types/sharedTypes";
 import axios from "axios";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -41,53 +42,56 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
 
     const handleSave = async () => {
         try {
-            let url : string = '';
+            //let url : string = '';
             if (oldClassSchedule?.classId == null) {
-                url = `https://localhost:7144/Class/AddClassByCourseId?courseId=${oldClassSchedule.courseId}&newStartDate=${editedClassSchedule.scheduleStart}&newEndDate=${editedClassSchedule.scheduleEnd}`;
-                
+                let responseData = null;
                 try {
-                    const response = await axios.post(url);
-
-                    if (response.status !== 201) {
-                        throw new Error('Error saving course');
-                    }
-
-                    if (response.data != null) {
-                        //console.log("response data", response.data);
-                        const newClass: ClassSchedule = response.data;
+                    responseData = await AddClassByCourseId(oldClassSchedule.courseId, editedClassSchedule.scheduleStart, editedClassSchedule.scheduleEnd);
+                } catch (error) {
+                    throw error;
+                } finally {
+                    if (responseData != null) {
+                        const newClass: ClassSchedule = responseData;
                         setOldClassSchedule(newClass);
                         setEditedClassSchedule(newClass);
                         onAdd(newClass);
                     }
-
-                } catch (error) {
-                    console.error('Error saving course', error);
                 }
-        
             }
             else if (oldClassSchedule?.classId != null)
             {
-                url = `https://localhost:7144/Class/EditClassById?id=${oldClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
+                // url = `https://localhost:7144/Class/EditClassById?id=${oldClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
                 
-                try {
-                    const response = await axios.post(url);
+                // try {
+                //     const response = await axios.post(url);
                     
-                    if (response.status !== 200) {
-                        throw new Error('Error saving course');
-                    }
+                //     if (response.status !== 200) {
+                //         throw new Error(`Error saving course: ${response.status}`);
+                //     }
                     
-                    setOldClassSchedule(editedClassSchedule);
-                    onAdd(editedClassSchedule);
+                //     setOldClassSchedule(editedClassSchedule);
+                //     onAdd(editedClassSchedule);
 
+                // } catch (error) {
+                //     throw error;
+                // }
+                let responseData = null;
+                try {
+                    responseData = await EditClassById(oldClassSchedule.classId, editedClassSchedule.scheduleStart, editedClassSchedule.scheduleEnd);
                 } catch (error) {
-                    console.error('Error saving course', error);
+                    throw error;
+                } finally {
+                    if (responseData != null) {
+                        setOldClassSchedule(editedClassSchedule);
+                        onAdd(editedClassSchedule);
+                    }
                 }
                 
             }
             setEditClass(false);
 
         } catch (error) {
-            console.error('Error saving course', error);
+            throw error;
         }
     }
 

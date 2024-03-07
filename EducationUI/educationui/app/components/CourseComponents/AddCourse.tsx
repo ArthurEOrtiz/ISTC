@@ -1,6 +1,6 @@
 'use client';
 import { Course, Topic } from '@/app/shared/types/sharedTypes';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import NewCourseForm from './NewCourseForm';
 import CourseInfoCard from './CourseInfoCard';
 import NewClass from './NewClass';
@@ -9,6 +9,7 @@ import axios from 'axios';
 import ConfirmationModal from '../ConfirmationModal';
 import { useRouter } from 'next/navigation';
 import SavingModal from '../SavingModal';
+import { postCourse } from '@/Utilities/api';
 
 
 
@@ -155,7 +156,8 @@ const AddCourse: React.FC = () => {
         
         try {
             setShowConfirmationModal(false);
-            await saveCourseToDatabase();
+            // imported from api.ts
+            await postCourse(course);
 
         } catch (error) {
             throw new Error(error as string);
@@ -169,21 +171,6 @@ const AddCourse: React.FC = () => {
 
     const handleConfirmationModalOnCancel = () => {
         setShowConfirmationModal(false);
-    }
-
-    // Additional Methods
-
-    const saveCourseToDatabase = async () => {
-        try {
-            // Perform the POST request to save the course
-            const response = await axios.post("https://localhost:7144/Course/PostCourse", course);
-
-            if (response.status !== 200) {
-                throw new Error(`Failed to save course. Status: ${response.status} - ${response.statusText}`);
-            } 
-        } catch (error) {
-            throw new Error(error as string);
-        }
     }
 
     return (
@@ -227,7 +214,7 @@ const AddCourse: React.FC = () => {
                 </>
 
             )}
-            
+
             {/* Dialogs - also known as Modals - and the saving spinner */}
             {showSelectTopicModal && (
                 <SelectTopicModal 

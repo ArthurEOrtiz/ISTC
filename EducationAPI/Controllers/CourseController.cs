@@ -119,7 +119,9 @@ namespace EducationAPI.Controllers
 				// Check if any of the topics in the request already exist in the database
 				foreach (var topic in topicsCopy)
 				{
-					var existingTopic = await _educationProgramContext.Topics.FirstOrDefaultAsync(t => t.TopicId == topic.TopicId);
+					var existingTopic = await _educationProgramContext.Topics
+						.FirstOrDefaultAsync(t => t.TopicId == topic.TopicId);
+
 					if (existingTopic != null)
 					{
 						// If the topic already exists, just link it to the course
@@ -148,6 +150,9 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var existingCourse = await _educationProgramContext.Courses
+					.Include(c => c.Classes)
+					.Include(c => c.Location)
+					.Include(c => c.Topics)
 					.FirstOrDefaultAsync(c => c.CourseId == id);
 
 				if (existingCourse == null)
@@ -156,7 +161,22 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
+				// Update scalar properties
 				_educationProgramContext.Entry(existingCourse).CurrentValues.SetValues(updatedCourse);
+
+				// Update topics. 
+				existingCourse.Topics.Clear();
+
+				foreach (var topic in updatedCourse.Topics)
+				{
+					var existingTopic = await _educationProgramContext.Topics
+						.FirstOrDefaultAsync(t => t.TopicId == topic.TopicId);
+
+					if (existingTopic != null)
+					{
+						existingCourse.Topics.Add(existingTopic);
+					}
+				}
 
 				await _educationProgramContext.SaveChangesAsync();
 

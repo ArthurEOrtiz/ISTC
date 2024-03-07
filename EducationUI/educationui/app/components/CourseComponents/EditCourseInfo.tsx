@@ -2,11 +2,11 @@
 import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SavingModal from "../SavingModal";
-import axios from "axios";
 import ConfirmationModal from "../ConfirmationModal";
 import { useRouter } from "next/navigation";
+import { DeleteCourseById, UpdateCourseById } from "@/Utilities/api";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -148,14 +148,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const handleSaveCourse = async () => {
         console.log("Saving Course", courseInfo);
         setIsSaving(true);
-        const url = `https://localhost:7144/Course/UpdateCourseById/${courseInfo.courseId}`;
-        try {
-            const response = await axios.put(url, courseInfo);
-            console.log("Response", response);
-            console.log("Response Data", response.data); 
+        try{
+           await UpdateCourseById(courseInfo.courseId, courseInfo);
         }
         catch (error) {
-            throw new Error("Error Saving Course", error as Error);
+            throw error;
         }
         finally {
             setIsSaving(false);
@@ -171,14 +168,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const handleConfirmDeleteCourse = async () => {
         console.log("Deleting Course", courseInfo);
         setIsSaving(true);
-        const url = `https://localhost:7144/Course/DeleteCourseById/${courseInfo.courseId}`;
         try {
-            const response = await axios.delete(url);
-            console.log("Response", response);
-            console.log("Response Data", response.data);
+            await DeleteCourseById(courseInfo.courseId);
         }
         catch (error) {
-            console.log("Error", error);
+            throw error;
         }
         finally {
             router.push('/admin/editcourse/edit');
@@ -190,30 +184,27 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const addNewClass = (): void => {
         const today = new Date();
 
-            today.setUTCHours(16,0,0,0);
-            const todayAt9AM = new Date(today)
-            //console.log("9am String ", todayAt9AM)
-           
-            today.setUTCHours(24,0,0,0);
-            const todayAt5PM = new Date(today) 
-            //console.log("5pm String ", todayAt5PM)
+        today.setUTCHours(16,0,0,0);
+        const todayAt9AM = new Date(today)
+        
+        today.setUTCHours(24,0,0,0);
+        const todayAt5PM = new Date(today) 
 
-
-            const newClassSchedule: ClassSchedule = {
-                classId: null,
-                courseId: course.courseId,
-                scheduleStart: todayAt9AM,
-                scheduleEnd: todayAt5PM,
-                attendance: []
+        const newClassSchedule: ClassSchedule = {
+            classId: null,
+            courseId: course.courseId,
+            scheduleStart: todayAt9AM,
+            scheduleEnd: todayAt5PM,
+            attendance: []
+        }
+        //console.log(newClassSchedule)
+        setCourseInfo(prevCourse => {
+            return {
+                ...prevCourse,
+                classes: [newClassSchedule]
             }
-            //console.log(newClassSchedule)
-            setCourseInfo(prevCourse => {
-                return {
-                    ...prevCourse,
-                    classes: [newClassSchedule]
-                }
-            });
-            setEditModeIndex(0);
+        });
+        setEditModeIndex(0);
     }
 
     const addNewClassPlusOneDay = (): void => {
@@ -298,11 +289,16 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                         onClick={handleOnClassAdd}>
                             Add Class
                     </button>
-                    {/* <button
+                    <button
                         className="btn btn-primary text-white m-1"
-                        onClick={()=> console.log(courseInfo)}>
+                        onClick={()=> console.log("COURSEINFO",courseInfo)}>
+                            Test Course Info
+                    </button>
+                    <button
+                        className="btn btn-primary text-white m-1"
+                        onClick={()=> console.log("COURSE",course)}>
                             Test Course
-                    </button> */}
+                    </button>
                 </div>
             </div>
 
