@@ -80,8 +80,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     // Event Handlers
 
     const handleOnCourseInfoCardSave = (updatedCourse: Course | null): void => {
-        //console.log("Updated Course", updatedCourse)
-        
         if (updatedCourse !== null) {
             setCourseInfo(updatedCourse);
         }
@@ -178,7 +176,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             router.push('/admin/editcourse/edit');
         }
     }
-
 
     // Helper Methods 
     const addNewClass = (): void => {
@@ -332,7 +329,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                           
  
         
-  );
+    );
 }
 
 export default EditCourseInfo;
