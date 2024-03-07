@@ -93,23 +93,18 @@ const AddCourse: React.FC = () => {
 
     // NewCourseForm
     const handleNewCourseFormOnSubmit = (course: Course) => {
-        // console.log("AddCourse.handleNewCourseFormOnSubmit: course: ", course);
         setCourse(course);
     }
 
     const handleCourseInfoCardOnApply = (course: Course) => {
-        //console.log("AddCourse.handleCourseInfoCardOnApply: course: ", course);
         setCourse(course);
     }
 
     // NewClass
     const handleNewClassOnDelete = (index: number) => {
-        //console.log("AddCourse.handleNewClassOnDelete: index: ", index);
         if (course) {
             const newClasses = [...course.classes];
-            // console.log("AddCourse.handleNewClassOnDelete: newClasses: ", newClasses);
             newClasses.splice(index, 1); // Remove the class at the specified index
-            // console.log("AddCourse.handleNewClassOnDelete: newClasses: ", newClasses);
             setCourse({
                 ...course,
                 classes: newClasses
@@ -118,7 +113,6 @@ const AddCourse: React.FC = () => {
     }
 
     const handleNewClassOnScheduleStartChange = (index: number, date: Date) => {
-        // console.log("AddCourse.handleNewClassOnDateChange: index: ", index, " date: ", date);
         if (course) {
             const newClasses = [...course.classes];
             newClasses[index].scheduleStart = date;
@@ -130,7 +124,6 @@ const AddCourse: React.FC = () => {
     }
 
     const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
-        // console.log("AddCourse.handleNewClassOnDateChange: index: ", index, " date: ", date);
         if (course) {
             const newClasses = [...course.classes];
             newClasses[index].scheduleEnd = date;
@@ -147,8 +140,6 @@ const AddCourse: React.FC = () => {
     }
 
     const handleSelectTopicModalOnSelect = (topic: Topic[]) => {
-        //console.log("AddCourse.handleSelectTopicModalOnSelect: topic: ", topic);
-        
         if (course) {
             setCourse({
                 ...course,
@@ -160,7 +151,6 @@ const AddCourse: React.FC = () => {
 
     // ConfirmationModal
     const handleConfirmationModalOnConfirm = async () => {
-        //console.log("AddCourse.handleConfirmationModalOnConfirm");
         setIsSaving(true);
         
         try {
@@ -233,16 +223,11 @@ const AddCourse: React.FC = () => {
                                 onClick={handleAddClass}
                             >Add Class</button>
                         </div>
-                        {/* <div className = "mt-2">
-                            <button
-                                className="btn btn-primary text-white"
-                                onClick={() => console.log("Course: ", course)}
-                            >Test Course</button>
-                        </div> */}
                     </div>
                 </>
 
             )}
+            
             {/* Dialogs - also known as Modals - and the saving spinner */}
             {showSelectTopicModal && (
                 <SelectTopicModal 
