@@ -136,13 +136,13 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
 
                     {editMode ?
                         <>
-                        <textarea
-                            name="description"
-                            maxLength = {255}
-                            defaultValue={editCourse?.description}
-                            onChange={handleTextAreaChange}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            />
+                            <textarea
+                                name="description"
+                                maxLength = {255}
+                                defaultValue={editCourse?.description}
+                                onChange={handleTextAreaChange}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                />
                             <CharacterCounter value={editCourse.description} limit={255} />
                         </>
                         : course?.description}

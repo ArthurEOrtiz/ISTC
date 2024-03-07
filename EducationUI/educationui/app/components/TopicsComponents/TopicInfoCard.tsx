@@ -1,5 +1,6 @@
 import { Topic } from "@/app/shared/types/sharedTypes";
 import { useState } from "react";
+import CharacterCounter from "../CharacterCounter";
 
 interface TopicInfoCardProps {
     topic: Topic;
@@ -31,16 +32,31 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply }) => {
                     type="text"
                     name = "title"
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    maxLength={50}
                     defaultValue={editTopic.title}
                     onChange={(e) => setEditTopic({ ...editTopic, title: e.target.value })}
-                /> : topic.title}</h1>
-            <p><strong>Description:</strong> {editMode ?
-                <textarea
-                    name="description"
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
-                    defaultValue={editTopic.description}
-                    onChange={(e) => setEditTopic({ ...editTopic, description: e.target.value })}
-                /> : topic.description} </p>
+                /> : topic.title}
+            </h1>
+            <div className="m-2">
+
+                <strong>Description:</strong> 
+
+                {editMode ?
+                    <>
+                        <textarea
+                            name="description"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
+                            maxLength={255}
+                            defaultValue={editTopic.description}
+                            onChange={(e) => setEditTopic({ ...editTopic, description: e.target.value })}
+                        />
+                        <CharacterCounter value={editTopic.description} limit={255} />
+                    </>
+                    
+                : topic.description}
+
+            </div>
+
             <button
                 onClick={toggleEditMode}
                 className="btn btn-primary text-white mt-4"
