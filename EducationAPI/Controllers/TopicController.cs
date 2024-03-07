@@ -77,6 +77,32 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpPut("UpdateTopicById/{id}")]
+		public async Task<ActionResult<Topic>> UpdateTopicById(int id, Topic updatedTopic)
+		{
+			try
+			{
+				var existingTopic = await _educationProgramContext.Topics
+					.FirstOrDefaultAsync(t => t.TopicId == id);
+
+				if (existingTopic == null)
+				{
+					_logger.LogError("UpdateTopicById({Id}, {UpdatedTopic}), Topic not found!", id, updatedTopic);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_educationProgramContext.Entry(existingTopic).CurrentValues.SetValues(updatedTopic);
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("UpdateTopicById({Id}. {UpdatedTopic}) called", id, updatedTopic);
+				return existingTopic;
+
+			} catch (Exception ex)
+			{
+				_logger.LogError(ex, "UpdateTopicById({Id}. {UpdatedTopic})", id, updatedTopic);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
 
 		[HttpPost("AddTopicToCourse")]
 		public async Task<ActionResult> AddTopicToCourse(int topicId, int courseId)

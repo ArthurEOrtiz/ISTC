@@ -1,5 +1,4 @@
 import { Topic } from "@/app/shared/types/sharedTypes";
-import { on } from "events";
 import { useState } from "react";
 
 interface TopicInfoCardProps {
@@ -26,7 +25,7 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply }) => {
 
 
     return (
-        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <div className="bg-white shadow-md rounded-xl p-3">
             <h1 className="text-xl font-bold"> {editMode ? 
                 <input
                     type="text"

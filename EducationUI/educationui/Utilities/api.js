@@ -109,5 +109,15 @@ export async function getAllTopics() {
     }
 }
 
+export async function updateTopicById(topicId, topic) {
+    try {
+        const response = await axiosInstance.put(`Topic/UpdateTopicById/${topicId}`, topic);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating topic:', error);
+        throw error;
+    }
+}
+
 
 
