@@ -88,6 +88,16 @@ export async function EditClassById (classId, scheduleStart, scheduleEnd) {
     }
 }
 
+export async function DeleteClassById(classId) {
+    try {
+        const response = await axiosInstance.delete(`Class/DeleteClassById?id=${classId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting class:', error);
+        throw error;
+    }
+}
+
 // Topics
 export async function getAllTopics() {
     try {
