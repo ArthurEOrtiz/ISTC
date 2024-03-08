@@ -4,7 +4,7 @@ import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
 import { useEffect, useState } from "react";
 import SavingModal from "../SavingModal";
-import ConfirmationModal from "../ConfirmationModal";
+import ConfirmationModal from "../../shared/modals/ConfirmationModal";
 import { useRouter } from "next/navigation";
 import { DeleteCourseById, UpdateCourseById } from "@/Utilities/api";
 

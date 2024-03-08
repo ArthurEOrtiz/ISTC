@@ -5,7 +5,7 @@ import NewCourseForm from './NewCourseForm';
 import CourseInfoCard from './CourseInfoCard';
 import NewClass from './NewClass';
 import SelectTopicModal from '../TopicsComponents/SelectTopicModal';
-import ConfirmationModal from '../ConfirmationModal';
+import ConfirmationModal from '../../shared/modals/ConfirmationModal';
 import { useRouter } from 'next/navigation';
 import SavingModal from '../SavingModal';
 import { postCourse } from '@/Utilities/api';
