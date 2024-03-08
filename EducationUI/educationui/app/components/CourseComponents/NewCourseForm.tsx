@@ -1,7 +1,7 @@
 'use client';
-import { Course, Location, Topic } from "@/app/shared/types/sharedTypes";
+import { Course } from "@/app/shared/types/sharedTypes";
 import { ChangeEvent, FocusEvent, FormEvent, useState } from "react";
-import CharacterCounter from "../CharacterCounter";
+import CharacterCounter from "../../shared/CharacterCounter";
 
 interface NewCourseFormProps {
     onSubmit: (course : Course) => void;
@@ -49,6 +49,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
         instructorName: '',
         instructorEmail: '',
         pdf: '',
+        locationId: 0,
         location: {
             locationId: 0,
             description: '',
