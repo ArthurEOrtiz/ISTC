@@ -101,21 +101,30 @@ namespace EducationAPI.Controllers
 
 				if (updatedTopic.Courses != null)
 				{
-					foreach(var existingCourse in existingTopic.Courses.ToList())
+					foreach (var existingCourse in existingTopic.Courses.ToList())
 					{
-						_educationProgramContext.Entry(existingCourse).State = EntityState.Detached;
+						// Check if the course exists in the updated list
+						var updatedCourse = updatedTopic.Courses.FirstOrDefault(c => c.CourseId == existingCourse.CourseId);
+						if (updatedCourse == null)
+						{
+							// If the course doesn't exist in the updated list, remove it
+							existingTopic.Courses.Remove(existingCourse);
+						}
 					}
 
-					foreach(var course in updatedTopic.Courses)
+					foreach (var course in updatedTopic.Courses)
 					{
-						var existingCourse = await _educationProgramContext.Courses
-							.FirstOrDefaultAsync(c => c.CourseId == course.CourseId);
-
-						if (existingCourse != null)
+						// Check if the course already exists in the topic's courses
+						if (!existingTopic.Courses.Any(c => c.CourseId == course.CourseId))
 						{
-							existingTopic.Courses.Add(existingCourse);
+							var existingCourse = await _educationProgramContext.Courses
+									.FirstOrDefaultAsync(c => c.CourseId == course.CourseId);
+
+							if (existingCourse != null)
+							{
+								existingTopic.Courses.Add(existingCourse);
+							}
 						}
-						
 					}
 				}
 
