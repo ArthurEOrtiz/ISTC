@@ -166,14 +166,6 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         )}
 
 
-
-                        {/* {editCourse?.topics?.map((topic, index) => (
-                            <span key={index}>
-                                {topic.title}
-                                {index !== (editCourse?.topics?.length ?? 0) - 1 && ', '}
-                            </span>
-                        ))} */}
-
                         {editMode ?
                             <button
                                 className="btn btn-xs btn-accent text-white ml-4"
