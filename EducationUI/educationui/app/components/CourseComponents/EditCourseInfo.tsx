@@ -235,7 +235,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     return (
         <div>
 
-            <div className="flex flex-col items-center">
+            <div>
                 <div className="p-4">
                     <h1 className="p-s text-3xl text-center font-bold"> Course Id: {courseInfo.courseId}</h1>
                     {unsavedChanges && (
@@ -244,33 +244,34 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                         <span>Warning: Unsaved Changes detected!</span>
                       </div>)}
                 </div>
-                <div className="navbar  w-1/2 rounded-xl flex justify-center">
-                    
-                    <button 
-                        className="btn btn-error text-white mb-1 mr-1"
-                        onClick={handleDeleteCourse}>
-                            Delete Course
-                    </button>
-                    <button
-                        className="btn btn-primary text-white mb-1"
-                        onClick = {handleSaveCourse}>
-                            Save Course
-                    </button>
 
-                    
+                <div className="flex justify-center">              
+                        
+                        <button 
+                            className="btn btn-error text-white mb-1 mr-1"
+                            onClick={handleDeleteCourse}>
+                                Delete Course
+                        </button>
+                        <button
+                            className="btn btn-primary text-white mb-1"
+                            onClick = {handleSaveCourse}>
+                                Save Course
+                        </button>
+                   
                 </div>
+                
                 <div className="p-4">
                     <CourseInfoCard course={courseInfo} onApply={handleOnCourseInfoCardSave} />
                 </div>
             </div>
             
-            <div className="flex flex-col items-center">
+            <div className="">
                 <div className="p-4">
                     <h1 className="p-s text-3xl text-center font-bold">
                         Classes
                     </h1>
                 </div>
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex justify-center">
                     {courseInfo.classes.map((classSchedule, index) => (
                         <ClassInfoCard 
                             key={classSchedule.classId}
@@ -280,13 +281,13 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                             editMode={index === editModeIndex} />
                     ))}
                 </div>
-                <div className="navbar  w-1/2 rounded-xl">
+                <div className="flex justify-center">
                     <button 
                         className="btn btn-primary text-white m-1"
                         onClick={handleOnClassAdd}>
                             Add Class
                     </button>
-                    <button
+                    {/* <button
                         className="btn btn-primary text-white m-1"
                         onClick={()=> console.log("COURSEINFO",courseInfo)}>
                             Test Course Info
@@ -295,7 +296,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                         className="btn btn-primary text-white m-1"
                         onClick={()=> console.log("COURSE",course)}>
                             Test Course
-                    </button>
+                    </button> */}
                 </div>
             </div>
 

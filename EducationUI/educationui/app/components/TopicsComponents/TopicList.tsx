@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Topic } from "@/app/shared/types/sharedTypes";
 import TopicInfoCard from "./TopicInfoCard";
-import { updateTopicById } from "@/Utilities/api";
+import { deleteTopicById, updateTopicById } from "@/Utilities/api";
 
 interface TopicListProps {
     topics: Topic[];
@@ -39,18 +39,27 @@ const TopicList: React.FC<TopicListProps> = ({ topics }) => {
         }
     };
 
+    const handleTopicInfoCardOnDelete = async (topicId: number) => { 
+        try {
+            await deleteTopicById(topicId);
+        } catch (error) {
+            throw error;
+        } finally {
+            const newTopicList = topicList.filter(topic => topic.topicId !== topicId);
+            setTopicList(newTopicList);
+        }
+    }
+
     return (
         <div className="flex flex-wrap justify-center gap-4 p-4">
             {topicList.map((topic, index) => (
                 <div key={index} className="card w-full">
                     <label className="flex items-center">
-                        <input
-                            type="checkbox"
-                            checked={selectedTopics.includes(topic.topicId as number)}
-                            onChange={() => handleToggleSelect(topic.topicId as number)}
-                            className="mr-2"
+                        <TopicInfoCard 
+                            topic={topic} 
+                            onApply={handleTopicInfoCardOnApply} 
+                            onDelete={handleTopicInfoCardOnDelete}
                         />
-                        <TopicInfoCard topic={topic} onApply={handleTopicInfoCardOnApply} />
                     </label>
                 </div>
             ))}

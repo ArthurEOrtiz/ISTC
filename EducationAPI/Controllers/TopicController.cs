@@ -167,6 +167,33 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpDelete("DeleteTopicById/{id}")]
+		public async Task<ActionResult> DeleteTopicById(int id)
+		{
+			try
+			{
+				var topic = await _educationProgramContext.Topics
+					.Include(t => t.Courses)
+					.FirstOrDefaultAsync(t => t.TopicId == id);
+
+				if (topic == null)
+				{
+					_logger.LogError("DeleteTopicById({Id}), Topic not found!", id);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_educationProgramContext.Topics.Remove(topic);
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("DeleteTopicById({Id}) called", id);
+				return new StatusCodeResult((int)HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "DeleteTopicById({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
 
 	}
 }

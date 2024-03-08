@@ -7,9 +7,10 @@ import SelectCourseModal from "../CourseComponents/SelectCourseModal";
 interface TopicInfoCardProps {
     topic: Topic;
     onApply: (topic: Topic) => void;
+    onDelete?: (topicId : number) => void;
 }
 
-const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply }) => {
+const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete }) => {
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editTopic, setEditTopic] = useState<Topic>(topic);
     const [courses, setCourses] = useState<Course[]>([]);
@@ -57,6 +58,12 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply }) => {
     const handleCancel = () => {
         setEditTopic(topic);
         setEditMode(false);
+    }
+
+    const handleDelete = () => {
+        if (onDelete && topic.topicId && topic.topicId !== 0) {
+            onDelete(topic.topicId);
+        }
     }
 
     return (
@@ -147,11 +154,6 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply }) => {
                     </>
                 ) : null}
             </div>
-
-            
-            
-            
-            
             
             <button
                 onClick={toggleEditMode}
@@ -166,6 +168,15 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply }) => {
                     className="btn btn-warning text-white mt-4 ml-2"
                 >
                     Cancel
+                </button>
+            )}
+
+            {editMode && topic.topicId !== 0  && (
+                <button
+                    onClick={handleDelete}
+                    className="btn btn-error text-white mt-4 ml-2"
+                >
+                    Delete
                 </button>
             )}
 

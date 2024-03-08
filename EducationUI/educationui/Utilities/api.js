@@ -139,5 +139,15 @@ export async function updateTopicById(topicId, topic) {
     }
 }
 
+export async function deleteTopicById(topicId) {
+    try {
+        const response = await axiosInstance.delete(`Topic/DeleteTopicById/${topicId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting topic:', error);
+        throw error;
+    }
+}
+
 
 
