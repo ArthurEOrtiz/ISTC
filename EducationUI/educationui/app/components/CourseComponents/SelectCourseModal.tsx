@@ -57,7 +57,7 @@ const SelectCourseModal: React.FC<SelectCourseModalProps> = ({ open, onClose, on
                 <h2 className="text-xl font-semibold mb-4">Select Course</h2>
 
                 {loading ? (
-                    <p>Loading...</p>
+                    <span className="loading loading-spinner loading-xs"></span>
                 ) : error ? (
                     <p>{error}</p>
                 ) : (

@@ -14,12 +14,22 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply }) => {
     const [editTopic, setEditTopic] = useState<Topic>(topic);
     const [courses, setCourses] = useState<Course[]>([]);
     const [showSelectCourseModal, setShowSelectCourseModal] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
+    
             if (topic.topicId === 0) return setCourses([]);
-            const responseData = await getCoursesByTopicId(topic.topicId);
-            setCourses(responseData);
+            setLoading(true);
+            try {
+                const responseData = await getCoursesByTopicId(topic.topicId);
+                setCourses(responseData);
+            } catch (error) {
+                console.error("Error fetching courses by topic id: ", error);
+            } finally {
+                setLoading(false);
+            }
+
         };
         fetchData();
     }, [topic]);
@@ -35,12 +45,18 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply }) => {
         if (editMode) {
             onApply(editTopic);
         }
+
     };
 
     const handleSelectCourseModalOnSelect = (selectedCourses: Course[]) => {
         setCourses(selectedCourses);
         setEditTopic({ ...editTopic, courses: selectedCourses });
         setShowSelectCourseModal(false);
+    }
+
+    const handleCancel = () => {
+        setEditTopic(topic);
+        setEditMode(false);
     }
 
     return (
@@ -99,11 +115,16 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply }) => {
                 <div className="m-2">
                     <strong>Courses: </strong>
 
-                    <ul>
-                        {courses.map((course, index) => (
-                            <li key={index}>{course.title}</li>
-                        ))}
-                    </ul>
+                    {loading ? (
+                        <span className="loading loading-spinner loading-xs"></span>
+                    ) : (
+                        <ul>
+                            {courses.map((course, index) => (
+                                <li key={index}>{course.title}</li>
+                            ))}
+                        </ul>
+                    )}
+                
                 
                     { editMode ? (
                     <button
@@ -127,12 +148,21 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply }) => {
                 {editMode ? "Apply" : "Edit"}
             </button>
 
-            <button 
+            {editMode && (
+                <button
+                    onClick={handleCancel}
+                    className="btn btn-warning text-white mt-4 ml-2"
+                >
+                    Cancel
+                </button>
+            )}
+
+            {/* <button 
                 onClick={() => console.log("Test Courses: ", courses)}
                 className="btn btn-primary text-white mt-4 ml-2"
             >
                 Test Courses
-            </button>
+            </button> */}
 
             {showSelectCourseModal && (
                 <SelectCourseModal 

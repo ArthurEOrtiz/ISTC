@@ -56,7 +56,7 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
                 <h2 className="text-xl font-semibold mb-4">Select Topics</h2>
                 
                 {loading ? (
-                    <p>Loading...</p>
+                    <span className="loading loading-spinner loading-xs"></span>
                 ) : error ? (
                     <p>{error}</p>
                 ) : (
