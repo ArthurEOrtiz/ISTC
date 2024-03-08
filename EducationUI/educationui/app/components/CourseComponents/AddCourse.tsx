@@ -31,8 +31,6 @@ const AddCourse: React.FC = () => {
     }
     , [course?.classes.length]);
 
-
-
     // Event Handlers this component. 
     const handleAddClass = () => {
         const today = new Date();
