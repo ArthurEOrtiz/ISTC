@@ -112,44 +112,42 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply }) => {
             </div>
 
             <div>
-                <strong>Courses: </strong>
-                {courses.length > 0 ? (
-                    <div className="m-2">
-                        
-
-                        {loading ? (
-                            <span className="loading loading-spinner loading-xs"></span>
-                        ) : (
-                            <div className="flex flex-wrap">
-                                {courses.map((course, index) => (
-                                    <div key={index} className="mr-2">
-                                        <div className="badge badge-info p-3">
-                                            <p className="font-bold text-white">{course.title}</p>
-                                        </div>
+            {topic.topicId !== 0 ? (
+                    <>
+                        <strong>Courses: </strong>
+                        {courses.length > 0 ? (
+                            <div className="m-2">
+                                {loading ? (
+                                    <span className="loading loading-spinner loading-xs"></span>
+                                ) : (
+                                    <div className="flex flex-wrap">
+                                        {courses.map((course, index) => (
+                                            <div key={index} className="mr-2">
+                                                <div className="badge badge-info p-3">
+                                                    <p className="font-bold text-white">{course.title}</p>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
+                                )}
+                            </div>
+                        ) : (
+                            <div className="badge badge-error p-3 mr-2">
+                                <p className="font-bold text-white">None</p>
                             </div>
                         )}
-                    
-                    
-                        { editMode ? (
-                        <button
-                            className="btn btn-primary text-white btn-xs"
-                            onClick={() => setShowSelectCourseModal(true)}
-                        >
-                            Edit Courses...
-                        </button>
-                        ) : null
-                        }
-                    
-                    </div>
-                    ) : (
-                        <div className="badge badge-error p-3">
-                            <p className="font-bold text-white">None</p>
-                        </div>
-                    )
-                    }
+                        {editMode && (
+                            <button
+                                className="btn btn-primary text-white btn-xs"
+                                onClick={() => setShowSelectCourseModal(true)}
+                            >
+                                Edit Courses...
+                            </button>
+                        )}
+                    </>
+                ) : null}
             </div>
+
             
             
             
