@@ -2,14 +2,14 @@ import Link from 'next/link';
 
 const EditCourseNav: React.FC = () => {
     return (
-        <ul className="menu bg-info-content lg:menu-horizontal w-full">
+        <ul className="navbar bg-primary">
             <li>
-                <Link href="/admin/editcourse/add" className="text-white">
+                <Link href="/admin/editcourse/add" className="btn btn-ghost text-white">
                     Add Course
                 </Link>
             </li>
             <li>
-                <Link href="/admin/editcourse/edit" className="text-white">
+                <Link href="/admin/editcourse/edit" className="btn btn-ghost text-white">
                     Edit Course
                 </Link>
             </li>
