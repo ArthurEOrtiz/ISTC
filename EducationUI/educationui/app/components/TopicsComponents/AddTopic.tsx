@@ -5,7 +5,7 @@ import { useState } from "react";
 import TopicInfoCard from "./TopicInfoCard";
 import ConfirmationModal from "../../shared/modals/ConfirmationModal";
 import { useRouter } from "next/navigation";
-import SavingModal from "../SavingModal";
+import SavingModal from "../../shared/modals/SavingModal";
 import { postTopic } from "@/Utilities/api";
 
 const AddTopic: React.FC = () => {

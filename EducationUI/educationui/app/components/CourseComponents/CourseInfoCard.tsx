@@ -139,7 +139,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             <textarea
                                 name="description"
                                 maxLength = {255}
-                                defaultValue={editCourse?.description}
+                                defaultValue={editCourse.description}
                                 onChange={handleTextAreaChange}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 />
@@ -247,7 +247,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="text"
                             name="pdf"
-                            defaultValue={editCourse?.pdf}
+                            defaultValue={editCourse?.pdf || ''}
                             onChange={handleInputChange}
                             className="border border-gray-300 rounded"/>
                             : course?.pdf}</p>
@@ -257,7 +257,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="text"
                             name="locationDescription"
-                            defaultValue={editCourse?.location?.description}
+                            defaultValue={editCourse?.location?.description || ''}
                             onChange={(e) => handleLocationInputChange(e, 'description')}
                             className="border border-gray-300 rounded w-1/2"/>
                             : course?.location?.description}</p>
@@ -267,7 +267,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="text"
                             name="locationRoom"
-                            defaultValue={editCourse?.location?.room}
+                            defaultValue={editCourse?.location?.room || ''}
                             onChange={(e) => handleLocationInputChange(e, "room")}
                             className="border border-gray-300 rounded"/>
                             : course?.location?.room}</p>
@@ -299,7 +299,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             type="text"
                             name="locationAddressLine2"
                             maxLength={50}
-                            defaultValue={editCourse?.location?.addressLine2}
+                            defaultValue={editCourse?.location?.addressLine2 || ''}
                             onChange={(e) => handleLocationInputChange(e, "addressLine2")}
                             className="border border-gray-300 rounded w-1/2" />
                             : course?.location?.addressLine2}</p>

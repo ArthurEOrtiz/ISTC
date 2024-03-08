@@ -109,6 +109,16 @@ export async function DeleteClassById(classId) {
 }
 
 // Topics
+
+export async function postTopic(topic) {
+    try {
+        const response = await axiosInstance.post('Topic/PostTopic', topic);
+        return response.data;
+    } catch (error) {
+        console.error('Error posting topic:', error);
+        throw error;
+    }
+}
 export async function getAllTopics() {
     try {
         const response = await axiosInstance.get('Topic/GetAllTopics');

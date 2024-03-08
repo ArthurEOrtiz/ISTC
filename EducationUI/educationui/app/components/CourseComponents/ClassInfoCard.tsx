@@ -12,9 +12,7 @@ interface ClassInfoCardProps {
 };
 
 /**
- * Renders a card component for displaying class information. This is used in the 
- * EditCourseInfo component, so after the course has been made. This method handles the 
- * time shift from UTC to local time.
+ * Renders a card component for displaying class information. 
  * 
  * @param classSchedule - The class schedule object.
  * @param onAdd - Callback function to add a class schedule.

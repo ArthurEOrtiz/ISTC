@@ -7,7 +7,7 @@ import NewClass from './NewClass';
 import SelectTopicModal from '../TopicsComponents/SelectTopicModal';
 import ConfirmationModal from '../../shared/modals/ConfirmationModal';
 import { useRouter } from 'next/navigation';
-import SavingModal from '../SavingModal';
+import SavingModal from '../../shared/modals/SavingModal';
 import { postCourse } from '@/Utilities/api';
 
 /**
@@ -69,7 +69,7 @@ const AddCourse: React.FC = () => {
             attendance: [],
         };
 
-        console.log("AddCourse.handleAddClass: newClass: ", newClass);
+        //console.log("AddCourse.handleAddClass: newClass: ", newClass);
     
         // Update the course state by adding the new class to the classes array
         if (course) {
@@ -83,7 +83,6 @@ const AddCourse: React.FC = () => {
     const handleSaveCourse = async () => {
         setShowConfirmationModal(true);
     };
-
 
     // Event Handlers for Components
 
@@ -155,7 +154,7 @@ const AddCourse: React.FC = () => {
             await postCourse(course);
 
         } catch (error) {
-            throw new Error(error as string);
+            throw error;
         } finally {
             router.push('/admin/editcourse/edit');
             // this might not do anything. 
@@ -204,6 +203,12 @@ const AddCourse: React.FC = () => {
                                 className="btn btn-primary text-white"
                                 onClick={handleAddClass}
                             >Add Class</button>
+
+                            <button
+                                className="btn btn-primary text-white ml-2"
+                                onClick={() => console.log(course)}
+                            >Console Log Course</button>
+
                         </div>
                     </div>
                 </>

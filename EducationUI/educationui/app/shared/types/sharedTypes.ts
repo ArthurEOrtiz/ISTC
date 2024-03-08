@@ -1,11 +1,11 @@
 
 export interface Location {
     locationId: number | null;
-    description: string;
-    room: string;
+    description: string | null;
+    room: string | null;
     remoteLink: string | null;
     addressLine1: string;
-    addressLine2: string;
+    addressLine2: string | null;
     city: string;
     state: string;
     postalCode: string;
@@ -29,7 +29,7 @@ export interface Course {
     enrollmentDeadline: string;
     instructorName: string;
     instructorEmail: string;
-    pdf: string;
+    pdf: string | null; 
     locationId: number | null;
     location: Location;
     topics: Topic[] | null;

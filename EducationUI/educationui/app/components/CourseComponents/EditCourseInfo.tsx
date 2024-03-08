@@ -3,7 +3,7 @@ import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
 import { useEffect, useState } from "react";
-import SavingModal from "../SavingModal";
+import SavingModal from "../../shared/modals/SavingModal";
 import ConfirmationModal from "../../shared/modals/ConfirmationModal";
 import { useRouter } from "next/navigation";
 import { DeleteCourseById, UpdateCourseById } from "@/Utilities/api";
