@@ -162,7 +162,9 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                                 </div>
                             ))
                         ) : (
-                            <p>None</p>
+                            <div className="badge badge-error p-3">
+                                <p className="font-bold text-white">None</p>
+                            </div>
                         )}
 
 
