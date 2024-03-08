@@ -1,4 +1,5 @@
 ﻿using EducationAPI.DataAccess;
+using EducationAPI.DTO;
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,9 @@ namespace EducationAPI.Controllers
 			try
 			{
 				_logger.LogInformation("GetAllTopics() Called");
-				return await _educationProgramContext.Topics.ToListAsync();
+				return await _educationProgramContext.Topics
+					.Include(t => t.Courses)
+					.ToListAsync();
 			}
 			catch (Exception ex)
 			{
@@ -40,6 +43,7 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var topic = await _educationProgramContext.Topics
+					.Include (t => t.Courses)
 					.FirstOrDefaultAsync(t => t.TopicId == id);
 
 				if (topic == null)
@@ -58,6 +62,7 @@ namespace EducationAPI.Controllers
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
+
 
 		[HttpPost("PostTopic")]
 		public async Task<ActionResult> PostTopic (Topic topic)
@@ -78,11 +83,12 @@ namespace EducationAPI.Controllers
 		}
 
 		[HttpPut("UpdateTopicById/{id}")]
-		public async Task<ActionResult<Topic>> UpdateTopicById(int id, Topic updatedTopic)
+		public async Task<ActionResult<Topic>> UpdateTopicById(int id, TopicDTO updatedTopic)
 		{
 			try
 			{
 				var existingTopic = await _educationProgramContext.Topics
+					.Include(t => t.Courses)
 					.FirstOrDefaultAsync(t => t.TopicId == id);
 
 				if (existingTopic == null)
@@ -92,6 +98,27 @@ namespace EducationAPI.Controllers
 				}
 
 				_educationProgramContext.Entry(existingTopic).CurrentValues.SetValues(updatedTopic);
+
+				if (updatedTopic.Courses != null)
+				{
+					foreach(var existingCourse in existingTopic.Courses.ToList())
+					{
+						_educationProgramContext.Entry(existingCourse).State = EntityState.Detached;
+					}
+
+					foreach(var course in updatedTopic.Courses)
+					{
+						var existingCourse = await _educationProgramContext.Courses
+							.FirstOrDefaultAsync(c => c.CourseId == course.CourseId);
+
+						if (existingCourse != null)
+						{
+							existingTopic.Courses.Add(existingCourse);
+						}
+						
+					}
+				}
+
 				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("UpdateTopicById({Id}. {UpdatedTopic}) called", id, updatedTopic);

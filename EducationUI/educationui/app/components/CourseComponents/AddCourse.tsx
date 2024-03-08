@@ -5,13 +5,10 @@ import NewCourseForm from './NewCourseForm';
 import CourseInfoCard from './CourseInfoCard';
 import NewClass from './NewClass';
 import SelectTopicModal from '../TopicsComponents/SelectTopicModal';
-import axios from 'axios';
 import ConfirmationModal from '../ConfirmationModal';
 import { useRouter } from 'next/navigation';
 import SavingModal from '../SavingModal';
 import { postCourse } from '@/Utilities/api';
-
-
 
 /**
  * Component for adding a new course. 

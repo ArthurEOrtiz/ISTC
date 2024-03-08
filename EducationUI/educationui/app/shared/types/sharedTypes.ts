@@ -1,23 +1,3 @@
-export interface CourseFormData {
-    courseId: number | null,
-    title: string;
-    description: string;
-    instructorName: string;
-    instructorEmail: string;
-    attendanceCredit: number;
-    completionCredit: number;
-    maxAttendance: number;
-    enrollmentDeadline: string;
-    pdf: string;
-    locationDescription: string;
-    room: string;
-    remoteLink: string;
-    addressLine1: string;
-    addressLine2: string;
-    city: string;
-    state: string;
-    postalCode: string;
-}
 
 export interface Location {
     locationId: number | null;
@@ -50,6 +30,7 @@ export interface Course {
     instructorName: string;
     instructorEmail: string;
     pdf: string;
+    locationId: number | null;
     location: Location;
     topics: Topic[] | null;
     classes: ClassSchedule[];
@@ -59,6 +40,7 @@ export interface Course {
     topicId: number | null;
     title: string;
     description: string;
+    courses: Course[] | null;
   }
 
   export interface Attendance {

@@ -32,27 +32,10 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var courses = await  _educationProgramContext.Courses
-					.Select(c => new Course
-					{
-						CourseId = c.CourseId,
-						Title = c.Title,
-						Description = c.Description,
-						AttendanceCredit = c.AttendanceCredit,
-						CompletionCredit = c.CompletionCredit,
-						MaxAttendance = c.MaxAttendance,
-						EnrollmentDeadline = c.EnrollmentDeadline,
-						InstructorEmail = c.InstructorEmail,
-						InstructorName = c.InstructorName,
-						Pdf = c.Pdf,
-						Location = c.Location,
-						Topics = c.Topics.Select(t => new Topic
-						{
-							TopicId = t.TopicId,
-							Title = t.Title,
-							Description = t.Description
-						}).ToList(),
-						Classes = c.Classes.ToList(),
-					}).ToListAsync();
+					.Include(c => c.Classes)
+					.Include(c => c.Topics)
+					.Include(c => c.Location)
+					.ToListAsync();
 
 				return courses;
 			}
@@ -95,6 +78,37 @@ namespace EducationAPI.Controllers
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "GetCourseById({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpGet("GetCoursesByTopicId/{Id}")]
+		public async Task<ActionResult<List<Course>>> GetCoursesByTopicId(int Id)
+		{
+			try
+			{
+				var topic = await _educationProgramContext.Topics
+					.Include(t => t.Courses)
+						.ThenInclude(c => c.Location)
+					.Include(t => t.Courses)
+						.ThenInclude(c => c.Classes)
+					.FirstOrDefaultAsync(t => t.TopicId == Id);
+
+				if (topic == null)
+				{
+					_logger.LogError("GetCourseByTopicId({Id}), Topic not found!", Id);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				List<Course> courses = topic.Courses.ToList();
+
+				_logger.LogInformation("GetCourseByTopicId({Id}), called", Id);
+				return courses;
+
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetCourseByTopicId({Id})", Id);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
@@ -157,7 +171,7 @@ namespace EducationAPI.Controllers
 
 				if (existingCourse == null)
 				{
-					_logger.LogError("UpdateCourse({Id}), Course not found!", id);
+					_logger.LogError("UpdateCourseById({Id}, {UpdatedCourse}), Course not found!", id, updatedCourse);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -180,12 +194,12 @@ namespace EducationAPI.Controllers
 
 				await _educationProgramContext.SaveChangesAsync();
 
-				_logger.LogInformation("UpdateCourse {Id} called", id);
+				_logger.LogInformation("UpdateCourseById({Id}, {UpdatedCourse}) called", id, updatedCourse);
 				return existingCourse;
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "UpdateCourse({Id})", id);
+				_logger.LogError(ex, "UpdateCourseById({Id}, {UpdatedCourse})", id, updatedCourse);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
