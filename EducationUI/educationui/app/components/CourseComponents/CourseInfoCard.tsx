@@ -103,7 +103,6 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
             timeZone: 'UTC'
         });
     };
-    
 
     const formatDate = (dateString: string | undefined): string => {
         if (!dateString) return ''; // Handle case when dateString is undefined
@@ -151,21 +150,41 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                 <div className="mb-4">
 
                     <strong>Topics: </strong> 
+                    
+                    <div className="flex flex-wrap mt-1">
+                
+                        {editCourse.topics && editCourse.topics.length > 0 ? (
+                            editCourse.topics.map((topic, index) => (
+                                <div key={index} className="mr-2 mb-1">
+                                    <div className="badge badge-primary p-3">
+                                        <p className="font-bold text-white">{topic.title}</p>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p>None</p>
+                        )}
 
-                    {editCourse?.topics?.map((topic, index) => (
-                        <span key={index}>
-                            {topic.title}
-                            {index !== (editCourse?.topics?.length ?? 0) - 1 && ', '}
-                        </span>
-                    ))}
 
-                    {editMode ?
-                        <button
-                            className="btn btn-xs btn-primary text-white ml-4"
-                            onClick={handleEditTopics}>
-                                ...Edit Topics
-                        </button>
-                        : ''}
+
+                        {/* {editCourse?.topics?.map((topic, index) => (
+                            <span key={index}>
+                                {topic.title}
+                                {index !== (editCourse?.topics?.length ?? 0) - 1 && ', '}
+                            </span>
+                        ))} */}
+
+                        {editMode ?
+                            <button
+                                className="btn btn-xs btn-accent text-white ml-4"
+                                onClick={handleEditTopics}>
+                                    ...Edit Topics
+                            </button>
+                            : ''}
+                        
+                    </div>
+
+                    
 
                 </div>
 

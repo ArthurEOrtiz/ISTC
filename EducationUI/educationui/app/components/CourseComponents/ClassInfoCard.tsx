@@ -1,7 +1,6 @@
 'use client';
 import { AddClassByCourseId, DeleteClassById, EditClassById } from "@/Utilities/api";
 import { ClassSchedule } from "@/app/shared/types/sharedTypes";
-import axios from "axios";
 import { ChangeEvent, useEffect, useState } from "react";
 
 interface ClassInfoCardProps {
