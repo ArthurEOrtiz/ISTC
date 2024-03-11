@@ -1,5 +1,5 @@
 import { Course, Topic } from "@/app/shared/types/sharedTypes";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import CharacterCounter from "../../shared/CharacterCounter";
 import { getCoursesByTopicId } from "@/Utilities/api";
 import SelectCourseModal from "../CourseComponents/SelectCourseModal";
@@ -33,36 +33,47 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
 
         };
         fetchData();
-    }, [topic]);
+    }, [editTopic]);
 
-    const toggleEditMode = () => {
-        
-        setEditMode(!editMode);
 
-        if (!editMode) {
-            setEditTopic(topic);
-        }
-
-        if (editMode) {
-            onApply(editTopic);
-        }
-
-    };
-
+    useEffect(() => {
+        console.log("UseEffect: Edit Mode: ", editMode);
+    }
+    , [editMode]);
+    
+    // Handlers
     const handleSelectCourseModalOnSelect = (selectedCourses: Course[]) => {
         setCourses(selectedCourses);
         setEditTopic({ ...editTopic, courses: selectedCourses });
         setShowSelectCourseModal(false);
     }
 
-    const handleCancel = () => {
-        setEditTopic(topic);
+    const handleCancel = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        console.log("Canceling edit");
+        console.log("Canceling edit: editMode: ", editMode);
+        event.preventDefault(); // Prevents the default behavior of the event
         setEditMode(false);
+        if (editTopic.topicId !== 0) {
+            setEditTopic(topic);
+        } 
     }
 
     const handleDelete = () => {
+        console.log("Deleting topic");
         if (onDelete && topic.topicId && topic.topicId !== 0) {
             onDelete(topic.topicId);
+        }
+    }
+
+    const handleApplyEdit = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        console.log("Applying edit");
+        console.log("Applying edit: editMode: ", editMode);
+        // event.preventDefault(); // Prevents the default behavior of the event
+        if (editMode) {
+            setEditMode(false);
+            onApply(editTopic);
+        } else {
+            setEditMode(true);
         }
     }
 
@@ -143,20 +154,20 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
                                 <p className="font-bold text-white">None</p>
                             </div>
                         )}
-                        {editMode && (
+                        {editMode ? (
                             <button
                                 className="btn btn-primary text-white btn-xs"
                                 onClick={() => setShowSelectCourseModal(true)}
                             >
                                 Edit Courses...
                             </button>
-                        )}
+                        ) : null}
                     </>
                 ) : null}
             </div>
             
             <button
-                onClick={toggleEditMode}
+                onClick={handleApplyEdit}
                 className="btn btn-primary text-white mt-4"
             >
                 {editMode ? "Apply" : "Edit"}

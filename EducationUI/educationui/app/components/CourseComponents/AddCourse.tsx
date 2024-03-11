@@ -204,10 +204,10 @@ const AddCourse: React.FC = () => {
                                 onClick={handleAddClass}
                             >Add Class</button>
 
-                            <button
+                            {/* <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
-                            >Console Log Course</button>
+                            >Console Log Course</button> */}
 
                         </div>
                     </div>
