@@ -1,4 +1,5 @@
 ﻿using EducationAPI.DataAccess;
+using EducationAPI.DTO;
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,9 @@ namespace EducationAPI.Controllers
 			try
 			{
 				_logger.LogInformation("GetAllTopics() Called");
-				return await _educationProgramContext.Topics.ToListAsync();
+				return await _educationProgramContext.Topics
+					.Include(t => t.Courses)
+					.ToListAsync();
 			}
 			catch (Exception ex)
 			{
@@ -40,6 +43,7 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var topic = await _educationProgramContext.Topics
+					.Include (t => t.Courses)
 					.FirstOrDefaultAsync(t => t.TopicId == id);
 
 				if (topic == null)
@@ -59,6 +63,7 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+
 		[HttpPost("PostTopic")]
 		public async Task<ActionResult> PostTopic (Topic topic)
 		{
@@ -77,6 +82,63 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpPut("UpdateTopicById/{id}")]
+		public async Task<ActionResult<Topic>> UpdateTopicById(int id, TopicDTO updatedTopic)
+		{
+			try
+			{
+				var existingTopic = await _educationProgramContext.Topics
+					.Include(t => t.Courses)
+					.FirstOrDefaultAsync(t => t.TopicId == id);
+
+				if (existingTopic == null)
+				{
+					_logger.LogError("UpdateTopicById({Id}, {UpdatedTopic}), Topic not found!", id, updatedTopic);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_educationProgramContext.Entry(existingTopic).CurrentValues.SetValues(updatedTopic);
+
+				if (updatedTopic.Courses != null)
+				{
+					foreach (var existingCourse in existingTopic.Courses.ToList())
+					{
+						// Check if the course exists in the updated list
+						var updatedCourse = updatedTopic.Courses.FirstOrDefault(c => c.CourseId == existingCourse.CourseId);
+						if (updatedCourse == null)
+						{
+							// If the course doesn't exist in the updated list, remove it
+							existingTopic.Courses.Remove(existingCourse);
+						}
+					}
+
+					foreach (var course in updatedTopic.Courses)
+					{
+						// Check if the course already exists in the topic's courses
+						if (!existingTopic.Courses.Any(c => c.CourseId == course.CourseId))
+						{
+							var existingCourse = await _educationProgramContext.Courses
+									.FirstOrDefaultAsync(c => c.CourseId == course.CourseId);
+
+							if (existingCourse != null)
+							{
+								existingTopic.Courses.Add(existingCourse);
+							}
+						}
+					}
+				}
+
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("UpdateTopicById({Id}. {UpdatedTopic}) called", id, updatedTopic);
+				return existingTopic;
+
+			} catch (Exception ex)
+			{
+				_logger.LogError(ex, "UpdateTopicById({Id}. {UpdatedTopic})", id, updatedTopic);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
 
 		[HttpPost("AddTopicToCourse")]
 		public async Task<ActionResult> AddTopicToCourse(int topicId, int courseId)
@@ -104,5 +166,34 @@ namespace EducationAPI.Controllers
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
+
+		[HttpDelete("DeleteTopicById/{id}")]
+		public async Task<ActionResult> DeleteTopicById(int id)
+		{
+			try
+			{
+				var topic = await _educationProgramContext.Topics
+					.Include(t => t.Courses)
+					.FirstOrDefaultAsync(t => t.TopicId == id);
+
+				if (topic == null)
+				{
+					_logger.LogError("DeleteTopicById({Id}), Topic not found!", id);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_educationProgramContext.Topics.Remove(topic);
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("DeleteTopicById({Id}) called", id);
+				return new StatusCodeResult((int)HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "DeleteTopicById({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 	}
 }

@@ -1,16 +1,14 @@
 'use client';
 import { Course, Topic } from '@/app/shared/types/sharedTypes';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import NewCourseForm from './NewCourseForm';
 import CourseInfoCard from './CourseInfoCard';
 import NewClass from './NewClass';
 import SelectTopicModal from '../TopicsComponents/SelectTopicModal';
-import axios from 'axios';
-import ConfirmationModal from '../ConfirmationModal';
+import ConfirmationModal from '../../shared/modals/ConfirmationModal';
 import { useRouter } from 'next/navigation';
-import SavingModal from '../SavingModal';
-
-
+import SavingModal from '../../shared/modals/SavingModal';
+import { postCourse } from '@/Utilities/api';
 
 /**
  * Component for adding a new course. 
@@ -32,8 +30,6 @@ const AddCourse: React.FC = () => {
         });
     }
     , [course?.classes.length]);
-
-
 
     // Event Handlers this component. 
     const handleAddClass = () => {
@@ -73,7 +69,7 @@ const AddCourse: React.FC = () => {
             attendance: [],
         };
 
-        console.log("AddCourse.handleAddClass: newClass: ", newClass);
+        //console.log("AddCourse.handleAddClass: newClass: ", newClass);
     
         // Update the course state by adding the new class to the classes array
         if (course) {
@@ -88,28 +84,22 @@ const AddCourse: React.FC = () => {
         setShowConfirmationModal(true);
     };
 
-
     // Event Handlers for Components
 
     // NewCourseForm
     const handleNewCourseFormOnSubmit = (course: Course) => {
-        // console.log("AddCourse.handleNewCourseFormOnSubmit: course: ", course);
         setCourse(course);
     }
 
     const handleCourseInfoCardOnApply = (course: Course) => {
-        //console.log("AddCourse.handleCourseInfoCardOnApply: course: ", course);
         setCourse(course);
     }
 
     // NewClass
     const handleNewClassOnDelete = (index: number) => {
-        //console.log("AddCourse.handleNewClassOnDelete: index: ", index);
         if (course) {
             const newClasses = [...course.classes];
-            // console.log("AddCourse.handleNewClassOnDelete: newClasses: ", newClasses);
             newClasses.splice(index, 1); // Remove the class at the specified index
-            // console.log("AddCourse.handleNewClassOnDelete: newClasses: ", newClasses);
             setCourse({
                 ...course,
                 classes: newClasses
@@ -118,7 +108,6 @@ const AddCourse: React.FC = () => {
     }
 
     const handleNewClassOnScheduleStartChange = (index: number, date: Date) => {
-        // console.log("AddCourse.handleNewClassOnDateChange: index: ", index, " date: ", date);
         if (course) {
             const newClasses = [...course.classes];
             newClasses[index].scheduleStart = date;
@@ -130,7 +119,6 @@ const AddCourse: React.FC = () => {
     }
 
     const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
-        // console.log("AddCourse.handleNewClassOnDateChange: index: ", index, " date: ", date);
         if (course) {
             const newClasses = [...course.classes];
             newClasses[index].scheduleEnd = date;
@@ -147,8 +135,6 @@ const AddCourse: React.FC = () => {
     }
 
     const handleSelectTopicModalOnSelect = (topic: Topic[]) => {
-        //console.log("AddCourse.handleSelectTopicModalOnSelect: topic: ", topic);
-        
         if (course) {
             setCourse({
                 ...course,
@@ -160,15 +146,15 @@ const AddCourse: React.FC = () => {
 
     // ConfirmationModal
     const handleConfirmationModalOnConfirm = async () => {
-        //console.log("AddCourse.handleConfirmationModalOnConfirm");
         setIsSaving(true);
         
         try {
             setShowConfirmationModal(false);
-            await saveCourseToDatabase();
+            // imported from api.ts
+            await postCourse(course);
 
         } catch (error) {
-            throw new Error(error as string);
+            throw error;
         } finally {
             router.push('/admin/editcourse/edit');
             // this might not do anything. 
@@ -179,21 +165,6 @@ const AddCourse: React.FC = () => {
 
     const handleConfirmationModalOnCancel = () => {
         setShowConfirmationModal(false);
-    }
-
-    // Additional Methods
-
-    const saveCourseToDatabase = async () => {
-        try {
-            // Perform the POST request to save the course
-            const response = await axios.post("https://localhost:7144/Course/PostCourse", course);
-
-            if (response.status !== 200) {
-                throw new Error(`Failed to save course. Status: ${response.status} - ${response.statusText}`);
-            } 
-        } catch (error) {
-            throw new Error(error as string);
-        }
     }
 
     return (
@@ -232,17 +203,18 @@ const AddCourse: React.FC = () => {
                                 className="btn btn-primary text-white"
                                 onClick={handleAddClass}
                             >Add Class</button>
+
+                            {/* <button
+                                className="btn btn-primary text-white ml-2"
+                                onClick={() => console.log(course)}
+                            >Console Log Course</button> */}
+
                         </div>
-                        {/* <div className = "mt-2">
-                            <button
-                                className="btn btn-primary text-white"
-                                onClick={() => console.log("Course: ", course)}
-                            >Test Course</button>
-                        </div> */}
                     </div>
                 </>
 
             )}
+
             {/* Dialogs - also known as Modals - and the saving spinner */}
             {showSelectTopicModal && (
                 <SelectTopicModal 

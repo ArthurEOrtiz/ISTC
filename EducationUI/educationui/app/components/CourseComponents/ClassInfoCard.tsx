@@ -1,6 +1,6 @@
 'use client';
+import { AddClassByCourseId, DeleteClassById, EditClassById } from "@/Utilities/api";
 import { ClassSchedule } from "@/app/shared/types/sharedTypes";
-import axios from "axios";
 import { ChangeEvent, useEffect, useState } from "react";
 
 interface ClassInfoCardProps {
@@ -11,9 +11,7 @@ interface ClassInfoCardProps {
 };
 
 /**
- * Renders a card component for displaying class information. This is used in the 
- * EditCourseInfo component, so after the course has been made. This method handles the 
- * time shift from UTC to local time.
+ * Renders a card component for displaying class information. 
  * 
  * @param classSchedule - The class schedule object.
  * @param onAdd - Callback function to add a class schedule.
@@ -40,55 +38,38 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     }
 
     const handleSave = async () => {
-        try {
-            let url : string = '';
-            if (oldClassSchedule?.classId == null) {
-                url = `https://localhost:7144/Class/AddClassByCourseId?courseId=${oldClassSchedule.courseId}&newStartDate=${editedClassSchedule.scheduleStart}&newEndDate=${editedClassSchedule.scheduleEnd}`;
-                
-                try {
-                    const response = await axios.post(url);
-
-                    if (response.status !== 201) {
-                        throw new Error('Error saving course');
-                    }
-
-                    if (response.data != null) {
-                        //console.log("response data", response.data);
-                        const newClass: ClassSchedule = response.data;
-                        setOldClassSchedule(newClass);
-                        setEditedClassSchedule(newClass);
-                        onAdd(newClass);
-                    }
-
-                } catch (error) {
-                    console.error('Error saving course', error);
+         
+        if (oldClassSchedule?.classId == null) {
+            let responseData = null;
+            try {
+                responseData = await AddClassByCourseId(oldClassSchedule.courseId, editedClassSchedule.scheduleStart, editedClassSchedule.scheduleEnd);
+            } catch (error) {
+                throw error;
+            } finally {
+                if (responseData != null) {
+                    const newClass: ClassSchedule = responseData;
+                    setOldClassSchedule(newClass);
+                    setEditedClassSchedule(newClass);
+                    onAdd(newClass);
                 }
-        
             }
-            else if (oldClassSchedule?.classId != null)
-            {
-                url = `https://localhost:7144/Class/EditClassById?id=${oldClassSchedule.classId}&newScheduleStart=${editedClassSchedule.scheduleStart}&newScheduleStop=${editedClassSchedule.scheduleEnd}`;
-                
-                try {
-                    const response = await axios.post(url);
-                    
-                    if (response.status !== 200) {
-                        throw new Error('Error saving course');
-                    }
-                    
+        }
+        else if (oldClassSchedule?.classId != null)
+        {
+            let responseData = null;
+            try {
+                responseData = await EditClassById(oldClassSchedule.classId, editedClassSchedule.scheduleStart, editedClassSchedule.scheduleEnd);
+            } catch (error) {
+                throw error;
+            } finally {
+                if (responseData != null) {
                     setOldClassSchedule(editedClassSchedule);
                     onAdd(editedClassSchedule);
-
-                } catch (error) {
-                    console.error('Error saving course', error);
                 }
-                
             }
-            setEditClass(false);
-
-        } catch (error) {
-            console.error('Error saving course', error);
         }
+        setEditClass(false);
+  
     }
 
     const handleCancel = () => {
@@ -106,28 +87,19 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
     const handleDelete = async () => {
 
         if (oldClassSchedule.classId) {
-            try {
-                const url = `https://localhost:7144/Class/DeleteClassById?id=${editedClassSchedule.classId}`;
+            await DeleteClassById(editedClassSchedule.classId);
+            
+            onDelete(editedClassSchedule.classId);
+            setDeleted(true);
 
-                const response = await axios.delete(url);
-
-                if (response.status !== 200) {
-                    throw new Error('Error Deleting Class');
-                }
-
-                onDelete(editedClassSchedule.classId);
-                setDeleted(true);
-
-            } catch (error) {
-
-                console.error('Error Deleting Class', error);
-
-            }
         } else {
+
             onDelete(null);
             setDeleted(true);
+
         }
     }
+
 
     const handleStartDateChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const newStartDate = event.target.value;

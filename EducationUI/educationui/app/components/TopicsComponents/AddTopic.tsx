@@ -3,10 +3,10 @@ import { Topic } from "@/app/shared/types/sharedTypes"
 import NewTopicForm from "./NewTopicForm"
 import { useState } from "react";
 import TopicInfoCard from "./TopicInfoCard";
-import axios from 'axios';
-import ConfirmationModal from "../ConfirmationModal";
+import ConfirmationModal from "../../shared/modals/ConfirmationModal";
 import { useRouter } from "next/navigation";
-import SavingModal from "../SavingModal";
+import SavingModal from "../../shared/modals/SavingModal";
+import { postTopic } from "@/Utilities/api";
 
 const AddTopic: React.FC = () => {
     const [topic, setTopic] = useState<Topic>();
@@ -24,10 +24,10 @@ const AddTopic: React.FC = () => {
 
         try {
             setShowConfirmationModal(false);
-            await saveTopicAsync();
+            await postTopic(topic);
         }
         catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
         finally {
             router.push('/admin/edittopics/edit');
@@ -42,22 +42,6 @@ const AddTopic: React.FC = () => {
 
     const handleTopicInfoCardOnApply = (topic: Topic)=> {
         setTopic(topic);
-    }
-
-    // Helper Methods 
-
-    const saveTopicAsync = async () => {
-        try {
-            const response = await axios.post('https://localhost:7144/Topic/PostTopic', topic);
-
-            if (response.status !== 201) {
-                throw new Error(`Error saving topic. Status: ${response.status} - ${response.statusText}`);
-            }
-
-            console.log(response.data);
-         } catch (error) {
-            throw new Error(`${error}`);
-       }
     }
 
     return (

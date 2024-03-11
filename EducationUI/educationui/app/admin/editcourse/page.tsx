@@ -1,10 +1,17 @@
 import React from 'react'
 
-const page = () => {
+const AddEditCourse: React.FC = () => {
   return (
-    <main>
-    </main>
+    <div>
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-4">Add/Edit Course</h1>
+          <p className="text-lg">
+            This page is where you can add or edit courses for your education program. 
+            Please choose an option from the navigation menu to get started.
+          </p>
+        </div>
+    </div>
   )
 }
 
-export default page
+export default AddEditCourse

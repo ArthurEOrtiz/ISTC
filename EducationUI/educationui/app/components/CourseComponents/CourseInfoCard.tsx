@@ -1,6 +1,6 @@
 import { Course, Topic } from "@/app/shared/types/sharedTypes";
 import { useState } from "react";
-import CharacterCounter from "../CharacterCounter";
+import CharacterCounter from "../../shared/CharacterCounter";
 import SelectTopicModal from "../TopicsComponents/SelectTopicModal";
 
 interface CourseCardProps {
@@ -103,7 +103,6 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
             timeZone: 'UTC'
         });
     };
-    
 
     const formatDate = (dateString: string | undefined): string => {
         if (!dateString) return ''; // Handle case when dateString is undefined
@@ -136,13 +135,13 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
 
                     {editMode ?
                         <>
-                        <textarea
-                            name="description"
-                            maxLength = {255}
-                            defaultValue={editCourse?.description}
-                            onChange={handleTextAreaChange}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            />
+                            <textarea
+                                name="description"
+                                maxLength = {255}
+                                defaultValue={editCourse.description}
+                                onChange={handleTextAreaChange}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                />
                             <CharacterCounter value={editCourse.description} limit={255} />
                         </>
                         : course?.description}
@@ -151,21 +150,35 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                 <div className="mb-4">
 
                     <strong>Topics: </strong> 
+                    
+                    <div className="flex flex-wrap mt-1">
+                
+                        {editCourse.topics && editCourse.topics.length > 0 ? (
+                            editCourse.topics.map((topic, index) => (
+                                <div key={index} className="mr-2 mb-1">
+                                    <div className="badge badge-primary p-3">
+                                        <p className="font-bold text-white">{topic.title}</p>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="badge badge-error p-3">
+                                <p className="font-bold text-white">None</p>
+                            </div>
+                        )}
 
-                    {editCourse?.topics?.map((topic, index) => (
-                        <span key={index}>
-                            {topic.title}
-                            {index !== (editCourse?.topics?.length ?? 0) - 1 && ', '}
-                        </span>
-                    ))}
 
-                    {editMode ?
-                        <button
-                            className="btn btn-xs btn-primary text-white ml-4"
-                            onClick={handleEditTopics}>
-                                ...Edit Topics
-                        </button>
-                        : ''}
+                        {editMode ?
+                            <button
+                                className="btn btn-xs btn-accent text-white ml-4"
+                                onClick={handleEditTopics}>
+                                    ...Edit Topics
+                            </button>
+                            : ''}
+                        
+                    </div>
+
+                    
 
                 </div>
 
@@ -247,7 +260,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="text"
                             name="pdf"
-                            defaultValue={editCourse?.pdf}
+                            defaultValue={editCourse?.pdf || ''}
                             onChange={handleInputChange}
                             className="border border-gray-300 rounded"/>
                             : course?.pdf}</p>
@@ -257,7 +270,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="text"
                             name="locationDescription"
-                            defaultValue={editCourse?.location?.description}
+                            defaultValue={editCourse?.location?.description || ''}
                             onChange={(e) => handleLocationInputChange(e, 'description')}
                             className="border border-gray-300 rounded w-1/2"/>
                             : course?.location?.description}</p>
@@ -267,7 +280,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="text"
                             name="locationRoom"
-                            defaultValue={editCourse?.location?.room}
+                            defaultValue={editCourse?.location?.room || ''}
                             onChange={(e) => handleLocationInputChange(e, "room")}
                             className="border border-gray-300 rounded"/>
                             : course?.location?.room}</p>
@@ -299,7 +312,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             type="text"
                             name="locationAddressLine2"
                             maxLength={50}
-                            defaultValue={editCourse?.location?.addressLine2}
+                            defaultValue={editCourse?.location?.addressLine2 || ''}
                             onChange={(e) => handleLocationInputChange(e, "addressLine2")}
                             className="border border-gray-300 rounded w-1/2" />
                             : course?.location?.addressLine2}</p>

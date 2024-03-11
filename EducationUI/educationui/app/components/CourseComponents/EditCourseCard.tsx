@@ -24,15 +24,23 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit}) => {
       <p className="text-2xl font-bold">{course.title}</p>
       <p className="text-base">{course.description}</p>
       <p className="text-1xl font-bold">Topics</p>
-      {course.topics && course.topics.length > 0 ? (
-        <ul>
-          {course.topics.map((topic, index) => (
-            <li key={index}>{topic.title}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>None</p>
-      )}
+      <div className="flex flex-wrap">
+        {course.topics && course.topics.length > 0 ? (
+          course.topics.map((topic, index) => (
+            <div key={index} className="mr-2 mb-1">
+              <div className="badge badge-primary p-3">
+                <p className="font-bold text-white">{topic.title}</p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="badge badge-error p-3">
+            <p className="font-bold text-white">None</p>
+          </div>
+        )}
+      </div>
+
+
       
       {course.classes && course.classes.length > 0 ? (
         <div className="flex justify-between">

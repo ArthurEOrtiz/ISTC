@@ -1,7 +1,7 @@
 'use client';
-import { Course, Location, Topic } from "@/app/shared/types/sharedTypes";
+import { Course } from "@/app/shared/types/sharedTypes";
 import { ChangeEvent, FocusEvent, FormEvent, useState } from "react";
-import CharacterCounter from "../CharacterCounter";
+import CharacterCounter from "../../shared/CharacterCounter";
 
 interface NewCourseFormProps {
     onSubmit: (course : Course) => void;
@@ -48,14 +48,15 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
         enrollmentDeadline: '',
         instructorName: '',
         instructorEmail: '',
-        pdf: '',
+        pdf: null,
+        locationId: 0,
         location: {
             locationId: 0,
-            description: '',
-            room: '',
+            description: null,
+            room: null,
             remoteLink: null,
             addressLine1: '',
-            addressLine2: '',
+            addressLine2: null,
             city: '',
             state: 'ID',
             postalCode: ''
@@ -247,7 +248,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     id="description"
                     placeholder="Optional"
-                    value = {course?.description}
+                    value = {course.description}
                     maxLength={255}
                     onChange = {handleChange}
                 />
@@ -393,7 +394,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         id="pdf"
                         type="text"
                         placeholder='PDF URL, Optional'
-                        value = {course?.pdf}
+                        value = {course?.pdf || ''}
                         onChange = {handleChange}
                     />
                 </div>
@@ -413,7 +414,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     type="text"
                     placeholder="Optional"
                     maxLength={50}
-                    defaultValue = {course?.location?.description}
+                    defaultValue = {course?.location?.description || ''}
                     onChange = {handleChange}
                 />
             </div>
@@ -433,7 +434,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         type="text"
                         placeholder="Optional"
                         maxLength={50}
-                        defaultValue = {course?.location?.room}
+                        defaultValue = {course?.location?.room || ''}
                         onChange = {handleChange}
                     />
                 </div>
@@ -490,7 +491,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     type="text"
                     placeholder="Optional"
                     maxLength={50}
-                    defaultValue = {course?.location?.addressLine2}
+                    defaultValue = {course?.location?.addressLine2 || ''}
                     onChange = {handleChange}
                 />
             </div>

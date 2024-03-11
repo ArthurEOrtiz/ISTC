@@ -16,7 +16,7 @@ namespace EducationAPI.Models
 		public string? Room { get; set; }
 
 		[Url]
-		public string? remoteLink { get; set; }
+		public string? RemoteLink { get; set; }
 
 		[MaxLength(255)]
 		public string? AddressLine1 { get; set; }

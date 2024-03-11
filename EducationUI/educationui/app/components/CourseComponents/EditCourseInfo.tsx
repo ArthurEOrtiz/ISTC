@@ -2,11 +2,11 @@
 import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
-import { use, useEffect, useState } from "react";
-import SavingModal from "../SavingModal";
-import axios from "axios";
-import ConfirmationModal from "../ConfirmationModal";
+import { useEffect, useState } from "react";
+import SavingModal from "../../shared/modals/SavingModal";
+import ConfirmationModal from "../../shared/modals/ConfirmationModal";
 import { useRouter } from "next/navigation";
+import { DeleteCourseById, UpdateCourseById } from "@/Utilities/api";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -80,8 +80,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     // Event Handlers
 
     const handleOnCourseInfoCardSave = (updatedCourse: Course | null): void => {
-        //console.log("Updated Course", updatedCourse)
-        
         if (updatedCourse !== null) {
             setCourseInfo(updatedCourse);
         }
@@ -148,14 +146,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const handleSaveCourse = async () => {
         console.log("Saving Course", courseInfo);
         setIsSaving(true);
-        const url = `https://localhost:7144/Course/UpdateCourseById/${courseInfo.courseId}`;
-        try {
-            const response = await axios.put(url, courseInfo);
-            console.log("Response", response);
-            console.log("Response Data", response.data); 
+        try{
+           await UpdateCourseById(courseInfo.courseId, courseInfo);
         }
         catch (error) {
-            throw new Error("Error Saving Course", error as Error);
+            throw error;
         }
         finally {
             setIsSaving(false);
@@ -171,49 +166,42 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const handleConfirmDeleteCourse = async () => {
         console.log("Deleting Course", courseInfo);
         setIsSaving(true);
-        const url = `https://localhost:7144/Course/DeleteCourseById/${courseInfo.courseId}`;
         try {
-            const response = await axios.delete(url);
-            console.log("Response", response);
-            console.log("Response Data", response.data);
+            await DeleteCourseById(courseInfo.courseId);
         }
         catch (error) {
-            console.log("Error", error);
+            throw error;
         }
         finally {
             router.push('/admin/editcourse/edit');
         }
     }
 
-
     // Helper Methods 
     const addNewClass = (): void => {
         const today = new Date();
 
-            today.setUTCHours(16,0,0,0);
-            const todayAt9AM = new Date(today)
-            //console.log("9am String ", todayAt9AM)
-           
-            today.setUTCHours(24,0,0,0);
-            const todayAt5PM = new Date(today) 
-            //console.log("5pm String ", todayAt5PM)
+        today.setUTCHours(16,0,0,0);
+        const todayAt9AM = new Date(today)
+        
+        today.setUTCHours(24,0,0,0);
+        const todayAt5PM = new Date(today) 
 
-
-            const newClassSchedule: ClassSchedule = {
-                classId: null,
-                courseId: course.courseId,
-                scheduleStart: todayAt9AM,
-                scheduleEnd: todayAt5PM,
-                attendance: []
+        const newClassSchedule: ClassSchedule = {
+            classId: null,
+            courseId: course.courseId,
+            scheduleStart: todayAt9AM,
+            scheduleEnd: todayAt5PM,
+            attendance: []
+        }
+        //console.log(newClassSchedule)
+        setCourseInfo(prevCourse => {
+            return {
+                ...prevCourse,
+                classes: [newClassSchedule]
             }
-            //console.log(newClassSchedule)
-            setCourseInfo(prevCourse => {
-                return {
-                    ...prevCourse,
-                    classes: [newClassSchedule]
-                }
-            });
-            setEditModeIndex(0);
+        });
+        setEditModeIndex(0);
     }
 
     const addNewClassPlusOneDay = (): void => {
@@ -247,7 +235,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     return (
         <div>
 
-            <div className="flex flex-col items-center">
+            <div>
                 <div className="p-4">
                     <h1 className="p-s text-3xl text-center font-bold"> Course Id: {courseInfo.courseId}</h1>
                     {unsavedChanges && (
@@ -256,33 +244,34 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                         <span>Warning: Unsaved Changes detected!</span>
                       </div>)}
                 </div>
-                <div className="navbar  w-1/2 rounded-xl flex justify-center">
-                    
-                    <button 
-                        className="btn btn-error text-white mb-1 mr-1"
-                        onClick={handleDeleteCourse}>
-                            Delete Course
-                    </button>
-                    <button
-                        className="btn btn-primary text-white mb-1"
-                        onClick = {handleSaveCourse}>
-                            Save Course
-                    </button>
 
-                    
+                <div className="flex justify-center">              
+                        
+                        <button 
+                            className="btn btn-error text-white mb-1 mr-1"
+                            onClick={handleDeleteCourse}>
+                                Delete Course
+                        </button>
+                        <button
+                            className="btn btn-primary text-white mb-1"
+                            onClick = {handleSaveCourse}>
+                                Save Course
+                        </button>
+                   
                 </div>
+                
                 <div className="p-4">
                     <CourseInfoCard course={courseInfo} onApply={handleOnCourseInfoCardSave} />
                 </div>
             </div>
             
-            <div className="flex flex-col items-center">
+            <div className="">
                 <div className="p-4">
                     <h1 className="p-s text-3xl text-center font-bold">
                         Classes
                     </h1>
                 </div>
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex justify-center">
                     {courseInfo.classes.map((classSchedule, index) => (
                         <ClassInfoCard 
                             key={classSchedule.classId}
@@ -292,7 +281,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                             editMode={index === editModeIndex} />
                     ))}
                 </div>
-                <div className="navbar  w-1/2 rounded-xl">
+                <div className="flex justify-center">
                     <button 
                         className="btn btn-primary text-white m-1"
                         onClick={handleOnClassAdd}>
@@ -300,7 +289,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </button>
                     {/* <button
                         className="btn btn-primary text-white m-1"
-                        onClick={()=> console.log(courseInfo)}>
+                        onClick={()=> console.log("COURSEINFO",courseInfo)}>
+                            Test Course Info
+                    </button>
+                    <button
+                        className="btn btn-primary text-white m-1"
+                        onClick={()=> console.log("COURSE",course)}>
                             Test Course
                     </button> */}
                 </div>
@@ -336,7 +330,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                           
  
         
-  );
+    );
 }
 
 export default EditCourseInfo;

@@ -32,27 +32,10 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var courses = await  _educationProgramContext.Courses
-					.Select(c => new Course
-					{
-						CourseId = c.CourseId,
-						Title = c.Title,
-						Description = c.Description,
-						AttendanceCredit = c.AttendanceCredit,
-						CompletionCredit = c.CompletionCredit,
-						MaxAttendance = c.MaxAttendance,
-						EnrollmentDeadline = c.EnrollmentDeadline,
-						InstructorEmail = c.InstructorEmail,
-						InstructorName = c.InstructorName,
-						Pdf = c.Pdf,
-						Location = c.Location,
-						Topics = c.Topics.Select(t => new Topic
-						{
-							TopicId = t.TopicId,
-							Title = t.Title,
-							Description = t.Description
-						}).ToList(),
-						Classes = c.Classes.ToList(),
-					}).ToListAsync();
+					.Include(c => c.Classes)
+					.Include(c => c.Topics)
+					.Include(c => c.Location)
+					.ToListAsync();
 
 				return courses;
 			}
@@ -99,6 +82,37 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetCoursesByTopicId/{Id}")]
+		public async Task<ActionResult<List<Course>>> GetCoursesByTopicId(int Id)
+		{
+			try
+			{
+				var topic = await _educationProgramContext.Topics
+					.Include(t => t.Courses)
+						.ThenInclude(c => c.Location)
+					.Include(t => t.Courses)
+						.ThenInclude(c => c.Classes)
+					.FirstOrDefaultAsync(t => t.TopicId == Id);
+
+				if (topic == null)
+				{
+					_logger.LogError("GetCourseByTopicId({Id}), Topic not found!", Id);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				List<Course> courses = topic.Courses.ToList();
+
+				_logger.LogInformation("GetCourseByTopicId({Id}), called", Id);
+				return courses;
+
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetCourseByTopicId({Id})", Id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 		/// <summary>
 		/// Gives the end user the ability to add a Course record to the database.
 		/// </summary>
@@ -119,7 +133,9 @@ namespace EducationAPI.Controllers
 				// Check if any of the topics in the request already exist in the database
 				foreach (var topic in topicsCopy)
 				{
-					var existingTopic = await _educationProgramContext.Topics.FirstOrDefaultAsync(t => t.TopicId == topic.TopicId);
+					var existingTopic = await _educationProgramContext.Topics
+						.FirstOrDefaultAsync(t => t.TopicId == topic.TopicId);
+
 					if (existingTopic != null)
 					{
 						// If the topic already exists, just link it to the course
@@ -148,24 +164,42 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var existingCourse = await _educationProgramContext.Courses
+					.Include(c => c.Classes)
+					.Include(c => c.Location)
+					.Include(c => c.Topics)
 					.FirstOrDefaultAsync(c => c.CourseId == id);
 
 				if (existingCourse == null)
 				{
-					_logger.LogError("UpdateCourse({Id}), Course not found!", id);
+					_logger.LogError("UpdateCourseById({Id}, {UpdatedCourse}), Course not found!", id, updatedCourse);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
+				// Update scalar properties
 				_educationProgramContext.Entry(existingCourse).CurrentValues.SetValues(updatedCourse);
+
+				// Update topics. 
+				existingCourse.Topics.Clear();
+
+				foreach (var topic in updatedCourse.Topics)
+				{
+					var existingTopic = await _educationProgramContext.Topics
+						.FirstOrDefaultAsync(t => t.TopicId == topic.TopicId);
+
+					if (existingTopic != null)
+					{
+						existingCourse.Topics.Add(existingTopic);
+					}
+				}
 
 				await _educationProgramContext.SaveChangesAsync();
 
-				_logger.LogInformation("UpdateCourse {Id} called", id);
+				_logger.LogInformation("UpdateCourseById({Id}, {UpdatedCourse}) called", id, updatedCourse);
 				return existingCourse;
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "UpdateCourse({Id})", id);
+				_logger.LogError(ex, "UpdateCourseById({Id}, {UpdatedCourse})", id, updatedCourse);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}

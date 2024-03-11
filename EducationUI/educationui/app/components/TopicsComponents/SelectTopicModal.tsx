@@ -1,5 +1,5 @@
+import { getAllTopics } from '@/Utilities/api';
 import { Topic } from '@/app/shared/types/sharedTypes';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 
 interface SelectTopicModalProps {
@@ -19,8 +19,8 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
         const fetchTopics = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get('https://localhost:7144/Topic/GetAllTopics');
-                setTopics(response.data);
+                const responseData = await getAllTopics();
+                setTopics(responseData);
             } catch (error) {
                 setError('Failed to fetch topics');
             } finally {
@@ -50,16 +50,21 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
     return (
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${open ? "" : "hidden"}`}>
             <div className="absolute inset-0 bg-black opacity-50"></div>
+
             <div className="bg-white p-8 rounded-lg z-50">
+
                 <h2 className="text-xl font-semibold mb-4">Select Topics</h2>
+                
                 {loading ? (
-                    <p>Loading...</p>
+                    <span className="loading loading-spinner loading-xs"></span>
                 ) : error ? (
                     <p>{error}</p>
                 ) : (
                     <>
                         <p className="text-lg mb-4">Please select topics from the list below</p>
+
                         <ul className="mb-4">
+
                             {topics.map((topic) => (
                                 <li key={topic.topicId} className="mb-2">
                                     <button
@@ -70,6 +75,7 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
                                     </button>
                                 </li>
                             ))}
+                            
                         </ul>
                     </>
                 )}

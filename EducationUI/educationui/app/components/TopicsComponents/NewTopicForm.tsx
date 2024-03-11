@@ -1,6 +1,6 @@
 import { Topic } from "@/app/shared/types/sharedTypes";
 import { useState } from "react";
-import CharacterCounter from "../CharacterCounter";
+import CharacterCounter from "../../shared/CharacterCounter";
 
 interface NewTopicFormProps {
     onSubmit: (topic: Topic) => void;
