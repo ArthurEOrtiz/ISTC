@@ -34,12 +34,6 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
         };
         fetchData();
     }, [editTopic]);
-
-
-    useEffect(() => {
-        console.log("UseEffect: Edit Mode: ", editMode);
-    }
-    , [editMode]);
     
     // Handlers
     const handleSelectCourseModalOnSelect = (selectedCourses: Course[]) => {
@@ -49,26 +43,21 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
     }
 
     const handleCancel = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        console.log("Canceling edit");
-        console.log("Canceling edit: editMode: ", editMode);
+
         event.preventDefault(); // Prevents the default behavior of the event
         setEditMode(false);
-        if (editTopic.topicId !== 0) {
-            setEditTopic(topic);
-        } 
+        setEditTopic(topic);
     }
 
     const handleDelete = () => {
-        console.log("Deleting topic");
         if (onDelete && topic.topicId && topic.topicId !== 0) {
             onDelete(topic.topicId);
         }
     }
 
-    const handleApplyEdit = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const handleApplyEdit = () => {
         console.log("Applying edit");
         console.log("Applying edit: editMode: ", editMode);
-        // event.preventDefault(); // Prevents the default behavior of the event
         if (editMode) {
             setEditMode(false);
             onApply(editTopic);
