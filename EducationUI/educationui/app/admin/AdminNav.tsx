@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
-const AdminMenu: React.FC = () => {
+const AdminNav
+: React.FC = () => {
     return (
         <ul className="navbar bg-neutral">
             <li>
@@ -27,4 +28,5 @@ const AdminMenu: React.FC = () => {
     )
 }
 
-export default AdminMenu;
+export default AdminNav
+;

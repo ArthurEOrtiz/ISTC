@@ -1,4 +1,4 @@
-import AdminMenu from "./AdminMenu";
+import AdminNav from "./AdminNav";
 
 export default function AdminLayout({
     children,
@@ -7,7 +7,7 @@ export default function AdminLayout({
 }) {
     return (
         <section>
-            <AdminMenu/>
+            <AdminNav/>
             {children}
         </section>
     );

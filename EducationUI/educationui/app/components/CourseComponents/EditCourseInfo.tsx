@@ -265,40 +265,35 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 </div>
             </div>
             
-            <div className="">
+            <div>
                 <div className="p-4">
                     <h1 className="p-s text-3xl text-center font-bold">
                         Classes
                     </h1>
                 </div>
-                <div className="flex justify-center">
-                    {courseInfo.classes.map((classSchedule, index) => (
-                        <ClassInfoCard 
-                            key={classSchedule.classId}
-                            classSchedule={classSchedule}
-                            onAdd={handleOnClassAdded}
-                            onDelete={handleOnClassInfoCardDelete}
-                            editMode={index === editModeIndex} />
-                    ))}
-                </div>
-                <div className="flex justify-center">
-                    <button 
-                        className="btn btn-primary text-white m-1"
-                        onClick={handleOnClassAdd}>
-                            Add Class
-                    </button>
-                    {/* <button
-                        className="btn btn-primary text-white m-1"
-                        onClick={()=> console.log("COURSEINFO",courseInfo)}>
-                            Test Course Info
-                    </button>
-                    <button
-                        className="btn btn-primary text-white m-1"
-                        onClick={()=> console.log("COURSE",course)}>
-                            Test Course
-                    </button> */}
+                <div>
+                    <div className="">
+                        {courseInfo.classes.map((classSchedule, index) => (
+                            <div key={index} className="flex justify-center">
+                                <ClassInfoCard 
+                                    key={classSchedule.classId}
+                                    classSchedule={classSchedule}
+                                    onAdd={handleOnClassAdded}
+                                    onDelete={handleOnClassInfoCardDelete}
+                                    editMode={index === editModeIndex} />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-center">
+                        <button 
+                            className="btn btn-primary text-white"
+                            onClick={handleOnClassAdd}>
+                                Add Class
+                        </button>
+                    </div>
                 </div>
             </div>
+
 
             <dialog id="warning_modal_class" className="modal">
                 <div className="modal-box">
@@ -325,11 +320,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             )}
 
 
-            
+
         </div>
-                          
- 
-        
     );
 }
 
