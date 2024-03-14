@@ -3,7 +3,13 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "./shared/header";
 
+import { PublicClientApplication } from "@azure/msal-browser";
+import { MsalProvider } from "@azure/msal-react";
+import { msalConfig } from "@/Utilities/authConfig";
+
+
 const inter = Inter({ subsets: ["latin"] });
+const msalInstance = new PublicClientApplication(msalConfig);
 
 export const metadata: Metadata = {
   title: "ISTC Education",
@@ -16,11 +22,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Header />
-        {children}
-      </body>
-    </html>
+    <MsalProvider instance={msalInstance}>
+      <html lang="en">
+        <body className={inter.className}>
+          <Header />
+          {children}
+        </body>
+      </html>
+    </MsalProvider>
   );
 }
