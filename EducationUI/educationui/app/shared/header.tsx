@@ -1,3 +1,4 @@
+import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import React from 'react';
 
@@ -17,8 +18,13 @@ const Header: React.FC = () => {
                             Admin
                         </Link>
                     </li>
+                    <li>
+                        <UserButton afterSignOutUrl='/' />
+                    </li>
                 </ul>
             </nav>
+
+            
         </header>
     );
 }
