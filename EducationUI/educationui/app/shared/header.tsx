@@ -19,7 +19,10 @@ const Header: React.FC = () => {
                         </Link>
                     </li>
                     <li>
-                        <UserButton afterSignOutUrl='/' />
+                        <div className='mt-2'>
+                            <UserButton afterSignOutUrl='/' />
+                        </div>
+                        
                     </li>
                 </ul>
             </nav>
