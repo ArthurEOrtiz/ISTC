@@ -4,6 +4,7 @@ using EducationAPI.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EducationAPI.Migrations
 {
     [DbContext(typeof(EducationProgramContext))]
-    partial class EducationProgramContextModelSnapshot : ModelSnapshot
+    [Migration("20240314214508_AddClerkIdToUsers")]
+    partial class AddClerkIdToUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -450,34 +452,6 @@ namespace EducationAPI.Migrations
                     ));
                 });
 
-            modelBuilder.Entity("EducationAPI.Models.User", b =>
-                {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
-
-                    b.Property<string>("ClerkId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsStudent")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("StudentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("Users");
-                });
-
             modelBuilder.Entity("CourseTopic", b =>
                 {
                     b.HasOne("EducationAPI.Models.Course", null)
@@ -541,15 +515,6 @@ namespace EducationAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Contact");
-                });
-
-            modelBuilder.Entity("EducationAPI.Models.User", b =>
-                {
-                    b.HasOne("EducationAPI.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("EducationAPI.Models.Class", b =>

@@ -9,6 +9,8 @@ namespace EducationAPI.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int UserId { get; set; }
 
+		public string ClerkId { get; set; } = null!;
+
 		public bool IsAdmin { get; set; }
 
 		public bool IsStudent { get; set; }

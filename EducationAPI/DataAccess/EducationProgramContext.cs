@@ -17,6 +17,7 @@ namespace EducationAPI.DataAccess
 		public DbSet<Course> Courses { get; set; } = null!;
 		public DbSet<Location> Locations { get; set; } = null!;
 		public DbSet<Student> Students { get; set; } = null!;
+		public DbSet<User> Users { get; set; } = null!;
 		public DbSet<Topic> Topics { get; set; } = null!;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
