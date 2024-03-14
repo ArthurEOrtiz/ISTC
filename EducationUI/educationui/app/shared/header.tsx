@@ -14,6 +14,11 @@ const Header: React.FC = () => {
                         </Link>
                     </li>
                     <li>
+                        <Link href="/courses" className="btn btn-ghost text-white">
+                            Courses
+                        </Link>
+                    </li>
+                    <li>
                         <Link href="/admin" className="btn btn-ghost text-white">
                             Admin
                         </Link>
