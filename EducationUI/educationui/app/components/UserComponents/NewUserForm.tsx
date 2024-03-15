@@ -14,13 +14,22 @@ const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName,
     const [user, setUser] = useState<User>({
         userId: 0,
         clerkId: clerkId,
-        firstName: firstName || "",
-        lastName: lastName || "",
+        firstName: firstName,
+        lastName: lastName,
         middleName: "",
-        email: email || "",
+        email: email,
+        employer: "select",
+        jobTitle: "",
         isAdmin: false,
         isStudent: true,
-        student: null,
+        student: {
+            studentId: 0,
+            userId: 0,
+            accumulatedCredit: 0,
+            appraisalCertified: false,
+            mappingCertified: false,
+            attendances: null
+        },
         contact: {
             contactId: 0,
             userId: 0,
@@ -33,9 +42,62 @@ const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName,
         }
     });
 
+    const countyArray = [
+        "Ada",
+        "Adams",
+        "Bannock",
+        "Bear Lake",
+        "Benewah",
+        "Bingham",
+        "Blaine",
+        "Boise",
+        "Bonner",
+        "Bonneville",
+        "Boundary",
+        "Butte",
+        "Camas",
+        "Canyon",
+        "Caribou",
+        "Cassia",
+        "Clark",
+        "Clearwater",
+        "Custer",
+        "Elmore",
+        "Franklin",
+        "Fremont",
+        "Gem",
+        "Gooding",
+        "Idaho",
+        "Jefferson",
+        "Jerome",
+        "Kootenai",
+        "Latah",
+        "Lemhi",
+        "Lewis",
+        "Lincoln",
+        "Madison",
+        "Minidoka",
+        "Nez Perce",
+        "Oneida",
+        "Owyhee",
+        "Payette",
+        "Power",
+        "Shoshone",
+        "Teton",
+        "Twin Falls",
+        "Valley",
+        "Washington"
+    ]
+
     const handleOnSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSubmit(user);
+    }
+
+    const handleEmpoyerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+       
+        setUser({ ...user, employer: e.target.value });
+       
     }
 
     return (
@@ -52,8 +114,26 @@ const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName,
                     type="text"
                     id="firstName"
                     maxLength={50}
-                    value={user.firstName || ""}
+                    required
+                    value={user.firstName}
                     onChange={(e) => setUser({ ...user, firstName: e.target.value })}
+                />
+            </div>
+            <div className="mb-4">
+                <label
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                    htmlFor="middleName"
+                    >
+                        Middle Name
+                </label>
+                <input
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="text"
+                    id="middleName"
+                    placeholder="Optional"
+                    maxLength={50}
+                    value={user.middleName || ""}
+                    onChange={(e) => setUser({ ...user, middleName: e.target.value })}
                 />
             </div>
             <div className="mb-4">
@@ -68,6 +148,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName,
                     type="text"
                     id="lastName"
                     maxLength={50}
+                    required
                     value={user.lastName || ""}
                     onChange={(e) => setUser({ ...user, lastName: e.target.value })}
                 />
@@ -84,8 +165,64 @@ const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName,
                     type="email"
                     id="email"
                     maxLength={100}
+                    required
                     value={user.email || ""}
                     onChange={(e) => setUser({ ...user, email: e.target.value })}
+                />
+            </div>
+            <div className="mb-4">
+                <label 
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                    htmlFor="employer"
+                    >
+                        Employer
+                </label>
+                <select
+                    id="employer"
+                    className="shawdow appearance-none border rounded w-full py-2 px-3"
+                    onChange={handleEmpoyerChange}>
+                    <option value="select">Select</option>
+                    <option value="other">Other / Not Listed</option>
+                    <option value="Tax Commission">Tax Commission</option>
+                    {countyArray.map((county, index) => (
+                        <option key={index} value={county}>{county}</option>
+                    ))}
+                </select>
+
+            </div>
+            {!countyArray.includes(user.employer) && user.employer !== "select" && user.employer !== "Tax Commission" && (
+                <div className="mb-4">
+                    <label 
+                        className="block text-gray-700 text-sm font-bold mb-2"
+                        htmlFor="employer"
+                        >
+                            Other Employer
+                    </label>
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        type="text"
+                        id="employer"
+                        maxLength={100}
+                        required
+                        defaultValue="Employer Name"
+                        onChange={(e) => setUser({ ...user, employer: e.target.value })}
+                    />
+                </div>
+            )}
+            <div className="mb-4">
+                <label 
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                    htmlFor="jobTitle"
+                    >
+                        Job Title
+                </label>
+                <input
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="text"
+                    id="jobTitle"
+                    maxLength={100}
+                    value={user.jobTitle || ""}
+                    onChange={(e) => setUser({ ...user, jobTitle: e.target.value })}
                 />
             </div>
             <div className="mb-4">
@@ -99,7 +236,10 @@ const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName,
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     type="tel"
                     id="phone"
-                    maxLength={10}
+                    pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
+                    maxLength={20}
+                    required
+                    placeholder="1234567890"
                     value={user.contact.phone || ""}
                     onChange={(e) => setUser({ ...user, contact: { ...user.contact, phone: e.target.value } })}
                 />
@@ -116,6 +256,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName,
                     type="text"
                     id="addressLine1"
                     maxLength={100}
+                    required
                     value={user.contact.addressLine1 || ""}
                     onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine1: e.target.value } })}
                 />
@@ -131,6 +272,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName,
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     type="text"
                     id="addressLine2"
+                    placeholder="Optional"
                     maxLength={100}
                     value={user.contact.addressLine2 || ""}
                     onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine2: e.target.value } })}
@@ -150,6 +292,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName,
                         type="text"
                         id="city"
                         maxLength={50}
+                        required
                         value={user.contact.city || ""}
                         onChange={(e) => setUser({ ...user, contact: { ...user.contact, city: e.target.value } })}
                     />
@@ -231,6 +374,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName,
                         type="text"
                         id="zip"
                         maxLength={5}
+                        required
                         value={user.contact.zip || ""}
                         onChange={(e) => setUser({ ...user, contact: { ...user.contact, zip: e.target.value } })}
                     />

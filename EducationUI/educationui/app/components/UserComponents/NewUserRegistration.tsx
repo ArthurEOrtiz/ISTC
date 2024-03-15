@@ -10,11 +10,6 @@ interface NewUserRegistrationProps {
 
 const NewUserRegistration: React.FC<NewUserRegistrationProps> = async({clerkId, firstName, lastName, email}) => {
 
-
-
-
-
-
     return (
         <div>
             <h1 className="p-2 text-3xl text-center font-bold">New User Registration</h1>
@@ -28,7 +23,7 @@ const NewUserRegistration: React.FC<NewUserRegistrationProps> = async({clerkId, 
                         firstName={firstName || ""} 
                         lastName={lastName || ""} 
                         email={email}
-                        onSubmit={() => {}} 
+                        onSubmit={(user) => {console.log(user)}} 
                     />
                 </div>
             </div>

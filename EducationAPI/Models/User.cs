@@ -23,6 +23,12 @@ namespace EducationAPI.Models
 		[EmailAddress]
 		public string Email { get; set; } = null!;
 
+		[MaxLength(50)]
+		public string Employer { get; set; } = null!;
+
+		[MaxLength(50)]
+		public string JobTitle { get; set; } = null!;	
+
 		public bool IsAdmin { get; set; }
 
 		public bool IsStudent { get; set; }

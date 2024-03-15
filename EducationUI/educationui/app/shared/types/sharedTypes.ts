@@ -58,6 +58,8 @@ export interface Course {
     lastName: string;
     middleName: string | null;
     email: string;
+    employer: string;
+    jobTitle: string; 
     isAdmin: boolean;
     isStudent: boolean;
     student : Student | null;
@@ -70,7 +72,6 @@ export interface Course {
     accumulatedCredit: number;
     appraisalCertified: boolean;
     mappingCertified: boolean;
-    contact: Contact;
     attendances: Attendance[] | null;
   }
 
