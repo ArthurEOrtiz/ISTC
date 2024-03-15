@@ -161,6 +161,26 @@ export async function getAllUsers() {
     }
 }
 
+export async function getUserByClerkId(clerkId) {
+    try {
+        const response = await axiosInstance.get(`User/GetUserByClerkId/${clerkId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        throw error;
+    }
+}
+
+export async function postUser(user) {
+    try {
+        const response = await axiosInstance.post('User/PostUser', user);
+        return response.data;
+    } catch (error) {
+        console.error('Error posting user:', error);
+        throw error;
+    }
+}
+
 export async function checkUserExistsByClerkId(clerkId) {
     try {
         const response = await axiosInstance.get(`User/CheckUserExistsByClerkId/${clerkId}`);

@@ -1,5 +1,7 @@
 'use client';
+import { postUser } from "@/Utilities/api";
 import NewUserForm from "./NewUserForm";
+import { User } from "@/app/shared/types/sharedTypes";
 
 interface NewUserRegistrationProps {
     clerkId: string;
@@ -8,7 +10,17 @@ interface NewUserRegistrationProps {
     email: string;
 }
 
-const NewUserRegistration: React.FC<NewUserRegistrationProps> = async({clerkId, firstName, lastName, email}) => {
+const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({clerkId, firstName, lastName, email}) => {
+    
+    const handleNewUserFormOnSubmit = async (user: User) => {
+        try {
+            await postUser(user);
+            // refresh the page to show the new user
+            window.location.reload();
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     return (
         <div>
@@ -23,7 +35,7 @@ const NewUserRegistration: React.FC<NewUserRegistrationProps> = async({clerkId, 
                         firstName={firstName || ""} 
                         lastName={lastName || ""} 
                         email={email}
-                        onSubmit={(user) => {console.log(user)}} 
+                        onSubmit={handleNewUserFormOnSubmit} 
                     />
                 </div>
             </div>
