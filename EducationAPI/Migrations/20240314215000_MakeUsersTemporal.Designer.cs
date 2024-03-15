@@ -4,6 +4,7 @@ using EducationAPI.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EducationAPI.Migrations
 {
     [DbContext(typeof(EducationProgramContext))]
-    partial class EducationProgramContextModelSnapshot : ModelSnapshot
+    [Migration("20240314215000_MakeUsersTemporal")]
+    partial class MakeUsersTemporal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,6 +170,10 @@ namespace EducationAPI.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
@@ -185,17 +191,11 @@ namespace EducationAPI.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Zip")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
                     b.HasKey("ContactId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Contact", (string)null);
 
@@ -361,8 +361,25 @@ namespace EducationAPI.Migrations
                     b.Property<bool>("AppraisalCertified")
                         .HasColumnType("bit");
 
+                    b.Property<int>("ContactId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<bool>("MappingCertified")
                         .HasColumnType("bit");
+
+                    b.Property<string>("MiddleName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()
@@ -374,13 +391,9 @@ namespace EducationAPI.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("StudentId");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("ContactId");
 
                     b.ToTable("Students", (string)null);
 
@@ -451,29 +464,11 @@ namespace EducationAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsStudent")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("MiddleName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()
@@ -485,7 +480,12 @@ namespace EducationAPI.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
 
+                    b.Property<int?>("StudentId")
+                        .HasColumnType("int");
+
                     b.HasKey("UserId");
+
+                    b.HasIndex("StudentId");
 
                     b.ToTable("Users", (string)null);
 
@@ -544,15 +544,6 @@ namespace EducationAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("EducationAPI.Models.Contact", b =>
-                {
-                    b.HasOne("EducationAPI.Models.User", null)
-                        .WithOne("Contact")
-                        .HasForeignKey("EducationAPI.Models.Contact", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("EducationAPI.Models.Course", b =>
                 {
                     b.HasOne("EducationAPI.Models.Location", "Location")
@@ -566,11 +557,22 @@ namespace EducationAPI.Migrations
 
             modelBuilder.Entity("EducationAPI.Models.Student", b =>
                 {
-                    b.HasOne("EducationAPI.Models.User", null)
-                        .WithOne("Student")
-                        .HasForeignKey("EducationAPI.Models.Student", "UserId")
+                    b.HasOne("EducationAPI.Models.Contact", "Contact")
+                        .WithMany()
+                        .HasForeignKey("ContactId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Contact");
+                });
+
+            modelBuilder.Entity("EducationAPI.Models.User", b =>
+                {
+                    b.HasOne("EducationAPI.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("EducationAPI.Models.Class", b =>
@@ -586,13 +588,6 @@ namespace EducationAPI.Migrations
             modelBuilder.Entity("EducationAPI.Models.Student", b =>
                 {
                     b.Navigation("Attendances");
-                });
-
-            modelBuilder.Entity("EducationAPI.Models.User", b =>
-                {
-                    b.Navigation("Contact");
-
-                    b.Navigation("Student");
                 });
 #pragma warning restore 612, 618
         }

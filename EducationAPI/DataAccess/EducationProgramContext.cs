@@ -49,6 +49,8 @@ namespace EducationAPI.DataAccess
 				.ToTable("Location", b => b.IsTemporal());
 			modelBuilder.Entity<Student>()
 				.ToTable("Students", b => b.IsTemporal());
+			modelBuilder.Entity<User>()
+				.ToTable("Users", b => b.IsTemporal());
 			modelBuilder.Entity<Topic>()
 				.ToTable("Topics", b => b.IsTemporal());
 		}

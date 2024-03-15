@@ -11,10 +11,24 @@ namespace EducationAPI.Models
 
 		public string ClerkId { get; set; } = null!;
 
+		[MaxLength(50)]
+		public string FirstName { get; set; } = null!;
+
+		[MaxLength(50)]
+		public string LastName { get; set; } = null!;
+
+		[MaxLength(50)]
+		public string? MiddleName { get; set; }
+
+		[EmailAddress]
+		public string Email { get; set; } = null!;
+
 		public bool IsAdmin { get; set; }
 
 		public bool IsStudent { get; set; }
 
 		public virtual Student? Student { get; set; }
+
+		public virtual Contact? Contact { get; set; }
 	}
 }

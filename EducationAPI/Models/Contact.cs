@@ -9,8 +9,8 @@ namespace EducationAPI.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int ContactId { get; set; }
 
-		[EmailAddress]
-		public string Email { get; set; } = null!;
+		[Required]
+		public int UserId { get; set; }
 
 		[Phone]
 		public string? Phone { get; set; }
@@ -26,5 +26,6 @@ namespace EducationAPI.Models
 
 		[MaxLength(10)]
 		public string? Zip { get; set; }
+
 	}
 }
