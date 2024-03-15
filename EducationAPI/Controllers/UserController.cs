@@ -104,7 +104,32 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpDelete("DeleteUserById/{id}")]
+		public async Task<ActionResult> DeleteUserById(int id)
+		{
+			try
+			{
+				var existingUser = await _educationProgramContext.Users
+						.Include(u => u.Contact)
+						.Include(u => u.Student)
+						.FirstOrDefaultAsync(u => u.UserId == id);
 
+				if (existingUser == null)
+				{
+					_logger.LogError("DeleteUserById({Id}), User not found!", id);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_educationProgramContext.Users.Remove(existingUser);
+				await _educationProgramContext.SaveChangesAsync();
+				return new StatusCodeResult((int)HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "DeleteUserById({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
 
 
 	}
