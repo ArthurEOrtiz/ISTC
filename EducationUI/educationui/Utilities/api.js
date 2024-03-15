@@ -149,5 +149,25 @@ export async function deleteTopicById(topicId) {
     }
 }
 
+// Users
 
+export async function getAllUsers() {
+    try {
+        const response = await axiosInstance.get('User/GetAllUsers');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+    }
+}
+
+export async function checkUserExistsByClerkId(clerkId) {
+    try {
+        const response = await axiosInstance.get(`User/CheckUserExistsByClerkId/${clerkId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        throw error;
+    }
+}
 

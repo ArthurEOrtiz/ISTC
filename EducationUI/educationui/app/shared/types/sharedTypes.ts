@@ -51,11 +51,22 @@ export interface Course {
     
   }
 
-  export interface Student {
-    studentId: number | null;
+  export interface User {
+    userId: number | null;
+    clerkId: string | null;
     firstName: string;
     lastName: string;
     middleName: string | null;
+    email: string;
+    isAdmin: boolean;
+    isStudent: boolean;
+    student : Student | null;
+    contact: Contact;
+  }
+
+  export interface Student {
+    studentId: number | null;
+    userId: number | null;
     accumulatedCredit: number;
     appraisalCertified: boolean;
     mappingCertified: boolean;
@@ -65,7 +76,7 @@ export interface Course {
 
   export interface Contact {
     contactId: number | null;
-    email: string;
+    userId: number | null;
     phone: string | null;
     addressLine1: string | null;
     addressLine2: string | null;

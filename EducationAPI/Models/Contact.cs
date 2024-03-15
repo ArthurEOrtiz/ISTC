@@ -21,6 +21,9 @@ namespace EducationAPI.Models
 		[MaxLength(255)]
 		public string? AddressLine2 { get; set; }
 
+		[MaxLength(30)]
+		public string? City { get; set; }
+
 		[MaxLength(10)]
 		public string? State { get; set; }
 
