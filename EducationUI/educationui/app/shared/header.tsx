@@ -3,6 +3,10 @@ import Link from 'next/link';
 import React from 'react';
 
 const Header: React.FC = () => {
+    const isSignedIn = true;
+    //
+
+
     return (
         <header className="flex justify-between items-center p-5 bg-primary">
             <h1 className="text-white text-2xl">Property Tax Education</h1>
@@ -18,11 +22,14 @@ const Header: React.FC = () => {
                             Courses
                         </Link>
                     </li>
-                    <li>
-                        <Link href="/admin" className="btn btn-ghost text-white">
-                            Admin
-                        </Link>
-                    </li>
+                    {isSignedIn && (
+                        <li>
+                            <Link href="/admin" className="btn btn-ghost text-white">
+                                Admin
+                            </Link>
+                        </li>
+                    )}
+                    
                     <li>
                         <div className='mt-2'>
                             <UserButton afterSignOutUrl='/' />
