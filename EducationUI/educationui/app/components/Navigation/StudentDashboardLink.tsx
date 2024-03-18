@@ -1,12 +1,12 @@
-;
-import { auth } from "@clerk/nextjs";
+
+import { currentUser } from "@clerk/nextjs";
 import Link from "next/link";
 
-const StudentDashboardLink = () => {
-    const {userId} = auth();
+const StudentDashboardLink =  async() => {
+    const user = await currentUser();
     
-    if (!userId) {
-        return null;
+    if (!user) {
+        return null
     }
 
     return (
