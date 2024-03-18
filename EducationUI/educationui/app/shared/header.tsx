@@ -1,12 +1,10 @@
-import { UserButton } from '@clerk/nextjs';
+import { UserButton} from '@clerk/nextjs';
 import Link from 'next/link';
 import React from 'react';
+import AdmindashboardLink from '../components/Navigation/AdminDashboardLink';
+import StudentDashboardLink from '../components/Navigation/StudentDashboardLink';
 
-const Header: React.FC = () => {
-    const isSignedIn = true;
-    //
-
-
+const Header: React.FC = async () => {
     return (
         <header className="flex justify-between items-center p-5 bg-primary">
             <h1 className="text-white text-2xl">Property Tax Education</h1>
@@ -22,14 +20,12 @@ const Header: React.FC = () => {
                             Courses
                         </Link>
                     </li>
-                    {isSignedIn && (
-                        <li>
-                            <Link href="/admin" className="btn btn-ghost text-white">
-                                Admin
-                            </Link>
-                        </li>
-                    )}
-                    
+                    <li>
+                        <StudentDashboardLink />
+                    </li> 
+                    <li>
+                        <AdmindashboardLink />
+                    </li>
                     <li>
                         <div className='mt-2'>
                             <UserButton afterSignOutUrl='/' />

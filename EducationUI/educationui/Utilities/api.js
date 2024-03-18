@@ -191,3 +191,13 @@ export async function checkUserExistsByClerkId(clerkId) {
     }
 }
 
+export async function IsUserAdminByClerkId(clerkId) {
+    try {
+        const response = await axiosInstance.get(`User/IsUserAdminByClerkId/${clerkId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        throw error;
+    }
+}
+
