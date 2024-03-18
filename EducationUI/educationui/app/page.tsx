@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 export default function Home() {
 
@@ -18,7 +17,7 @@ export default function Home() {
         Whether you're a taxpayer, tax professional, or simply interested in learning more about Idaho's tax system, we're here to support you every step of the way.
       </p>
 
-      <div className="flex justify-between mt-8">
+      <div className="flex mt-8 w-1/2 space-x-4">
 
         <div className="card w-96 bg-base-100 shadow-xl">
           <div className="card-body">

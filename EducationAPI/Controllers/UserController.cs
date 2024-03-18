@@ -70,7 +70,7 @@ namespace EducationAPI.Controllers
 
 
 		[HttpGet("CheckUserExistsByClerkId/{clerkId}")]
-		public async Task<bool> CheckUserExistsByClerkId(string clerkId)
+		public async Task<ActionResult<bool>> CheckUserExistsByClerkId(string clerkId)
 		{
 			try
 			{
@@ -83,7 +83,32 @@ namespace EducationAPI.Controllers
 			{
 				_logger.LogError(ex, "CheckUserExistsByClerkId({ClerkId})", clerkId);
 				// If an exception occurs, return false
-				return false;
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+
+		[HttpGet("IsUserAdminByClerkId/{clerkId}")]
+		public async Task<ActionResult<bool>> IsUserAdminByClerkId(string clerkId)
+		{
+			try
+			{
+				var user = await _educationProgramContext.Users
+					.FirstOrDefaultAsync(u => u.ClerkId == clerkId);
+
+				if (user == null)
+				{
+					_logger.LogError("IsUserAdminByClerkId({ClerkId}), Record not found!", clerkId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_logger.LogInformation("IsUserAdminByClerkId({ClerkId}), called", clerkId);
+				return user.IsAdmin;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "IsUserAdminByClerkId({ClerkId})", clerkId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
 
