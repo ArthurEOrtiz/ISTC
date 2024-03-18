@@ -1,8 +1,8 @@
 import { checkUserExistsByClerkId } from "@/Utilities/api";
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
-import NewUserRegistration from "../components/UserComponents/NewUserRegistration";
-import UserDashboard from "../components/UserComponents/UserDashboard";
+import NewUserRegistration from "../components/User/NewUserRegistration";
+import UserDashboard from "../components/User/UserDashboard";
 
 const UserPage: React.FC = async() => {
     const user = await currentUser();
