@@ -7,14 +7,7 @@ interface MonthProps {
 }
 
 const Month: React.FC<MonthProps> = ({ month, year }) => {
-    // Helper function to convert month number to name
-    const numberToMonth = (month: number): string => {
-        const monthNames = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-        ];
-        return monthNames[month - 1];
-    };
+
 
     // Get the number of days in the month
     const daysInMonth = new Date(year, month, 0).getDate();
@@ -31,28 +24,47 @@ const Month: React.FC<MonthProps> = ({ month, year }) => {
 
     // Concatenate the two arrays
     daysArrayWithPadding.push(...daysArray.map(String));
-
-
     
     // Array of days of the week
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+    // Helper function to convert month number to name
+    const numberToMonth = (month: number): string => {
+        const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        return monthNames[month - 1];
+    };
+
     return (
         <div className="border border-gray-300 rounded-lg p-4 w-auto mx-auto">
+
+            {/* Render the Month and Year */}
             <div className="bg-gray-100 text-gray-800 font-semibold text-center mb-2">
                 {numberToMonth(month)} {year}
             </div>
+
+            
             <div className="grid grid-cols-7 ">
+                {/* Render the days of the week */}
                 {daysOfWeek.map(day => (
                     <div key={day} className="bg-gray-100 border border-gray-300  p-2 text-center font-semibold">
                         {day}
                     </div>
                 ))}
-                {daysArrayWithPadding.map(day => (
-                    <div key={day} className="bg-gray-200 border border-gray-300  p-2 h-40">
-                        <Day day={day} />
-                    </div>
-                ))}
+
+                {/* Render the days of the month */}
+                {daysArrayWithPadding.map(day => {
+
+                    return (
+                        <div key={day} className="bg-gray-200 border border-gray-300  p-2 h-40">
+                            <Day day={day} />
+                        </div>
+                    );
+                    
+})}
+                
             </div>
         </div>
     );

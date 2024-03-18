@@ -113,6 +113,51 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetCoursesByDateRange")]
+		public async Task<ActionResult<List<Course>>> GetCoursesByDateRange(DateTime startDate, DateTime endDate)
+		{
+			try
+			{
+				var classesInRange = await _educationProgramContext.Classes
+						.Where(c => c.ScheduleStart >= startDate && c.ScheduleEnd <= endDate)
+						.ToListAsync();
+
+				if (classesInRange == null)
+				{
+					_logger.LogError("GetCoursesByDateRange({StartDate}, {EndDate}), classes not found", startDate, endDate);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				HashSet<int> courseIds = new();
+				List<Course> courseInRange = new();
+
+				foreach (var @class in classesInRange)
+				{
+					if (!courseIds.Contains(@class.CourseId))
+					{
+						Course? parentCourse = await _educationProgramContext.Courses
+								.Include(c => c.Classes)
+								.FirstOrDefaultAsync(c => c.CourseId == @class.CourseId);
+
+						if (parentCourse != null)
+						{
+							courseInRange.Add(parentCourse);
+							courseIds.Add(@class.CourseId);
+						}
+					}
+				}
+
+				_logger.LogInformation("GetCoursesByDateRange({StartDate}, {EndDate}), called", startDate, endDate);
+				return courseInRange;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetCoursesByDateRange({StartDate}, {EndDate})", startDate, endDate);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+
 		/// <summary>
 		/// Gives the end user the ability to add a Course record to the database.
 		/// </summary>
