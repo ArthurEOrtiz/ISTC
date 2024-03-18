@@ -1,14 +1,12 @@
 import React from 'react';
-import { getAllCourses } from '@/Utilities/api';
-import { Course } from '@/app/shared/types/sharedTypes';
-import CourseList from '@/app/components/CourseComponents/CourseList';
+import CourseCalendar from '../components/Course/CourseCalendar';
+
 
 const CoursesPage: React.FC = async () => {
-    const courseJson = await getAllCourses();
-    const courses = courseJson as Course[];
+    
 
     return (
-        <CourseList courses={courses}/>
+        <CourseCalendar />
     );
 };
 

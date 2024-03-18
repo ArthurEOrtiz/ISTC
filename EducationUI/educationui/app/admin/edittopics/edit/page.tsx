@@ -1,5 +1,5 @@
 import { getAllTopics } from "@/Utilities/api"
-import TopicList from "@/app/components/TopicsComponents/TopicList";
+import TopicList from "@/app/components/Topics/TopicList";
 import { Topic } from "@/app/shared/types/sharedTypes";
 
 const EditTopicPage: React.FC = async() => {

@@ -1,5 +1,5 @@
 import { getCourseById } from "@/Utilities/api";
-import EditCourseInfo from "@/app/components/CourseComponents/EditCourseInfo";
+import EditCourseInfo from "@/app/components/Course/EditCourseInfo";
 import { Course } from "@/app/shared/types/sharedTypes";
 
 const CourseDetail: React.FC<{ params: { courseId: string } }> = async ({ params }) => {

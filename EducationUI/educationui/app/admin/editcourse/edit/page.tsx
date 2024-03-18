@@ -1,7 +1,7 @@
 import React from 'react';
 import { getAllCourses } from '@/Utilities/api';
 import { Course } from '@/app/shared/types/sharedTypes';
-import CourseList from '@/app/components/CourseComponents/CourseList';
+import CourseList from '@/app/components/Course/CourseList';
 
 const EditCourse: React.FC = async () => {
     const courseJson = await getAllCourses();

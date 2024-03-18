@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import NewCourseForm from './NewCourseForm';
 import CourseInfoCard from './CourseInfoCard';
 import NewClass from './NewClass';
-import SelectTopicModal from '../TopicsComponents/SelectTopicModal';
+import SelectTopicModal from '../Topics/SelectTopicModal';
 import ConfirmationModal from '../../shared/modals/ConfirmationModal';
 import { useRouter } from 'next/navigation';
 import SavingModal from '../../shared/modals/SavingModal';

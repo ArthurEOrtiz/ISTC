@@ -1,8 +1,8 @@
 import { Course, Topic } from "@/app/shared/types/sharedTypes";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CharacterCounter from "../../shared/CharacterCounter";
 import { getCoursesByTopicId } from "@/Utilities/api";
-import SelectCourseModal from "../CourseComponents/SelectCourseModal";
+import SelectCourseModal from "../Course/SelectCourseModal";
 
 interface TopicInfoCardProps {
     topic: Topic;

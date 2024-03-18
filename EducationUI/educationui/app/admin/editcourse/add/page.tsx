@@ -1,4 +1,4 @@
-import AddCourse from "@/app/components/CourseComponents/AddCourse"
+import AddCourse from "@/app/components/Course/AddCourse"
 
 
 const AddCoursePage: React.FC = () => {
