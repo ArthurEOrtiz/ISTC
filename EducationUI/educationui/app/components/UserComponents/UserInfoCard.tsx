@@ -1,4 +1,5 @@
 import { User } from "@/app/shared/types/sharedTypes";
+import { useState } from "react";
 
 interface UserInfoCardProps {
     user: User;
@@ -6,6 +7,9 @@ interface UserInfoCardProps {
 }
 
 const UserInfoCard: React.FC<UserInfoCardProps> = ({ user, onApply }) => {
+    const [editMode, setEditMode] = useState(false);
+    const [editUser, setEditUser] = useState<User>(user);
+
     return (
         <div className="bg-white shawdow-md rounded-xl p-4 w-1/2">
             <h1 className="text-2xl text-center font-bold">{user.firstName} {user.lastName}</h1>
@@ -72,11 +76,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({ user, onApply }) => {
                             </div>
                         </div>
                     )}
-            
             </div>
-            
-            
-
         </div>
     );
 }
