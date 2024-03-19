@@ -1,5 +1,5 @@
 'use client';   
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -34,7 +34,7 @@ const CourseCalendar: React.FC = () => {
     }
     , [currentRange]);
         
-
+    // This function will convert the courses to events that can be displayed on the calendar.
     const convertCoursesToEvents = (courses: Course[]) => {
         const events: any[] = [];
         courses.forEach((course) => {
@@ -49,17 +49,16 @@ const CourseCalendar: React.FC = () => {
         return events;
     }
     
+    // This is the events that will be displayed on the calendar.
     const events = convertCoursesToEvents(courses);
 
 
-    // Not used
+    // This function will be called when the user navigates to a different month. It will set the currentRange state
     const handleNaigate = (date: Date) => {
         setCurrentRange({
             start: moment(date).startOf('month').toDate(),
             end: moment(date).endOf('month').toDate(),
         });
-        console.log(currentRange);
-        console.log(courses);
     }
 
     return (
