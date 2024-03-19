@@ -29,7 +29,7 @@ const Day: React.FC<DayProps> = ({ day, event }) => {
 
     return (
         <div className="bg-white">
-            <div className="text-center font-semibold">
+            <div className="text-center font-semibold text-sm">
                 {day}
             </div>
       

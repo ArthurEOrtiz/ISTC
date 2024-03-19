@@ -59,11 +59,11 @@ const Month: React.FC<MonthProps> = ({ month, year }) => {
 
                     return (
                         <div key={day} className="bg-gray-200 border border-gray-300  p-2 h-40">
-                            <Day day={day} />
+                            <Day day={day} event={{name:"Some Course aboutstuff", startDay: 1, endDate: 5}} />
                         </div>
                     );
                     
-})}
+                })}
                 
             </div>
         </div>
