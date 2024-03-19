@@ -38,33 +38,22 @@ const Month: React.FC<MonthProps> = ({ month, year }) => {
     };
 
     return (
-        <div className="border border-gray-300 rounded-lg p-4 w-auto mx-auto">
 
-            {/* Render the Month and Year */}
+        <div className="border border-gray-300 rounded-lg p-4 w-auto mx-auto">
             <div className="bg-gray-100 text-gray-800 font-semibold text-center mb-2">
                 {numberToMonth(month)} {year}
             </div>
-
-            
-            <div className="grid grid-cols-7 ">
-                {/* Render the days of the week */}
+            <div className="grid grid-cols-7">
                 {daysOfWeek.map(day => (
-                    <div key={day} className="bg-gray-100 border border-gray-300  p-2 text-center font-semibold">
+                    <div key={day} className="bg-gray-100 border border-gray-300 p-2 text-center font-semibold">
                         {day}
                     </div>
                 ))}
-
-                {/* Render the days of the month */}
-                {daysArrayWithPadding.map(day => {
-
-                    return (
-                        <div key={day} className="bg-gray-200 border border-gray-300  p-2 h-40">
-                            <Day day={day} event={{name:"Some Course aboutstuff", startDay: 1, endDate: 5}} />
-                        </div>
-                    );
-                    
-                })}
-                
+                {daysArrayWithPadding.map(day => (
+                    <div key={day} className="bg-gray-200 border border-gray-300 p-2 h-40">
+                        <Day day={day} event={{name:"Some Course aboutstuff", startDay: 1, endDay: 5}} />
+                    </div>
+                ))}
             </div>
         </div>
     );
