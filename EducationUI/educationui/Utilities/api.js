@@ -42,6 +42,16 @@ export async function getCoursesByTopicId(topicId) {
     }
 }
 
+export async function getCoursesByDateRange(startDate, endDate) {
+    try {
+        const response = await axiosInstance.get(`Course/GetCoursesByDateRange?startDate=${startDate}&endDate=${endDate}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching courses:', error);
+        throw error;
+    }
+}
+
 export async function postCourse(course) {
     try {
         const response = await axiosInstance.post('Course/PostCourse', course);

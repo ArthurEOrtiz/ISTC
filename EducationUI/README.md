@@ -16,5 +16,8 @@ Next.js
 ESLint
 Axios
 Clerk
+React-Big-Calendar
 
 
+Known Issues
+- With React-Big-Calendar there is a known issue that make the navaigation buttons in operaple. The current solution is to modify the nextConfig to set reactStrictMode to false. refrence https://github.com/vercel/next.js/issues/56206
