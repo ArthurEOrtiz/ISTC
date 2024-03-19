@@ -67,7 +67,6 @@ const CourseCalendar: React.FC = () => {
     }
 
     const handleSelectEvent = (event: any) => {
-        console.log(event.id);
         router.push(`/courses/course/${event.id}`);
     }
 
