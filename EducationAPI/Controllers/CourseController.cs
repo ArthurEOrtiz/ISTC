@@ -249,6 +249,67 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpPost("EnrollStudent")]
+		public async Task<ActionResult> EnrollStudentToCourse(int studentId, int courseId)
+		{
+			try
+			{
+				var course = await _educationProgramContext.Courses
+					.Include(c => c.Classes)
+					.FirstOrDefaultAsync();
+
+				if (course == null)
+				{
+					_logger.LogError("EnrollStudentToCourse({StudentId},{CourseId}), Course not found!", studentId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				var student = await _educationProgramContext.Students
+					.Include(s => s.Attendances)
+					.FirstOrDefaultAsync();
+
+				if (student == null)
+				{
+					_logger.LogError("EnrollStudentToCourse({StudentId},{CourseId}), Student not found!", studentId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				// Check if the student is already enroll in the course
+				if (student.Attendances != null && student.Attendances.Any(a => a.Class.CourseId == courseId))
+				{
+					_logger.LogError("EnrollStudentToCourse({StudentId},{CourseId}), Student already enrolled in course!", studentId, courseId);
+					return new ObjectResult("Student is already enrolled in course")
+					{
+						StatusCode = (int)HttpStatusCode.Conflict
+					};
+				}
+
+				foreach (var @class in course.Classes)
+				{
+					var attendance = new Attendance
+					{
+						StudentId = studentId,
+						ClassId = @class.ClassId,
+						Attended = false
+					};
+
+					_educationProgramContext.Attendances.Add(attendance);
+				}
+
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("EnrollStudentToCourse({StudentId},{CourseId}), called.", studentId, courseId);
+				return new StatusCodeResult((int)HttpStatusCode.Created);
+
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "EnrollStudentToCourse({StudentId},{CourseId})", studentId, courseId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+
 		[HttpDelete("DeleteCourseById/{id}")]
 		public async Task<ActionResult> DeleteCourseById(int id)
 		{

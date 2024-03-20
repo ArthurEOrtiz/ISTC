@@ -1,13 +1,16 @@
 'use client';
 import React from 'react'
 import { Course } from '@/app/shared/types/sharedTypes'
+import { on } from 'events';
 
 interface CourseCardProps {
   course: Course;
   onEdit: (course: Course) => void;
+  onEnroll?: (course: Course) => void;  
+  viewOnly?: boolean;
 }
 
-const CourseCard : React.FC<CourseCardProps> = ({course, onEdit}) => {
+const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onEnroll, viewOnly}) => {
   
   const formatToMountainTime = (utcDate: Date): string => {
 
@@ -57,14 +60,27 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit}) => {
         <p>No classes have been defined for this course!</p>
       )}
 
+      {!viewOnly && (
+        <div className="card-actions justify-end">
+          <button 
+            className="btn btn-primary text-white"
+            onClick={() => onEdit(course)}>
+              Edit
+            </button>
+        </div>
+      )}
 
-      <div className="card-actions justify-end">
-        <button 
-          className="btn btn-primary text-white"
-          onClick={() => onEdit(course)}>
-            Edit
+      {viewOnly && (
+        <div className="card-actions justify-end">
+          <button
+            className="btn btn-primary text-white"
+            onClick={onEnroll && (() => onEnroll(course))}
+          >
+            Enroll
           </button>
-      </div>
+        </div>
+      )}
+
     </div>
   )
 }

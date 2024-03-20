@@ -1,12 +1,8 @@
-import React from 'react';
-import CourseCalendar from '../components/Course/CourseCalendar';
-
+import CourseCatalog from '../components/Course/CourseCatalog';
 
 const CoursesPage: React.FC = async () => {
-    
-
     return (
-        <CourseCalendar />
+        <CourseCatalog />
     );
 };
 
