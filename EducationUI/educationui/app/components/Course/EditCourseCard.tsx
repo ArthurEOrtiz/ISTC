@@ -1,16 +1,19 @@
 'use client';
-import React from 'react'
+import React, { useState } from 'react'
 import { Course } from '@/app/shared/types/sharedTypes'
-import { on } from 'events';
+import ConfirmationModal from '@/app/shared/modals/ConfirmationModal';
+import { enrollStudentToCourse } from '@/Utilities/api';
+import { useUser } from '@clerk/clerk-react';
 
 interface CourseCardProps {
   course: Course;
-  onEdit: (course: Course) => void;
-  onEnroll?: (course: Course) => void;  
+  onEdit?: (course: Course) => void; 
   viewOnly?: boolean;
 }
 
-const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onEnroll, viewOnly}) => {
+const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
+  const { isSignedIn, user } = useUser();
+  const [ isConfirmationModalVisible, setIsConfirmationModalVisible ] = useState(false);
   
   const formatToMountainTime = (utcDate: Date): string => {
 
@@ -20,6 +23,21 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onEnroll, viewO
     const mountainTime = localTime.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'America/Denver'})
 
     return mountainTime;
+  }
+
+  const handleEnroll = (): void => {
+    setIsConfirmationModalVisible(true);
+    
+  }
+
+  const enrollStudent = async() => {
+    if(!isSignedIn) {
+      // TODO: Prompt user to sign in to enroll in course
+      console.log('User is not signed in');
+      return
+    }
+
+    console.log('Enrolling user', user.id, 'in course', course.courseId);
   }
 
   return (
@@ -64,7 +82,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onEnroll, viewO
         <div className="card-actions justify-end">
           <button 
             className="btn btn-primary text-white"
-            onClick={() => onEdit(course)}>
+            onClick={(onEdit && (() => onEdit(course)))}>
               Edit
             </button>
         </div>
@@ -74,15 +92,23 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onEnroll, viewO
         <div className="card-actions justify-end">
           <button
             className="btn btn-primary text-white"
-            onClick={onEnroll && (() => onEnroll(course))}
+            onClick={handleEnroll}
           >
             Enroll
           </button>
         </div>
       )}
 
+      {isConfirmationModalVisible && (
+        <ConfirmationModal
+          title="Enroll"
+          message={`Are you sure you want to enroll in ${course.title}?`}
+          onConfirm={enrollStudent}
+          onCancel={() => setIsConfirmationModalVisible(false)}
+        />
+      )}
     </div>
-  )
+  );  
 }
 
 export default CourseCard 

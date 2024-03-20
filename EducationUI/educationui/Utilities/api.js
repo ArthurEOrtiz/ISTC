@@ -72,6 +72,16 @@ export async function UpdateCourseById(courseId, course) {
     }
 }
 
+export async function enrollStudentToCourse(studentId, courseId) {
+    try {
+        const response = await axiosInstance.post(`Course/EnrollStudentToCourse?studentId=${studentId}&courseId=${courseId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error enrolling student:', error);
+        throw error;
+    }
+}
+
 export async function DeleteCourseById(courseId) {
     try {
         const response = await axiosInstance.delete(`Course/DeleteCourseById/${courseId}`);

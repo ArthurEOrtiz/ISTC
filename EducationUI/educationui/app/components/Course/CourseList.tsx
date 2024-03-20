@@ -7,10 +7,9 @@ import { useRouter } from 'next/navigation';
 interface CourseListProps {
     courses: Course[];
     viewOnly?: boolean;
-    onEnroll?: (course: Course) => void; 
 }
 
-const CourseList: React.FC<CourseListProps> = ({courses, viewOnly, onEnroll}) => {
+const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
     const [courseList , setCourseList] = React.useState<Course[]>(courses);
     const [searchString , setSearchString] = React.useState<string>('');
     const router = useRouter();
@@ -62,7 +61,6 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly, onEnroll}) =>
                             course={course} 
                             onEdit={handleOnEdit} 
                             viewOnly={viewOnly}
-                            onEnroll={onEnroll}
                         />
 
                     </div>
