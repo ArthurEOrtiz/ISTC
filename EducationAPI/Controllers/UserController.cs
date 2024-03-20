@@ -68,6 +68,38 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetStudentIdByClerkId/{ClerkId}")]
+		public async Task<ActionResult<int>> GetStudentIdByClerkId(string clerkId)
+		{
+			try
+			{
+				var user = await _educationProgramContext.Users
+					.Include(u => u.Student)
+					.FirstOrDefaultAsync();
+
+				if (user == null)
+				{
+					_logger.LogError("GetStudentByClerkId({ClerkID}), user not found!", clerkId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				if (user.Student != null)
+				{
+					_logger.LogInformation("GetStudentByClerkId({ClerkID}) called", clerkId);
+					return user.Student.StudentId;
+				}
+				else
+				{
+					_logger.LogError("GetStudentByClerkId({ClerkID}), student not found!", clerkId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetStudentByClerkId({ClerkID})", clerkId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
 
 		[HttpGet("CheckUserExistsByClerkId/{clerkId}")]
 		public async Task<ActionResult<bool>> CheckUserExistsByClerkId(string clerkId)

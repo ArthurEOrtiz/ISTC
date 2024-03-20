@@ -53,7 +53,7 @@ const CourseCatalog: React.FC = () => {
             {isCourseListVisible && <CourseList
                                         courses={courses}
                                         viewOnly={true}
-                                        onEnroll={(course) => console.log("Enroll", course )} />}
+                                        />}
         </div>
     );
 }

@@ -151,7 +151,7 @@ const AddCourse: React.FC = () => {
         try {
             setShowConfirmationModal(false);
             // imported from api.ts
-            await postCourse(course);
+            await postCourse(course as Course);
 
         } catch (error) {
             throw error;

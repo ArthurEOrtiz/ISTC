@@ -1,3 +1,4 @@
+import { Course, Topic, User } from '@/app/shared/types/sharedTypes';
 import axios from 'axios';
 import https from 'https';
 
@@ -22,7 +23,7 @@ export async function getAllCourses() {
     }
 }
 
-export async function getCourseById(courseId) {
+export async function getCourseById(courseId: number) {
     try {
         const response = await axiosInstance.get(`Course/GetCourseById?id=${courseId}`);
         return response.data;
@@ -32,7 +33,7 @@ export async function getCourseById(courseId) {
     }
 }
 
-export async function getCoursesByTopicId(topicId) {
+export async function getCoursesByTopicId(topicId: number) {
     try {
         const response = await axiosInstance.get(`Course/GetCoursesByTopicId/${topicId}`);
         return response.data;
@@ -42,7 +43,7 @@ export async function getCoursesByTopicId(topicId) {
     }
 }
 
-export async function getCoursesByDateRange(startDate, endDate) {
+export async function getCoursesByDateRange(startDate: Date, endDate: Date) {
     try {
         const response = await axiosInstance.get(`Course/GetCoursesByDateRange?startDate=${startDate}&endDate=${endDate}`);
         return response.data;
@@ -52,7 +53,7 @@ export async function getCoursesByDateRange(startDate, endDate) {
     }
 }
 
-export async function postCourse(course) {
+export async function postCourse(course: Course) {
     try {
         const response = await axiosInstance.post('Course/PostCourse', course);
         return response.data;
@@ -62,7 +63,7 @@ export async function postCourse(course) {
     }
 }
 
-export async function UpdateCourseById(courseId, course) {
+export async function UpdateCourseById(courseId: Number, course: Course) {
     try {
         const response = await axiosInstance.put(`Course/UpdateCourseById/${courseId}`, course);
         return response.data;
@@ -72,17 +73,17 @@ export async function UpdateCourseById(courseId, course) {
     }
 }
 
-export async function enrollStudentToCourse(studentId, courseId) {
+export async function enrollStudentToCourse(studentId: Number, courseId: Number) {
     try {
-        const response = await axiosInstance.post(`Course/EnrollStudentToCourse?studentId=${studentId}&courseId=${courseId}`);
-        return response.data;
+        const response = await axiosInstance.post(`Course/EnrollStudent?studentId=${studentId}&courseId=${courseId}`);
+        return response;
     } catch (error) {
         console.error('Error enrolling student:', error);
         throw error;
     }
 }
 
-export async function DeleteCourseById(courseId) {
+export async function DeleteCourseById(courseId: Number) {
     try {
         const response = await axiosInstance.delete(`Course/DeleteCourseById/${courseId}`);
         return response.data;
@@ -93,7 +94,7 @@ export async function DeleteCourseById(courseId) {
 }
 
 // Class
-export async function AddClassByCourseId(courseId, scheduleStart, scheduleEnd)
+export async function AddClassByCourseId(courseId: Number, scheduleStart: Date, scheduleEnd: Date)
 {
     try {
         const url = `Class/AddClassByCourseId?courseId=${courseId}&newStartDate=${scheduleStart}&newEndDate=${scheduleEnd}`;
@@ -106,7 +107,7 @@ export async function AddClassByCourseId(courseId, scheduleStart, scheduleEnd)
     }
 }
 
-export async function EditClassById (classId, scheduleStart, scheduleEnd) {
+export async function EditClassById (classId: Number, scheduleStart: Date, scheduleEnd: Date) {
     try {
         const url = `Class/EditClassById?id=${classId}&newScheduleStart=${scheduleStart}&newScheduleStop=${scheduleEnd}`;
 
@@ -118,7 +119,7 @@ export async function EditClassById (classId, scheduleStart, scheduleEnd) {
     }
 }
 
-export async function DeleteClassById(classId) {
+export async function DeleteClassById(classId: Number) {
     try {
         const response = await axiosInstance.delete(`Class/DeleteClassById?id=${classId}`);
         return response.data;
@@ -130,7 +131,7 @@ export async function DeleteClassById(classId) {
 
 // Topics
 
-export async function postTopic(topic) {
+export async function postTopic(topic: Topic) {
     try {
         const response = await axiosInstance.post('Topic/PostTopic', topic);
         return response.data;
@@ -149,7 +150,7 @@ export async function getAllTopics() {
     }
 }
 
-export async function updateTopicById(topicId, topic) {
+export async function updateTopicById(topicId: Number, topic: Topic) {
     try {
         const response = await axiosInstance.put(`Topic/UpdateTopicById/${topicId}`, topic);
         return response.data;
@@ -159,7 +160,7 @@ export async function updateTopicById(topicId, topic) {
     }
 }
 
-export async function deleteTopicById(topicId) {
+export async function deleteTopicById(topicId: Number) {
     try {
         const response = await axiosInstance.delete(`Topic/DeleteTopicById/${topicId}`);
         return response.data;
@@ -181,7 +182,7 @@ export async function getAllUsers() {
     }
 }
 
-export async function getUserByClerkId(clerkId) {
+export async function getUserByClerkId(clerkId: String) {
     try {
         const response = await axiosInstance.get(`User/GetUserByClerkId/${clerkId}`);
         return response.data;
@@ -191,7 +192,7 @@ export async function getUserByClerkId(clerkId) {
     }
 }
 
-export async function postUser(user) {
+export async function postUser(user: User) {
     try {
         const response = await axiosInstance.post('User/PostUser', user);
         return response.data;
@@ -201,7 +202,7 @@ export async function postUser(user) {
     }
 }
 
-export async function checkUserExistsByClerkId(clerkId) {
+export async function checkUserExistsByClerkId(clerkId: String) {
     try {
         const response = await axiosInstance.get(`User/CheckUserExistsByClerkId/${clerkId}`);
         return response.data;
@@ -211,10 +212,20 @@ export async function checkUserExistsByClerkId(clerkId) {
     }
 }
 
-export async function IsUserAdminByClerkId(clerkId) {
+export async function IsUserAdminByClerkId(clerkId: String) {
     try {
         const response = await axiosInstance.get(`User/IsUserAdminByClerkId/${clerkId}`);
         return response.data;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        throw error;
+    }
+}
+
+export async function getStudentIdByClerkId(clerkId: String) {
+    try {
+        const response = await axiosInstance.get(`User/GetStudentIdByClerkId/${clerkId}`);
+        return response;
     } catch (error) {
         console.error('Error fetching user:', error);
         throw error;

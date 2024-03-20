@@ -249,35 +249,45 @@ namespace EducationAPI.Controllers
 			}
 		}
 
-		[HttpPost("EnrollStudent")]
-		public async Task<ActionResult> EnrollStudentToCourse(int studentId, int courseId)
+		[HttpPost("EnrollStudentByClerkId/{clerkId}/{courseId}")]
+		public async Task<ActionResult> EnrollStudentToCourse(string clerkId, int courseId)
 		{
 			try
 			{
 				var course = await _educationProgramContext.Courses
 					.Include(c => c.Classes)
+					.Where(c => c.CourseId == courseId)
 					.FirstOrDefaultAsync();
 
 				if (course == null)
 				{
-					_logger.LogError("EnrollStudentToCourse({StudentId},{CourseId}), Course not found!", studentId, courseId);
+					_logger.LogError("EnrollStudentToCourse({StudentId},{CourseId}), Course not found!", clerkId, courseId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				var student = await _educationProgramContext.Students
-					.Include(s => s.Attendances)
+				var user = await _educationProgramContext.Users
+					.Include(u => u.Student)
+					.Where(u => u.ClerkId == clerkId)
 					.FirstOrDefaultAsync();
+
+				if (user == null)
+				{
+					_logger.LogError("EnrollStudentToCourse({ClerkId},{CourseId}), User not found!", clerkId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				var student = user.Student;
 
 				if (student == null)
 				{
-					_logger.LogError("EnrollStudentToCourse({StudentId},{CourseId}), Student not found!", studentId, courseId);
+					_logger.LogError("EnrollStudentToCourse({ClerkId},{CourseId}), Student not found!", clerkId, courseId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
 				// Check if the student is already enroll in the course
 				if (student.Attendances != null && student.Attendances.Any(a => a.Class.CourseId == courseId))
 				{
-					_logger.LogError("EnrollStudentToCourse({StudentId},{CourseId}), Student already enrolled in course!", studentId, courseId);
+					_logger.LogError("EnrollStudentToCourse({ClerkId},{CourseId}), Student already enrolled in course!", clerkId, courseId);
 					return new ObjectResult("Student is already enrolled in course")
 					{
 						StatusCode = (int)HttpStatusCode.Conflict
@@ -288,7 +298,7 @@ namespace EducationAPI.Controllers
 				{
 					var attendance = new Attendance
 					{
-						StudentId = studentId,
+						StudentId = student.StudentId,
 						ClassId = @class.ClassId,
 						Attended = false
 					};
@@ -298,13 +308,13 @@ namespace EducationAPI.Controllers
 
 				await _educationProgramContext.SaveChangesAsync();
 
-				_logger.LogInformation("EnrollStudentToCourse({StudentId},{CourseId}), called.", studentId, courseId);
+				_logger.LogInformation("EnrollStudentToCourse({ClerkId},{CourseId}), called.", clerkId, courseId);
 				return new StatusCodeResult((int)HttpStatusCode.Created);
 
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "EnrollStudentToCourse({StudentId},{CourseId})", studentId, courseId);
+				_logger.LogError(ex, "EnrollStudentToCourse({ClerkId},{CourseId})", clerkId, courseId);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}

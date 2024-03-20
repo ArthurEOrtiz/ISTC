@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/admin/editcourse/course/[courseId]", "app/admin/editcourse/edit/course/[courseId]/500.js", "app/authConfig.js", "Utilities/api.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/admin/editcourse/course/[courseId]", "app/admin/editcourse/edit/course/[courseId]/500.js", "app/authConfig.js", "Utilities/api.ts"],
   "exclude": ["node_modules"]
 }
