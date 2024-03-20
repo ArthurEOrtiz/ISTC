@@ -17,7 +17,6 @@ const NewTopicForm: React.FC<NewTopicFormProps> = ({ onSubmit }) => {
     const handleOnSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSubmit(topic);
-        
     };
 
     return (
