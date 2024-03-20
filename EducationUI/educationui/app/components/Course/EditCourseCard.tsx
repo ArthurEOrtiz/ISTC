@@ -3,7 +3,8 @@ import React, { useState } from 'react'
 import { Course } from '@/app/shared/types/sharedTypes'
 import ConfirmationModal from '@/app/shared/modals/ConfirmationModal';
 import { useUser } from '@clerk/clerk-react';
-import { enrollStudentToCourse, getStudentIdByClerkId } from '@/Utilities/api';
+import { EnrollStudentByClerkId } from '@/Utilities/api';
+
 
 interface CourseCardProps {
   course: Course;
@@ -39,33 +40,18 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
 
     console.log('User', user);
 
-    let studenId
+    const response = await EnrollStudentByClerkId(user.id, course.courseId as Number);
 
-    try {
-      const result = await getStudentIdByClerkId(user.id);
-      //console.log(result.status);
-      if(result.status === 200) {
-        studenId = result.data;
-      } else {
-        throw new Error('Error getting student id');
-      }
-    } catch (error) {
-      throw error;
+    if (response.status === 409) {
+      console.log('User is already enrolled in this course');
+      return;
     }
-    
-    
-    try {
-      
-      const result = await enrollStudentToCourse(studenId, course.courseId as Number);
-      console.log(result.status);
-      if(result.status === 200) {
-        setIsConfirmationModalVisible(false);
-      } else {
-        throw new Error('Error enrolling student');
-      }
-    } catch (error) {
-      throw error;
+
+    if (response.status === 201) {
+      console.log('User enrolled in course');
+      setIsConfirmationModalVisible(false);
     }
+   
 
 
   }

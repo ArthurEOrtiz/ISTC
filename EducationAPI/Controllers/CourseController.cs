@@ -270,13 +270,16 @@ namespace EducationAPI.Controllers
 					.Where(u => u.ClerkId == clerkId)
 					.FirstOrDefaultAsync();
 
-				if (user == null)
+				if (user == null || user.Student == null)
 				{
-					_logger.LogError("EnrollStudentToCourse({ClerkId},{CourseId}), User not found!", clerkId, courseId);
+					_logger.LogError("EnrollStudentToCourse({ClerkId},{CourseId}), User or student not found!", clerkId, courseId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				var student = user.Student;
+				var student = await _educationProgramContext.Students
+					.Include(s => s.Attendances)
+					.Where(s => s.StudentId == user.Student.StudentId)
+					.FirstOrDefaultAsync();
 
 				if (student == null)
 				{

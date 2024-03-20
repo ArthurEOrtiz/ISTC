@@ -73,9 +73,9 @@ export async function UpdateCourseById(courseId: Number, course: Course) {
     }
 }
 
-export async function enrollStudentToCourse(studentId: Number, courseId: Number) {
+export async function EnrollStudentByClerkId(clerkId: String, courseId: Number){
     try {
-        const response = await axiosInstance.post(`Course/EnrollStudent?studentId=${studentId}&courseId=${courseId}`);
+        const response = await axiosInstance.post(`Course/EnrollStudentByClerkId/${clerkId}/${courseId}`);
         return response;
     } catch (error) {
         console.error('Error enrolling student:', error);
