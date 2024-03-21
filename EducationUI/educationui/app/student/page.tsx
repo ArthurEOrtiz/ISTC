@@ -6,6 +6,7 @@ import UserDashboard from "../components/User/UserDashboard";
 
 const UserPage: React.FC = async() => {
     const user = await currentUser();
+    
     if (!user) {
          redirect('/');
     }

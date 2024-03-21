@@ -4,6 +4,7 @@ import { Course } from '@/app/shared/types/sharedTypes'
 import ConfirmationModal from '@/app/shared/modals/ConfirmationModal';
 import { useUser } from '@clerk/clerk-react';
 import { EnrollStudentByClerkId } from '@/Utilities/api';
+import ErrorModal from '@/app/shared/modals/ErrorModal';
 
 
 interface CourseCardProps {
@@ -15,7 +16,9 @@ interface CourseCardProps {
 const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
   const { isSignedIn, user } = useUser();
   const [ isConfirmationModalVisible, setIsConfirmationModalVisible ] = useState(false);
-  
+  const [ isErrorModalVisible, setIsErrorModalVisible ] = useState(false);  
+
+
   const formatToMountainTime = (utcDate: Date): string => {
 
     const inputDate =  `${utcDate}z`  
@@ -34,7 +37,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
   const enrollStudent = async() => {
     if(!isSignedIn) {
       // TODO: Prompt user to sign in to enroll in course
-      console.log('User is not signed in');
+      setIsErrorModalVisible(true);
       return
     }
 
@@ -123,6 +126,13 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
           onCancel={() => setIsConfirmationModalVisible(false)}
         />
       )}
+
+      {isErrorModalVisible && (
+        <ErrorModal 
+          title={'Error!'} 
+          message={'Please log in to enroll in a course!'} 
+          onClose={()=> setIsErrorModalVisible(false)} />
+          )}
     </div>
   );  
 }
