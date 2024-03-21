@@ -8,6 +8,7 @@ import ErrorModal from '@/app/shared/modals/ErrorModal';
 import { SignOutButton } from '@clerk/clerk-react';
 
 
+
 interface UserDashboardProps {
     clerkId: string;
 }
@@ -29,7 +30,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         fetchUser();
     }, [clerkId]);
 
-
+    const handleOnSignOut = () => {
+        window.location.href = '/';
+    }
 
     const handleErrorModalClose = () => {
         setShowErrorMessage(false);
@@ -50,7 +53,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                 </div>
                 <div className='basis-1/4'>
                     <div className="ml-2 ">
-                        <SignOutButton>
+                        <SignOutButton
+                            signOutCallback={handleOnSignOut}>
                             <button className="btn btn-error text-white">Sign Out</button>
                         </SignOutButton>
                     </div>
