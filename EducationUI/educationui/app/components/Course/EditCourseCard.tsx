@@ -16,7 +16,8 @@ interface CourseCardProps {
 const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
   const { isSignedIn, user } = useUser();
   const [ isConfirmationModalVisible, setIsConfirmationModalVisible ] = useState(false);
-  const [ isErrorModalVisible, setIsErrorModalVisible ] = useState(false);  
+  const [ isErrorModalVisible, setIsErrorModalVisible ] = useState(false); 
+  const [ errorMessage, setErrorMessage ] = useState('');
 
 
   const formatToMountainTime = (utcDate: Date): string => {
@@ -31,32 +32,34 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
 
   const handleEnroll = (): void => {
     setIsConfirmationModalVisible(true);
-    
   }
 
   const enrollStudent = async() => {
     if(!isSignedIn) {
-      // TODO: Prompt user to sign in to enroll in course
+      setErrorMessage("Please log in to enroll in a course!")
       setIsErrorModalVisible(true);
       return
     }
 
-    console.log('User', user);
-
     const response = await EnrollStudentByClerkId(user.id, course.courseId as Number);
 
-    if (response.status === 409) {
-      console.log('User is already enrolled in this course');
-      return;
+    switch (response.status) {
+      case 500:
+        console.error('Error enrolling user in course');
+        break;
+      case 409:
+        setErrorMessage('You are already enrolled in this course');
+        setIsErrorModalVisible(true);
+        console.error('User is already enrolled in this course');
+        console.log(user.id);
+        break;
+      case 201:
+        console.log('User enrolled in course');
+        setIsConfirmationModalVisible(false);
+        break;
+      default:
+        break;
     }
-
-    if (response.status === 201) {
-      console.log('User enrolled in course');
-      setIsConfirmationModalVisible(false);
-    }
-   
-
-
   }
 
   return (
@@ -130,7 +133,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
       {isErrorModalVisible && (
         <ErrorModal 
           title={'Error!'} 
-          message={'Please log in to enroll in a course!'} 
+          message={errorMessage} 
           onClose={()=> setIsErrorModalVisible(false)} />
           )}
     </div>

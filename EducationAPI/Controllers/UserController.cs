@@ -145,6 +145,47 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("IsUserEnrolledInCourse/{clerkId}/{courseId}")]
+		public async Task<ActionResult<bool>> IsUserEnrolledInCourse(string clerkId, int courseId)
+		{
+			try
+			{
+				var user = await _educationProgramContext.Users
+					.Include(u => u.Student)
+					.ThenInclude(s => s!.Attendances)
+					.FirstOrDefaultAsync(u => u.ClerkId == clerkId);
+
+				if (user == null)
+				{
+					_logger.LogError("IsUserEnrolledInCourse({ClerkId}, {CourseId}), user not found.", clerkId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				var course = await _educationProgramContext.Courses
+					.Include(c => c.Classes)
+					.FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+				if (course == null)
+				{
+					_logger.LogError("IsUserEnrolledInCourse({ClerkId}, {CourseId}), course not found.", clerkId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				// Check if there are any attendances for the user and the course
+				var isSignedUp = user.Student?.Attendances != null &&
+												 user.Student.Attendances.Any(a => a.Class?.CourseId == courseId);
+
+
+				return isSignedUp;
+
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "IsUserEnrolledInCourse({ClerkId}, {CourseId})", clerkId, courseId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 
 		[HttpGet("IsUserAdminByClerkId/{clerkId}")]
 		public async Task<ActionResult<bool>> IsUserAdminByClerkId(string clerkId)

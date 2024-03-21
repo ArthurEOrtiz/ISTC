@@ -265,10 +265,11 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
+				// Fetch the student
 				var user = await _educationProgramContext.Users
-					.Include(u => u.Student)
-					.Where(u => u.ClerkId == clerkId)
-					.FirstOrDefaultAsync();
+						.Include(u => u.Student)
+						.ThenInclude(s => s!.Attendances)
+						.FirstOrDefaultAsync(u => u.ClerkId == clerkId);
 
 				if (user == null || user.Student == null)
 				{
@@ -276,10 +277,7 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				var student = await _educationProgramContext.Students
-					.Include(s => s.Attendances)
-					.Where(s => s.StudentId == user.Student.StudentId)
-					.FirstOrDefaultAsync();
+				var student = user.Student;
 
 				if (student == null)
 				{
@@ -288,7 +286,7 @@ namespace EducationAPI.Controllers
 				}
 
 				// Check if the student is already enroll in the course
-				if (student.Attendances != null && student.Attendances.Any(a => a.Class.CourseId == courseId))
+				if (student.Attendances != null && student.Attendances.Any(a => a.Class != null && a.Class.CourseId == courseId))
 				{
 					_logger.LogError("EnrollStudentToCourse({ClerkId},{CourseId}), Student already enrolled in course!", clerkId, courseId);
 					return new ObjectResult("Student is already enrolled in course")
@@ -321,7 +319,6 @@ namespace EducationAPI.Controllers
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
-
 
 		[HttpDelete("DeleteCourseById/{id}")]
 		public async Task<ActionResult> DeleteCourseById(int id)

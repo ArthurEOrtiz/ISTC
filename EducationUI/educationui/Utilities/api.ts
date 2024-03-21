@@ -79,7 +79,7 @@ export async function EnrollStudentByClerkId(clerkId: String, courseId: Number){
         return response;
     } catch (error) {
         console.error('Error enrolling student:', error);
-        throw error;
+        return error.response;
     }
 }
 
