@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react';
 import { getUserByClerkId } from "@/Utilities/api";
 import { User } from '@/app/shared/types/sharedTypes';
 import Loading from '@/app/shared/Loading';
-import { User } from '@clerk/nextjs/server';
 import UserInfoCard from './UserInfoCard';
+import ErrorModal from '@/app/shared/modals/ErrorModal';
+import AdminDashboardLink from '../Navigation/AdminDashboardLink';
 
 interface UserDashboardProps {
     clerkId: string;
@@ -12,14 +13,15 @@ interface UserDashboardProps {
 
 const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     const [user, setUser] = useState<User>();
+    const [ showErrorMessage, setShowErrorMessage ] = useState(false);
 
     useEffect(() => {
         const fetchUser = async () => {
-            try {
-                const userData = await getUserByClerkId(clerkId);
-                setUser(userData);
-            } catch (error) {
-                console.error(error);
+            const response = await getUserByClerkId(clerkId);
+            if (response.status === 200) {
+                setUser(response.data);
+            } else {
+                setShowErrorMessage(true);
             }
         };
 
@@ -29,6 +31,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     const handleApply = (user: User) => {
         console.log(user);
     };
+
+    const handleErrorModalClose = () => {
+        setShowErrorMessage(false);
+    }
 
     if (!user) {
         return <Loading />
@@ -40,6 +46,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
             <div className='flex justify-center mt-4'>
                 <UserInfoCard user={user} onApply={handleApply} />
             </div>
+            {showErrorMessage && (
+                <ErrorModal
+                    title="Error"
+                    message="There was an error fetching user information."
+                    onClose={handleErrorModalClose}
+                />
+            )}
         </div>
     );
 }

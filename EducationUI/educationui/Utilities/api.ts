@@ -185,7 +185,7 @@ export async function getAllUsers() {
 export async function getUserByClerkId(clerkId: String) {
     try {
         const response = await axiosInstance.get(`User/GetUserByClerkId/${clerkId}`);
-        return response.data;
+        return response;
     } catch (error) {
         console.error('Error fetching user:', error);
         throw error;

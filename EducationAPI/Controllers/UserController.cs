@@ -39,6 +39,32 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetUserById/{id}")]
+		public async Task<ActionResult<User>> GetUserById(int id)
+		{
+			try
+			{
+				var user = await _educationProgramContext.Users
+					.Include(u => u.Contact)
+					.Include(u => u.Student)
+					.FirstOrDefaultAsync(u => u.UserId == id);
+
+				if (user == null)
+				{
+					_logger.LogError("GetUserById({Id}), user not found1", id);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_logger.LogInformation("GetUserById({Id}), called", id);
+				return user;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetUserById({Id}", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 		[HttpGet("GetUserByClerkId/{clerkId}")]
 		public async Task<ActionResult<User>> GetUserByClerkId(string clerkId)
 		{
@@ -151,6 +177,7 @@ namespace EducationAPI.Controllers
 			{
 				_educationProgramContext.Users.Add(user);
 				await _educationProgramContext.SaveChangesAsync();
+
 				_logger.LogInformation("PostUser({User}), called", user);
 				return new StatusCodeResult((int)HttpStatusCode.OK);
 			}

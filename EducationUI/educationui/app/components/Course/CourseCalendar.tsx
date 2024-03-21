@@ -31,8 +31,8 @@ const CourseCalendar: React.FC = () => {
         const fetchData = async () => {
             const startDate = moment(currentRange.start).format('YYYY-MM-DD');
             const endDate = moment(currentRange.end).format('YYYY-MM-DD');
-            const result = await getCoursesByDateRange(startDate, endDate);
-            setCourses(result);
+            const data = await getCoursesByDateRange(startDate, endDate);
+            setCourses(data);
         };
         fetchData();
     }

@@ -2,6 +2,9 @@
 import { postUser } from "@/Utilities/api";
 import NewUserForm from "./NewUserForm";
 import { User } from "@/app/shared/types/sharedTypes";
+import { useState } from "react";
+import ErrorModal from "@/app/shared/modals/ErrorModal";
+import { redirect } from "next/navigation";
 
 interface NewUserRegistrationProps {
     clerkId: string;
@@ -11,16 +14,24 @@ interface NewUserRegistrationProps {
 }
 
 const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({clerkId, firstName, lastName, email}) => {
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
     
     const handleNewUserFormOnSubmit = async (user: User) => {
-        try {
-            await postUser(user);
-            // refresh the page to show the new user
-            window.location.reload();
-        } catch (error) {
-            console.error(error);
+        const response = await postUser(user);
+
+        if (response.status === 200) {
+             // refresh the page to show the new user
+             window.location.reload();
+        } else {
+            setShowErrorMessage(true);
         }
     }
+
+    const handleErrorModalClose = () => {
+        setShowErrorMessage(false);
+        redirect('/');
+    }
+
 
     return (
         <div>
@@ -39,6 +50,13 @@ const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({clerkId, first
                     />
                 </div>
             </div>
+            {showErrorMessage && (
+                <ErrorModal
+                    title="Error"
+                    message="There was an error creating the user."
+                    onClose={handleErrorModalClose}
+                />
+            )}
         
         </div>
     )
