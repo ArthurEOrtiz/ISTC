@@ -1,14 +1,12 @@
 import { User } from "@/app/shared/types/sharedTypes";
-import { useState } from "react";
 
 interface UserInfoCardProps {
     user: User;
-    onApply: (user: User) => void;
+ 
 }
 
-const UserInfoCard: React.FC<UserInfoCardProps> = ({ user, onApply }) => {
-    const [editMode, setEditMode] = useState(false);
-    const [editUser, setEditUser] = useState<User>(user);
+const UserInfoCard: React.FC<UserInfoCardProps> = ({ user}) => {
+
 
     return (
         <div className="bg-white shawdow-md rounded-xl p-4 w-full">
