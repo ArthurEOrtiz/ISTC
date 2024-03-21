@@ -2,6 +2,7 @@ import { Course, Topic, User } from '@/app/shared/types/sharedTypes';
 import axios from 'axios';
 import https from 'https';
 
+
 const baseUrl = 'https://localhost:7144/';
 
 const axiosInstance = axios.create({
@@ -77,7 +78,7 @@ export async function EnrollStudentByClerkId(clerkId: String, courseId: Number){
     try {
         const response = await axiosInstance.post(`Course/EnrollStudentByClerkId/${clerkId}/${courseId}`);
         return response;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error enrolling student:', error);
         return error.response;
     }
@@ -215,6 +216,16 @@ export async function checkUserExistsByClerkId(clerkId: String) {
 export async function IsUserAdminByClerkId(clerkId: String) {
     try {
         const response = await axiosInstance.get(`User/IsUserAdminByClerkId/${clerkId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        throw error;
+    }
+}
+
+export async function IsUserEnrolledInCourse(clerkId: String, courseId: Number) {
+    try {
+        const response = await axiosInstance.get(`User/IsUserEnrolledInCourse/${clerkId}/${courseId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching user:', error);

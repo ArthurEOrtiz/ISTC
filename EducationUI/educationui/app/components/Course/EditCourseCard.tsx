@@ -1,9 +1,9 @@
 'use client';
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Course } from '@/app/shared/types/sharedTypes'
 import ConfirmationModal from '@/app/shared/modals/ConfirmationModal';
 import { useUser } from '@clerk/clerk-react';
-import { EnrollStudentByClerkId } from '@/Utilities/api';
+import { EnrollStudentByClerkId, IsUserEnrolledInCourse } from '@/Utilities/api';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
 
 
@@ -18,6 +18,19 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
   const [ isConfirmationModalVisible, setIsConfirmationModalVisible ] = useState(false);
   const [ isErrorModalVisible, setIsErrorModalVisible ] = useState(false); 
   const [ errorMessage, setErrorMessage ] = useState('');
+  const [ isEnrolled, setIsEnrolled ] = useState(false);
+
+  useEffect(() => {
+    if (viewOnly){
+      const checkEnrollment = async () => {
+        if (!user) return;
+        const response = await IsUserEnrolledInCourse(user.id, course.courseId as Number);
+        setIsEnrolled(response);
+      }
+    checkEnrollment();
+    }
+  }, [viewOnly] )
+  
 
 
   const formatToMountainTime = (utcDate: Date): string => {
@@ -51,7 +64,6 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
         setErrorMessage('You are already enrolled in this course');
         setIsErrorModalVisible(true);
         console.error('User is already enrolled in this course');
-        console.log(user.id);
         break;
       case 201:
         console.log('User enrolled in course');
@@ -110,7 +122,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
         </div>
       )}
 
-      {viewOnly && (
+      {viewOnly && !isEnrolled && (
         <div className="card-actions justify-end">
           <button
             className="btn btn-primary text-white"
@@ -118,6 +130,12 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
           >
             Enroll
           </button>
+        </div>
+      )}
+
+      {viewOnly && isEnrolled && (
+        <div className="card-actions justify-end">
+          <p className="text-green-500">You are already enrolled in this course</p>
         </div>
       )}
 
@@ -141,5 +159,9 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
 }
 
 export default CourseCard 
+
+
+
+
 
 
