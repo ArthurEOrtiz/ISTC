@@ -43,7 +43,7 @@ export async function getCoursesByTopicId(topicId: number) {
     }
 }
 
-export async function getCoursesByDateRange(startDate: Date, endDate: Date) {
+export async function getCoursesByDateRange(startDate: string, endDate: string) {
     try {
         const response = await axiosInstance.get(`Course/GetCoursesByDateRange?startDate=${startDate}&endDate=${endDate}`);
         return response.data;
@@ -195,7 +195,7 @@ export async function getUserByClerkId(clerkId: String) {
 export async function postUser(user: User) {
     try {
         const response = await axiosInstance.post('User/PostUser', user);
-        return response.data;
+        return response;
     } catch (error) {
         console.error('Error posting user:', error);
         throw error;
