@@ -183,23 +183,23 @@ export async function getAllUsers() {
     }
 }
 
-export async function getUserByClerkId(clerkId: String) {
+export async function GetUserByClerkId(clerkId: String) {
     try {
         const response = await axiosInstance.get(`User/GetUserByClerkId/${clerkId}`);
         return response;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching user:', error);
-        throw error;
+        return error.message;
     }
 }
 
-export async function postUser(user: User) {
+export async function PostUser(user: User) {
     try {
         const response = await axiosInstance.post('User/PostUser', user);
         return response;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error posting user:', error);
-        throw error;
+        return error.message;
     }
 }
 

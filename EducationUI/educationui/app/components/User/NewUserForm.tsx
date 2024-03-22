@@ -1,46 +1,52 @@
 'use client';
+import Loading from "@/app/shared/Loading";
 import { User } from "@/app/shared/types/sharedTypes";
-import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
 
 interface NewUserFormProps {
-    clerkId : string;
-    firstName: string;
-    lastName: string;
-    email: string;
     onSubmit: (user: User) => void
 }
 
-const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName, email, onSubmit}) => {
-    const [user, setUser] = useState<User>({
-        userId: 0,
-        clerkId: clerkId,
-        firstName: firstName,
-        lastName: lastName,
-        middleName: "",
-        email: email,
-        employer: "select",
-        jobTitle: "",
-        isAdmin: false,
-        isStudent: true,
-        student: {
-            studentId: 0,
-            userId: 0,
-            accumulatedCredit: 0,
-            appraisalCertified: false,
-            mappingCertified: false,
-            attendances: null
-        },
-        contact: {
-            contactId: 0,
-            userId: 0,
-            phone: "",
-            addressLine1: "",
-            addressLine2: "",
-            state: "ID",
-            city:"",
-            zip: ""
+const NewUserForm: React.FC<NewUserFormProps> = ({  onSubmit}) => {
+    const {user: clerkUser, isLoaded} = useUser();
+    
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        if (clerkUser && isLoaded) {
+            setUser({
+                userId: 0,
+                clerkId: clerkUser.id,
+                firstName: clerkUser.firstName || "",
+                lastName: clerkUser.lastName || "",
+                middleName: "",
+                email: clerkUser.emailAddresses[0].emailAddress,
+                employer: "select",
+                jobTitle: "",
+                isAdmin: false,
+                isStudent: true,
+                student: {
+                    studentId: 0,
+                    userId: 0,
+                    accumulatedCredit: 0,
+                    appraisalCertified: false,
+                    mappingCertified: false,
+                    attendances: null
+                },
+                contact: {
+                    contactId: 0,
+                    userId: 0,
+                    phone: "",
+                    addressLine1: "",
+                    addressLine2: "",
+                    state: "ID",
+                    city: "",
+                    zip: ""
+                }
+            });
         }
-    });
+    }, [clerkUser, isLoaded]);
 
     const countyArray = [
         "Ada",
@@ -98,6 +104,10 @@ const NewUserForm: React.FC<NewUserFormProps> = ({ clerkId, firstName, lastName,
        
         setUser({ ...user, employer: e.target.value });
        
+    }
+
+    if (!isLoaded) {
+        return <Loading />;
     }
 
     return (

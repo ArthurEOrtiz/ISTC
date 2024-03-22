@@ -1,15 +1,14 @@
+'use client';
 import { User } from "@/app/shared/types/sharedTypes";
 
 interface UserInfoCardProps {
     user: User;
- 
 }
 
-const UserInfoCard: React.FC<UserInfoCardProps> = ({ user}) => {
-
+const UserInfoCard: React.FC<UserInfoCardProps> = ({user}) => {
 
     return (
-        <div className="bg-white shawdow-md rounded-xl p-4 w-full">
+        <div className="bg-base-100 shawdow-md rounded-xl p-4 w-full">
             <h1 className="text-2xl text-center font-bold">{user.firstName} {user.lastName}</h1>
             <div>
                 <p className="text-center">{user.employer} | {user.jobTitle}</p>
@@ -44,8 +43,6 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({ user}) => {
                     </div>
                 )}
             </div>
-              
-           
         </div>
     );
 }

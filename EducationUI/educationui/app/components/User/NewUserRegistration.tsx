@@ -1,28 +1,23 @@
 'use client';
-import { postUser } from "@/Utilities/api";
+import { PostUser } from "@/Utilities/api";
 import NewUserForm from "./NewUserForm";
 import { User } from "@/app/shared/types/sharedTypes";
 import { useState } from "react";
 import ErrorModal from "@/app/shared/modals/ErrorModal";
 import { redirect } from "next/navigation";
 
-interface NewUserRegistrationProps {
-    clerkId: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-}
 
-const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({clerkId, firstName, lastName, email}) => {
+const NewUserRegistration: React.FC = () => {
     const [showErrorMessage, setShowErrorMessage] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     
     const handleNewUserFormOnSubmit = async (user: User) => {
-        const response = await postUser(user);
+        const response = await PostUser(user);
 
         if (response.status === 200) {
-             // refresh the page to show the new user
              window.location.reload();
         } else {
+            setErrorMessage(response);
             setShowErrorMessage(true);
         }
     }
@@ -42,10 +37,6 @@ const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({clerkId, first
             <div className="flex justify-center">
                 <div className="w-1/2">
                     <NewUserForm 
-                        clerkId={clerkId} 
-                        firstName={firstName || ""} 
-                        lastName={lastName || ""} 
-                        email={email}
                         onSubmit={handleNewUserFormOnSubmit} 
                     />
                 </div>
@@ -53,7 +44,7 @@ const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({clerkId, first
             {showErrorMessage && (
                 <ErrorModal
                     title="Error"
-                    message="There was an error creating the user."
+                    message={errorMessage}
                     onClose={handleErrorModalClose}
                 />
             )}

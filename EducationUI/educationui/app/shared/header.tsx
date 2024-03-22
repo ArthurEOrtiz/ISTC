@@ -1,10 +1,6 @@
-import { SignedIn, SignedOut, SignInButton, SignOutButton} from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignInButton} from '@clerk/nextjs';
 import Link from 'next/link';
 import React from 'react';
-import AdmindashboardLink from '../components/Navigation/AdminDashboardLink';
-import StudentDashboardLink from '../components/Navigation/StudentDashboardLink';
-import { Sign } from 'crypto';
-
 
 const Header: React.FC = async () => {
     return (
@@ -27,8 +23,8 @@ const Header: React.FC = async () => {
                         </li>
                         <li>
                             <SignedIn>
-                                <Link href="/student" className="btn btn-ghost text-white">
-                                    Student Dashboard
+                                <Link href="/user" className="btn btn-ghost text-white">
+                                    Dashboard
                                 </Link>
                             </SignedIn>
                             <SignedOut>

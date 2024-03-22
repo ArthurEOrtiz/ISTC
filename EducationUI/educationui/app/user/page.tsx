@@ -3,9 +3,10 @@ import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import NewUserRegistration from "../components/User/NewUserRegistration";
 import UserDashboard from "../components/User/UserDashboard";
+import { User } from "@clerk/nextjs/server";
 
 const UserPage: React.FC = async() => {
-    const user = await currentUser();
+    const user: User | null = await currentUser();
     
     if (!user) {
          redirect('/');
@@ -13,23 +14,15 @@ const UserPage: React.FC = async() => {
     
     const doesUserExist = await checkUserExistsByClerkId(user.id);
 
-    const firstName = user.firstName;
-    const lastName = user.lastName;
-    const email = user.emailAddresses[0].emailAddress;
-
     return (
         <div>
             {doesUserExist ? (
                 <div>
-                    <UserDashboard clerkId={user.id}/>
+                    <UserDashboard clerkId={user.id} />
                 </div>
             ) : (
                 <div>
-                    <NewUserRegistration 
-                        clerkId={user.id}
-                        firstName={firstName|| ""} 
-                        lastName={lastName ||""}
-                        email={email}/>
+                    <NewUserRegistration />
                 </div>
             )}
         </div>
