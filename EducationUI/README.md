@@ -4,7 +4,7 @@ Arthur Edward Ortiz
 
 
 **Description**
-The ISTC Education applications is a platform designed to manage educational programs, courses, and student enrollments. Built on the .NET framework, it offers the administrators to create and manage courses, track attendance, and enroll students. With features such as role-based access control and comprehensive logging, EducationAPI ensures security and accountability throughout the educational program lifecycle. 
+The ISTC Education application is a platform designed to manage educational programs, courses, and student enrollments. Built with Next.js and utilizing a .Net API, it offers the administrators to create and manage courses, track attendance, and enroll students. With features such as role-based access control and comprehensive logging, EducationAPI ensures security and accountability throughout the educational program lifecycle. 
 
 ***
 
