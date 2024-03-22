@@ -53,10 +53,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                 </div>
                 <div className='basis-1/4'>
                     <div className="ml-2 ">
+                        <div className='flex flex-col p-2 space-y-3'>
                         <SignOutButton
                             signOutCallback={handleOnSignOut}>
                             <button className="btn btn-error text-white">Sign Out</button>
                         </SignOutButton>
+                        <button className="btn btn-primary text-white">Edit Profile</button>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
