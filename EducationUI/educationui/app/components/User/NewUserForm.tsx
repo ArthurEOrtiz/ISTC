@@ -159,7 +159,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({  onSubmit}) => {
                     id="lastName"
                     maxLength={50}
                     required
-                    value={user.lastName || ""}
+                    value={user?.lastName || ""}
                     onChange={(e) => setUser({ ...user, lastName: e.target.value })}
                 />
             </div>
@@ -176,7 +176,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({  onSubmit}) => {
                     id="email"
                     maxLength={100}
                     required
-                    value={user.email || ""}
+                    value={user?.email || ""}
                     onChange={(e) => setUser({ ...user, email: e.target.value })}
                 />
             </div>
@@ -328,6 +328,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({  onSubmit}) => {
                         <option value="CO">Colorado</option>
                         <option value="CT">Connecticut</option>
                         <option value="DE">Delaware</option>
+                        <option value="DC">District Of Columbia</option>
                         <option value="FL">Florida</option>
                         <option value="GA">Georgia</option>
                         <option value="HI">Hawaii</option>

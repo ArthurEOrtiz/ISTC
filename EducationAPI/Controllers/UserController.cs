@@ -229,6 +229,26 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpPut("UpdateUserContact")]
+		public async Task<ActionResult> UpdateUserContact(User user)
+		{
+			try
+			{
+				var userToUpdate = await _educationProgramContext.Users
+					.Include(u => u.Contact)
+					.FirstOrDefaultAsync(u => u.UserId == user.UserId);
+
+				if (userToUpdate == null)
+				{
+					_logger.LogError("UpdateUserContact({User}), user not found", user);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				//FINISH THIS
+			}
+		}
+
+
 		[HttpDelete("DeleteUserById/{id}")]
 		public async Task<ActionResult> DeleteUserById(int id)
 		{

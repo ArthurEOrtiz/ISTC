@@ -6,6 +6,7 @@ import Loading from '@/app/shared/Loading';
 import UserInfoCard from './UserInfoCard';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
 import { SignOutButton } from '@clerk/clerk-react';
+import EditContactModal from './EditContactModal';
 
 
 interface UserDashboardProps {
@@ -17,6 +18,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     const [ user, setUser ] = useState<User>();
     const [ showErrorMessage, setShowErrorMessage ] = useState(false);
     const [ errorMessage, setErrorMessage ] = useState('');
+    const [ showEditContactModal, setShowEditContactModal ] = useState(false);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -51,6 +53,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         setShowErrorMessage(false);
     }
 
+    const handleEditContactModelOnSubmit = (user: User) => {
+        console.log(user);
+    }
+
     if (!user) {
         return <Loading />
     }
@@ -71,13 +77,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                                 signOutCallback={handleOnSignOut}>
                                 <button className="btn btn-error text-white">Sign Out</button>
                             </SignOutButton>
-                            <button className="btn btn-primary text-white">Edit Profile</button>
+                            <button 
+                                className="btn btn-primary text-white"
+                                onClick={() => setShowEditContactModal(true)}
+                                >Update Contact</button>
                         </div>
-                        
                     </div>
                 </div>
             </div>
                 
+            <EditContactModal 
+                user={user} 
+                isOpen={showEditContactModal} 
+                onCancel={() => setShowEditContactModal(false)}
+                onSubmit={() => handleEditContactModelOnSubmit(user)}
+            />
             
             {showErrorMessage && (
                 <ErrorModal
