@@ -17,11 +17,17 @@ interface UserDashboardProps {
 const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     
     const [ user, setUser ] = useState<User>();
+
     const [ showErrorMessage, setShowErrorMessage ] = useState(false);
     const [ errorMessage, setErrorMessage ] = useState('');
+
     const [ showEditContactModal, setShowEditContactModal ] = useState(false);
+
     const [ showConfirmationModal, setShowConfirmationModal ] = useState(false);
+    const [ showConfirmationModalCancel, setShowConfirmationModalCancel ] = useState(false);
+    const [ confirmationModalTitle, setConfirmationModalTitle ] = useState('');
     const [ confirmationMessage, setConfirmationMessage ] = useState('');
+   
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -48,12 +54,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         fetchUser();
     }, [user]);
 
+
+    // Handlers
     const handleOnSignOut = () => {
         window.location.href = '/';
-    }
-
-    const handleErrorModalClose = () => {
-        setShowErrorMessage(false);
     }
 
     const handleEditContactModelOnSubmit =  async (editUser: User) => {
@@ -64,6 +68,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
             case 200:
                 setUser(response.data);
                 setShowEditContactModal(false);
+                setConfirmationModalTitle('Success');
                 setConfirmationMessage('Contact information updated successfully.');
                 setShowConfirmationModal(true);
                 break;
@@ -85,6 +90,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         }
     }
 
+
+
+
+
     if (!user) {
         return <Loading />
     }
@@ -100,15 +109,84 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                 </div>
                 <div className='basis-1/4'>
                     <div className="ml-2 ">
-                        <div className='flex flex-col p-2 space-y-3'>
-                            <SignOutButton
-                                signOutCallback={handleOnSignOut}>
-                                <button className="btn btn-error text-white">Sign Out</button>
-                            </SignOutButton>
-                            <button 
-                                className="btn btn-primary text-white"
-                                onClick={() => setShowEditContactModal(true)}
-                                >Update Contact</button>
+                        <div className='flex flex-col pr-2'>
+
+
+                            <ul className='menu bg-base-100 rounded-box w-full'>
+                                <li>
+                                    <h2 className=" text-2xl"> User Actions</h2>
+                                </li>
+                                <ul>
+                                    <details open>
+                                        <summary className='text-lg'>Account</summary>
+                                        <ul className='space-y-2 mt-1'>
+                                            <li>
+                                                <button
+                                                    className="btn btn-primary text-white w-full"
+                                                    onClick={() => setShowEditContactModal(true)}
+                                                    >
+                                                        Update Contact Information
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button
+                                                    className="btn btn-primary text-white w-full"
+                                                    >
+                                                        Update Employer Information
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button
+                                                    className="btn btn-primary text-white w-full"
+                                                    >
+                                                        Change Password
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </details>
+                                </ul>
+                                <ul>
+                                    <details open>
+                                        <summary className='text-lg mt-2'>Certifications</summary>
+                                        <ul className='space-y-2 mt-1'>
+                                            <li>
+                                                <button
+                                                    className="btn btn-primary text-white w-full"
+                                                    >
+                                                        Apply for Appraisor Certification
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button
+                                                    className="btn btn-primary text-white w-full"
+                                                    >
+                                                        Apply for Mapping Certification
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </details>
+                                </ul>
+                                <ul>
+                                    <details>
+                                        <summary className='text-lg text-error mt-2'>
+                                            Sign Out/Delete
+                                        </summary>
+                                        <ul className='space-y-2 mt-1'>
+                                            <SignOutButton
+                                                signOutCallback={handleOnSignOut}>
+                                                <button className="btn btn-error text-white w-full">Sign Out</button>
+                                            </SignOutButton>
+                                            <li>
+                                                <button
+                                                    className="btn btn-error text-white w-full"
+                                                    >
+                                                        Delete Account
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </details>    
+                                </ul>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -125,17 +203,27 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                 <ErrorModal
                     title="Error"
                     message={errorMessage}
-                    onClose={handleErrorModalClose}
+                    onClose={() => setShowErrorMessage(false)}
                 />
             )}
 
-            {showConfirmationModal && (
-                <ConfirmationModal
-                    title="Success"
-                    message={confirmationMessage}
-                    onConfirm={() => setShowConfirmationModal(false)}
-                />
-            )}
+            {
+                showConfirmationModal && (!showConfirmationModalCancel ? (
+                    <ConfirmationModal
+                        title={confirmationModalTitle}
+                        message={confirmationMessage}
+                        onConfirm={() => setShowConfirmationModal(false)}
+                    />
+                ) : (
+                    <ConfirmationModal
+                        title={confirmationModalTitle}
+                        message={confirmationMessage}
+                        onConfirm={() => setShowConfirmationModalCancel(false)}
+                        onCancel={() => setShowConfirmationModalCancel(false)}
+                    />
+                ))
+            }
+
 
         </div>
     );
