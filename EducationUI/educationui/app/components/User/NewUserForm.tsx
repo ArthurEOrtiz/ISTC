@@ -3,18 +3,20 @@ import Loading from "@/app/shared/Loading";
 import { User } from "@/app/shared/types/sharedTypes";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
+import PhoneInput from "react-phone-input-2";
+import 'react-phone-input-2/lib/style.css';
 
 interface NewUserFormProps {
     onSubmit: (user: User) => void
 }
 
-const NewUserForm: React.FC<NewUserFormProps> = ({  onSubmit}) => {
+const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit}) => {
     const {user: clerkUser, isLoaded} = useUser();
-    
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<User>();
 
     useEffect(() => {
         if (clerkUser && isLoaded) {
+            console.log(clerkUser);
             setUser({
                 userId: 0,
                 clerkId: clerkUser.id,
@@ -46,7 +48,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({  onSubmit}) => {
                 }
             });
         }
-    }, [clerkUser, isLoaded]);
+    }, [clerkUser && isLoaded]);
 
     const countyArray = [
         "Ada",
@@ -97,227 +99,218 @@ const NewUserForm: React.FC<NewUserFormProps> = ({  onSubmit}) => {
 
     const handleOnSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!user) {
+            return;
+        }
         onSubmit(user);
     }
 
-    const handleEmpoyerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-       
-        setUser({ ...user, employer: e.target.value });
-       
+    const handleZipInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+            return;
+        }
+        if (isNaN(Number(e.key))) {
+            e.preventDefault();
+        }
     }
+
 
     if (!isLoaded) {
         return <Loading />;
     }
 
-    return (
-        <form onSubmit={handleOnSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <div className="mb-4">
-                <label 
-                    className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="firstName"
-                    >
-                        First Name
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    type="text"
-                    id="firstName"
-                    maxLength={50}
-                    required
-                    value={user.firstName}
-                    onChange={(e) => setUser({ ...user, firstName: e.target.value })}
-                />
-            </div>
-            <div className="mb-4">
-                <label
-                    className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="middleName"
-                    >
-                        Middle Name
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    type="text"
-                    id="middleName"
-                    placeholder="Optional"
-                    maxLength={50}
-                    value={user.middleName || ""}
-                    onChange={(e) => setUser({ ...user, middleName: e.target.value })}
-                />
-            </div>
-            <div className="mb-4">
-                <label 
-                    className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="lastName"
-                    >
-                        Last Name
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    type="text"
-                    id="lastName"
-                    maxLength={50}
-                    required
-                    value={user?.lastName || ""}
-                    onChange={(e) => setUser({ ...user, lastName: e.target.value })}
-                />
-            </div>
-            <div className="mb-4">
-                <label 
-                    className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="email"
-                    >
-                        Email
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    type="email"
-                    id="email"
-                    maxLength={100}
-                    required
-                    value={user?.email || ""}
-                    onChange={(e) => setUser({ ...user, email: e.target.value })}
-                />
-            </div>
-            <div className="mb-4">
-                <label 
-                    className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="employer"
-                    >
-                        Employer
-                </label>
-                <select
-                    id="employer"
-                    className="shawdow appearance-none border rounded w-full py-2 px-3"
-                    onChange={handleEmpoyerChange}>
-                    <option value="select">Select</option>
-                    <option value="other">Other / Not Listed</option>
-                    <option value="Tax Commission">Tax Commission</option>
-                    {countyArray.map((county, index) => (
-                        <option key={index} value={county}>{county}</option>
-                    ))}
-                </select>
-
-            </div>
-            {!countyArray.includes(user.employer) && user.employer !== "select" && user.employer !== "Tax Commission" && (
+    if (user) {
+        return (
+            <form onSubmit={handleOnSubmit} className="bg-base-200 shadow-md rounded px-8 pt-6 pb-8 mb-4">
                 <div className="mb-4">
-                    <label 
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="employer"
-                        >
-                            Other Employer
+                    <label className="block text-sm font-bold mb-2" htmlFor="firstName">
+                        First Name
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        id="firstName"
                         type="text"
-                        id="employer"
-                        maxLength={100}
+                        placeholder="First Name"
                         required
-                        defaultValue="Employer Name"
-                        onChange={(e) => setUser({ ...user, employer: e.target.value })}
+                        maxLength={50}
+                        minLength={2}
+                        value={user?.firstName}
+                        onChange={(e) => setUser({ ...user, firstName: e.target.value})}
                     />
                 </div>
-            )}
-            <div className="mb-4">
-                <label 
-                    className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="jobTitle"
-                    >
-                        Job Title
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    type="text"
-                    id="jobTitle"
-                    maxLength={100}
-                    value={user.jobTitle || ""}
-                    onChange={(e) => setUser({ ...user, jobTitle: e.target.value })}
-                />
-            </div>
-            <div className="mb-4">
-                <label 
-                    className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="phone"
-                    >
-                        Phone
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    type="tel"
-                    id="phone"
-                    pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
-                    maxLength={20}
-                    required
-                    placeholder="1234567890"
-                    value={user.contact.phone || ""}
-                    onChange={(e) => setUser({ ...user, contact: { ...user.contact, phone: e.target.value } })}
-                />
-            </div>
-            <div className="mb-4">
-                <label 
-                    className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="addressLine1"
-                    >
-                        Address Line 1
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    type="text"
-                    id="addressLine1"
-                    maxLength={100}
-                    required
-                    value={user.contact.addressLine1 || ""}
-                    onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine1: e.target.value } })}
-                />
-            </div>
-            <div className="mb-4">
-                <label 
-                    className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="addressLine2"
-                    >
-                        Address Line 2
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    type="text"
-                    id="addressLine2"
-                    placeholder="Optional"
-                    maxLength={100}
-                    value={user.contact.addressLine2 || ""}
-                    onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine2: e.target.value } })}
-                />
-            </div>
-            <div className="flex justify-between">
-            
-                <div className="mb-4 w-1/2 pr-2">
-                    <label 
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="city"
-                        >
-                            City
+
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="middleName">
+                        Middle Name
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        id="middleName"
                         type="text"
-                        id="city"
-                        maxLength={50}
+                        placeholder="Middle Name/ Optional"
+                        value={user?.middleName ?? ''}
+                        onChange={(e) => setUser({ ...user, middleName: e.target.value})}
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="lastName">
+                        Last Name
+                    </label>
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        id="lastName"
+                        type="text"
+                        placeholder="Last Name"
+                        value={user?.lastName}
+                        onChange={(e) => setUser({ ...user, lastName: e.target.value})}
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="email">
+                        Email
+                    </label>
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        id="email"
+                        type="email"
+                        placeholder="Email"
+                        value={user?.email}
+                        onChange={(e) => setUser({ ...user, email: e.target.value})}
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="employer">
+                        Employer
+                    </label>
+                    <select
+                        className="select select-bordered w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        id="employer"
+                        value={user?.employer}
                         required
-                        value={user.contact.city || ""}
+                        onChange={(e) => setUser({ ...user, employer: e.target.value})}
+                    >
+                        <option value="select">Select</option>
+                        <option value="other">Other</option>
+                        <option value="Tax Commision">Tax Commision</option>
+                        {countyArray.map((county, index) => (
+                            <option key={index} value={county}>{county}</option>
+                        ))}
+                    </select>
+                </div>
+
+                {!countyArray.includes(user.employer) && user.employer !=="select" && user.employer !== "Tax Commision" && (
+                    <div className="mb-4">
+                        <label className="block text-sm font-bold mb-2" htmlFor="otherEmployer">
+                            Other Employer
+                        </label>
+                        <input
+                            className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                            id="otherEmployer"
+                            type="text"
+                            placeholder="Other Employer"
+                            value={user?.employer}
+                            onChange={(e) => setUser({ ...user, employer: e.target.value})}
+                        />
+                    </div>
+                )}
+
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="jobTitle">
+                        Job Title
+                    </label>
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        id="jobTitle"
+                        type="text"
+                        placeholder="Job Title"
+                        required
+                        maxLength={50}
+                        value={user?.jobTitle}
+                        onChange={(e) => setUser({ ...user, jobTitle: e.target.value})}
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="phone">
+                        Phone
+                    </label>
+                    <PhoneInput
+                        country={'us'}
+                        regions={'north-america'}
+                        disableCountryGuess={true}
+                        disableCountryCode={true}
+                        placeholder="(208)123-4567"
+                        value={user?.contact.phone}
+                        onChange={(phone) => setUser({ ...user, contact: { ...user.contact, phone }})}
+                        buttonStyle={{display: 'none'}}
+                        inputProps={{
+                            required: true,
+                            maxLength: 14,
+                            minLength: 14,
+                            className: 'shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline',
+                        }}
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="addressLine1">
+                        Address Line 1
+                    </label>
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        id="addressLine1"
+                        type="text"
+                        placeholder="1234 Fake St."
+                        required
+                        maxLength={50}
+                        value={user.contact.addressLine1 ?? ''}
+                        onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine1: e.target.value } })}
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="addressLine2">
+                        Address Line 2
+                    </label>
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        id="addressLine2"
+                        type="text"
+                        placeholder="Apt. 123 / Optional"
+                        maxLength={50}
+                        value={user.contact.addressLine2 ?? ''}
+                        onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine2: e.target.value } })}
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="city">
+                        City
+                    </label>
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        id="city"
+                        type="text"
+                        placeholder="City"
+                        required
+                        maxLength={50}
+                        value={user.contact.city ?? ''}
                         onChange={(e) => setUser({ ...user, contact: { ...user.contact, city: e.target.value } })}
                     />
                 </div>
-                <div className="mb-4 w-1/2 pl-2">
-                    <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="state"
-                        >
-                            State
+
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="state">
+                        State
                     </label>
                     <select
+                        className="select select-bordered w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="state"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        value={user.contact.state || ""}
+                        value={user.contact.state ?? "ID"}
+                        required
                         onChange={(e) => setUser({ ...user, contact: { ...user.contact, state: e.target.value } })}
                     >
                         <option value="AL">Alabama</option>
@@ -373,34 +366,38 @@ const NewUserForm: React.FC<NewUserFormProps> = ({  onSubmit}) => {
                         <option value="WY">Wyoming</option>
                     </select>
                 </div>
-                <div className="mb-4 w-1/2 pl-2">
-                    <label 
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="zip"
-                        >
-                            Zip
+
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="zip">
+                        Zip
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        type="text"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="zip"
-                        maxLength={5}
+                        type="text"
+                        placeholder="Zip"
                         required
-                        value={user.contact.zip || ""}
+                        maxLength={5}
+                        minLength={5}
+                        value={user.contact.zip ?? ''}
+                        onKeyDown={(e) => {handleZipInput(e)}}
                         onChange={(e) => setUser({ ...user, contact: { ...user.contact, zip: e.target.value } })}
                     />
                 </div>
-            </div>
 
-            <button 
-                type="submit"
-                className="btn btn-primary text-white  mt-4"
-                >
-                    Add User
-            </button>
-        
-        </form>
-    )
+
+
+    
+                <button 
+                    type="submit"
+                    className="btn btn-primary text-white  mt-4"
+                    >
+                        Add User
+                </button>
+            
+            </form>
+        )
+    }
 }
 
 export default NewUserForm;

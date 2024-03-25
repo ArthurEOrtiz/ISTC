@@ -101,6 +101,7 @@ const EditContactModal: React.FC<EditContactModalProps> = ({user, isOpen, onCanc
                             inputProps={{
                                 required: true,
                                 maxLength: 14,
+                                minLength: 14,
                                 className: 'input input-bordered flex items-center gap-2 text-base w-full',
                             }}
                         />

@@ -238,7 +238,7 @@ namespace EducationAPI.Controllers
 		/// </param>
 		/// <returns>
 		/// Returns an HTTP status code indicating the result of the update operation:
-		/// - <see cref="HttpStatusCode.OK"> / 200 Okay: If the contact information is successfully updated.
+		/// - 200 Okay: If the contact information is successfully updated.
 		/// - 400 Bad Request: If the provided user object does not contain valid contact information.
 		/// - 404 Not Found: If the user to be updated is not found in the database.
 		/// - 500 Internal Server Error: If an unexpected error occurs during the update process.
