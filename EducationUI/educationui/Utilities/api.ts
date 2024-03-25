@@ -203,6 +203,16 @@ export async function PostUser(user: User) {
     }
 }
 
+export async function UpdateUserContact(user: User) {
+    try {
+        const response = await axiosInstance.put('User/UpdateUserContact', user);
+        return response;
+    } catch (error: any) {
+        console.error('Error updating user:', error);
+        return error.message;
+    }
+}
+
 export async function checkUserExistsByClerkId(clerkId: String) {
     try {
         const response = await axiosInstance.get(`User/CheckUserExistsByClerkId/${clerkId}`);

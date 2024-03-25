@@ -229,6 +229,20 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Updates the contact information of a user in the system.
+		/// </summary>
+		/// <param name="user">
+		/// The <see cref="User"/> object with <see cref="Contact"/> information containing the updated contact 
+		/// information.
+		/// </param>
+		/// <returns>
+		/// Returns an HTTP status code indicating the result of the update operation:
+		/// - <see cref="HttpStatusCode.OK"> / 200 Okay: If the contact information is successfully updated.
+		/// - 400 Bad Request: If the provided user object does not contain valid contact information.
+		/// - 404 Not Found: If the user to be updated is not found in the database.
+		/// - 500 Internal Server Error: If an unexpected error occurs during the update process.
+		/// </returns>
 		[HttpPut("UpdateUserContact")]
 		public async Task<ActionResult> UpdateUserContact(User user)
 		{
@@ -244,7 +258,29 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				//FINISH THIS
+				if (user.Contact != null)
+				{
+					// Update contact properties 
+					_educationProgramContext.Entry(userToUpdate.Contact!).CurrentValues.SetValues(user.Contact);
+				}
+				else
+				{
+					_logger.LogError("UpdateUserContact({User}), user has no contact", user);
+					return new StatusCodeResult((int)HttpStatusCode.BadRequest);
+				}
+
+				// Update user properties
+
+
+				await _educationProgramContext.SaveChangesAsync();
+				_logger.LogInformation("UpdateUserContact({User}), called", user);
+				return new StatusCodeResult((int)HttpStatusCode.OK);
+
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "UpdateContact({User})", user);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
 

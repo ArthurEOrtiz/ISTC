@@ -1,12 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { GetUserByClerkId } from "@/Utilities/api";
+import { GetUserByClerkId, UpdateUserContact } from "@/Utilities/api";
 import { User } from '@/app/shared/types/sharedTypes';
 import Loading from '@/app/shared/Loading';
 import UserInfoCard from './UserInfoCard';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
 import { SignOutButton } from '@clerk/clerk-react';
 import EditContactModal from './EditContactModal';
+import ConfirmationModal from '@/app/shared/modals/ConfirmationModal';
 
 
 interface UserDashboardProps {
@@ -19,6 +20,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     const [ showErrorMessage, setShowErrorMessage ] = useState(false);
     const [ errorMessage, setErrorMessage ] = useState('');
     const [ showEditContactModal, setShowEditContactModal ] = useState(false);
+    const [ showConfirmationModal, setShowConfirmationModal ] = useState(false);
+    const [ confirmationMessage, setConfirmationMessage ] = useState('');
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -43,7 +46,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
             }
         };
         fetchUser();
-    }, [clerkId]);
+    }, [user]);
 
     const handleOnSignOut = () => {
         window.location.href = '/';
@@ -53,8 +56,33 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         setShowErrorMessage(false);
     }
 
-    const handleEditContactModelOnSubmit = (user: User) => {
-        console.log(user);
+    const handleEditContactModelOnSubmit =  async (editUser: User) => {
+        console.log(editUser);
+        const response = await UpdateUserContact(editUser);
+
+        switch (response.status) {
+            case 200:
+                setUser(response.data);
+                setShowEditContactModal(false);
+                setConfirmationMessage('Contact information updated successfully.');
+                setShowConfirmationModal(true);
+                break;
+            case 400:
+                setErrorMessage('Contact information is invalid. Please try again.');
+                setShowErrorMessage(true);
+                break;
+            case 404:
+                setErrorMessage('User information not found.');
+                setShowErrorMessage(true);
+                break;
+            case 500:
+                setErrorMessage('Internal server error. Please contact support.');
+                setShowErrorMessage(true);
+                break;
+            default:
+                // Handle other status codes if needed
+                break;
+        }
     }
 
     if (!user) {
@@ -90,7 +118,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                 user={user} 
                 isOpen={showEditContactModal} 
                 onCancel={() => setShowEditContactModal(false)}
-                onSubmit={() => handleEditContactModelOnSubmit(user)}
+                onSubmit={(editUser) => handleEditContactModelOnSubmit(editUser)}
             />
             
             {showErrorMessage && (
@@ -100,6 +128,15 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                     onClose={handleErrorModalClose}
                 />
             )}
+
+            {showConfirmationModal && (
+                <ConfirmationModal
+                    title="Success"
+                    message={confirmationMessage}
+                    onConfirm={() => setShowConfirmationModal(false)}
+                />
+            )}
+
         </div>
     );
 }

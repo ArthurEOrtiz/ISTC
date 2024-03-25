@@ -6,13 +6,13 @@ interface UserInfoCardProps {
 }
 
 const UserInfoCard: React.FC<UserInfoCardProps> = ({user}) => {
-
+    const formattedPhoneNumber = user.contact?.phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
     return (
         <div className="bg-base-100 shawdow-md rounded-xl p-4 w-full">
             <h1 className="text-2xl text-center font-bold">{user.firstName} {user.lastName}</h1>
             <div>
                 <p className="text-center">{user.employer} | {user.jobTitle}</p>
-                <p className="text-center">{user.email} | {user.contact.phone}</p>
+                <p className="text-center">{user.email} | {formattedPhoneNumber}</p>
                 <p className="text-center">{user.contact.addressLine1}</p>
                 <p className="text-center"> {user.contact.addressLine2}</p> 
                 <p className="text-center"> {user.contact.city}, {user.contact.state}, {user.contact.zip}</p>

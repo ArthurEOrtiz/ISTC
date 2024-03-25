@@ -4,7 +4,7 @@ interface ConfirmationModalProps {
     title: string;
     message: string;
     onConfirm: () => void;
-    onCancel: () => void;
+    onCancel?: () => void;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ title, message, onConfirm, onCancel }) => {
@@ -15,8 +15,16 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ title, message, o
                 <h2 className="text-xl font-semibold mb-4">{title}</h2>
                 <p className="text-lg mb-4">{message}</p>
                 <div className="flex justify-between">
-                    <button onClick={onConfirm} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">Yes</button>
-                    <button onClick={onCancel} className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">No</button>
+                    {onCancel && (
+                        <>
+                        <button onClick={onConfirm} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">Yes</button>
+                        <button onClick={onCancel} className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">No</button>
+                        </>
+                    )}
+                    {!onCancel && (
+                        <button onClick={onConfirm} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">OK</button>
+                    )}
+                    
                 </div>
             </div>
         </div>
