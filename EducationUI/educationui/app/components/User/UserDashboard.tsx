@@ -1,13 +1,16 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { GetUserByClerkId, UpdateUserContact } from "@/Utilities/api";
+import { DeleteUserById, GetUserByClerkId, UpdateUser, UpdateUserContact } from "@/Utilities/api";
 import { User } from '@/app/shared/types/sharedTypes';
 import Loading from '@/app/shared/Loading';
 import UserInfoCard from './UserInfoCard';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
-import { SignOutButton } from '@clerk/clerk-react';
+import { clerkClient } from "@clerk/nextjs";
+import { SignOutButton, useClerk } from '@clerk/clerk-react';
 import EditContactModal from './EditContactModal';
 import ConfirmationModal from '@/app/shared/modals/ConfirmationModal';
+import EditEmployerModal from './EditEmployerModal';
+import { useRouter } from 'next/navigation';
 
 
 interface UserDashboardProps {
@@ -23,10 +26,15 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
 
     const [ showEditContactModal, setShowEditContactModal ] = useState(false);
 
+    const [ showEditEmployerModal, setShowEditEmployerModal ] = useState(false);
+
     const [ showConfirmationModal, setShowConfirmationModal ] = useState(false);
     const [ showConfirmationModalCancel, setShowConfirmationModalCancel ] = useState(false);
     const [ confirmationModalTitle, setConfirmationModalTitle ] = useState('');
     const [ confirmationMessage, setConfirmationMessage ] = useState('');
+
+    const {signOut} = useClerk();
+    const router = useRouter();
    
 
     useEffect(() => {
@@ -90,9 +98,74 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         }
     }
 
+    const handleEditEmployerModalOnSubmit = async (editUser: User) => {
+        console.log(editUser);
+        const response = await UpdateUser(editUser);
 
+        switch (response.status) {
+            case 200:
+                setUser(response.data);
+                setShowEditEmployerModal(false);
+                setConfirmationModalTitle('Success');
+                setConfirmationMessage('Employer information updated successfully.');
+                setShowConfirmationModal(true);
+                break;
+            case 404:
+                setErrorMessage('User information not found.');
+                setShowErrorMessage(true);
+                break;
+            case 500:
+                setErrorMessage('Internal server error. Please contact support.');
+                setShowErrorMessage(true);
+                break;
+            default:
+                // Handle other status codes if needed
+                break;
+        }
+    }
 
+    const handleModalConfirm = async() => {
+        setShowConfirmationModal(false);
+        if (confirmationModalTitle === 'Delete Account') {
+            if (!user?.userId) {
+                return;
+            }
+            // Delete account
+           try{
+            const response = await clerkClient.users.deleteUser(clerkId)
+            console.log(response);
+           } catch (error) {
+            setErrorMessage(`Error deleting account. Please contact support.\n ${error}`);
+            setShowErrorMessage(true);
+           } 
+            // const response = await DeleteUserById(user.userId)
 
+            // switch (response.status) {
+            //     case 200:
+            //         await signOut(() => router.push('/'));
+            //         break;
+            //     case 404:
+            //         setErrorMessage('User not found.');
+            //         setShowErrorMessage(true);
+            //         break;
+            //     case 500:
+            //         setErrorMessage('Internal server error.');
+            //         setShowErrorMessage(true);
+            //         break;
+            //     default:
+            //         // Handle other status codes if needed
+            //         break;
+            //     }
+            
+        }
+    }
+
+    const handleOnDeleteAccount = () => {
+        setConfirmationModalTitle('Delete Account');
+        setConfirmationMessage('Are you sure you want to delete your account?');
+        setShowConfirmationModalCancel(true);
+        setShowConfirmationModal(true);
+    }
 
     if (!user) {
         return <Loading />
@@ -131,15 +204,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                                             <li>
                                                 <button
                                                     className="btn btn-primary text-white w-full"
+                                                    onClick={() => setShowEditEmployerModal(true)}
                                                     >
                                                         Update Employer Information
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button
-                                                    className="btn btn-primary text-white w-full"
-                                                    >
-                                                        Change Password
                                                 </button>
                                             </li>
                                         </ul>
@@ -179,6 +246,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                                             <li>
                                                 <button
                                                     className="btn btn-error text-white w-full"
+                                                    onClick={handleOnDeleteAccount}
                                                     >
                                                         Delete Account
                                                 </button>
@@ -197,6 +265,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                 isOpen={showEditContactModal} 
                 onCancel={() => setShowEditContactModal(false)}
                 onSubmit={(editUser) => handleEditContactModelOnSubmit(editUser)}
+            />
+
+            <EditEmployerModal
+                user={user}
+                isOpen={showEditEmployerModal}
+                onCancel={() => setShowEditEmployerModal(false)}
+                onSubmit={(editUser) => handleEditEmployerModalOnSubmit(editUser)}
             />
             
             {showErrorMessage && (
@@ -218,7 +293,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                     <ConfirmationModal
                         title={confirmationModalTitle}
                         message={confirmationMessage}
-                        onConfirm={() => setShowConfirmationModalCancel(false)}
+                        onConfirm={handleModalConfirm}
                         onCancel={() => setShowConfirmationModalCancel(false)}
                     />
                 ))

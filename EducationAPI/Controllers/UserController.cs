@@ -270,8 +270,6 @@ namespace EducationAPI.Controllers
 				}
 
 				// Update user properties
-
-
 				await _educationProgramContext.SaveChangesAsync();
 				_logger.LogInformation("UpdateUserContact({User}), called", user);
 				return new StatusCodeResult((int)HttpStatusCode.OK);
@@ -283,6 +281,43 @@ namespace EducationAPI.Controllers
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
+
+		/// <summary>
+		/// Updates the information of a user in the system.
+		/// </summary>
+		/// <param name="user">The <see cref="User"/> object with the updated information.</param>
+		/// <returns>
+		/// Returns an HTTP status code indicating the result of the update operation:
+		/// <para>200 OK: If the user information is successfully updated.</para>
+		/// <para>404 Not Found: If the user to be updated is not found in the database.</para>
+		/// <para>500 Internal Server Error: If an unexpected error occurs during the update process.</para>
+		/// </returns>
+		[HttpPut("UpdateUser")]
+		public async Task<ActionResult> UpdateUser(User user)
+		{
+			try
+			{
+				var userToUpdate = await _educationProgramContext.Users
+					.FirstOrDefaultAsync(u => u.UserId == user.UserId);
+
+				if (userToUpdate == null)
+				{
+					_logger.LogError("UpdateUser({User}), could not find user", user);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_educationProgramContext.Entry(userToUpdate).CurrentValues.SetValues(user);
+				await _educationProgramContext.SaveChangesAsync();
+				_logger.LogInformation("UpdateUser({User}) called", user);
+				return new StatusCodeResult((int)HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "UpdateUser({User})", user);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 
 
 		[HttpDelete("DeleteUserById/{id}")]

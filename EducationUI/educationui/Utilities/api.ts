@@ -213,6 +213,16 @@ export async function UpdateUserContact(user: User) {
     }
 }
 
+export async function UpdateUser(user: User) {
+    try {
+        const response = await axiosInstance.put('User/UpdateUser', user);
+        return response;
+    } catch (error: any) {
+        console.error('Error updating user:', error);
+        return error.message;
+    }
+}
+
 export async function checkUserExistsByClerkId(clerkId: String) {
     try {
         const response = await axiosInstance.get(`User/CheckUserExistsByClerkId/${clerkId}`);
@@ -249,6 +259,16 @@ export async function getStudentIdByClerkId(clerkId: String) {
         return response;
     } catch (error) {
         console.error('Error fetching user:', error);
+        throw error;
+    }
+}
+
+export async function DeleteUserById(userId: Number) {
+    try {
+        const response = await axiosInstance.delete(`User/DeleteUserById/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting user:', error);
         throw error;
     }
 }
