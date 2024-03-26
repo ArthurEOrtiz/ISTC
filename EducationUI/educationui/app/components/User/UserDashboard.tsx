@@ -125,48 +125,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     const handleModalConfirm = async() => {
         setShowConfirmationModal(false);
         if (confirmationModalTitle === 'Delete Account') {
-            if (!user?.userId) {
-                setErrorMessage('User not found.');
-                setShowErrorMessage(true);
-                return;
-            }
-
-            if (!clerkUser) {
-                setErrorMessage('User not found.');
-                setShowErrorMessage(true);
-                return;
-            }
-            // Delete account
-
-            const response = await DeleteUserById(user.userId)
-            console.log("Delete Response", response);
-
-            switch (response.status) {
-                case 200:
-                    router.push('/');
-                    break;
-                case 404:
-                    setErrorMessage('User not found.');
-                    setShowErrorMessage(true);
-                    break;
-                case 500:
-                    setErrorMessage('Internal server error.');
-                    setShowErrorMessage(true);
-                    break;
-                default:
-                    // Handle other status codes if needed
-                    break;
-            }
-
-            try {
-                clerkUser.delete();
-            } catch (error) {
-                console.error('Error deleting user:', error);
-                setErrorMessage('Error deleting user.');
-                setShowErrorMessage(true);
-            }
-
-           
+            deleteAccount();
         }
     }
 
@@ -177,6 +136,52 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         setShowConfirmationModal(true);
     }
 
+    // Helper Methods
+    const deleteAccount = async () => {
+        if (!user?.userId) {
+            setErrorMessage('User not found.');
+            setShowErrorMessage(true);
+            return;
+        }
+
+        if (!clerkUser) {
+            setErrorMessage('User not found.');
+            setShowErrorMessage(true);
+            return;
+        }
+        // Delete account
+        try {
+            clerkUser.delete();
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            setErrorMessage('Error deleting user.');
+            setShowErrorMessage(true);
+            return
+        }
+
+        const response = await DeleteUserById(user.userId)
+        console.log("Delete Response", response);
+
+        switch (response.status) {
+            case 200:
+                router.push('/');
+                break;
+            case 404:
+                setErrorMessage('User not found.');
+                setShowErrorMessage(true);
+                break;
+            case 500:
+                setErrorMessage('Internal server error.');
+                setShowErrorMessage(true);
+                break;
+            default:
+                // Handle other status codes if needed
+                break;
+        }
+    }
+
+
+    // Render
     if (!user) {
         return <Loading />
     }
