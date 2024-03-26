@@ -1,4 +1,4 @@
-import AddTopic from "@/app/components/TopicsComponents/AddTopic"
+import AddTopic from "@/app/components/Topics/AddTopic"
 
 const AddTopicPage: React.FC = () => {
     return (

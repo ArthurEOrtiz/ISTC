@@ -113,6 +113,102 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetUserEnrolledCoursesById/{userId}")]
+		public async Task<ActionResult<List<Course>>> GetUserEnrolledCoursesById(int userId)
+		{
+			try
+			{
+				var user = await _educationProgramContext.Users
+					.Include(u => u.Student)
+					.ThenInclude(s => s!.Attendances ) 
+					.FirstOrDefaultAsync(u => u.UserId == userId);
+
+				if (user == null)
+				{
+					_logger.LogError("GetUserEnrolledCoursesById/({UserId})", userId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				var classes = user.Student?.Attendances!
+					.Select(a => a.Class)
+					.GroupBy(c => c.CourseId)
+					.Select(g => g.First())
+					.ToList() ?? new List<Class> ();
+				
+				List<Course> courses = new();
+
+				if (classes.Count == 0)
+				{
+					return courses;
+				}
+
+				foreach (var @class in classes)
+				{
+					var course = await _educationProgramContext.Courses
+						.Include(c => c.Classes)
+						.Include(c => c.Location)
+						.Include(c => c.Topics)
+						.FirstOrDefaultAsync(c => c.CourseId == @class.CourseId);
+					if (course != null)
+					{
+						courses.Add(course);
+					}
+				}
+
+				return courses;
+
+			}
+			catch (Exception ex)
+			{
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpGet("GetCoursesByDateRange")]
+		public async Task<ActionResult<List<Course>>> GetCoursesByDateRange(DateTime startDate, DateTime endDate)
+		{
+			try
+			{
+				var classesInRange = await _educationProgramContext.Classes
+						.Where(c => c.ScheduleStart >= startDate && c.ScheduleEnd <= endDate)
+						.ToListAsync();
+
+				if (classesInRange == null)
+				{
+					_logger.LogError("GetCoursesByDateRange({StartDate}, {EndDate}), classes not found", startDate, endDate);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				HashSet<int> courseIds = new();
+				List<Course> courseInRange = new();
+
+				foreach (var @class in classesInRange)
+				{
+					if (!courseIds.Contains(@class.CourseId))
+					{
+						Course? parentCourse = await _educationProgramContext.Courses
+								.Include(c => c.Classes)
+								.FirstOrDefaultAsync(c => c.CourseId == @class.CourseId);
+
+						if (parentCourse != null)
+						{
+							courseInRange.Add(parentCourse);
+							courseIds.Add(@class.CourseId);
+						}
+					}
+				}
+
+				_logger.LogInformation("GetCoursesByDateRange({StartDate}, {EndDate}), called", startDate, endDate);
+				return courseInRange;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetCoursesByDateRange({StartDate}, {EndDate})", startDate, endDate);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+
 		/// <summary>
 		/// Gives the end user the ability to add a Course record to the database.
 		/// </summary>
@@ -203,6 +299,175 @@ namespace EducationAPI.Controllers
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
+
+		/// <summary>
+		/// Enrolls a student in a course based on the clerk ID and course ID.
+		/// </summary>
+		/// <param name="clerkId">The clerk ID of the user performing the enrollment.</param>
+		/// <param name="courseId">The ID of the course in which the student will be enrolled.</param>
+		/// <returns>
+		///   <list type="bullet">
+		///     <item>
+		///       <description>201 Created: The student was successfully enrolled in the course.</description>
+		///     </item>
+		///     <item>
+		///       <description>404 Not Found: If the specified course, user, or student is not found.</description>
+		///     </item>
+		///     <item>
+		///       <description>409 Conflict: If the student is already enrolled in the course.</description>
+		///     </item>
+		///     <item>
+		///       <description>500 Internal Server Error: If an unexpected error occurs during the enrollment process.</description>
+		///     </item>
+		///   </list>
+		/// </returns>
+		[HttpPost("EnrollStudentByClerkId/{clerkId}/{courseId}")]
+		public async Task<ActionResult> EnrollStudentToCourse(string clerkId, int courseId)
+		{
+			try
+			{
+				var course = await _educationProgramContext.Courses
+					.Include(c => c.Classes)
+					.Where(c => c.CourseId == courseId)
+					.FirstOrDefaultAsync();
+
+				if (course == null)
+				{
+					_logger.LogError("EnrollStudentToCourse({StudentId},{CourseId}), Course not found!", clerkId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				// Fetch the student
+				var user = await _educationProgramContext.Users
+						.Include(u => u.Student)
+						.ThenInclude(s => s!.Attendances)
+						.FirstOrDefaultAsync(u => u.ClerkId == clerkId);
+
+				if (user == null || user.Student == null)
+				{
+					_logger.LogError("EnrollStudentToCourse({ClerkId},{CourseId}), User or student not found!", clerkId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				var student = user.Student;
+
+				if (student == null)
+				{
+					_logger.LogError("EnrollStudentToCourse({ClerkId},{CourseId}), Student not found!", clerkId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				// Check if the student is already enroll in the course
+				if (student.Attendances != null && student.Attendances.Any(a => a.Class != null && a.Class.CourseId == courseId))
+				{
+					_logger.LogError("EnrollStudentToCourse({ClerkId},{CourseId}), Student already enrolled in course!", clerkId, courseId);
+					return new ObjectResult("Student is already enrolled in course")
+					{
+						StatusCode = (int)HttpStatusCode.Conflict
+					};
+				}
+
+				foreach (var @class in course.Classes)
+				{
+					var attendance = new Attendance
+					{
+						StudentId = student.StudentId,
+						ClassId = @class.ClassId,
+						Attended = false
+					};
+
+					_educationProgramContext.Attendances.Add(attendance);
+				}
+
+				await _educationProgramContext.SaveChangesAsync();
+
+				_logger.LogInformation("EnrollStudentToCourse({ClerkId},{CourseId}), called.", clerkId, courseId);
+				return new StatusCodeResult((int)HttpStatusCode.Created);
+
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "EnrollStudentToCourse({ClerkId},{CourseId})", clerkId, courseId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+		/// <summary>
+		/// Unenrolls a student from a course based on the clerk ID and course ID.
+		/// </summary>
+		/// <param name="clerkId">The clerk ID of the user performing the unenrollment.</param>
+		/// <param name="courseId">The ID of the course from which the student will be unenrolled.</param>
+		/// <returns>
+		///   <list type="bullet">
+		///     <item>
+		///       <description>200 OK: The student was successfully unenrolled from the course.</description>
+		///     </item>
+		///     <item>
+		///       <description>404 Not Found: If the specified course or student is not found.</description>
+		///     </item>
+		///     <item>
+		///       <description>500 Internal Server Error: If an unexpected error occurs during the unenrollment process.</description>
+		///     </item>
+		///   </list>
+		/// </returns>
+		[HttpDelete("UnenrollStudentByClerkId/{clerkId}/{courseId}")]
+		public async Task<ActionResult> UnenrollStudentFromCourse(string clerkId, int courseId)
+		{
+			try
+			{
+				// Fetch the course
+				var course = await _educationProgramContext.Courses
+						.Include(c => c.Classes)
+						.Where(c => c.CourseId == courseId)
+						.FirstOrDefaultAsync();
+
+				if (course == null)
+				{
+					_logger.LogError("UnenrollStudentFromCourse({ClerkId},{CourseId}), Course not found!", clerkId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				// Fetch the student
+				var user = await _educationProgramContext.Users
+						.Include(u => u.Student)
+						.ThenInclude(s => s!.Attendances)
+						.FirstOrDefaultAsync(u => u.ClerkId == clerkId);
+
+				if (user == null || user.Student == null)
+				{
+					_logger.LogError("UnenrollStudentFromCourse({ClerkId},{CourseId}), User or student not found!", clerkId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				var student = user.Student;
+
+				if (student == null)
+				{
+					_logger.LogError("UnenrollStudentFromCourse({ClerkId},{CourseId}), Student not found!", clerkId, courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				// Remove the attendances for the specified course
+				var attendancesToRemove = student.Attendances?
+						.Where(a => a.Class != null && a.Class.CourseId == courseId)
+						.ToList();
+
+				if (attendancesToRemove != null && attendancesToRemove.Any())
+				{
+					_educationProgramContext.Attendances.RemoveRange(attendancesToRemove);
+					await _educationProgramContext.SaveChangesAsync();
+				}
+
+				_logger.LogInformation("UnenrollStudentFromCourse({ClerkId},{CourseId}), called.", clerkId, courseId);
+				return new StatusCodeResult((int)HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "UnenrollStudentFromCourse({ClerkId},{CourseId})", clerkId, courseId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 
 		[HttpDelete("DeleteCourseById/{id}")]
 		public async Task<ActionResult> DeleteCourseById(int id)

@@ -2,14 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  background-color: #f3f4f6;
-}
+
 
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
+    background-color: #3E4C69;
+    .rbc-today {
+      background-color: #3E4C69;
+    }
+    .rbc-toolbar button {
+      color: white;
+    }
+    .rbc-off-range {
+      color: white;
+    }
+    .rbc-off-range-bg {
+      background: #3E6769;
+    }
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --foreground-rgb: 0, 0, 0;
+    /* background-color: #f3f4f6; */
+    background-color: #D6E4FF;
   }
 }
 
@@ -20,5 +38,6 @@ body {
 
 main {
   padding: 1rem;  
-
 }
+
+

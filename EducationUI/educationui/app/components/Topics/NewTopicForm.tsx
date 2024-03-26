@@ -11,12 +11,12 @@ const NewTopicForm: React.FC<NewTopicFormProps> = ({ onSubmit }) => {
         topicId: 0,
         title: "",
         description: "",
+        courses: [],
     });
 
     const handleOnSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSubmit(topic);
-        setTopic({ topicId: 0, title: "", description: "" });
     };
 
     return (

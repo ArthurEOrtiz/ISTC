@@ -48,6 +48,32 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetClassesByDateRange")]
+		public async Task<ActionResult<List<Class>>> GetClassesByDateRange(DateTime startDate, DateTime endDate)
+		{
+			try
+			{
+				var classesInRange = await _educationProgramContext.Classes
+					.Where(c => c.ScheduleStart >= startDate && c.ScheduleStart >= endDate)
+					.ToListAsync();
+
+				if (classesInRange == null)
+				{
+					_logger.LogError("GetClassesByDateRange({StartDate}, {EndDate}), record not found.", startDate, endDate);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_logger.LogInformation("GetClassesByDateRange({StartDate}, {EndDate}), called", startDate, endDate);
+				return classesInRange;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetClassesByDateRange({StartDate}, {EndDate})", startDate, endDate);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+
 		/// <summary>
 		/// Allows you to change the Schedule Start and Schedule Stop properties of a class. 
 		/// </summary>

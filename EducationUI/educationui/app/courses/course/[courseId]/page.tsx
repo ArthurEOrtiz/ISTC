@@ -1,6 +1,7 @@
 import { getCourseById } from "@/Utilities/api";
-import EditCourseInfo from "@/app/components/Course/EditCourseInfo";
+import CourseCard from "@/app/components/Course/EditCourseCard";
 import { Course } from "@/app/shared/types/sharedTypes";
+
 
 const CourseDetail: React.FC<{ params: { courseId: string } }> = async ({ params }) => {
     const courseId = parseInt(params.courseId);
@@ -8,9 +9,12 @@ const CourseDetail: React.FC<{ params: { courseId: string } }> = async ({ params
     const course = courseJson as Course;
 
     return (
-        <>
-            <EditCourseInfo course={course} />
-        </>
+        <div>
+            <CourseCard 
+                course={course}
+                viewOnly={true}
+                />
+        </div>
   );
 }
 

@@ -1,41 +1,41 @@
-import { UserButton} from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignInButton} from '@clerk/nextjs';
 import Link from 'next/link';
 import React from 'react';
-import AdmindashboardLink from '../components/Navigation/AdminDashboardLink';
-import StudentDashboardLink from '../components/Navigation/StudentDashboardLink';
 
 const Header: React.FC = async () => {
     return (
-        <header className="flex justify-between items-center p-5 bg-primary">
-            <h1 className="text-white text-2xl">Property Tax Education</h1>
-            <nav>
-                <ul className="flex space-x-4">
-                    <li>
-                        <Link href="/" className="btn btn-ghost text-white">
-                            Home
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/courses" className="btn btn-ghost text-white">
-                            Courses
-                        </Link>
-                    </li>
-                    <li>
-                        <StudentDashboardLink />
-                    </li> 
-                    <li>
-                        <AdmindashboardLink />
-                    </li>
-                    <li>
-                        <div className='mt-2'>
-                            <UserButton afterSignOutUrl='/' />
-                        </div>
-                        
-                    </li>
-                </ul>
-            </nav>
-
-            
+        <header>
+            <div className="navbar bg-primary">
+                <div className="flex-1">
+                    <Link href="/" className="btn btn-ghost flex flex-col items-center">
+                        <p className='text-2xl text-white'>ISTC</p>
+                        <p className='text-base text-white font-normal'>Education Program</p>
+                    </Link>
+                </div>
+                <div className="flex-none">
+                    <ul className="menu menu-horizontal px-1">
+                        <li>
+                            <Link 
+                                href='/courses'
+                                className='btn btn-ghost text-white'
+                                >Course Catalog
+                            </Link>
+                        </li>
+                        <li>
+                            <SignedIn>
+                                <Link href="/user" className="btn btn-ghost text-white">
+                                    Dashboard
+                                </Link>
+                            </SignedIn>
+                            <SignedOut>
+                                <SignInButton>
+                                    <button className="btn btn-ghost text-white">Sign In</button>
+                                </SignInButton>
+                            </SignedOut>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </header>
     );
 }
