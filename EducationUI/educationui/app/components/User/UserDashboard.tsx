@@ -10,6 +10,7 @@ import EditContactModal from './EditContactModal';
 import ConfirmationModal from '@/app/shared/modals/ConfirmationModal';
 import EditEmployerModal from './EditEmployerModal';
 import { useRouter } from 'next/navigation';
+import UserEnrolledCourses from './UserEnrolledCourses';
 
 interface UserDashboardProps {
     clerkId: string;    
@@ -37,9 +38,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
 
     useEffect(() => {
         const fetchUser = async () => {
-
             const response = await GetUserByClerkId(clerkId);
-            console.log(response);
             switch (response.status) {
                 case 200:
                     setUser(response.data);
@@ -63,7 +62,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
 
     // Handlers
     const handleOnSignOut = () => {
-        window.location.href = '/';
+        router.push('/');
     }
 
     const handleEditContactModelOnSubmit =  async (editUser: User) => {
@@ -160,7 +159,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         }
 
         const response = await DeleteUserById(user.userId)
-        console.log("Delete Response", response);
 
         switch (response.status) {
             case 200:
@@ -180,7 +178,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         }
     }
 
-
     // Render
     if (!user) {
         return <Loading />
@@ -192,8 +189,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
 
             <div className='flex flex-row mt-4'>
                 <div className='basis-1/4' ></div>
-                <div className='basis-1/2'>
-                    <UserInfoCard user={user}/>
+                <div className='basis-1/2 space-y-3'>
+                    <div>
+                        <UserInfoCard user={user}/>
+                    </div>
+                    <div>
+                        <UserEnrolledCourses user={user}/>
+                    </div>
+                    
                 </div>
                 <div className='basis-1/4'>
                     <div className="ml-2 ">
@@ -266,13 +269,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                                                         Delete Account
                                                 </button>
                                             </li>
-                                            {/* <li>
-                                                <UserButton
-                                                    afterSignOutUrl='/'
-                                                    >
-                                                    
-                                                </UserButton>
-                                            </li> */}
                                         </ul>
                                     </details>    
                                 </ul>
