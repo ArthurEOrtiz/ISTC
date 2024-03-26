@@ -16,23 +16,53 @@ interface CourseCardProps {
 const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
   const { isSignedIn, user } = useUser();
   const [ isConfirmationModalVisible, setIsConfirmationModalVisible ] = useState(false);
+  const [ confirmationMessage, setConfirmationMessage ] = useState(''); 
+  const [ confirmationTitle, setConfirmationTitle ] = useState('');
   const [ isErrorModalVisible, setIsErrorModalVisible ] = useState(false); 
   const [ errorMessage, setErrorMessage ] = useState('');
   const [ isEnrolled, setIsEnrolled ] = useState(false);
 
+  // This useEffect will check if the user is enrolled in the course when the component mounts.
   useEffect(() => {
     if (viewOnly){
       const checkEnrollment = async () => {
         if (!user) return;
+        console.log("Checking enrollment");
         const response = await IsUserEnrolledInCourse(user.id, course.courseId as Number);
         setIsEnrolled(response);
       }
     checkEnrollment();
     }
-  }, [viewOnly] )
-  
+  }, [] )
+
+  // Handlers
+
+  const handleConfirm = (): void => {
+    if (confirmationTitle === 'Enroll') {
+      enrollStudent();
+      return;
+    }
+
+    if (confirmationTitle === 'Unenroll') {
+      unenrollStudent();
+      return;
+    }
+    
+  }
+  const handleEnroll = (): void => {
+    setConfirmationTitle('Enroll');
+    setConfirmationMessage(`Are you sure you want to enroll in ${course.title}?`);
+    setIsConfirmationModalVisible(true);
+  }
+
+  const handleUnenroll = (): void => {
+    setConfirmationTitle('Unenroll');
+    setConfirmationMessage(`Are you sure you want to unenroll from ${course.title}?`);
+    setIsConfirmationModalVisible(true);
+  }
 
 
+  // Helpers
   const formatToMountainTime = (utcDate: Date): string => {
 
     const inputDate =  `${utcDate}z`  
@@ -43,11 +73,10 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
     return mountainTime;
   }
 
-  const handleEnroll = (): void => {
-    setIsConfirmationModalVisible(true);
-  }
-
   const enrollStudent = async() => {
+
+    setIsConfirmationModalVisible(false);
+
     if(!isSignedIn) {
       setErrorMessage("Please log in to enroll in a course!")
       setIsErrorModalVisible(true);
@@ -58,20 +87,25 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
 
     switch (response.status) {
       case 500:
-        console.error('Error enrolling user in course');
+        setErrorMessage('An error occurred while enrolling in the course, please contact support.');
+        setIsErrorModalVisible(true);
         break;
       case 409:
         setErrorMessage('You are already enrolled in this course');
         setIsErrorModalVisible(true);
-        console.error('User is already enrolled in this course');
         break;
       case 201:
-        console.log('User enrolled in course');
-        setIsConfirmationModalVisible(false);
+        setIsEnrolled(true);
+        
         break;
       default:
         break;
     }
+  }
+
+  const unenrollStudent = async() => {
+    setIsConfirmationModalVisible(false);
+    console.log('unenrolling student');
   }
 
   return (
@@ -135,15 +169,21 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
 
       {viewOnly && isEnrolled && (
         <div className="card-actions justify-end">
-          <p className="text-green-500">You are already enrolled in this course</p>
+          <p className="text-green-500">You are enrolled in this course</p>
+          <button
+            className="btn btn-error text-white"
+            onClick={handleUnenroll}
+            >
+            Unenroll
+            </button>
         </div>
       )}
 
       {isConfirmationModalVisible && (
         <ConfirmationModal
-          title="Enroll"
-          message={`Are you sure you want to enroll in ${course.title}?`}
-          onConfirm={enrollStudent}
+          title={confirmationTitle}
+          message={confirmationMessage}
+          onConfirm={handleConfirm}
           onCancel={() => setIsConfirmationModalVisible(false)}
         />
       )}

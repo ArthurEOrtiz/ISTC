@@ -71,8 +71,8 @@ const CourseCalendar: React.FC = () => {
     }
 
     return (
-        <div className="h-screen flex justify-center items-center">
-            <div className="max-w-screen-lg w-full h-full bg-gray-100 p-4 rounded-lg">
+        <div className="h-screen flex justify-center">
+            <div className="max-w-screen-lg w-full h-3/4 bg-base-200 p-4 rounded-lg">
                 <Calendar
                     localizer={localizer}
                     events={events}
@@ -82,6 +82,7 @@ const CourseCalendar: React.FC = () => {
                     views={['month']}
                     onNavigate={handleNaigate}
                     onSelectEvent={handleSelectEvent}
+                   
                 />
             </div>
         </div>

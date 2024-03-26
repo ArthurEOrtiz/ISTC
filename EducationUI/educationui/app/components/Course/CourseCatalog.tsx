@@ -31,10 +31,10 @@ const CourseCatalog: React.FC = () => {
     }
 
     return (
-        <div className='p-4'>
+        <div className='p-4 space-y-2'>
             <h1 className='text-3xl text-center font-bold'>Courses</h1>
             <div>
-                <div className='join  p-2'>
+                <div className='join p-1'>
                     <button
                         className={`join-item btn ${isCourseCalendarVisible ? 'btn-primary text-white' : ''}`}   
                         onClick={handleCourseCalendarClick}
@@ -49,11 +49,16 @@ const CourseCatalog: React.FC = () => {
                     </button>
                 </div>
             </div>
-            {isCourseCalendarVisible && <CourseCalendar />}
-            {isCourseListVisible && <CourseList
-                                        courses={courses}
-                                        viewOnly={true}
-                                        />}
+            <div>
+                {isCourseCalendarVisible && <CourseCalendar />}
+            </div>
+            <div>
+                {isCourseListVisible && <CourseList
+                                            courses={courses}
+                                            viewOnly={true}
+                                            />}
+            </div>
+            
         </div>
     );
 }
