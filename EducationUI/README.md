@@ -17,7 +17,7 @@ The ISTC Education application is a platform designed to manage educational prog
 - ESLint
 - Axios
 - [Clerk](https://clerk.com/docs)
-- React-Big-Calendar
+- [React-Big-Calendar](https://www.npmjs.com/package/react-big-calendar)
 - [React-Phone-Input-2](https://www.npmjs.com/package/react-phone-input-2)
 
 ***

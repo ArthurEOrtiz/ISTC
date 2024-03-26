@@ -34,7 +34,7 @@ const CourseCatalog: React.FC = () => {
         <div className='p-4'>
             <h1 className='text-3xl text-center font-bold'>Courses</h1>
             <div>
-                <div className='join border'>
+                <div className='join  p-2'>
                     <button
                         className={`join-item btn ${isCourseCalendarVisible ? 'btn-primary text-white' : ''}`}   
                         onClick={handleCourseCalendarClick}
