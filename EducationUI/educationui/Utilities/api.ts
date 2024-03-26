@@ -266,10 +266,10 @@ export async function getStudentIdByClerkId(clerkId: String) {
 export async function DeleteUserById(userId: Number) {
     try {
         const response = await axiosInstance.delete(`User/DeleteUserById/${userId}`);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error deleting user:', error);
-        throw error;
+        return error.message;
     }
 }
 

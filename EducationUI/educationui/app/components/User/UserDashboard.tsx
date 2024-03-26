@@ -5,13 +5,11 @@ import { User } from '@/app/shared/types/sharedTypes';
 import Loading from '@/app/shared/Loading';
 import UserInfoCard from './UserInfoCard';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
-import { clerkClient } from "@clerk/nextjs";
-import { SignOutButton, useClerk } from '@clerk/clerk-react';
+import { SignOutButton, useUser } from '@clerk/clerk-react';
 import EditContactModal from './EditContactModal';
 import ConfirmationModal from '@/app/shared/modals/ConfirmationModal';
 import EditEmployerModal from './EditEmployerModal';
 import { useRouter } from 'next/navigation';
-
 
 interface UserDashboardProps {
     clerkId: string;    
@@ -33,15 +31,15 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     const [ confirmationModalTitle, setConfirmationModalTitle ] = useState('');
     const [ confirmationMessage, setConfirmationMessage ] = useState('');
 
-    const {signOut} = useClerk();
     const router = useRouter();
+    const { user: clerkUser } = useUser(); 
    
 
     useEffect(() => {
         const fetchUser = async () => {
 
             const response = await GetUserByClerkId(clerkId);
-
+            console.log(response);
             switch (response.status) {
                 case 200:
                     setUser(response.data);
@@ -60,7 +58,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
             }
         };
         fetchUser();
-    }, [user]);
+    }, []);
 
 
     // Handlers
@@ -128,35 +126,47 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         setShowConfirmationModal(false);
         if (confirmationModalTitle === 'Delete Account') {
             if (!user?.userId) {
+                setErrorMessage('User not found.');
+                setShowErrorMessage(true);
+                return;
+            }
+
+            if (!clerkUser) {
+                setErrorMessage('User not found.');
+                setShowErrorMessage(true);
                 return;
             }
             // Delete account
-           try{
-            const response = await clerkClient.users.deleteUser(clerkId)
-            console.log(response);
-           } catch (error) {
-            setErrorMessage(`Error deleting account. Please contact support.\n ${error}`);
-            setShowErrorMessage(true);
-           } 
-            // const response = await DeleteUserById(user.userId)
 
-            // switch (response.status) {
-            //     case 200:
-            //         await signOut(() => router.push('/'));
-            //         break;
-            //     case 404:
-            //         setErrorMessage('User not found.');
-            //         setShowErrorMessage(true);
-            //         break;
-            //     case 500:
-            //         setErrorMessage('Internal server error.');
-            //         setShowErrorMessage(true);
-            //         break;
-            //     default:
-            //         // Handle other status codes if needed
-            //         break;
-            //     }
-            
+            const response = await DeleteUserById(user.userId)
+            console.log("Delete Response", response);
+
+            switch (response.status) {
+                case 200:
+                    router.push('/');
+                    break;
+                case 404:
+                    setErrorMessage('User not found.');
+                    setShowErrorMessage(true);
+                    break;
+                case 500:
+                    setErrorMessage('Internal server error.');
+                    setShowErrorMessage(true);
+                    break;
+                default:
+                    // Handle other status codes if needed
+                    break;
+            }
+
+            try {
+                clerkUser.delete();
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                setErrorMessage('Error deleting user.');
+                setShowErrorMessage(true);
+            }
+
+           
         }
     }
 
@@ -251,6 +261,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                                                         Delete Account
                                                 </button>
                                             </li>
+                                            {/* <li>
+                                                <UserButton
+                                                    afterSignOutUrl='/'
+                                                    >
+                                                    
+                                                </UserButton>
+                                            </li> */}
                                         </ul>
                                     </details>    
                                 </ul>
