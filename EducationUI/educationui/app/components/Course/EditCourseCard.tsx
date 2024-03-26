@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Course } from '@/app/shared/types/sharedTypes'
 import ConfirmationModal from '@/app/shared/modals/ConfirmationModal';
 import { useUser } from '@clerk/clerk-react';
-import { EnrollStudentByClerkId, IsUserEnrolledInCourse } from '@/Utilities/api';
+import { EnrollStudentByClerkId, IsUserEnrolledInCourse, UnenrollStudentByClerkId } from '@/Utilities/api';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
 
 
@@ -94,9 +94,12 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
         setErrorMessage('You are already enrolled in this course');
         setIsErrorModalVisible(true);
         break;
+      case 404:
+        setErrorMessage('The student or course was not found. Please contact support.');
+        setIsErrorModalVisible(true);
+        break;
       case 201:
         setIsEnrolled(true);
-        
         break;
       default:
         break;
@@ -105,7 +108,31 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
 
   const unenrollStudent = async() => {
     setIsConfirmationModalVisible(false);
-    console.log('unenrolling student');
+
+    if(!isSignedIn) {
+      setErrorMessage("Please log in to unenroll from a course!")
+      setIsErrorModalVisible(true);
+      return
+    }
+
+    const response = await UnenrollStudentByClerkId(user.id, course.courseId as Number);
+
+    switch (response.status) {
+      case 500:
+        setErrorMessage('An error occurred while unenrolling from the course, please contact support.');
+        setIsErrorModalVisible(true);
+        break;
+      case 404:
+        setErrorMessage('The student or course was not found. Please contact support.');
+        setIsErrorModalVisible(true);
+        break;
+      case 200:
+        setIsEnrolled(false);
+        break;
+      default:
+        break;
+    }
+    
   }
 
   return (

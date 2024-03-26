@@ -84,6 +84,16 @@ export async function EnrollStudentByClerkId(clerkId: String, courseId: Number){
     }
 }
 
+export async function UnenrollStudentByClerkId(clerkId: String, courseId: Number){
+    try {
+        const response = await axiosInstance.delete(`Course/UnenrollStudentByClerkId/${clerkId}/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error enrolling student:', error);
+        return error.response;
+    }
+}
+
 export async function DeleteCourseById(courseId: Number) {
     try {
         const response = await axiosInstance.delete(`Course/DeleteCourseById/${courseId}`);
