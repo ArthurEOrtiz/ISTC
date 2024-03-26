@@ -113,6 +113,57 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetUserEnrolledCoursesById/{userId}")]
+		public async Task<ActionResult<List<Course>>> GetUserEnrolledCoursesById(int userId)
+		{
+			try
+			{
+				var user = await _educationProgramContext.Users
+					.Include(u => u.Student)
+					.ThenInclude(s => s!.Attendances ) 
+					.FirstOrDefaultAsync(u => u.UserId == userId);
+
+				if (user == null)
+				{
+					_logger.LogError("GetUserEnrolledCoursesById/({UserId})", userId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				var classes = user.Student?.Attendances!
+					.Select(a => a.Class)
+					.GroupBy(c => c.CourseId)
+					.Select(g => g.First())
+					.ToList() ?? new List<Class> ();
+				
+				List<Course> courses = new();
+
+				if (classes.Count == 0)
+				{
+					return courses;
+				}
+
+				foreach (var @class in classes)
+				{
+					var course = await _educationProgramContext.Courses
+						.Include(c => c.Classes)
+						.Include(c => c.Location)
+						.Include(c => c.Topics)
+						.FirstOrDefaultAsync(c => c.CourseId == @class.CourseId);
+					if (course != null)
+					{
+						courses.Add(course);
+					}
+				}
+
+				return courses;
+
+			}
+			catch (Exception ex)
+			{
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 		[HttpGet("GetCoursesByDateRange")]
 		public async Task<ActionResult<List<Course>>> GetCoursesByDateRange(DateTime startDate, DateTime endDate)
 		{
@@ -249,6 +300,27 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Enrolls a student in a course based on the clerk ID and course ID.
+		/// </summary>
+		/// <param name="clerkId">The clerk ID of the user performing the enrollment.</param>
+		/// <param name="courseId">The ID of the course in which the student will be enrolled.</param>
+		/// <returns>
+		///   <list type="bullet">
+		///     <item>
+		///       <description>201 Created: The student was successfully enrolled in the course.</description>
+		///     </item>
+		///     <item>
+		///       <description>404 Not Found: If the specified course, user, or student is not found.</description>
+		///     </item>
+		///     <item>
+		///       <description>409 Conflict: If the student is already enrolled in the course.</description>
+		///     </item>
+		///     <item>
+		///       <description>500 Internal Server Error: If an unexpected error occurs during the enrollment process.</description>
+		///     </item>
+		///   </list>
+		/// </returns>
 		[HttpPost("EnrollStudentByClerkId/{clerkId}/{courseId}")]
 		public async Task<ActionResult> EnrollStudentToCourse(string clerkId, int courseId)
 		{

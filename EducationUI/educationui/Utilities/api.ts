@@ -283,3 +283,14 @@ export async function DeleteUserById(userId: Number) {
     }
 }
 
+//Student
+
+export async function GetStudentAttendanceById(studentId: Number) {
+    try {
+        const response = await axiosInstance.get(`Student/GetStudentAttendanceById/${studentId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching student attendance:', error);
+        throw error.message;
+    }
+}
