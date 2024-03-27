@@ -34,6 +34,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
 
     const router = useRouter();
     const { user: clerkUser } = useUser(); 
+    console.log(clerkUser);
    
 
     useEffect(() => {
@@ -178,6 +179,15 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         }
     }
 
+    const isUserAdmin = () => {
+        if (!clerkUser) {
+            return false;
+        }
+        const isAdmin = clerkUser.publicMetadata.isAdmin;
+        return isAdmin as boolean;
+    }
+    
+
     // Render
     if (!user) {
         return <Loading />
@@ -272,6 +282,24 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                                         </ul>
                                     </details>    
                                 </ul>
+                                {isUserAdmin() && (
+                                <ul>
+                                    <details open>
+                                        <summary className='text-lg mt-2'>Admin</summary>
+                                        <ul className='space-y-2 mt-1'>
+                                            <li>
+                                                <button
+                                                    className="btn btn-primary text-white w-full"
+                                                    onClick={() => router.push('/admin')}
+                                                    >
+                                                        Admin Dashboard
+                                                </button>
+                                            </li>
+
+                                        </ul>
+                                    </details>
+                                </ul>
+                                )}
                             </ul>
                         </div>
                     </div>

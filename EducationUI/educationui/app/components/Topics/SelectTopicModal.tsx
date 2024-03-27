@@ -51,7 +51,7 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${open ? "" : "hidden"}`}>
             <div className="absolute inset-0 bg-black opacity-50"></div>
 
-            <div className="bg-white p-8 rounded-lg z-50">
+            <div className="bg-base-100 p-8 rounded-lg z-50">
 
                 <h2 className="text-xl font-semibold mb-4">Select Topics</h2>
                 
@@ -80,8 +80,8 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
                     </>
                 )}
                 <div className="flex justify-between">
-                    <button onClick={handleSelect} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">Select</button>
-                    <button onClick={onClose} className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
+                    <button onClick={handleSelect} className="btn btn-primary text-white px-4 py-2 mr-2">Select</button>
+                    <button onClick={onClose} className="btn btn-ghost dark:text-white px-4 py-2">Cancel</button>
                 </div>
             </div>
         </div>

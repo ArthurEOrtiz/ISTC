@@ -12,7 +12,6 @@ const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
     const [ showErrorModal, setShowErrorModal ] = useState(false);
     const [ errorMessage, setErrorMessage ] = useState('');
     const [ courses, setCourses ] = useState<Course[]>([]);
-    console.log(courses);
 
     useEffect(() => {
         const fetchUserAttendance = async () => {

@@ -178,8 +178,13 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
           <button 
             className="btn btn-primary text-white"
             onClick={(onEdit && (() => onEdit(course)))}>
-              Edit
+              Edit Course
             </button>
+            <button
+              className='btn btn-secondary text-white'
+              >
+                Track Attendance
+              </button>
         </div>
       )}
 

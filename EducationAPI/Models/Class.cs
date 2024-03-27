@@ -22,7 +22,7 @@ namespace EducationAPI.Models
 
 		public DateTime ScheduleEnd { get; set; }
 
-		[JsonIgnore]
+		
 		public virtual ICollection<Attendance> Attendances { get; set; }
 	}
 }

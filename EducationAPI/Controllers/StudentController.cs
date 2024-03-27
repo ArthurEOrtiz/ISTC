@@ -19,6 +19,32 @@ namespace EducationAPI.Controllers
 			_logger = logger;
 		}
 
+		[HttpGet("GetStudentById/{studentId}")]
+		public async Task<ActionResult<Student>> GetStudentById(int studentId)
+		{
+			try
+			{
+				var student = await _educationProgramContext.Students
+					.Include(s => s.Attendances)
+						.ThenInclude(a => a.Class)
+					.FirstOrDefaultAsync(s => s.StudentId == studentId);
+
+				if (student == null)
+				{
+					_logger.LogError("GetStudentById({StudentId}) student not found", studentId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_logger.LogInformation("GetStudentById({StudentId}) called", studentId);
+				return student;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetStudentById({StudentId})", studentId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 		[HttpGet("GetStudentAttendanceById/{studentId}")]
 		public async Task<ActionResult<List<Attendance>>> GetStudentAttendanceById(int studentId)
 		{
@@ -26,6 +52,7 @@ namespace EducationAPI.Controllers
 			{
 				var student = await _educationProgramContext.Students
 					.Include(s => s.Attendances)
+						.ThenInclude(a => a.Class)
 					.FirstOrDefaultAsync(s => s.StudentId == studentId);
 
 				if (student == null)

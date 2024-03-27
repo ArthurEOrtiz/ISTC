@@ -85,50 +85,50 @@ const NewClass: React.FC<NewClassProps> = ({scheduleStart, scheduleEnd,  onDelet
     }
 
     return (
-        <div className="bg-white shadow-md rounded-md p-4 relative">
+        <div className="bg-base-100 shadow-md rounded-xl p-4 relative">
             <button
-                className="absolute top-0 right-0 mr-2 mt-1 bg-red-500 text-white px-2 py-1 rounded"
+                className="absolute top-0 right-0 mr-2 mt-1 bg-red-500 text-white px-2 py-1 rounded-full font-bold"
                 onClick={handleRemoveClick}
             >
-                Remove
+                x
             </button>
             <div className="flex flex-wrap -mx-3 mb-6">
                 <div className="w-full px-3 mb-6 md:w-1/3 md:mb-0">
-                    <label htmlFor="classDate" className="block text-gray-700 text-sm font-bold mb-2">
+                    <label htmlFor="classDate" className="block  text-sm font-bold mb-2">
                         Class Date
                     </label>
                     <input
                         type="date"
                         name="classDate"
                         id="classDate"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                         defaultValue={classDate}
                         onChange= {handleClassDateChange}
                         min={new Date().toISOString().split('T')[0]}
                     />
                 </div>
                 <div className="w-full px-3 mb-6 md:w-1/3 md:mb-0">
-                    <label htmlFor="startTime" className="block text-gray-700 text-sm font-bold mb-2">
+                    <label htmlFor="startTime" className="block  text-sm font-bold mb-2">
                         Start Time
                     </label>
                     <input
                         type="time"
                         name="startTime"
                         id="startTime"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                         defaultValue={start}
                         onChange={handleStartTimeChange}
                     />
                 </div>
                 <div className="w-full px-3 mb-6 md:w-1/3 md:mb-0">
-                    <label htmlFor="endTime" className="block text-gray-700 text-sm font-bold mb-2">
+                    <label htmlFor="endTime" className="block  text-sm font-bold mb-2">
                         End Time
                     </label>
                     <input
                         type="time"
                         name="endTime"
                         id="endTime"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                         defaultValue={end}
                         onChange = {handleEndTimeChange}
                     />

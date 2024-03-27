@@ -229,7 +229,6 @@ namespace EducationAPI.Controllers
 			}
 		}
 
-
 		/// <summary>
 		/// Gives the end user the ability to add a Course record to the database.
 		/// </summary>
