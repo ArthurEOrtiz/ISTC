@@ -54,6 +54,16 @@ export async function getCoursesByDateRange(startDate: string, endDate: string) 
     }
 }
 
+export async function GetUserEnrolledCoursesById(studentId: Number) {
+    try {
+        const response = await axiosInstance.get(`Course/GetUserEnrolledCoursesById/${studentId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching courses:', error);
+        return error.message;
+    }
+}
+
 export async function postCourse(course: Course) {
     try {
         const response = await axiosInstance.post('Course/PostCourse', course);

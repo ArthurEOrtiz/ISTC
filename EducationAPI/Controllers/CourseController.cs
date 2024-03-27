@@ -113,12 +113,32 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Retrieves a list of courses enrolled by a user identified by the specified user ID.
+		/// </summary>
+		/// <param name="userId">The ID of the user whose enrolled courses are to be retrieved. <see cref="User.UserId"/></param>
+		/// <returns>
+		/// <list type="bullet">
+		///   <item>
+		///     <description>200 OK: A list of Course objects representing the courses enrolled by the user.</description>
+		///   </item>
+		///   <item>
+		///     <description>404 Not Found: If the specified user is not found.</description>
+		///   </item>
+		///   <item>
+		///     <description>500 Internal Server Error: If an unexpected error occurs during the retrieval process.</description>
+		///   </item>
+		/// </list>
+		/// </returns>
 		[HttpGet("GetUserEnrolledCoursesById/{userId}")]
 		public async Task<ActionResult<List<Course>>> GetUserEnrolledCoursesById(int userId)
 		{
 			try
 			{
 				var user = await _educationProgramContext.Users
+					.Include(u => u.Student)
+						.ThenInclude(s => s.Attendances)
+							.ThenInclude(a => a.Class)
 					.FirstOrDefaultAsync(u => u.UserId == userId);
 
 				if (user == null)
@@ -137,6 +157,7 @@ namespace EducationAPI.Controllers
 
 				if (classes.Count == 0)
 				{
+					_logger.LogInformation("GetUserEnrolledCoursesById/({UserId}), called", userId);
 					return courses;
 				}
 
@@ -153,7 +174,7 @@ namespace EducationAPI.Controllers
 					}
 				}
 
-				
+				_logger.LogInformation("GetUserEnrolledCoursesById/({UserId}), called", userId);
 				return courses;
 
 			}
@@ -501,7 +522,6 @@ namespace EducationAPI.Controllers
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
-
 
 	}
 }

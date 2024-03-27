@@ -121,7 +121,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         }
     }
 
-    const handleModalConfirm = async() => {
+    const handleModalConfirm = () => {
         setShowConfirmationModal(false);
         if (confirmationModalTitle === 'Delete Account') {
             deleteAccount();
