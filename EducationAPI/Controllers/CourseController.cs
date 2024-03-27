@@ -119,8 +119,6 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var user = await _educationProgramContext.Users
-					.Include(u => u.Student)
-					.ThenInclude(s => s!.Attendances ) 
 					.FirstOrDefaultAsync(u => u.UserId == userId);
 
 				if (user == null)
@@ -129,11 +127,11 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				var classes = user.Student?.Attendances!
+				var classes = user.Student.Attendances
 					.Select(a => a.Class)
 					.GroupBy(c => c.CourseId)
 					.Select(g => g.First())
-					.ToList() ?? new List<Class> ();
+					.ToList();
 				
 				List<Course> courses = new();
 
@@ -155,11 +153,13 @@ namespace EducationAPI.Controllers
 					}
 				}
 
+				
 				return courses;
 
 			}
 			catch (Exception ex)
 			{
+				_logger.LogError(ex,"GetUserEnrolledCoursesById/({UserId})", userId);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}

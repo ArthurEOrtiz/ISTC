@@ -283,7 +283,7 @@ export async function DeleteUserById(userId: Number) {
     }
 }
 
-//Student
+//Students
 
 export async function GetStudentAttendanceById(studentId: Number) {
     try {
