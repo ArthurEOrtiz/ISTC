@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Course } from '@/app/shared/types/sharedTypes';
 import CourseCard from './EditCourseCard';
 import { useRouter } from 'next/navigation';
+import AttendanceModal from '../Attendance/AttendanceModal';
 
 interface CourseListProps {
     courses: Course[];
@@ -11,12 +12,9 @@ interface CourseListProps {
 
 const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
     const [courseList , setCourseList] = React.useState<Course[]>(courses);
+    const [course, setCourse] = React.useState<Course | null>(null);
     const [searchString , setSearchString] = React.useState<string>('');
     const router = useRouter();
-
-    const handleOnEdit = (course: Course): void  => {
-        router.push(`/admin/editcourse/edit/course/${course.courseId}`);
-    }
 
     useEffect(() => {
         if(searchString.length > 0){
@@ -31,6 +29,14 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
             setCourseList(courses);
         }
     }, [searchString]);
+
+    const handleOnEdit = (course: Course): void  => {
+        router.push(`/admin/editcourse/edit/course/${course.courseId}`);
+    }
+
+    const handleOnAttendance = (course: Course): void => {
+        setCourse(course);
+    }
 
     return (
         <div>
@@ -60,12 +66,23 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
                         <CourseCard 
                             course={course} 
                             onEdit={handleOnEdit} 
+                            onAttendance={handleOnAttendance}
                             viewOnly={viewOnly}
                         />
 
                     </div>
                 ))}
             </div>
+
+            {course && (
+                <AttendanceModal 
+                    course={course}
+                    isOpen={true}
+                    onExit={() => setCourse(null)}
+                />
+            
+            )}
+
         </div>
     );
 }

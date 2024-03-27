@@ -128,6 +128,16 @@ export async function AddClassByCourseId(courseId: Number, scheduleStart: Date, 
     }
 }
 
+export async function GetClassesByCourseId(courseId: Number) {
+    try {
+        const response = await axiosInstance.get(`Class/GetClassesByCourseId/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching classes:', error);
+        return error.message;
+    }
+}
+
 export async function EditClassById (classId: Number, scheduleStart: Date, scheduleEnd: Date) {
     try {
         const url = `Class/EditClassById?id=${classId}&newScheduleStart=${scheduleStart}&newScheduleStop=${scheduleEnd}`;

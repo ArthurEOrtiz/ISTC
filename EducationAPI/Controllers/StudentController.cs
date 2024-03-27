@@ -45,6 +45,7 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+
 		[HttpGet("GetStudentAttendanceById/{studentId}")]
 		public async Task<ActionResult<List<Attendance>>> GetStudentAttendanceById(int studentId)
 		{

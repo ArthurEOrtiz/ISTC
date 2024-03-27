@@ -11,9 +11,10 @@ interface CourseCardProps {
   course: Course;
   onEdit?: (course: Course) => void; 
   viewOnly?: boolean;
+  onAttendance?: (course: Course) => void;
 }
 
-const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
+const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, viewOnly}) => {
   const { isSignedIn, user } = useUser();
   const [ isConfirmationModalVisible, setIsConfirmationModalVisible ] = useState(false);
   const [ confirmationMessage, setConfirmationMessage ] = useState(''); 
@@ -182,6 +183,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, viewOnly}) => {
             </button>
             <button
               className='btn btn-secondary text-white'
+              onClick={(onAttendance && (() => onAttendance(course)))}
               >
                 Track Attendance
               </button>

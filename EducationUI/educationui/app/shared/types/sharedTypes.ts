@@ -11,7 +11,7 @@ export interface Location {
     postalCode: string;
   }
   
-export interface ClassSchedule {
+export interface Class {
     classId: number | null;
     courseId: number | null;
     scheduleStart: Date;
@@ -33,7 +33,7 @@ export interface Course {
     locationId: number | null;
     location: Location;
     topics: Topic[] | null;
-    classes: ClassSchedule[];
+    classes: Class[];
   }
   
   export interface Topic {
