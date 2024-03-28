@@ -38,6 +38,13 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({ course, isOpen, onExi
         onExit();
     }
 
+    const handleClassAttendaceCardError = (message: string | null) => {
+        if (message !== null){
+            setErrorMessage(message);
+            setIsErrorModalVisible(true);
+        }
+    }
+
     return (
         
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${isOpen ? 'block' : 'hidden'}`}>
@@ -65,6 +72,7 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({ course, isOpen, onExi
                                 return (
                                     <div key={index} >
                                         <ClassAttendanceCard
+                                            errorMessage={(message: string | null) => handleClassAttendaceCardError(message)}
                                             class={classItem}
                                         />
       

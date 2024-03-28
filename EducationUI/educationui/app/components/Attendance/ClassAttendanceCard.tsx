@@ -1,27 +1,27 @@
-import { Attendance, Class, Student, User } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, User } from "@/app/shared/types/sharedTypes";
 import { GetUserByStudentId, UpdateAttendanceById } from "@/Utilities/api";
 import { useEffect, useState } from "react";
 
 interface ClassAttendanceCardProps {
     class: Class;
+    errorMessage: (message: string | null) => void;
 }
 
-const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls}) => {
+const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, errorMessage}) => {
     const [ attendances, setAttendances ] = useState<Attendance[]>(cls.attendances);
     const [ users , setUsers ] = useState<User[]>([]);
-    const [ errorMessage, setErrorMessage ] = useState('');
-    const [ isErrorModalVisible, setIsErrorModalVisible ] = useState(false);
+
+
 
     useEffect(() => {
         const fetchUsers = async () => {
             if (attendances && attendances.length > 0){
                 const promises = attendances.map(async (attendance) => {
                     const response = await GetUserByStudentId(attendance.studentId);
-                    if (response.status == 200){
+                    if (response.status === 200){
                         return response.data;
                     } else {
-                        setErrorMessage(response.data);
-                        setIsErrorModalVisible(true);
+                        errorMessage(response);
                         return;
                     }
                 });
@@ -33,8 +33,6 @@ const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls})
         
     }, [cls.attendances]);
     
-   //console.log("User\n",users);  
-   console.log("Attendance\n",attendances);
 
    const HandleAttendanceChange = (studentId: number, attended: boolean) => {
         const updatedAttendances = attendances.map((attendance) => {
@@ -67,9 +65,8 @@ const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls})
         if (response.status === 200){
             console.log("Attendance updated");
         } else {
-            console.log("Error", response);
-            setErrorMessage(response);
-            setIsErrorModalVisible(true);
+           
+            errorMessage(response)
         }
     }
     
