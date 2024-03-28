@@ -72,6 +72,60 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpPut("UpdateAttendanceCreditsById/{attendanceId}")]
+		public async Task<ActionResult> UpdateAttendanceCreditsById(int attendanceId)
+		{
+			try
+			{
+				var attendance = await _educationProgramContext.Attendances
+					.Include(a => a.Student)
+					.FirstOrDefaultAsync(a => a.AttendanceId == attendanceId);
+
+				if (attendance == null)
+				{
+					_logger.LogError("UpdateAttendanceCreditsById({attendanceId}), attendance not found", attendanceId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				var course = await _educationProgramContext.Courses
+					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
+					.FirstOrDefaultAsync(c => c.Classes.Single().ClassId == attendance.ClassId);
+
+				if (course == null)
+				{
+					_logger.LogError("UpdateAttendanceCreditsById({attendanceId}), course not found", attendanceId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				int classCount = 0;
+				int attended = 0;
+				foreach ( var @class in course.Classes )
+				{
+					classCount++;
+					foreach ( var att in  @class.Attendances )
+					{
+						if (att.AttendanceId == attendanceId && att.Attended)
+						{
+							attended++;
+						}
+					}
+				}
+				
+			
+				if (classCount == attended)
+				{
+					attendance.Student.AccumulatedCredit += course.AttendanceCredit;
+				}
+
+
+				return new StatusCodeResult((int)HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
 
 	}
 }
