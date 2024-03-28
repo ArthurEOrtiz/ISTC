@@ -94,35 +94,28 @@ namespace EducationAPI.Controllers
 			}
 		}
 
-		[HttpGet("GetStudentIdByClerkId/{ClerkId}")]
-		public async Task<ActionResult<int>> GetStudentIdByClerkId(string clerkId)
+		[HttpGet("GetUserByStudentId/{studentId}")]
+		public async Task<ActionResult<User>> GetUserByStudentId(int studentId)
 		{
 			try
 			{
 				var user = await _educationProgramContext.Users
 					.Include(u => u.Student)
-					.FirstOrDefaultAsync();
+						.ThenInclude(s => s.Attendances)
+					.FirstOrDefaultAsync(u => u.Student.StudentId == studentId);
 
 				if (user == null)
 				{
-					_logger.LogError("GetStudentByClerkId({ClerkID}), user not found!", clerkId);
+					_logger.LogError("GetUserByStudentId({StudentId}), user not found.", studentId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				if (user.Student != null)
-				{
-					_logger.LogInformation("GetStudentByClerkId({ClerkID}) called", clerkId);
-					return user.Student.StudentId;
-				}
-				else
-				{
-					_logger.LogError("GetStudentByClerkId({ClerkID}), student not found!", clerkId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
-				}
+				_logger.LogInformation("GetUserByStudentId({StudentId}), called.", studentId);
+				return user;
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "GetStudentByClerkId({ClerkID})", clerkId);
+				_logger.LogError(ex, "GetUserByStudentId({StudentId})", studentId);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}

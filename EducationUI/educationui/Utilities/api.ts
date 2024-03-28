@@ -13,6 +13,17 @@ const axiosInstance = axios.create({
     },
 });
 
+// Attendance
+export async function UpdateAttendanceById(attendanceId: Number, attended: Boolean) {
+    try {
+        const response = await axiosInstance.put(`Attendance/UpdateAttendanceById/${attendanceId}/${attended}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error updating attendance:', error);
+        return error.message;
+    }
+}
+
 // Courses 
 export async function getAllCourses() {
     try {
@@ -283,13 +294,13 @@ export async function IsUserEnrolledInCourse(clerkId: String, courseId: Number) 
     }
 }
 
-export async function getStudentIdByClerkId(clerkId: String) {
+export async function GetUserByStudentId(studentId: Number) {
     try {
-        const response = await axiosInstance.get(`User/GetStudentIdByClerkId/${clerkId}`);
+        const response = await axiosInstance.get(`User/GetUserByStudentId/${studentId}`);
         return response;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching user:', error);
-        throw error;
+        return error.message;
     }
 }
 
@@ -311,6 +322,16 @@ export async function GetStudentAttendanceById(studentId: Number) {
         return response;
     } catch (error: any) {
         console.error('Error fetching student attendance:', error);
+        throw error.message;
+    }
+}
+
+export async function getStudentIdByClerkId(clerkId: String) {
+    try {
+        const response = await axiosInstance.get(`Student/GetStudentIdByClerkId/${clerkId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching user:', error);
         throw error.message;
     }
 }

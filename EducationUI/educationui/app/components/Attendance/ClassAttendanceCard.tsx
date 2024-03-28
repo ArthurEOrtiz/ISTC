@@ -1,17 +1,109 @@
-import { Class } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, Student, User } from "@/app/shared/types/sharedTypes";
+import { GetUserByStudentId, UpdateAttendanceById } from "@/Utilities/api";
+import { useEffect, useState } from "react";
 
 interface ClassAttendanceCardProps {
     class: Class;
 }
 
 const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls}) => {
+    const [ attendances, setAttendances ] = useState<Attendance[]>(cls.attendances);
+    const [ users , setUsers ] = useState<User[]>([]);
+    const [ errorMessage, setErrorMessage ] = useState('');
+    const [ isErrorModalVisible, setIsErrorModalVisible ] = useState(false);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            if (attendances && attendances.length > 0){
+                const promises = attendances.map(async (attendance) => {
+                    const response = await GetUserByStudentId(attendance.studentId);
+                    if (response.status == 200){
+                        return response.data;
+                    } else {
+                        setErrorMessage(response.data);
+                        setIsErrorModalVisible(true);
+                        return;
+                    }
+                });
+                const users = await Promise.all(promises);
+                setUsers(users);
+            }
+        };
+        fetchUsers();
+        
+    }, [cls.attendances]);
+    
+   //console.log("User\n",users);  
+   console.log("Attendance\n",attendances);
+
+   const HandleAttendanceChange = (studentId: number, attended: boolean) => {
+        const updatedAttendances = attendances.map((attendance) => {
+            if (attendance.studentId === studentId){
+                return {
+                    ...attendance,
+                    attended
+                }
+            }
+            return attendance;
+        });
+        setAttendances(updatedAttendances);
+    }
+
+    const HandleSaveAttendance = () => {
+        attendances.map((attendance) => {
+                updateAttendance(attendance);
+            }
+        );
+    }
+
+
+   const hasUserAttended = (studentId: number): boolean => {
+         const attendance = attendances.find((attendance) => attendance.studentId === studentId);
+         return attendance?.attended || false;
+    }
+
+    const updateAttendance = async (attendance: Attendance) => {
+        const response = await UpdateAttendanceById(attendance.attendanceId, attendance.attended);
+        if (response.status === 200){
+            console.log("Attendance updated");
+        } else {
+            console.log("Error", response);
+            setErrorMessage(response);
+            setIsErrorModalVisible(true);
+        }
+    }
+    
     return (
         <div className="card bg-base-200 shadow-xl w-full">
             <div className="card-body">
                 <h2 className="card-title">{new Date(cls.scheduleStart).toLocaleDateString()}</h2>
-                <p>If a dog chews shoes whose shoes does he choose?</p>
+                {users && (
+                    <div className='space-y-0'>
+                        {users.map((user, index) => (
+                            <div key={index} className="flex">
+                                <label className="label cursor-pointer">
+                                    <input 
+                                        type="checkbox"
+                                        className="checkbox mr-2"
+                                        defaultChecked={hasUserAttended(user.student?.studentId as number)}
+                                        onChange={(e) => {HandleAttendanceChange(user.student?.studentId as number, e.target.checked)}}
+                                        
+                                    />
+                                    <span className="label-text">{user.firstName} {user.lastName}</span>
+                                    
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                            
                 <div className="card-actions justify-end">
-                <button className="btn btn-primary">Buy Now</button>
+                    <button 
+                        className="btn btn-primary text-white"
+                        onClick={HandleSaveAttendance}
+                        >
+                            Save Attendance
+                    </button>
                 </div>
             </div>
         </div>
