@@ -34,7 +34,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit}) => {
                     accumulatedCredit: 0,
                     appraisalCertified: false,
                     mappingCertified: false,
-                    attendances: null
+                    attendances: []
                 },
                 contact: {
                     contactId: 0,

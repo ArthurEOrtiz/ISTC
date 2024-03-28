@@ -73,6 +73,33 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetClassesByCourseId/{courseId}")]
+		public async Task<ActionResult<List<Class>>> GetClassesByCourseId(int courseId)
+		{
+			try
+			{
+				var course = await _educationProgramContext.Courses
+					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
+							.ThenInclude(a => a.Student)
+					.FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+				if (course == null)
+				{
+					_logger.LogError("GetClassesByCourseId({CourseId}), course not found", courseId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_logger.LogInformation("GetClassesByCourseId({CourseId}) called", courseId);
+				return course.Classes.ToList();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex,"GetClassesByCourseId({CourseId})", courseId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 
 		/// <summary>
 		/// Allows you to change the Schedule Start and Schedule Stop properties of a class. 

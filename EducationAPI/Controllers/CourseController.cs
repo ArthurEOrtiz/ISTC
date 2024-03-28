@@ -113,6 +113,23 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Retrieves a list of courses enrolled by a user identified by the specified user ID.
+		/// </summary>
+		/// <param name="userId">The ID of the user whose enrolled courses are to be retrieved. <see cref="User.UserId"/></param>
+		/// <returns>
+		/// <list type="bullet">
+		///   <item>
+		///     <description>200 OK: A list of Course objects representing the courses enrolled by the user.</description>
+		///   </item>
+		///   <item>
+		///     <description>404 Not Found: If the specified user is not found.</description>
+		///   </item>
+		///   <item>
+		///     <description>500 Internal Server Error: If an unexpected error occurs during the retrieval process.</description>
+		///   </item>
+		/// </list>
+		/// </returns>
 		[HttpGet("GetUserEnrolledCoursesById/{userId}")]
 		public async Task<ActionResult<List<Course>>> GetUserEnrolledCoursesById(int userId)
 		{
@@ -120,7 +137,8 @@ namespace EducationAPI.Controllers
 			{
 				var user = await _educationProgramContext.Users
 					.Include(u => u.Student)
-					.ThenInclude(s => s!.Attendances ) 
+						.ThenInclude(s => s.Attendances)
+							.ThenInclude(a => a.Class)
 					.FirstOrDefaultAsync(u => u.UserId == userId);
 
 				if (user == null)
@@ -129,16 +147,17 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				var classes = user.Student?.Attendances!
+				var classes = user.Student.Attendances
 					.Select(a => a.Class)
 					.GroupBy(c => c.CourseId)
 					.Select(g => g.First())
-					.ToList() ?? new List<Class> ();
+					.ToList();
 				
 				List<Course> courses = new();
 
 				if (classes.Count == 0)
 				{
+					_logger.LogInformation("GetUserEnrolledCoursesById/({UserId}), called", userId);
 					return courses;
 				}
 
@@ -155,11 +174,13 @@ namespace EducationAPI.Controllers
 					}
 				}
 
+				_logger.LogInformation("GetUserEnrolledCoursesById/({UserId}), called", userId);
 				return courses;
 
 			}
 			catch (Exception ex)
 			{
+				_logger.LogError(ex,"GetUserEnrolledCoursesById/({UserId})", userId);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
@@ -207,7 +228,6 @@ namespace EducationAPI.Controllers
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
-
 
 		/// <summary>
 		/// Gives the end user the ability to add a Course record to the database.
@@ -501,7 +521,6 @@ namespace EducationAPI.Controllers
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
-
 
 	}
 }

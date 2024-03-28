@@ -1,14 +1,17 @@
-import { User } from "@/app/shared/types/sharedTypes";
-import { GetStudentAttendanceById } from "@/Utilities/api";
+import ErrorModal from "@/app/shared/modals/ErrorModal";
+import { Course, User } from "@/app/shared/types/sharedTypes";
+import { GetUserEnrolledCoursesById } from "@/Utilities/api";
 import React, { useEffect, useState } from "react";
+import CourseCard from "../Course/EditCourseCard";
 
 interface UserEnrolledCoursesProps {
     user: User;
 }
 
 const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
-    const [ classes, setClasses ] = useState([]);
-    console.log(classes);
+    const [ showErrorModal, setShowErrorModal ] = useState(false);
+    const [ errorMessage, setErrorMessage ] = useState('');
+    const [ courses, setCourses ] = useState<Course[]>([]);
 
     useEffect(() => {
         const fetchUserAttendance = async () => {
@@ -17,14 +20,14 @@ const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
                 //TODO: Handle error  
                 return;  
             }
-            const response = await GetStudentAttendanceById(studentId);
+            const response = await GetUserEnrolledCoursesById(studentId);
             switch (response.status) {
                 case 200:
-                    setClasses(response.data);
-                    
+                    setCourses(response.data);
                     break;
                 case 404:
-                    console.log('No attendance found');
+                    setErrorMessage('There was an error finding courses for this user.');
+                    setShowErrorModal(true);
                     break;
                 default:
                     break;
@@ -36,8 +39,42 @@ const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
 
     return (
         <div className='bg-base-100 shadow-md rounded-xl p-4 w-full'>
-            <h1 className='text-2xl text-center font-bold'>Enrolled Courses</h1>
+            <div >
+                <h1 className='text-2xl text-center font-bold mb-2'>Enrolled Courses</h1>
+            </div>
+
+            <div className='space-y-4'>
+                {courses.length > 0 ? (
+                    courses.map((course: Course, index) => (
+                        <div
+                            key={index}
+                            className='card w-full bg-base-300 shadow-xl'
+                        >
+                            <CourseCard
+                                course={course}
+                                viewOnly={true}
+                            />
+                        </div> 
+                    ))
+                ) : (
+                    <div className='card w-full bg-base-100 shadow-xl'>
+                        <p className='text-center p-4'>No courses found.</p>
+                    </div>
+                )}
+
+            </div>
+
+            {showErrorModal && (
+                <ErrorModal
+                    title='Error'
+                    message={errorMessage}
+                    onClose={() => setShowErrorModal(false)}
+                />
+            )}                          
+
         </div>
+        
+
     );
 }
 

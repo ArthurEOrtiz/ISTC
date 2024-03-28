@@ -215,17 +215,17 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form onSubmit={handleSubmit} className="bg-base-100 shadow-md rounded px-8 pt-6 pb-8 mb-4">
 
             <div className="mb-4">
                 <label
-                    className="block text-gray-700 text-sm font-bold mb-2"
+                    className="block text-sm font-bold mb-2"
                     htmlFor="title"
                 >
                     Title
                 </label>
                 <input
-                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!istitleValid && titleTouched? 'border-red-500' : ''}`}
+                    className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!istitleValid && titleTouched? 'border-red-500' : ''}`}
                     id="title"
                     type="text"
                     placeholder="Title"
@@ -239,13 +239,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
             <div className="mb-4">
                 <label
-                    className="block text-gray-700 text-sm font-bold mb-2"
+                    className="block text-sm font-bold mb-2"
                     htmlFor="description"
                 >
                     Course Description
                 </label>
                 <textarea
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                     id="description"
                     placeholder="Optional"
                     value = {course.description}
@@ -259,13 +259,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pr-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="instructorName"
                         >
                         Instructor Name
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isInstructorNameValid && instructorNameTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isInstructorNameValid && instructorNameTouched ? 'border-red-500' : ''}`}
                         id="instructorName"
                         type="text"
                         placeholder="John Doe"
@@ -279,13 +279,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="instructorEmail"
                     >
                         Instructor Email
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isEmailValid && emailTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isEmailValid && emailTouched ? 'border-red-500' : ''}`}
                         id="instructorEmail"
                         type="email"
                         placeholder="valid@Email.com"
@@ -302,13 +302,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pr-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="attendanceCredit"
                         >
                         Attendance Credit
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isAttendanceCreditValid && attendanceCreditTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isAttendanceCreditValid && attendanceCreditTouched ? 'border-red-500' : ''}`}
                         id="attendanceCredit"
                         type="text"
                         onInput={handleCreditInput}
@@ -322,13 +322,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block  text-sm font-bold mb-2"
                         htmlFor="completionCredit"
                     >
                         Completion Credit
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isCompletionCreditValid && completionCreditTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isCompletionCreditValid && completionCreditTouched ? 'border-red-500' : ''}`}
                         id="completionCredit"
                         type="text"
                         onInput={handleCreditInput}
@@ -342,13 +342,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block  text-sm font-bold mb-2"
                         htmlFor="maxAttendance"
                     >
                         Max Attendance
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isMaxAttendanceValid && maxAttendanceTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isMaxAttendanceValid && maxAttendanceTouched ? 'border-red-500' : ''}`}
                         id="maxAttendance"
                         type="text"
                         onInput={handleMaxAttendanceInput}
@@ -365,13 +365,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                 
                 <div className="mb-4 w-1/2 pr-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block  text-sm font-bold mb-2"
                         htmlFor="enrollmentDeadline"
                     >
                         Enrollment Deadline
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isEnrollmentDeadlineValid && enrollmentDeadlineTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isEnrollmentDeadlineValid && enrollmentDeadlineTouched ? 'border-red-500' : ''}`}
                         id="enrollmentDeadline"
                         min = {new Date().toISOString().split('T')[0]}
                         type="date"
@@ -384,13 +384,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block  text-sm font-bold mb-2"
                         htmlFor="pdf"
                     >
                         PDF
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                         id="pdf"
                         type="text"
                         placeholder='PDF URL, Optional'
@@ -403,13 +403,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
             <div className="mb-4">
                 <label
-                    className="block text-gray-700 text-sm font-bold mb-2"
+                    className="block  text-sm font-bold mb-2"
                     htmlFor="location.description"
                 >
                     Location Description
                 </label>
                 <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                     id="location.description"
                     type="text"
                     placeholder="Optional"
@@ -423,13 +423,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pr-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block  text-sm font-bold mb-2"
                         htmlFor="location.room"
                         >
                         Room
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                         id="location.room"
                         type="text"
                         placeholder="Optional"
@@ -441,13 +441,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block  text-sm font-bold mb-2"
                         htmlFor="location.remoteLink"
                     >
                         Remote Link
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                         id="location.remoteLink"
                         type="url"
                         placeholder="https://zoom.us/j/1234567890?pwd=abc123"
@@ -460,13 +460,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
             <div className="mb-4">
                 <label
-                    className="block text-gray-700 text-sm font-bold mb-2"
+                    className="block  text-sm font-bold mb-2"
                     htmlFor="location.addressLine1"
                 >
                     Address Line 1
                 </label>
                 <input
-                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isAddressLine1Valid && addressLine1Touched ? 'border-red-500' : ''}`}
+                    className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isAddressLine1Valid && addressLine1Touched ? 'border-red-500' : ''}`}
                     id="location.addressLine1"
                     type="text"
                     placeholder="123 Main St"
@@ -480,13 +480,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
             <div className="mb-4">
                 <label
-                    className="block text-gray-700 text-sm font-bold mb-2"
+                    className="block  text-sm font-bold mb-2"
                     htmlFor="location.addressLine2"
                 >
                     Address Line 2
                 </label>
                 <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
+                    className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline "
                     id="location.addressLine2"
                     type="text"
                     placeholder="Optional"
@@ -500,13 +500,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pr-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block  text-sm font-bold mb-2"
                         htmlFor="location.city"
                         >
                         City
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isCityValid && cityTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isCityValid && cityTouched ? 'border-red-500' : ''}`}
                         id="location.city"
                         type="text"
                         placeholder="Boise"
@@ -519,13 +519,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block  text-sm font-bold mb-2"
                         htmlFor="location.state"
                     >
                         State
                     </label>
                     <select
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                         id="location.state"
                         onChange = {handleChange}
                         defaultValue = {course?.location?.state}
@@ -585,13 +585,13 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
+                        className="block  text-sm font-bold mb-2"
                         htmlFor="location.postalCode"
                     >
                         Zip Code
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${!isPostalCodeValid && postalCodeTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isPostalCodeValid && postalCodeTouched ? 'border-red-500' : ''}`}
                         id="location.postalCode"
                         type="text"
                         placeholder="83706"
@@ -607,7 +607,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
             <div className="flex items-center justify-between">
                 <button
-                    className={`btn btn-primary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : ''}`}
+                    className={`btn btn-primary text-white  py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : ''}`}
                     type="submit"
                     disabled={!isFormValid}
                 >

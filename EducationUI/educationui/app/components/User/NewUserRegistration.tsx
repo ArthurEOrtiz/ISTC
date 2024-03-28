@@ -12,6 +12,7 @@ const NewUserRegistration: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState('');
     
     const handleNewUserFormOnSubmit = async (user: User) => {
+        console.log(user);
         const response = await PostUser(user);
 
         if (response.status === 200) {

@@ -33,7 +33,7 @@ namespace EducationAPI.Models
 
 		public bool IsStudent { get; set; }
 
-		public virtual Student? Student { get; set; }
+		public virtual Student Student { get; set; } = new Student();
 
 		public virtual Contact? Contact { get; set; }
 	}

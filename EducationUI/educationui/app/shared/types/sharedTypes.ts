@@ -11,12 +11,12 @@ export interface Location {
     postalCode: string;
   }
   
-export interface ClassSchedule {
+export interface Class {
     classId: number | null;
     courseId: number | null;
     scheduleStart: Date;
     scheduleEnd: Date;
-    attendance: Attendance[] | null;
+    attendances: Attendance[];
   }
   
 export interface Course {
@@ -33,7 +33,7 @@ export interface Course {
     locationId: number | null;
     location: Location;
     topics: Topic[] | null;
-    classes: ClassSchedule[];
+    classes: Class[];
   }
   
   export interface Topic {
@@ -44,10 +44,10 @@ export interface Course {
   }
 
   export interface Attendance {
-    attendanceId: number | null;
+    attendanceId: number;
     attended: boolean;
-    studentId: number | null;
-    classId: number | null;
+    studentId: number;
+    classId: number;
     
   }
 
@@ -72,7 +72,7 @@ export interface Course {
     accumulatedCredit: number;
     appraisalCertified: boolean;
     mappingCertified: boolean;
-    attendances: Attendance[] | null;
+    attendances: Attendance[];
   }
 
   export interface Contact {
