@@ -251,10 +251,12 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				if (user.Contact != null)
+				if (user.Contact != null && userToUpdate.Contact != null)
 				{
 					// Update contact properties 
-					_educationProgramContext.Entry(userToUpdate.Contact!).CurrentValues.SetValues(user.Contact);
+					_educationProgramContext.Entry(userToUpdate).CurrentValues.SetValues(user);
+					_educationProgramContext.Entry(userToUpdate.Contact).CurrentValues.SetValues(user.Contact);
+					await _educationProgramContext.SaveChangesAsync();
 				}
 				else
 				{
@@ -263,7 +265,7 @@ namespace EducationAPI.Controllers
 				}
 
 				// Update user properties
-				await _educationProgramContext.SaveChangesAsync();
+				
 				_logger.LogInformation("UpdateUserContact({User}), called", user);
 				return new StatusCodeResult((int)HttpStatusCode.OK);
 

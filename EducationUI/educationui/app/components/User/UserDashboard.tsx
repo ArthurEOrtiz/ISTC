@@ -34,7 +34,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
 
     const router = useRouter();
     const { user: clerkUser } = useUser(); 
-    console.log(clerkUser);
+    //console.log(clerkUser);
    
 
     useEffect(() => {
@@ -58,7 +58,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
             }
         };
         fetchUser();
-    }, []);
+    }, [user]);
 
 
     // Handlers
@@ -91,7 +91,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                 setShowErrorMessage(true);
                 break;
             default:
-                // Handle other status codes if needed
+                console.error('Unhandled status code:', response);
                 break;
         }
     }

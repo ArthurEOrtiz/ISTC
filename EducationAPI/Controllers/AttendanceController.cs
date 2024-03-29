@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Net;
+using System.Security.Claims;
 
 namespace EducationAPI.Controllers
 {
@@ -98,23 +99,23 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				int classCount = 0;
-				int attended = 0;
-				foreach (var @class in course.Classes)
-				{
-					classCount++;
-					foreach (var att in @class.Attendances)
-					{
-						if (att.ClassId == @class.ClassId && att.Attended)
-						{
-							attended++;
-						}
-					}
-				}
+				int classCount = course.Classes.Count;
 
-				//int classCount = course.Classes.Count();
-				//int attended = course.Classes.Sum(c => c.Attendances.Count(att => att.Attended));
+				int attended = course.Classes
+						.SelectMany(cl => cl.Attendances) // Flatten attendances for all classes
+						.Count(att => att.ClassId == attendance.ClassId && att.Attended);
 
+				//int attended = 0;
+				//foreach (var @class in course.Classes)
+				//{
+				//	foreach (var att in @class.Attendances)
+				//	{
+				//		if (att.ClassId == @class.ClassId && att.Attended)
+				//		{
+				//			attended++;
+				//		}
+				//	}
+				//}
 
 				if (classCount == attended)
 				{

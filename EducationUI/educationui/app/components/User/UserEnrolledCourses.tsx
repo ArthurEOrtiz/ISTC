@@ -35,7 +35,7 @@ const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
         }
         fetchUserAttendance();
     }
-    , []);
+    , [courses]);
 
     return (
         <div className='bg-base-100 shadow-md rounded-xl p-4 w-full'>
