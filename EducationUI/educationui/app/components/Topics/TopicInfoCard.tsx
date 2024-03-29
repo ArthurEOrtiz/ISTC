@@ -67,7 +67,7 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
     }
 
     return (
-        <div className="bg-white shadow-md rounded-xl p-3 w-full">
+        <div className="bg-base-100 shadow-md rounded-xl p-3 w-full">
 
             <div className="flex justify-between">
             
@@ -75,7 +75,7 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
                     <input
                         type="text"
                         name = "title"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         maxLength={50}
                         defaultValue={editTopic.title}
                         onChange={(e) => setEditTopic({ ...editTopic, title: e.target.value })}
@@ -100,13 +100,13 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
             
             <div className="m-2">
 
-                <strong>Description:</strong> 
+                <strong>Description: </strong> 
 
                 {editMode ?
                     <>
                         <textarea
                             name="description"
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
                             maxLength={255}
                             defaultValue={editTopic.description}
                             onChange={(e) => setEditTopic({ ...editTopic, description: e.target.value })}

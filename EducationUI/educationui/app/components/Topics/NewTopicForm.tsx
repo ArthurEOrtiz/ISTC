@@ -20,32 +20,32 @@ const NewTopicForm: React.FC<NewTopicFormProps> = ({ onSubmit }) => {
     };
 
     return (
-        <form onSubmit={handleOnSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form onSubmit={handleOnSubmit} className="bg-base-100 shadow-md rounded-xl px-8 pt-6 pb-8 mb-4">
             <div className="flex flex-col space-y-2">
                 <label 
-                    className="block text-gray-700 text-sm font-bold mb-2"
+                    className="block text-sm font-bold mb-2"
                     htmlFor="title"
                     >
                         Title
                 </label>
                 <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                     type="text"
                     id="title"
                     value={topic.title || ""}
                     onChange={(e) => setTopic({ ...topic, title: e.target.value })}
                 />
             </div>
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col space-y-2 mt-3">
                 <label
-                    className="block text-gray-700 text-sm font-bold mb-2" 
+                    className="block text-sm font-bold mb-2" 
                     htmlFor="description"
                     >
                         Description
                 </label>
                 <textarea
                     id="description"
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
                     value={topic.description || ""}
                     onChange={(e) => setTopic({ ...topic, description: e.target.value })}
                 />

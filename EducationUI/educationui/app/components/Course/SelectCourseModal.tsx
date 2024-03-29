@@ -52,7 +52,7 @@ const SelectCourseModal: React.FC<SelectCourseModalProps> = ({ open, onClose, on
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${open ? "" : "hidden"}`}>
             <div className="absolute inset-0 bg-black opacity-50"></div>
 
-            <div className="bg-white p-8 rounded-lg z-50">
+            <div className="bg-base-100 p-8 rounded-lg z-50">
 
                 <h2 className="text-xl font-semibold mb-4">Select Course</h2>
 
