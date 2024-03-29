@@ -1,5 +1,5 @@
 'use client';
-import { ClassSchedule, Course } from "@/app/shared/types/sharedTypes";
+import { Class, Course } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import ClassInfoCard from "./ClassInfoCard";
 import { useEffect, useState } from "react";
@@ -15,7 +15,7 @@ interface EditCourseInfoProps {
 const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => { 
 
     // Initializing Logic 
-    const sortClassesByDate = (classes : ClassSchedule[]): ClassSchedule[] => {
+    const sortClassesByDate = (classes : Class[]): Class[] => {
         const sortedClasses = [...classes].sort((a, b) => {
             return new Date(a.scheduleStart).getTime() - new Date(b.scheduleStart).getTime();
         });
@@ -123,7 +123,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         setEditModeIndex(courseInfo.classes.length);
     }
 
-    const handleOnClassAdded = (updatedClassSchedule: ClassSchedule | null): void => {
+    const handleOnClassAdded = (updatedClassSchedule: Class | null): void => {
         console.log("Updated Class Schedule", updatedClassSchedule);
         if (updatedClassSchedule !==  null) {
             const index = courseInfo.classes.findIndex(classSchedule => classSchedule.classId === null);
@@ -147,7 +147,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         console.log("Saving Course", courseInfo);
         setIsSaving(true);
         try{
-           await UpdateCourseById(courseInfo.courseId, courseInfo);
+           await UpdateCourseById(courseInfo.courseId!, courseInfo);
         }
         catch (error) {
             throw error;
@@ -167,7 +167,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         console.log("Deleting Course", courseInfo);
         setIsSaving(true);
         try {
-            await DeleteCourseById(courseInfo.courseId);
+            await DeleteCourseById(courseInfo.courseId!);
         }
         catch (error) {
             throw error;
@@ -187,12 +187,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         today.setUTCHours(24,0,0,0);
         const todayAt5PM = new Date(today) 
 
-        const newClassSchedule: ClassSchedule = {
+        const newClassSchedule: Class = {
             classId: null,
             courseId: course.courseId,
             scheduleStart: todayAt9AM,
             scheduleEnd: todayAt5PM,
-            attendance: []
+            attendances: []
         }
         //console.log(newClassSchedule)
         setCourseInfo(prevCourse => {
@@ -214,12 +214,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         scheduleEndPlusOneDay.setDate(scheduleEndPlusOneDay.getDate() + 1);
         const newScheduleEnd = scheduleEndPlusOneDay.toISOString().slice(0, -5);
 
-        const newClassSchedule: ClassSchedule = {
+        const newClassSchedule: Class = {
             classId: null,
             courseId: course.courseId,
             scheduleStart: newScheduleStart as unknown as Date,
             scheduleEnd: newScheduleEnd as unknown as Date,
-            attendance: []
+            attendances: []
         }
         // Disable edit mode for all other classes 
         setEditModeIndex(null);
