@@ -100,29 +100,38 @@ namespace EducationAPI.Controllers
 
 				int classCount = 0;
 				int attended = 0;
-				foreach ( var @class in course.Classes )
+				foreach (var @class in course.Classes)
 				{
 					classCount++;
-					foreach ( var att in  @class.Attendances )
+					foreach (var att in @class.Attendances)
 					{
-						if (att.AttendanceId == attendanceId && att.Attended)
+						if (att.ClassId == @class.ClassId && att.Attended)
 						{
 							attended++;
 						}
 					}
 				}
-				
-			
+
+				//int classCount = course.Classes.Count();
+				//int attended = course.Classes.Sum(c => c.Attendances.Count(att => att.Attended));
+
+
 				if (classCount == attended)
 				{
 					attendance.Student.AccumulatedCredit += course.AttendanceCredit;
+					await _educationProgramContext.SaveChangesAsync();
+				}
+				else if (classCount < attended)
+				{
+					throw new ArithmeticException("Attendance count higher than class count.");
 				}
 
-
+				_logger.LogInformation("UpdateAttendanceCreditsById({attendanceId}), called.", attendanceId);
 				return new StatusCodeResult((int)HttpStatusCode.OK);
 			}
 			catch (Exception ex)
 			{
+				_logger.LogError(ex, "UpdateAttendanceCreditsById({attendanceId})", attendanceId);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}

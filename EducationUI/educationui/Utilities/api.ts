@@ -24,6 +24,16 @@ export async function UpdateAttendanceById(attendanceId: Number, attended: Boole
     }
 }
 
+export async function UpdateAttendanceCreditsById(attendanceId: Number){
+    try {
+        const response = await axiosInstance.put(`Attendance/UpdateAttendanceCreditsById/${attendanceId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error updating attendance:', error);
+        return error.message;
+    }
+}
+
 // Courses 
 export async function getAllCourses() {
     try {

@@ -83,7 +83,6 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({ course, isOpen, onExi
                     )}
                 </div>
 
-
                 <div className="modal-action">
                     <button
                         className="btn btn-error text-white"
