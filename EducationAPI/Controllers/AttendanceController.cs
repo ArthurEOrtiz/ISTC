@@ -91,7 +91,8 @@ namespace EducationAPI.Controllers
 				var course = await _educationProgramContext.Courses
 					.Include(c => c.Classes)
 						.ThenInclude(c => c.Attendances)
-					.FirstOrDefaultAsync(c => c.Classes.Single().ClassId == attendance.ClassId);
+							.ThenInclude(a  => a.Student)
+					.FirstOrDefaultAsync(c => c.Classes.Any() && c.Classes.Any(cl => cl.ClassId == attendance.ClassId));
 
 				if (course == null)
 				{
@@ -101,32 +102,32 @@ namespace EducationAPI.Controllers
 
 				int classCount = course.Classes.Count;
 
-				int attended = course.Classes
-						.SelectMany(cl => cl.Attendances) // Flatten attendances for all classes
-						.Count(att => att.ClassId == attendance.ClassId && att.Attended);
+				//int attended = course.Classes
+				//		.SelectMany(cl => cl.Attendances) // Flatten attendances for all classes
+				//		.Count(att => att.ClassId == attendance.ClassId && att.StudentId == attendance.StudentId && att.Attended);
 
-				//int attended = 0;
-				//foreach (var @class in course.Classes)
-				//{
-				//	foreach (var att in @class.Attendances)
-				//	{
-				//		if (att.ClassId == @class.ClassId && att.Attended)
-				//		{
-				//			attended++;
-				//		}
-				//	}
-				//}
+				int attended = 0;
+				foreach (var @class in course.Classes)
+				{
+					foreach (var att in @class.Attendances)
+					{
+						if (att.StudentId == attendance.StudentId && att.Attended)
+						{
+							attended++;
+						}
+					}
+				}
 
 				if (classCount == attended)
 				{
 					attendance.Student.AccumulatedCredit += course.AttendanceCredit;
-					await _educationProgramContext.SaveChangesAsync();
 				}
 				else if (classCount < attended)
 				{
 					throw new ArithmeticException("Attendance count higher than class count.");
 				}
-
+				
+				await _educationProgramContext.SaveChangesAsync();
 				_logger.LogInformation("UpdateAttendanceCreditsById({attendanceId}), called.", attendanceId);
 				return new StatusCodeResult((int)HttpStatusCode.OK);
 			}

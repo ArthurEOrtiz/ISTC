@@ -10,6 +10,9 @@ FROM Contact;
 SELECT *
 FROM Students;
 
+--UPDATE Students
+--Set AccumulatedCredit = 0
+
 SELECT *
 FROM Classes;
 

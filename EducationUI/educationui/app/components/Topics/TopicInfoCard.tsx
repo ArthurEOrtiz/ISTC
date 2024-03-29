@@ -33,17 +33,16 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
 
         };
         fetchData();
-    }, [editTopic]);
+    }, [topic]);
     
     // Handlers
     const handleSelectCourseModalOnSelect = (selectedCourses: Course[]) => {
-        setCourses(selectedCourses);
-        setEditTopic({ ...editTopic, courses: selectedCourses });
         setShowSelectCourseModal(false);
+        setCourses(selectedCourses); // This is not working.
+        setEditTopic({ ...editTopic, courses: selectedCourses }); // This is working.
     }
 
     const handleCancel = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-
         event.preventDefault(); // Prevents the default behavior of the event
         setEditMode(false);
         setEditTopic(topic);
@@ -185,6 +184,12 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
                 className="btn btn-primary text-white mt-4 ml-2"
             >
                 Test Courses
+            </button>
+
+            <button
+                onClick={() => console.log("Edit Topic: ", editTopic)}
+                className="btn btn-primary text-white mt-4 ml-2">
+                Test Edit Topic
             </button> */}
 
             {showSelectCourseModal && (
