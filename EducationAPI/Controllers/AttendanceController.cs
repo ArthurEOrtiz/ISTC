@@ -2,16 +2,13 @@
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using System.Linq.Expressions;
 using System.Net;
-using System.Security.Claims;
 
 namespace EducationAPI.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
-	public class AttendanceController 
+	public class AttendanceController
 	{
 		private readonly EducationProgramContext _educationProgramContext;
 		private readonly ILogger<AttendanceController> _logger;
@@ -82,6 +79,7 @@ namespace EducationAPI.Controllers
 				var student = await _educationProgramContext.Students
 					.Include(s => s.Attendances)
 						.ThenInclude(a => a.Class)
+							.ThenInclude(c => c.Course)
 					.FirstOrDefaultAsync(s => s.StudentId == studentId);
 
 				if (student == null)
@@ -90,58 +88,30 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				var attendedClasses = student.Attendances
+				var attendedCourses = student.Attendances
 					.Where(a => a.Attended)
-					.ToList();
+					.Select(a => a.Class.Course)
+					.Distinct();
 
-				// Return and array of ID's of classes attended 
-				var attendedClassesIds = student.Attendances
-							 .Where(a =>  a.Attended)
-							 .Select(a => a.ClassId)
-							 .ToList();
-
-
-				var attendedCoursesIds = await _educationProgramContext.Classes
-								.Where(c => attendedClassesIds.Contains(c.ClassId))
-								.GroupBy(c => c.CourseId)
-								.Where(g => g.All(c => attendedClassesIds.Contains(c.ClassId)))
-								.Select(g => g.Key)
-								.ToListAsync();
-
-				List<Course> coursesWithAllChildClassesAttended = new();
 				int accumulatedCredit = 0;
 
-				foreach (var courseId in attendedCoursesIds)
+				foreach (var course in attendedCourses)
 				{
-					var course = await _educationProgramContext.Courses
-						.Include(c => c.Classes)
-						.FirstOrDefaultAsync(c => c.CourseId == courseId);
+					var attendedClassIds = student.Attendances
+							.Where(a => a.Attended && a.Class.CourseId == course.CourseId)
+							.Select(a => a.ClassId)
+							.ToList();
 
-					if (course == null)
-					{
-						_logger.LogError("CalculateStudentCreditHours({StudentId}), course not found", studentId);
-						return new StatusCodeResult((int)HttpStatusCode.NotFound);
-					}
+					var totalClassCount = course.Classes.Count;
 
-					int classCount = course.Classes.Count;
-					int attendance = 0;
+					var attendedClassCount = await _educationProgramContext.Classes
+							.Where(c => attendedClassIds.Contains(c.ClassId))
+							.CountAsync();
 
-					foreach ( var @class in course.Classes)
-					{
-						foreach (var attendedClass in attendedClasses)
-						{
-							if (attendedClass.ClassId == @class.ClassId)
-							{
-								attendance++;
-							}
-						}
-					}
-
-					if ( attendance == classCount )
+					if (totalClassCount == attendedClassCount)
 					{
 						accumulatedCredit += course.AttendanceCredit;
 					}
-
 				}
 
 				student.AccumulatedCredit = accumulatedCredit;

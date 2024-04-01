@@ -90,12 +90,6 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({ course, isOpen, onExi
                     >
                         Exit
                     </button>
-                    <button
-                        className="btn btn-primary text-white"
-                        onClick={() => console.log(classes)}
-                    >
-                        CLASS
-                    </button>
                 </div>
             </div>
         </div>

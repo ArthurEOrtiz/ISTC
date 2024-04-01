@@ -93,19 +93,18 @@ const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, 
                 )}
                             
                 <div className="card-actions justify-end">
-                    {saved && <p className="text-primary">Attendance Saved!</p>}
+                    {saved ? (
+                        <p className="text-primary">Attendance Saved!</p>
+                    ) : (
+                        <p className="text-error">Attendance Not Saved</p>
+                    )}
                     <button 
                         className="btn btn-primary text-white"
                         onClick={HandleSaveAttendance}
                         >
                             Save Attendance
                     </button>
-                    <button
-                        className='btn btn-primary text-white'
-                        onClick={() => console.log(attendances)}
-                    >
-                        View Attendance
-                    </button>
+
                 </div>
             </div>
         </div>
