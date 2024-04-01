@@ -11,7 +11,7 @@ interface AttendanceModalProps {
 }
 
 const AttendanceModal: React.FC<AttendanceModalProps> = ({ course, isOpen, onExit }) => {
-    const [classes, setClasses] = useState<Class[] | null>(null)
+    const [ classes, setClasses ] = useState<Class[] | null>(null)
     const [ errorMessage, setErrorMessage ] = useState('');
     const [ isErrorModalVisible, setIsErrorModalVisible ] = useState(false);
 
@@ -89,6 +89,12 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({ course, isOpen, onExi
                         onClick={onExit}
                     >
                         Exit
+                    </button>
+                    <button
+                        className="btn btn-primary text-white"
+                        onClick={() => console.log(classes)}
+                    >
+                        CLASS
                     </button>
                 </div>
             </div>

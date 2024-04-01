@@ -1,5 +1,5 @@
 import { Attendance, Class, User } from "@/app/shared/types/sharedTypes";
-import { GetUserByStudentId, UpdateAttendanceById, UpdateAttendanceCreditsById } from "@/Utilities/api";
+import { GetUserByStudentId, UpdateAttendanceById } from "@/Utilities/api";
 import { useEffect, useState } from "react";
 
 interface ClassAttendanceCardProps {
@@ -63,16 +63,8 @@ const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, 
         const response = await UpdateAttendanceById(attendance.attendanceId, attendance.attended);
         if (response.status === 200){
             setSaved(true);
-            updateAttendanceCredits(attendance.attendanceId);
         } else {
             errorMessage(response)
-        }
-    }
-
-    const updateAttendanceCredits = async (attendanceId: number) => {
-        const response = await UpdateAttendanceCreditsById(attendanceId);
-        if (response.status !== 200){
-            errorMessage(response);
         }
     }
     
@@ -107,6 +99,12 @@ const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, 
                         onClick={HandleSaveAttendance}
                         >
                             Save Attendance
+                    </button>
+                    <button
+                        className='btn btn-primary text-white'
+                        onClick={() => console.log(attendances)}
+                    >
+                        View Attendance
                     </button>
                 </div>
             </div>

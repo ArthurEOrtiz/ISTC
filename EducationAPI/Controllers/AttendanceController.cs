@@ -2,6 +2,7 @@
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.Linq.Expressions;
 using System.Net;
 using System.Security.Claims;
@@ -73,67 +74,85 @@ namespace EducationAPI.Controllers
 			}
 		}
 
-		[HttpPut("UpdateAttendanceCreditsById/{attendanceId}")]
-		public async Task<ActionResult> UpdateAttendanceCreditsById(int attendanceId)
+		[HttpPut("CalculateStudentCreditHours/{studentId}")]
+		public async Task<ActionResult> CalculateStudentCreditHours(int studentId)
 		{
 			try
 			{
-				var attendance = await _educationProgramContext.Attendances
-					.Include(a => a.Student)
-					.FirstOrDefaultAsync(a => a.AttendanceId == attendanceId);
+				var student = await _educationProgramContext.Students
+					.Include(s => s.Attendances)
+						.ThenInclude(a => a.Class)
+					.FirstOrDefaultAsync(s => s.StudentId == studentId);
 
-				if (attendance == null)
+				if (student == null)
 				{
-					_logger.LogError("UpdateAttendanceCreditsById({attendanceId}), attendance not found", attendanceId);
+					_logger.LogError("CalculateStudentCreditHours({StudentId}), student not found", studentId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				var course = await _educationProgramContext.Courses
-					.Include(c => c.Classes)
-						.ThenInclude(c => c.Attendances)
-							.ThenInclude(a  => a.Student)
-					.FirstOrDefaultAsync(c => c.Classes.Any() && c.Classes.Any(cl => cl.ClassId == attendance.ClassId));
+				var attendedClasses = student.Attendances
+					.Where(a => a.Attended)
+					.ToList();
 
-				if (course == null)
+				// Return and array of ID's of classes attended 
+				var attendedClassesIds = student.Attendances
+							 .Where(a =>  a.Attended)
+							 .Select(a => a.ClassId)
+							 .ToList();
+
+
+				var attendedCoursesIds = await _educationProgramContext.Classes
+								.Where(c => attendedClassesIds.Contains(c.ClassId))
+								.GroupBy(c => c.CourseId)
+								.Where(g => g.All(c => attendedClassesIds.Contains(c.ClassId)))
+								.Select(g => g.Key)
+								.ToListAsync();
+
+				List<Course> coursesWithAllChildClassesAttended = new();
+				int accumulatedCredit = 0;
+
+				foreach (var courseId in attendedCoursesIds)
 				{
-					_logger.LogError("UpdateAttendanceCreditsById({attendanceId}), course not found", attendanceId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
-				}
+					var course = await _educationProgramContext.Courses
+						.Include(c => c.Classes)
+						.FirstOrDefaultAsync(c => c.CourseId == courseId);
 
-				int classCount = course.Classes.Count;
-
-				//int attended = course.Classes
-				//		.SelectMany(cl => cl.Attendances) // Flatten attendances for all classes
-				//		.Count(att => att.ClassId == attendance.ClassId && att.StudentId == attendance.StudentId && att.Attended);
-
-				int attended = 0;
-				foreach (var @class in course.Classes)
-				{
-					foreach (var att in @class.Attendances)
+					if (course == null)
 					{
-						if (att.StudentId == attendance.StudentId && att.Attended)
+						_logger.LogError("CalculateStudentCreditHours({StudentId}), course not found", studentId);
+						return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					}
+
+					int classCount = course.Classes.Count;
+					int attendance = 0;
+
+					foreach ( var @class in course.Classes)
+					{
+						foreach (var attendedClass in attendedClasses)
 						{
-							attended++;
+							if (attendedClass.ClassId == @class.ClassId)
+							{
+								attendance++;
+							}
 						}
 					}
+
+					if ( attendance == classCount )
+					{
+						accumulatedCredit += course.AttendanceCredit;
+					}
+
 				}
 
-				if (classCount == attended)
-				{
-					attendance.Student.AccumulatedCredit += course.AttendanceCredit;
-				}
-				else if (classCount < attended)
-				{
-					throw new ArithmeticException("Attendance count higher than class count.");
-				}
-				
+				student.AccumulatedCredit = accumulatedCredit;
 				await _educationProgramContext.SaveChangesAsync();
-				_logger.LogInformation("UpdateAttendanceCreditsById({attendanceId}), called.", attendanceId);
+				_logger.LogInformation("CalculateStudentCreditHours({StudentId}), called", studentId);
 				return new StatusCodeResult((int)HttpStatusCode.OK);
+
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "UpdateAttendanceCreditsById({attendanceId})", attendanceId);
+				_logger.LogError(ex, "CalculateStudentCreditHours({StudentId})", studentId);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
