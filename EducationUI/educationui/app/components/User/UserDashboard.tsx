@@ -35,10 +35,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     const router = useRouter();
     const { user: clerkUser } = useUser(); 
     //console.log(clerkUser);
-   
+    console.log(user);
 
     useEffect(() => {
         const fetchUser = async () => {
+            console.log("Fetching user")
             const response = await GetUserByClerkId(clerkId);
             switch (response.status) {
                 case 200:
@@ -57,8 +58,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                     break;
             }
         };
+
         fetchUser();
-    }, [user]);
+    }, []);
 
 
     // Handlers
