@@ -25,7 +25,7 @@ const TopicList: React.FC<TopicListProps> = ({ topics }) => {
     const handleTopicInfoCardOnApply = async (topic: Topic) => {
         console.log(topic);
         try {
-            const response = await updateTopicById(topic.topicId, topic);
+            const response = await updateTopicById(topic.topicId!, topic);
             const index = topicList.findIndex(topic => topic.topicId === response.topicId);
             if (index !== -1) {
                 const newTopicList = [...topicList];
@@ -64,7 +64,7 @@ const TopicList: React.FC<TopicListProps> = ({ topics }) => {
                 </div>
             ))}
 
-        <button
+        {/* <button
             className="btn btn-primary text-white"
             onClick={() => console.log(topics)}
         >
@@ -83,7 +83,7 @@ const TopicList: React.FC<TopicListProps> = ({ topics }) => {
             onClick={() => console.log(selectedTopics)}
         >
             Test Selected Courses
-        </button>
+        </button> */}
         </div>
     );
 };

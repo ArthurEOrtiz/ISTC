@@ -67,8 +67,8 @@ export interface Course {
   }
 
   export interface Student {
-    studentId: number | null;
-    userId: number | null;
+    studentId: number;
+    userId: number;
     accumulatedCredit: number;
     appraisalCertified: boolean;
     mappingCertified: boolean;

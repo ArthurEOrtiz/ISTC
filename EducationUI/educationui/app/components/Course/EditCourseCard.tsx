@@ -34,7 +34,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
       }
     checkEnrollment();
     }
-  }, [] )
+  }, [user])
 
   // Handlers
 

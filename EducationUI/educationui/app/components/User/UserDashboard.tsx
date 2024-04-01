@@ -1,7 +1,7 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { DeleteUserById, GetUserByClerkId, UpdateUser, UpdateUserContact } from "@/Utilities/api";
-import { User } from '@/app/shared/types/sharedTypes';
+import { use, useEffect, useState } from 'react';
+import { CalculateStudentCreditHours, DeleteUserById, getStudentIdByClerkId, GetUserByClerkId, UpdateUser, UpdateUserContact } from "@/Utilities/api";
+import { Student, User } from '@/app/shared/types/sharedTypes';
 import Loading from '@/app/shared/Loading';
 import UserInfoCard from './UserInfoCard';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
@@ -19,6 +19,7 @@ interface UserDashboardProps {
 const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     
     const [ user, setUser ] = useState<User>();
+    const [ studentId, setStudentId ] = useState<number>();
 
     const [ showErrorMessage, setShowErrorMessage ] = useState(false);
     const [ errorMessage, setErrorMessage ] = useState('');
@@ -34,11 +35,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
 
     const router = useRouter();
     const { user: clerkUser } = useUser(); 
-    console.log(clerkUser);
-   
+  
 
     useEffect(() => {
         const fetchUser = async () => {
+            console.log("Fetching user")
             const response = await GetUserByClerkId(clerkId);
             switch (response.status) {
                 case 200:
@@ -57,8 +58,42 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                     break;
             }
         };
+
         fetchUser();
     }, []);
+
+    useEffect(() => {
+        const fetchStudent = async () => {
+            if (!user) {
+                return;
+            }
+            const response = await getStudentIdByClerkId(clerkId);
+            if (response.status === 200) {
+                setStudentId(response.data);
+            } else {
+                setErrorMessage('Student not found.');
+                setShowErrorMessage(true);
+            }
+        }
+        fetchStudent();
+    }
+    , [user]);
+
+    useEffect(() => {
+        const calculateCreditHours = async () => {
+            if (!studentId) {
+                return;
+            }
+            const response = await CalculateStudentCreditHours(studentId);
+            if (response.status !== 200) {
+                setErrorMessage('Error calculating credit hours.');
+                setShowErrorMessage(true);
+            }
+        }
+        calculateCreditHours();
+    }
+    , [studentId]);
+            
 
 
     // Handlers
@@ -91,7 +126,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                 setShowErrorMessage(true);
                 break;
             default:
-                // Handle other status codes if needed
+                console.error('Unhandled status code:', response);
                 break;
         }
     }

@@ -24,6 +24,16 @@ export async function UpdateAttendanceById(attendanceId: Number, attended: Boole
     }
 }
 
+export async function CalculateStudentCreditHours(studentId: Number) {
+    try {
+        const response = await axiosInstance.put(`Attendance/CalculateStudentCreditHours/${studentId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error calculating student credit hours:', error);
+        return error.message;
+    }
+}
+
 // Courses 
 export async function getAllCourses() {
     try {

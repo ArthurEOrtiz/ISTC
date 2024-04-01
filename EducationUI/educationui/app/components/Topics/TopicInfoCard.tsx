@@ -33,17 +33,16 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
 
         };
         fetchData();
-    }, [editTopic]);
+    }, [topic]);
     
     // Handlers
     const handleSelectCourseModalOnSelect = (selectedCourses: Course[]) => {
-        setCourses(selectedCourses);
-        setEditTopic({ ...editTopic, courses: selectedCourses });
         setShowSelectCourseModal(false);
+        setCourses(selectedCourses); // This is not working.
+        setEditTopic({ ...editTopic, courses: selectedCourses }); // This is working.
     }
 
     const handleCancel = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-
         event.preventDefault(); // Prevents the default behavior of the event
         setEditMode(false);
         setEditTopic(topic);
@@ -67,7 +66,7 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
     }
 
     return (
-        <div className="bg-white shadow-md rounded-xl p-3 w-full">
+        <div className="bg-base-100 shadow-md rounded-xl p-3 w-full">
 
             <div className="flex justify-between">
             
@@ -75,7 +74,7 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
                     <input
                         type="text"
                         name = "title"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         maxLength={50}
                         defaultValue={editTopic.title}
                         onChange={(e) => setEditTopic({ ...editTopic, title: e.target.value })}
@@ -100,13 +99,13 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
             
             <div className="m-2">
 
-                <strong>Description:</strong> 
+                <strong>Description: </strong> 
 
                 {editMode ?
                     <>
                         <textarea
                             name="description"
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
                             maxLength={255}
                             defaultValue={editTopic.description}
                             onChange={(e) => setEditTopic({ ...editTopic, description: e.target.value })}
@@ -185,6 +184,12 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
                 className="btn btn-primary text-white mt-4 ml-2"
             >
                 Test Courses
+            </button>
+
+            <button
+                onClick={() => console.log("Edit Topic: ", editTopic)}
+                className="btn btn-primary text-white mt-4 ml-2">
+                Test Edit Topic
             </button> */}
 
             {showSelectCourseModal && (

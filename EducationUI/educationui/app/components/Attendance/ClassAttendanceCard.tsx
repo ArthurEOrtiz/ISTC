@@ -10,7 +10,7 @@ interface ClassAttendanceCardProps {
 const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, errorMessage}) => {
     const [ attendances, setAttendances ] = useState<Attendance[]>(cls.attendances);
     const [ users , setUsers ] = useState<User[]>([]);
-    const [ saved, setSaved ] = useState(false);
+    const [ saved, setSaved ] = useState<Boolean | null>(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -54,7 +54,6 @@ const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, 
         );
     }
 
-
    const hasUserAttended = (studentId: number): boolean => {
          const attendance = attendances.find((attendance) => attendance.studentId === studentId);
          return attendance?.attended || false;
@@ -94,13 +93,18 @@ const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, 
                 )}
                             
                 <div className="card-actions justify-end">
-                    {saved && <p className="text-primary">Attendance Saved!</p>}
+                    {saved === true ? (
+                        <p className="text-primary">Attendance Saved!</p>
+                    ) : saved === false ? (
+                        <p className="text-error">Unsaved Attendanced!</p>
+                    ) : null}
                     <button 
                         className="btn btn-primary text-white"
                         onClick={HandleSaveAttendance}
                         >
                             Save Attendance
                     </button>
+
                 </div>
             </div>
         </div>

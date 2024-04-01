@@ -30,12 +30,16 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
         }
     }, [searchString]);
 
-    const handleOnEdit = (course: Course): void  => {
+    const handleCourseCardOnEdit = (course: Course): void  => {
         router.push(`/admin/editcourse/edit/course/${course.courseId}`);
     }
 
-    const handleOnAttendance = (course: Course): void => {
+    const handleCourseCardOnAttendance = (course: Course): void => {
         setCourse(course);
+    }
+
+    const handleAttendanceModalOnExit = (): void => {
+        setCourse(null);
     }
 
     return (
@@ -65,8 +69,8 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
                     
                         <CourseCard 
                             course={course} 
-                            onEdit={handleOnEdit} 
-                            onAttendance={handleOnAttendance}
+                            onEdit={handleCourseCardOnEdit} 
+                            onAttendance={handleCourseCardOnAttendance}
                             viewOnly={viewOnly}
                         />
 
@@ -78,7 +82,7 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
                 <AttendanceModal 
                     course={course}
                     isOpen={true}
-                    onExit={() => setCourse(null)}
+                    onExit={handleAttendanceModalOnExit}
                 />
             
             )}
