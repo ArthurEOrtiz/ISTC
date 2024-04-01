@@ -40,7 +40,6 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
 
     const handleAttendanceModalOnExit = (): void => {
         setCourse(null);
-
     }
 
     return (
