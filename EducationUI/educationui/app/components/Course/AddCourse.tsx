@@ -9,6 +9,7 @@ import ConfirmationModal from '../../shared/modals/ConfirmationModal';
 import { useRouter } from 'next/navigation';
 import SavingModal from '../../shared/modals/SavingModal';
 import { postCourse } from '@/Utilities/api';
+import ErrorModal from '@/app/shared/modals/ErrorModal';
 
 /**
  * Component for adding a new course. 
@@ -21,6 +22,8 @@ const AddCourse: React.FC = () => {
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [hasError, setHasError] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
     const router = useRouter();
     
     useEffect(() => {
@@ -66,10 +69,15 @@ const AddCourse: React.FC = () => {
             courseId: 0,
             scheduleStart: scheduleStart,
             scheduleEnd: scheduleEnd,
-            attendance: [],
+            attendance: [
+                // {
+                //     attendanceId: 0,
+                //     classId: 0,
+                //     studentId: 0,
+                //     attended: false,
+                // },
+            ],
         };
-
-        //console.log("AddCourse.handleAddClass: newClass: ", newClass);
     
         // Update the course state by adding the new class to the classes array
         if (course) {
@@ -147,19 +155,16 @@ const AddCourse: React.FC = () => {
     // ConfirmationModal
     const handleConfirmationModalOnConfirm = async () => {
         setIsSaving(true);
-        
-        try {
-            setShowConfirmationModal(false);
-            // imported from api.ts
-            await postCourse(course as Course);
-
-        } catch (error) {
-            throw error;
-        } finally {
-            router.push('/admin/editcourse/edit');
-            // this might not do anything. 
+        setShowConfirmationModal(false);
+        const response = await postCourse(course as Course);
+        if (response.status === 201) {
             setIsSaving(false);
             setCourse(undefined);
+            router.push('/admin/editcourse/edit');
+        } else {
+            setIsSaving(false);
+            setHasError(true);
+            setErrorMessage(response as unknown as string);
         }
     }
 
@@ -204,10 +209,10 @@ const AddCourse: React.FC = () => {
                                 onClick={handleAddClass}
                             >Add Class</button>
 
-                            {/* <button
+                            <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
-                            >Console Log Course</button> */}
+                            >Console Log Course</button>
 
                         </div>
                     </div>
@@ -215,7 +220,7 @@ const AddCourse: React.FC = () => {
 
             )}
 
-            {/* Dialogs - also known as Modals - and the saving spinner */}
+            {/* Dialogs - also known as Modals */}
             {showSelectTopicModal && (
                 <SelectTopicModal 
                     open={showSelectTopicModal} 
@@ -224,6 +229,7 @@ const AddCourse: React.FC = () => {
                     topics={course?.topics || []} 
                     /> 
             )}
+
             {showConfirmationModal && (
                 <ConfirmationModal 
                     title={'Save Course'} 
@@ -232,10 +238,19 @@ const AddCourse: React.FC = () => {
                     onCancel={handleConfirmationModalOnCancel}
                 />
             )}
+
             {isSaving && (
                 <SavingModal text={'Saving Course...'} />
                 )
-            } 
+            }
+
+            {hasError && (
+                <ErrorModal
+                    title={'Error'}
+                    message={errorMessage}
+                    onClose={() => setHasError(false)}
+                />
+            )}
 
         </>
     );

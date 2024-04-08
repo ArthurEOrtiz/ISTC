@@ -11,12 +11,11 @@ const CourseCatalog: React.FC = () => {
     const [ courses, setCourses ] = useState<Course[]>([]);
 
     useEffect(() => {
-        console.log('fetching courses');
-        const fetchData = async () => {
+        const fetchCourses = async () => {
             const data = await getAllCourses();
             setCourses(data);
         }
-        fetchData();
+        fetchCourses();
     }
     , [isCourseListVisible]);
 

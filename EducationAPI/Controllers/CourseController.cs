@@ -47,6 +47,54 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetAllEnrollableCourses")]
+		public async Task<ActionResult<List<Course>>> GetAllEnrollableCourses()
+		{
+			try
+			{
+				var today = DateTime.Today;
+				var enrollableCourses = new List<Course>();
+
+				var courses = await _educationProgramContext.Courses
+					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
+					.Include(c => c.Topics)
+					.Include(c => c.Location)
+					.Where(c => c.EnrollmentDeadline >= today)
+					.ToListAsync();
+
+				if (courses == null)
+				{
+					_logger.LogError("GetAllEnrollableCourse(), could not find courses.");
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				foreach (Course course in courses)
+				{
+					int MaxAttendance = course.MaxAttendance;
+					var firstClass = course.Classes.FirstOrDefault();
+					if (firstClass == null)
+					{
+						_logger.LogError("GetAllEnrollableCourse(), could not find class");
+						return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					}
+
+					if (firstClass.Attendances.Count < MaxAttendance)
+					{
+						enrollableCourses.Add(course);
+					}
+				}
+
+				_logger.LogInformation("GetAllEnrollableCourse(), called");
+				return enrollableCourses;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetAllEnrollableCourses()");
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 		/// <summary>
 		/// Gets a Course record by Id
 		/// </summary>
@@ -240,6 +288,7 @@ namespace EducationAPI.Controllers
 		/// The instance of <see cref="Course"/> Created. 
 		/// </returns>
 		[HttpPost("PostCourse")]
+		[ProducesResponseType((int)HttpStatusCode.Created)]
 		public async Task<ActionResult> PostCourse(Course course)
 		{
 			try
@@ -261,12 +310,18 @@ namespace EducationAPI.Controllers
 					}
 				}
 
+				// Set the Course property for each Class in the Course
+				foreach ( var @class in course.Classes)
+				{
+					@class.Course = course;
+				}
+
 				_educationProgramContext.Courses.Add(course);
 				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("PostCourse {Course} called", course);
 				// Should return a 201 status code. 
-				return new StatusCodeResult((int)HttpStatusCode.OK);
+				return new StatusCodeResult((int)HttpStatusCode.Created);
 			}
 			catch (Exception ex)
 			{

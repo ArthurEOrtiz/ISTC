@@ -45,6 +45,16 @@ export async function getAllCourses() {
     }
 }
 
+export async function getAllEnrollableCourses() {
+    try {
+        const response = await axiosInstance.get('Course/GetAllEnrollableCourses');
+        return response;
+    } catch (error : any) {
+        console.error('Error fetching courses:', error);
+        throw error.message;
+    }
+}
+
 export async function getCourseById(courseId: number) {
     try {
         const response = await axiosInstance.get(`Course/GetCourseById?id=${courseId}`);
@@ -88,10 +98,10 @@ export async function GetUserEnrolledCoursesById(studentId: Number) {
 export async function postCourse(course: Course) {
     try {
         const response = await axiosInstance.post('Course/PostCourse', course);
-        return response.data;
-    } catch (error) {
+        return response
+    } catch (error : any) {
         console.error('Error posting course:', error);
-        throw error;
+        throw error.message;
     }
 }
 
