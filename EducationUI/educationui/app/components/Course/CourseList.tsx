@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { use, useEffect } from 'react';
 import { Course } from '@/app/shared/types/sharedTypes';
 import CourseCard from './EditCourseCard';
 import { useRouter } from 'next/navigation';
@@ -29,6 +29,16 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
             setCourseList(courses);
         }
     }, [searchString]);
+
+    useEffect(() => {
+        setCourseList(courseList.sort(compareDates));
+    }, [courseList]);
+
+    const compareDates = (a: Course, b: Course): number => {
+        const dateA = new Date(a.classes[0].scheduleStart);
+        const dateB = new Date(b.classes[0].scheduleStart);
+        return dateA.getTime() - dateB.getTime();
+    }
 
     const handleCourseCardOnEdit = (course: Course): void  => {
         router.push(`/admin/editcourse/edit/course/${course.courseId}`);

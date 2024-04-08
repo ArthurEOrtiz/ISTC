@@ -174,6 +174,11 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
         <p>No classes have been defined for this course!</p>
       )}
 
+      <div>
+        <p className="text-1xl font-bold">Enrollment DeadLine</p>
+        <p>{new Date(course.enrollmentDeadline).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}</p>
+      </div>
+
       {!viewOnly && (
         <div className="card-actions justify-end">
           <button 
