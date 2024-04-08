@@ -22,9 +22,10 @@ namespace EducationAPI.Controllers
 		/// <summary>
 		/// Gets all Course records from the data base. 
 		/// </summary>
-		/// <returns>
-		/// <see cref="List{T}"/> of <see cref="Course"/> with a <see cref="List{T}"/> of children 
-		/// <see cref="Class"/>
+		/// <returns> 
+		/// A <see cref="List{Course}"/> of <see cref="Course"/> with a <see cref="List{T}"/> of children 
+		/// <see cref="Class"/>, a <see cref="List{T}"/> of children <see cref="Topic"/>, and the linked 
+		/// <see cref="Location"/>		
 		/// </returns>
 		[HttpGet("GetAllCourses")]
 		public async Task<ActionResult<List<Course>>> GetAllCourses()
