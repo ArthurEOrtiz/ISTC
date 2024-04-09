@@ -45,7 +45,7 @@ export async function getAllCourses() {
     }
 }
 
-export async function getAllEnrollableCourses() {
+export async function GetAllEnrollableCourses() {
     try {
         const response = await axiosInstance.get('Course/GetAllEnrollableCourses');
         return response;
@@ -152,10 +152,10 @@ export async function AddClassByCourseId(courseId: Number, scheduleStart: Date, 
         const url = `Class/AddClassByCourseId?courseId=${courseId}&newStartDate=${scheduleStart}&newEndDate=${scheduleEnd}`;
 
         const response = await axiosInstance.post(url);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error adding class:', error);
-        throw error;
+        throw error.message;
     }
 }
 
@@ -174,10 +174,10 @@ export async function EditClassById (classId: Number, scheduleStart: Date, sched
         const url = `Class/EditClassById?id=${classId}&newScheduleStart=${scheduleStart}&newScheduleStop=${scheduleEnd}`;
 
         const response = await axiosInstance.post(url);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error editing class:', error);
-        throw error;
+        throw error.message;
     }
 }
 

@@ -35,8 +35,8 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
     }, [courseList]);
 
     const compareDates = (a: Course, b: Course): number => {
-        const dateA = new Date(a.classes[0].scheduleStart);
-        const dateB = new Date(b.classes[0].scheduleStart);
+        const dateA = new Date(a.enrollmentDeadline);
+        const dateB = new Date(b.enrollmentDeadline);
         return dateA.getTime() - dateB.getTime();
     }
 

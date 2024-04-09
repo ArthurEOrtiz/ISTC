@@ -3,17 +3,23 @@ import { useEffect, useState } from "react";
 import CourseCalendar from "./CourseCalendar"
 import CourseList from "./CourseList";
 import { Course } from "@/app/shared/types/sharedTypes";
-import { getAllCourses } from "@/Utilities/api";
+import { GetAllEnrollableCourses } from "@/Utilities/api";
+import ErrorModel from "@/app/shared/modals/ErrorModal";
 
 const CourseCatalog: React.FC = () => {
     const [ isCourseCalendarVisible, setIsCourseCalendarVisible ] = useState(true);
     const [ isCourseListVisible, setIsCourseListVisible ] = useState(false);
     const [ courses, setCourses ] = useState<Course[]>([]);
+    const [ errorMessages, setErrorMessages ] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchCourses = async () => {
-            const data = await getAllCourses();
-            setCourses(data);
+            const response = await GetAllEnrollableCourses();
+            if (response.status === 200) {
+                setCourses(response.data);
+            } else {
+                setErrorMessages(response as unknown as string);
+            }
         }
         fetchCourses();
     }
@@ -57,6 +63,13 @@ const CourseCatalog: React.FC = () => {
                                             viewOnly={true}
                                             />}
             </div>
+
+            {errorMessages && <ErrorModel
+                                title='Error'
+                                message={errorMessages}
+                                onClose={() => setErrorMessages(null)}
+                                />}
+
             
         </div>
     );

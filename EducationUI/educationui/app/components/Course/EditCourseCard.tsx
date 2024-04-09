@@ -116,6 +116,16 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
       return
     }
 
+    const now = new Date();
+    const deadline = new Date(course.enrollmentDeadline);
+
+    if (deadline < now) {
+      setErrorMessage("You cannot unenroll from a course that has already started!")
+      setIsErrorModalVisible(true);
+      return;
+    }
+
+
     const response = await UnenrollStudentByClerkId(user.id, course.courseId as Number);
 
     switch (response.status) {
@@ -135,6 +145,8 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
     }
     
   }
+
+
 
   return (
     <div className="card-body">
@@ -195,7 +207,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
         </div>
       )}
 
-      {viewOnly && !isEnrolled && (
+      {viewOnly && !isEnrolled && new Date(course.enrollmentDeadline) > new Date() && (
         <div className="card-actions justify-end">
           <button
             className="btn btn-primary text-white"
@@ -206,7 +218,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
         </div>
       )}
 
-      {viewOnly && isEnrolled && (
+      {viewOnly && isEnrolled && new Date(course.enrollmentDeadline) > new Date() && (
         <div className="card-actions justify-end">
           <p className="text-green-500">You are enrolled in this course</p>
           <button
@@ -215,6 +227,12 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
             >
             Unenroll
             </button>
+        </div>
+      )}
+
+      {viewOnly && new Date(course.enrollmentDeadline) < new Date() && (
+        <div className="card-actions justify-end">
+          <p className="text-red-500">The enrollment deadline has passed</p>
         </div>
       )}
 

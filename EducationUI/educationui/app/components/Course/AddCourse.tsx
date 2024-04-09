@@ -69,14 +69,7 @@ const AddCourse: React.FC = () => {
             courseId: 0,
             scheduleStart: scheduleStart,
             scheduleEnd: scheduleEnd,
-            attendance: [
-                // {
-                //     attendanceId: 0,
-                //     classId: 0,
-                //     studentId: 0,
-                //     attended: false,
-                // },
-            ],
+            attendances: [],
         };
     
         // Update the course state by adding the new class to the classes array
@@ -209,10 +202,10 @@ const AddCourse: React.FC = () => {
                                 onClick={handleAddClass}
                             >Add Class</button>
 
-                            <button
+                            {/* <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
-                            >Console Log Course</button>
+                            >Console Log Course</button> */}
 
                         </div>
                     </div>

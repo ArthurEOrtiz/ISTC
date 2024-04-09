@@ -23,7 +23,12 @@ const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
             const response = await GetUserEnrolledCoursesById(studentId);
             switch (response.status) {
                 case 200:
-                    setCourses(response.data);
+                    // Sort the courses by enrollmentDeadline
+                    const sortedCourses = response.data.sort((a: Course, b: Course) => {
+                        return new Date(a.enrollmentDeadline).getTime() - new Date(b.enrollmentDeadline).getTime();
+                    });
+                    const reversedCourses = sortedCourses.reverse();
+                    setCourses(reversedCourses);
                     break;
                 case 404:
                     setErrorMessage('There was an error finding courses for this user.');
