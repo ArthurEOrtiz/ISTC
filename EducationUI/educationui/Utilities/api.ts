@@ -146,7 +146,7 @@ export async function DeleteCourseById(courseId: Number) {
 }
 
 // Class
-export async function AddClassByCourseId(courseId: Number, scheduleStart: Date, scheduleEnd: Date)
+export async function AddClassByCourseId(courseId: Number, scheduleStart: string, scheduleEnd: string)
 {
     try {
         const url = `Class/AddClassByCourseId?courseId=${courseId}&newStartDate=${scheduleStart}&newEndDate=${scheduleEnd}`;
@@ -169,10 +169,9 @@ export async function GetClassesByCourseId(courseId: Number) {
     }
 }
 
-export async function EditClassById (classId: Number, scheduleStart: Date, scheduleEnd: Date) {
+export async function EditClassById (classId: Number, scheduleStart: string, scheduleEnd: string) {
     try {
         const url = `Class/EditClassById?id=${classId}&newScheduleStart=${scheduleStart}&newScheduleStop=${scheduleEnd}`;
-
         const response = await axiosInstance.post(url);
         return response;
     } catch (error: any) {
@@ -184,10 +183,10 @@ export async function EditClassById (classId: Number, scheduleStart: Date, sched
 export async function DeleteClassById(classId: Number) {
     try {
         const response = await axiosInstance.delete(`Class/DeleteClassById?id=${classId}`);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error deleting class:', error);
-        throw error;
+        throw error.message;
     }
 }
 

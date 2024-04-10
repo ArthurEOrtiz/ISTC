@@ -150,6 +150,7 @@ namespace EducationAPI.Controllers
 		/// <param name="id"><see cref="int"/> of <see cref="Class.ClassId"/></param>
 		/// <returns>Status code 200</returns>
 		[HttpDelete("DeleteClassById")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
 		public async Task<IActionResult> DeleteClassById(int id)
 		{
 			try

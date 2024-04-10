@@ -3,12 +3,14 @@ import { AddClassByCourseId, DeleteClassById, EditClassById } from "@/Utilities/
 import { Class } from "@/app/shared/types/sharedTypes";
 import { ChangeEvent, useEffect, useState } from "react";
 import moment from 'moment-timezone';
+import { on } from "events";
 
 interface ClassInfoCardProps {
     class: Class;
     onAdd: (updatedClassSchdedule : Class | null) => void;
     onDelete: (id: number | null) => void;
     editMode: boolean;
+    onError: (message: string) => void;
 };
 
 /**
@@ -19,7 +21,7 @@ interface ClassInfoCardProps {
  * @param onDelete - Callback function to delete a class schedule.
  * @param editMode - Flag indicating whether the card is in edit mode.
  */
-const ClassInfoCard: React.FC<ClassInfoCardProps> = ({class : cls, onAdd, onDelete, editMode}) => {
+const ClassInfoCard: React.FC<ClassInfoCardProps> = ({class : cls, onAdd, onDelete, editMode, onError}) => {
     const [editClass, setEditClass] = useState<Boolean>(false);
     const [editedClass, setEditedClass] = useState<Class>(cls);
     const [classId, setClassId] = useState<number>(cls.classId);
@@ -39,25 +41,12 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({class : cls, onAdd, onDele
     }
 
     const handleSave = async () => {
-        // First make sure that the editedClass has the correct format for the API.
-        // This is because if the date was ever incorrectly formatted, it will be a string and not a Date object.
-
-        let scheduleStart : string | null = null;
-        let scheduleEnd : string | null = null
-
-        try {
-            scheduleStart = editedClass.scheduleStart.toISOString();
-            scheduleEnd = editedClass.scheduleEnd.toISOString();
-        } catch (error) {
-            console.error(error);
-            return;
-        }
         
-        // Now we send it to the API, if the classId is 0, then we are adding a new class
+        // If the classId is 0, then we are adding a new class
         // Otherwise, we are editing an existing class.
          
         if (cls.classId == 0) {
-            const response = await AddClassByCourseId(cls.courseId, scheduleStart, scheduleEnd);
+            const response = await AddClassByCourseId(cls.courseId, editedClass.scheduleStart, editedClass.scheduleEnd);
             // This API will return the new class object with the classId set.
             // If the response is successful, add the new class to the parent component
             if (response.status === 201) {
@@ -66,7 +55,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({class : cls, onAdd, onDele
                 setClassId(newClass.classId);
                 onAdd(newClass);
                 setEditClass(false);
-                console.log('Class added successfully');
+               
             } else
             {
                 console.error(response);
@@ -74,7 +63,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({class : cls, onAdd, onDele
         }
         else // if cls.classId  != 0
         {
-            const response = await EditClassById(cls.classId, scheduleStart, scheduleEnd);
+            const response = await EditClassById(cls.classId, editedClass.scheduleStart, editedClass.scheduleEnd);
             if (response.status === 200) {
                 onAdd(editedClass);
             } else {
@@ -82,7 +71,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({class : cls, onAdd, onDele
             }
         }
 
-        //setEditClass(false);
+        setEditClass(false);
     }
 
     const handleCancel = () => {
@@ -101,7 +90,12 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({class : cls, onAdd, onDele
 
         if (cls.classId != 0) {
 
-            await DeleteClassById(editedClass.classId);
+            const response = await DeleteClassById(editedClass.classId);
+            
+            if (response.status !== 200) {
+                onError('Error deleting class \n' + response);
+                return;
+            }
             
             onDelete(editedClass.classId);
             setDeleted(true);
@@ -116,19 +110,25 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({class : cls, onAdd, onDele
 
 
     const handleStartDateChange = (event: ChangeEvent<HTMLInputElement>): void => {
-        const oldStartTime = editedClass.scheduleStart.toISOString().split('T')[1];
-        const newStartDateTime = new Date(`${event.target.value}T${oldStartTime}`);
+
+        const updateDate = (date: string) => {
+            const oldTime = moment.utc(date).format('HH:mm:ss.SS');
+            return moment.utc(`${event.target.value}T${oldTime}`).format('YYYY-MM-DDTHH:mm:ss[Z]')
+        };
+
+        const newStartDateTime = updateDate(editedClass.scheduleStart);
+        const newEndDateTime = updateDate(editedClass.scheduleEnd);
 
         setEditedClass((prevState) => ({
             ...prevState,
-            scheduleStart: newStartDateTime as unknown as Date, 
+            scheduleStart: newStartDateTime, scheduleEnd: newEndDateTime,
         }));
 
     }
 
     const handleStartTimeChange = (event: ChangeEvent<HTMLInputElement>): void => {
-        const oldStartDate = editedClass.scheduleStart.toISOString();
-        const newScheduleStart = new Date(`${oldStartDate.split('T')[0]}T${event.target.value}`);
+
+        const newScheduleStart = updateTime(editedClass.scheduleStart, event.target.value)
         
         setEditedClass((prevState) => ({
             ...prevState,
@@ -137,8 +137,8 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({class : cls, onAdd, onDele
     }
 
     const handleEndTimeChange = (event: ChangeEvent<HTMLInputElement>): void => {
-        const oldEndDate = editedClass.scheduleEnd.toISOString();
-        const newScheduleEnd = new Date(`${oldEndDate.split('T')[0]}T${event.target.value}`);
+       
+        const newScheduleEnd = updateTime(editedClass.scheduleEnd, event.target.value)
         
         setEditedClass((prevState) => ({
             ...prevState,
@@ -148,38 +148,33 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({class : cls, onAdd, onDele
     }
 
     // Helper Methods
-    const getStartDate = (date: Date | null) => {
+
+    const updateTime = (date: string, time: string) => {
+        const localTime = moment.tz(date, 'America/Denver');
+        const [hours, minutes, seconds] = time.split(':').map(Number);
+        localTime.hours(hours).minutes(minutes).seconds(seconds);
+        return localTime.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    }
+   
+
+    const getStartDate = (date: string | null) => {
         
         if (date === null) {
             return null;
         }
 
-        const localDateTime = new Date(`${date}Z`);
-
-        const formattedDate = localDateTime.toLocaleDateString(
-            'en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                weekday: 'long',
-            }
-        );
-        return formattedDate;
+        return moment.utc(date).tz('America/Denver').format('dddd, MMMM DD, YYYY');
     }
 
-    const formatStringToDate = (dateString: Date) => {
-        const dateObject = new Date(`${dateString}z`);
-        const year = dateObject.getFullYear();
-        const month = (dateObject.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-        const day = dateObject.getDate().toString().padStart(2, '0');
-        return `${year}-${month}-${day}`;
+    const formatStringToDate = (dateString: string) => {
+        return moment(dateString).format('YYYY-MM-DD');
     }
 
-    const getTime = (date: Date) => {
+    const getTime = (date: string) => {
         return moment.utc(date).tz('America/Denver').format('h:mm A'); 
     }
 
-    const formatTime = (time: Date) => {
+    const formatTime = (time: string) => {
         return moment.utc(time).tz('America/Denver').format('HH:mm');
     }
 

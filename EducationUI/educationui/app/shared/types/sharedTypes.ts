@@ -14,8 +14,8 @@ export interface Location {
 export interface Class {
     classId: number;
     courseId: number;
-    scheduleStart: Date;
-    scheduleEnd: Date;
+    scheduleStart: string;
+    scheduleEnd: string;
     attendances: Attendance[];
   }
   
