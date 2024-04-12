@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import SavingModal from '../../shared/modals/SavingModal';
 import { postCourse } from '@/Utilities/api';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
+import { cp } from 'fs';
 
 /**
  * Component for adding a new course. 
@@ -67,8 +68,8 @@ const AddCourse: React.FC = () => {
         const newClass = {
             classId: 0,
             courseId: 0,
-            scheduleStart: scheduleStart,
-            scheduleEnd: scheduleEnd,
+            scheduleStart: scheduleStart.toISOString(),
+            scheduleEnd: scheduleEnd.toISOString(),
             attendances: [],
         };
     
@@ -111,7 +112,7 @@ const AddCourse: React.FC = () => {
     const handleNewClassOnScheduleStartChange = (index: number, date: Date) => {
         if (course) {
             const newClasses = [...course.classes];
-            newClasses[index].scheduleStart = date;
+            newClasses[index].scheduleStart = date.toISOString();
             setCourse({
                 ...course,
                 classes: newClasses
@@ -122,7 +123,7 @@ const AddCourse: React.FC = () => {
     const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
         if (course) {
             const newClasses = [...course.classes];
-            newClasses[index].scheduleEnd = date;
+            newClasses[index].scheduleEnd = date.toISOString();
             setCourse({
                 ...course,
                 classes: newClasses
@@ -150,6 +151,7 @@ const AddCourse: React.FC = () => {
         setIsSaving(true);
         setShowConfirmationModal(false);
         const response = await postCourse(course as Course);
+        
         if (response.status === 201) {
             setIsSaving(false);
             setCourse(undefined);
@@ -202,10 +204,10 @@ const AddCourse: React.FC = () => {
                                 onClick={handleAddClass}
                             >Add Class</button>
 
-                            {/* <button
+                            <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
-                            >Console Log Course</button> */}
+                            >Console Log Course</button>
 
                         </div>
                     </div>

@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 
 
 interface NewClassProps {
-    scheduleStart: Date; // Prop to receive the schedule start date
-    scheduleEnd: Date; // Prop to receive the schedule end date
+    scheduleStart: string; // Prop to receive the schedule start date
+    scheduleEnd: string; // Prop to receive the schedule end date
     onDelete: () => void; // Prop to receive the delete event
     onScheduleStartChange: (date: Date) => void; // Prop to receive the schedule start change event
     onScheduleEndChange: (date: Date) => void; // Prop to receive the schedule end change event

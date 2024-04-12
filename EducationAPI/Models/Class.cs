@@ -25,6 +25,6 @@ namespace EducationAPI.Models
 		public virtual ICollection<Attendance> Attendances { get; set; }
 
 		[JsonIgnore]
-		public Course? Course { get; set; } 
+		public Course? Course { get; set; }
 	}
 }

@@ -24,7 +24,8 @@ export interface Course {
     title: string;
     description: string;
     attendanceCredit: number;
-    completionCredit: number;
+    examCredit: number | null;
+    hasExam: boolean; 
     maxAttendance: number;
     enrollmentDeadline: Date;
     instructorName: string;

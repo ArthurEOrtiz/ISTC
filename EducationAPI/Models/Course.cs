@@ -36,9 +36,11 @@ namespace EducationAPI.Models
 		public int AttendanceCredit { get; set; }
 
 		[Range(0, 100)]
-		public int CompletionCredit { get; set; }
+		public int? ExamCredit { get; set; }
 
-		public int MaxAttendance {  get; set; }
+		public bool HasExam { get; set; }
+
+		public int MaxAttendance { get; set; }
 
 		public DateTime? EnrollmentDeadline { get; set; }
 

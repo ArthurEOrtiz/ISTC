@@ -234,6 +234,60 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetUserCompletedCourses/{userId}")]
+		public async Task<ActionResult<List<Course>>> GetUserCompletedCourses(int userId)
+		{
+			try
+			{
+				var user = await _educationProgramContext.Users
+					.Include(u => u.Student)
+						.ThenInclude(s => s.Attendances)
+							.ThenInclude(a => a.Class)
+								.ThenInclude(c => c.Course)
+					.FirstOrDefaultAsync(u => u.UserId == userId);
+
+				if (user == null)
+				{
+					_logger.LogError("GetUserCompletedCourses({UserId}, user not found.", userId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				var attendedCourses = user.Student.Attendances
+					.Where(a => a.Attended)
+					.Select(a => a.Class.Course)
+					.Distinct();
+
+				var completedCourses = new List<Course>();
+
+				foreach (var course in attendedCourses)
+				{
+					var attendedClassIds = user.Student.Attendances
+							.Where(a => a.Attended && a.Class.CourseId == course.CourseId)
+							.Select(a => a.ClassId)
+							.ToList();
+
+					var totalClassCount = course.Classes.Count;
+
+					var attendedClassCount = await _educationProgramContext.Classes
+							.Where(c => attendedClassIds.Contains(c.ClassId))
+							.CountAsync();
+
+					if (totalClassCount == attendedClassCount)
+					{
+						completedCourses.Add(course);
+					}
+				}
+
+				_logger.LogInformation("GetUserCompletedCourses({UserId}), called", userId);
+				return completedCourses;
+			}
+			catch(Exception ex)
+			{
+				_logger.LogError(ex,"GetUserCompletedCourses({UserId}", userId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 		[HttpGet("GetCoursesByDateRange")]
 		public async Task<ActionResult<List<Course>>> GetCoursesByDateRange(DateTime startDate, DateTime endDate)
 		{
