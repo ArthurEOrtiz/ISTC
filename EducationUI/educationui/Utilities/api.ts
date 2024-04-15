@@ -293,6 +293,16 @@ export async function checkUserExistsByClerkId(clerkId: String) {
     }
 }
 
+export async function CheckUserExistsByEmail(string: string){
+    try {
+        const response = await axiosInstance.get(`User/CheckUserExistsByEmail/${string}`);
+        return response
+    } catch (error: any) {
+        console.error('Error fetching user:', error);
+        throw error.message;
+    }
+}
+
 export async function IsUserAdminByClerkId(clerkId: String) {
     try {
         const response = await axiosInstance.get(`User/IsUserAdminByClerkId/${clerkId}`);

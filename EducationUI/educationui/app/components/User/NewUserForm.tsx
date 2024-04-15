@@ -1,55 +1,22 @@
 'use client';
 import Loading from "@/app/shared/Loading";
 import { User } from "@/app/shared/types/sharedTypes";
+import { CheckUserExistsByEmail } from "@/Utilities/api";
 import { useUser } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import 'react-phone-input-2/lib/style.css';
 
 interface NewUserFormProps {
     onSubmit: (user: User) => void
+    onError : (error: string) => void
 }
 
-const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit}) => {
-    const {user: clerkUser, isLoaded} = useUser();
-    const [user, setUser] = useState<User>();
-
-    useEffect(() => {
-        if (clerkUser && isLoaded) {
-            console.log(clerkUser);
-            setUser({
-                userId: 0,
-                clerkId: clerkUser.id,
-                firstName: clerkUser.firstName || "",
-                lastName: clerkUser.lastName || "",
-                middleName: "",
-                email: clerkUser.emailAddresses[0].emailAddress,
-                employer: "select",
-                jobTitle: "",
-                isAdmin: false,
-                isStudent: true,
-                student: {
-                    studentId: 0,
-                    userId: 0,
-                    accumulatedCredit: 0,
-                    appraisalCertified: false,
-                    mappingCertified: false,
-                    attendances: []
-                },
-                contact: {
-                    contactId: 0,
-                    userId: 0,
-                    phone: "",
-                    addressLine1: "",
-                    addressLine2: "",
-                    state: "ID",
-                    city: "",
-                    zip: ""
-                }
-            });
-        }
-    }, [clerkUser && isLoaded]);
-
+const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError}) => {
+    // Constants
+    const { user: clerkUser, isLoaded } = useUser();
+    const [ user, setUser ] = useState<User>();
+    const [ isEmailValid, setIsEmailValid ] = useState<boolean | null>(null);
     const countyArray = [
         "Ada",
         "Adams",
@@ -97,12 +64,54 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit}) => {
         "Washington"
     ]
 
+    // Effects
+    useEffect(() => {
+        if (clerkUser && isLoaded) {
+            setUser({
+                userId: 0,
+                clerkId: clerkUser.id,
+                firstName: clerkUser.firstName || "",
+                lastName: clerkUser.lastName || "",
+                middleName: "",
+                email: clerkUser.emailAddresses[0].emailAddress,
+                employer: "select",
+                jobTitle: "",
+                isAdmin: false,
+                isStudent: true,
+                student: {
+                    studentId: 0,
+                    userId: 0,
+                    accumulatedCredit: 0,
+                    appraisalCertified: false,
+                    mappingCertified: false,
+                    attendances: []
+                },
+                contact: {
+                    contactId: 0,
+                    userId: 0,
+                    phone: "",
+                    addressLine1: "",
+                    addressLine2: "",
+                    state: "ID",
+                    city: "",
+                    zip: ""
+                }
+            });
+        }
+    }, [clerkUser && isLoaded]);
+
+    // Handlers
     const handleOnSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!user) {
             return;
         }
-        onSubmit(user);
+        if (!isEmailValid || isEmailValid === null) {
+            onError("Please enter a valid email address!");
+            return;
+        } else  {
+            onSubmit(user);
+        }
     }
 
     const handleZipInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -114,14 +123,50 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit}) => {
         }
     }
 
+    const handleEmailBlur = async (event: React.FocusEvent<HTMLInputElement>): Promise<void> => {
+        if (event.target.value) {
+            console.log(event.target.value);
+            const isEmailValid = validatEamil(event.target.value);
+            const doesEmailExist = await checkUserExistsByEmail(event.target.value);
+            console.log(isEmailValid);
+            console.log(doesEmailExist);
+            if (isEmailValid && !doesEmailExist) {
+                setIsEmailValid(true);
+            } else {
+                setIsEmailValid(false);
+            }
+        } else {
+            setIsEmailValid(null);
+        }
+    }
 
+    // Helper Methods
+    const validatEamil = (email: string) => {
+        const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    }
+
+    const checkUserExistsByEmail = async (email: string) => {
+        const response = await CheckUserExistsByEmail(email);
+        if (response.data === true) {
+            onError("The E-mail provided is already in use!");
+            return true;
+        } else if (response.data === false) {
+            return false;
+        } else if (response.status !== 200) {
+            onError("Error checking email!");
+            return false;
+        }
+    }
+
+    // Render 
     if (!isLoaded) {
         return <Loading />;
     }
 
     if (user) {
         return (
-            <form onSubmit={handleOnSubmit} className="bg-base-200 shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <form onSubmit={handleOnSubmit} className="bg-base-200 shadow-md rounded-xl px-8 pt-6 pb-8 mb-4">
                 <div className="mb-4">
                     <label className="block text-sm font-bold mb-2" htmlFor="firstName">
                         First Name
@@ -162,6 +207,9 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit}) => {
                         id="lastName"
                         type="text"
                         placeholder="Last Name"
+                        required
+                        maxLength={50}
+                        minLength={2}
                         value={user?.lastName}
                         onChange={(e) => setUser({ ...user, lastName: e.target.value})}
                     />
@@ -178,7 +226,9 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit}) => {
                         placeholder="Email"
                         value={user?.email}
                         onChange={(e) => setUser({ ...user, email: e.target.value})}
+                        onBlur={handleEmailBlur}
                     />
+                    {isEmailValid === false && (<p className="text-red-500 text-xs italic">Please enter a valid email address</p>)}
                 </div>
 
                 <div className="mb-4">
@@ -186,7 +236,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit}) => {
                         Employer
                     </label>
                     <select
-                        className="select select-bordered w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                         id="employer"
                         value={user?.employer}
                         required
@@ -286,107 +336,109 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit}) => {
                     />
                 </div>
 
-                <div className="mb-4">
-                    <label className="block text-sm font-bold mb-2" htmlFor="city">
-                        City
-                    </label>
-                    <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-                        id="city"
-                        type="text"
-                        placeholder="City"
-                        required
-                        maxLength={50}
-                        value={user.contact.city ?? ''}
-                        onChange={(e) => setUser({ ...user, contact: { ...user.contact, city: e.target.value } })}
-                    />
+                <div className="flex justify-between space-x-2">
+                    <div className="mb-4">
+                        <label className="block text-sm font-bold mb-2" htmlFor="city">
+                            City
+                        </label>
+                        <input
+                            className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                            id="city"
+                            type="text"
+                            placeholder="City"
+                            required
+                            maxLength={50}
+                            value={user.contact.city ?? ''}
+                            onChange={(e) => setUser({ ...user, contact: { ...user.contact, city: e.target.value } })}
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block text-sm font-bold mb-2" htmlFor="state">
+                            State
+                        </label>
+                        <select
+                            className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                            id="state"
+                            value={user.contact.state ?? "ID"}
+                            required
+                            onChange={(e) => setUser({ ...user, contact: { ...user.contact, state: e.target.value } })}
+                        >
+                            <option value="AL">Alabama</option>
+                            <option value="AK">Alaska</option>
+                            <option value="AZ">Arizona</option>
+                            <option value="AR">Arkansas</option>
+                            <option value="CA">California</option>
+                            <option value="CO">Colorado</option>
+                            <option value="CT">Connecticut</option>
+                            <option value="DE">Delaware</option>
+                            <option value="DC">District Of Columbia</option>
+                            <option value="FL">Florida</option>
+                            <option value="GA">Georgia</option>
+                            <option value="HI">Hawaii</option>
+                            <option value="ID">Idaho</option>
+                            <option value="IL">Illinois</option>
+                            <option value="IN">Indiana</option>
+                            <option value="IA">Iowa</option>
+                            <option value="KS">Kansas</option>
+                            <option value="KY">Kentucky</option>
+                            <option value="LA">Louisiana</option>
+                            <option value="ME">Maine</option>
+                            <option value="MD">Maryland</option>
+                            <option value="MA">Massachusetts</option>
+                            <option value="MI">Michigan</option>
+                            <option value="MN">Minnesota</option>
+                            <option value="MS">Mississippi</option>
+                            <option value="MO">Missouri</option>
+                            <option value="MT">Montana</option>
+                            <option value="NE">Nebraska</option>
+                            <option value="NV">Nevada</option>
+                            <option value="NH">New Hampshire</option>
+                            <option value="NJ">New Jersey</option>
+                            <option value="NM">New Mexico</option>
+                            <option value="NY">New York</option>
+                            <option value="NC">North Carolina</option>
+                            <option value="ND">North Dakota</option>
+                            <option value="OH">Ohio</option>
+                            <option value="OK">Oklahoma</option>
+                            <option value="OR">Oregon</option>
+                            <option value="PA">Pennsylvania</option>
+                            <option value="RI">Rhode Island</option>
+                            <option value="SC">South Carolina</option>
+                            <option value="SD">South Dakota</option>
+                            <option value="TN">Tennessee</option>
+                            <option value="TX">Texas</option>
+                            <option value="UT">Utah</option>
+                            <option value="VT">Vermont</option>
+                            <option value="VA">Virginia</option>
+                            <option value="WA">Washington</option>
+                            <option value="WV">West Virginia</option>
+                            <option value="WI">Wisconsin</option>
+                            <option value="WY">Wyoming</option>
+                        </select>
+                    </div>
+
+                    <div className="mb-4 w-1/3">
+                        <label className="block text-sm font-bold mb-2" htmlFor="zip">
+                            Zip
+                        </label>
+                        <input
+                            className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                            id="zip"
+                            type="text"
+                            placeholder="Zip"
+                            required
+                            maxLength={5}
+                            minLength={5}
+                            value={user.contact.zip ?? ''}
+                            onKeyDown={(e) => {handleZipInput(e)}}
+                            onChange={(e) => setUser({ ...user, contact: { ...user.contact, zip: e.target.value } })}
+                        />
+                    </div>
+                
                 </div>
 
-                <div className="mb-4">
-                    <label className="block text-sm font-bold mb-2" htmlFor="state">
-                        State
-                    </label>
-                    <select
-                        className="select select-bordered w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-                        id="state"
-                        value={user.contact.state ?? "ID"}
-                        required
-                        onChange={(e) => setUser({ ...user, contact: { ...user.contact, state: e.target.value } })}
-                    >
-                        <option value="AL">Alabama</option>
-                        <option value="AK">Alaska</option>
-                        <option value="AZ">Arizona</option>
-                        <option value="AR">Arkansas</option>
-                        <option value="CA">California</option>
-                        <option value="CO">Colorado</option>
-                        <option value="CT">Connecticut</option>
-                        <option value="DE">Delaware</option>
-                        <option value="DC">District Of Columbia</option>
-                        <option value="FL">Florida</option>
-                        <option value="GA">Georgia</option>
-                        <option value="HI">Hawaii</option>
-                        <option value="ID">Idaho</option>
-                        <option value="IL">Illinois</option>
-                        <option value="IN">Indiana</option>
-                        <option value="IA">Iowa</option>
-                        <option value="KS">Kansas</option>
-                        <option value="KY">Kentucky</option>
-                        <option value="LA">Louisiana</option>
-                        <option value="ME">Maine</option>
-                        <option value="MD">Maryland</option>
-                        <option value="MA">Massachusetts</option>
-                        <option value="MI">Michigan</option>
-                        <option value="MN">Minnesota</option>
-                        <option value="MS">Mississippi</option>
-                        <option value="MO">Missouri</option>
-                        <option value="MT">Montana</option>
-                        <option value="NE">Nebraska</option>
-                        <option value="NV">Nevada</option>
-                        <option value="NH">New Hampshire</option>
-                        <option value="NJ">New Jersey</option>
-                        <option value="NM">New Mexico</option>
-                        <option value="NY">New York</option>
-                        <option value="NC">North Carolina</option>
-                        <option value="ND">North Dakota</option>
-                        <option value="OH">Ohio</option>
-                        <option value="OK">Oklahoma</option>
-                        <option value="OR">Oregon</option>
-                        <option value="PA">Pennsylvania</option>
-                        <option value="RI">Rhode Island</option>
-                        <option value="SC">South Carolina</option>
-                        <option value="SD">South Dakota</option>
-                        <option value="TN">Tennessee</option>
-                        <option value="TX">Texas</option>
-                        <option value="UT">Utah</option>
-                        <option value="VT">Vermont</option>
-                        <option value="VA">Virginia</option>
-                        <option value="WA">Washington</option>
-                        <option value="WV">West Virginia</option>
-                        <option value="WI">Wisconsin</option>
-                        <option value="WY">Wyoming</option>
-                    </select>
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-sm font-bold mb-2" htmlFor="zip">
-                        Zip
-                    </label>
-                    <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-                        id="zip"
-                        type="text"
-                        placeholder="Zip"
-                        required
-                        maxLength={5}
-                        minLength={5}
-                        value={user.contact.zip ?? ''}
-                        onKeyDown={(e) => {handleZipInput(e)}}
-                        onChange={(e) => setUser({ ...user, contact: { ...user.contact, zip: e.target.value } })}
-                    />
-                </div>
-
-
-
+                
     
                 <button 
                     type="submit"
@@ -394,6 +446,25 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit}) => {
                     >
                         Add User
                 </button>
+
+                {/* <button
+                    type="button"
+                    className="btn btn-secondary text-white mt-4 ml-2"
+                    onClick={(() => console.log(user))}
+                >
+                    USER
+                </button>
+
+                <button
+                    type="button"
+                    className="btn btn-secondary text-white mt-4 ml-2"
+                    onClick= {() => console.log(isEmailValid)}
+                >
+                    IS EMAIL VALID
+                </button> */}
+
+
+    
             
             </form>
         )

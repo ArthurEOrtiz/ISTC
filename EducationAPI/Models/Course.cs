@@ -35,10 +35,10 @@ namespace EducationAPI.Models
 		[Range(0, 100)]
 		public int AttendanceCredit { get; set; }
 
+		public bool HasExam { get; set; }
+
 		[Range(0, 100)]
 		public int? ExamCredit { get; set; }
-
-		public bool HasExam { get; set; }
 
 		public int MaxAttendance { get; set; }
 

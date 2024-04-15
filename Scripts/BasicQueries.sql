@@ -28,3 +28,6 @@ FROM Attendance;
 
 SELECT *
 FROM Courses;
+
+SELECT *
+FROM Location;

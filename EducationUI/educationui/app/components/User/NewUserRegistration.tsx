@@ -29,6 +29,11 @@ const NewUserRegistration: React.FC = () => {
     }
 
 
+    function handleNewUserFormError(error: string): void {
+        setShowErrorMessage(true);
+        setErrorMessage(error);
+    }
+
     return (
         <div>
             <h1 className="p-2 text-3xl text-center font-bold">New User Registration</h1>
@@ -39,6 +44,7 @@ const NewUserRegistration: React.FC = () => {
                 <div className="w-1/2">
                     <NewUserForm 
                         onSubmit={handleNewUserFormOnSubmit} 
+                        onError={handleNewUserFormError}
                     />
                 </div>
             </div>

@@ -151,7 +151,7 @@ const AddCourse: React.FC = () => {
         setIsSaving(true);
         setShowConfirmationModal(false);
         const response = await postCourse(course as Course);
-        
+        console.log(response);
         if (response.status === 201) {
             setIsSaving(false);
             setCourse(undefined);

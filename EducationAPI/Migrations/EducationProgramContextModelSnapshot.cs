@@ -44,7 +44,7 @@ namespace EducationAPI.Migrations
 
                     b.HasIndex("TopicsTopicId");
 
-                    b.ToTable("CourseTopic");
+                    b.ToTable("CourseTopic", (string)null);
 
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                         {

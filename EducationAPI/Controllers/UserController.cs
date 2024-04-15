@@ -133,7 +133,22 @@ namespace EducationAPI.Controllers
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "CheckUserExistsByClerkId({ClerkId})", clerkId);
-				// If an exception occurs, return false
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpGet("CheckUserExistsByEmail/{email}")]
+		public async Task<ActionResult<bool>> CheckUserExistsByEmail(string email)
+		{
+			try
+			{
+				var userExists = await _educationProgramContext.Users.AnyAsync(u => u.Email == email);
+				_logger.LogInformation("CheckUserExistsByEmail({Email})", email);
+				return userExists;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "CheckUserExistsByEmail({Email})", email);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
