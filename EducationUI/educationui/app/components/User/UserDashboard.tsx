@@ -1,7 +1,7 @@
 'use client';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CalculateStudentCreditHours, DeleteUserById, getStudentIdByClerkId, GetUserByClerkId, UpdateUser, UpdateUserContact } from "@/Utilities/api";
-import { Student, User } from '@/app/shared/types/sharedTypes';
+import {  User } from '@/app/shared/types/sharedTypes';
 import Loading from '@/app/shared/Loading';
 import UserInfoCard from './UserInfoCard';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
@@ -39,7 +39,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
 
     useEffect(() => {
         const fetchUser = async () => {
-            console.log("Fetching user")
             const response = await GetUserByClerkId(clerkId);
             switch (response.status) {
                 case 200:
@@ -132,7 +131,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     }
 
     const handleEditEmployerModalOnSubmit = async (editUser: User) => {
-        console.log(editUser);
+        
         const response = await UpdateUser(editUser);
 
         switch (response.status) {

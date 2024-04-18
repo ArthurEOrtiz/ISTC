@@ -259,8 +259,12 @@ namespace EducationAPI.Controllers
 
 				var completedCourses = new List<Course>();
 
+	
+
 				foreach (var course in attendedCourses)
 				{
+					if (course == null) continue;
+
 					var attendedClassIds = user.Student.Attendances
 							.Where(a => a.Attended && a.Class.CourseId == course.CourseId)
 							.Select(a => a.ClassId)

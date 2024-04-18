@@ -236,10 +236,40 @@ export async function deleteTopicById(topicId: Number) {
 export async function getAllUsers() {
     try {
         const response = await axiosInstance.get('User/GetAllUsers');
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching users:', error);
+        return error.message;
+    }
+}
+
+export async function SearchUsers(searchString: string) {
+    try {
+        const response = await axiosInstance.get(`User/SearchUsers/${searchString}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching users:', error);
+        return error.message;
+    }
+}
+
+export async function GetUserById(userId: Number) {
+    try {
+        const response = await axiosInstance.get(`User/GetUserById/${userId}`);
         return response.data;
     } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching user:', error);
         throw error;
+    }
+}
+
+export async function GetUserByEmail(email: string) {
+    try {
+        const response = await axiosInstance.get(`User/GetUserByEmail/${email}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching user:', error);
+        return error.message;
     }
 }
 
@@ -299,7 +329,7 @@ export async function CheckUserExistsByEmail(string: string){
         return response
     } catch (error: any) {
         console.error('Error fetching user:', error);
-        throw error.message;
+        return error.message;
     }
 }
 

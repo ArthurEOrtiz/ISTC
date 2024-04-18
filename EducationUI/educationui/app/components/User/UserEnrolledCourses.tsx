@@ -58,6 +58,7 @@ const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
                             <CourseCard
                                 course={course}
                                 viewOnly={true}
+                                clerkId={user.clerkId!}
                             />
                         </div> 
                     ))

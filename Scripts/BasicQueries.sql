@@ -10,6 +10,9 @@ FROM Contact;
 SELECT *
 FROM Students;
 
+--DELETE FROM Users
+--WHERE UserId IN (1031, 1032);
+
 --UPDATE Students
 --Set AccumulatedCredit = 0
 

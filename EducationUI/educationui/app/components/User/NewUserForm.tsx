@@ -1,22 +1,20 @@
 'use client';
-import Loading from "@/app/shared/Loading";
 import { User } from "@/app/shared/types/sharedTypes";
 import { CheckUserExistsByEmail } from "@/Utilities/api";
-import { useUser } from "@clerk/nextjs";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import 'react-phone-input-2/lib/style.css';
 
 interface NewUserFormProps {
-    onSubmit: (user: User) => void
-    onError : (error: string) => void
+    onSubmit: (user: User) => void;
+    onError : (error: string) => void;
+    user: User | null;
 }
 
-const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError}) => {
+const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : incomingUser}) => {
     // Constants
-    const { user: clerkUser, isLoaded } = useUser();
     const [ user, setUser ] = useState<User>();
-    const [ isEmailValid, setIsEmailValid ] = useState<boolean | null>(null);
+    const [ isEmailValid, setIsEmailValid ] = useState<boolean>(true);
     const countyArray = [
         "Ada",
         "Adams",
@@ -64,41 +62,13 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError}) => {
         "Washington"
     ]
 
-    // Effects
+    //Effects
     useEffect(() => {
-        if (clerkUser && isLoaded) {
-            setUser({
-                userId: 0,
-                clerkId: clerkUser.id,
-                firstName: clerkUser.firstName || "",
-                lastName: clerkUser.lastName || "",
-                middleName: "",
-                email: clerkUser.emailAddresses[0].emailAddress,
-                employer: "select",
-                jobTitle: "",
-                isAdmin: false,
-                isStudent: true,
-                student: {
-                    studentId: 0,
-                    userId: 0,
-                    accumulatedCredit: 0,
-                    appraisalCertified: false,
-                    mappingCertified: false,
-                    attendances: []
-                },
-                contact: {
-                    contactId: 0,
-                    userId: 0,
-                    phone: "",
-                    addressLine1: "",
-                    addressLine2: "",
-                    state: "ID",
-                    city: "",
-                    zip: ""
-                }
-            });
+        if (incomingUser) {
+            setUser(incomingUser);
         }
-    }, [clerkUser && isLoaded]);
+    }, [incomingUser]);
+
 
     // Handlers
     const handleOnSubmit = (e: React.FormEvent) => {
@@ -125,18 +95,17 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError}) => {
 
     const handleEmailBlur = async (event: React.FocusEvent<HTMLInputElement>): Promise<void> => {
         if (event.target.value) {
-            console.log(event.target.value);
+      
             const isEmailValid = validatEamil(event.target.value);
             const doesEmailExist = await checkUserExistsByEmail(event.target.value);
-            console.log(isEmailValid);
-            console.log(doesEmailExist);
+          
             if (isEmailValid && !doesEmailExist) {
                 setIsEmailValid(true);
             } else {
                 setIsEmailValid(false);
             }
         } else {
-            setIsEmailValid(null);
+            setIsEmailValid(false);
         }
     }
 
@@ -159,10 +128,6 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError}) => {
         }
     }
 
-    // Render 
-    if (!isLoaded) {
-        return <Loading />;
-    }
 
     if (user) {
         return (
@@ -293,7 +258,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError}) => {
                         disableCountryGuess={true}
                         disableCountryCode={true}
                         placeholder="(208)123-4567"
-                        value={user?.contact.phone}
+                        value={user?.contact?.phone}
                         onChange={(phone) => setUser({ ...user, contact: { ...user.contact, phone }})}
                         buttonStyle={{display: 'none'}}
                         inputProps={{
@@ -316,7 +281,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError}) => {
                         placeholder="1234 Fake St."
                         required
                         maxLength={50}
-                        value={user.contact.addressLine1 ?? ''}
+                        value={user.contact?.addressLine1 ?? ''}
                         onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine1: e.target.value } })}
                     />
                 </div>
@@ -331,7 +296,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError}) => {
                         type="text"
                         placeholder="Apt. 123 / Optional"
                         maxLength={50}
-                        value={user.contact.addressLine2 ?? ''}
+                        value={user.contact?.addressLine2 ?? ''}
                         onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine2: e.target.value } })}
                     />
                 </div>
@@ -348,7 +313,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError}) => {
                             placeholder="City"
                             required
                             maxLength={50}
-                            value={user.contact.city ?? ''}
+                            value={user.contact?.city ?? ''}
                             onChange={(e) => setUser({ ...user, contact: { ...user.contact, city: e.target.value } })}
                         />
                     </div>
@@ -360,7 +325,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError}) => {
                         <select
                             className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                             id="state"
-                            value={user.contact.state ?? "ID"}
+                            value={user.contact?.state ?? "ID"}
                             required
                             onChange={(e) => setUser({ ...user, contact: { ...user.contact, state: e.target.value } })}
                         >
@@ -430,15 +395,13 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError}) => {
                             required
                             maxLength={5}
                             minLength={5}
-                            value={user.contact.zip ?? ''}
+                            value={user.contact?.zip ?? ''}
                             onKeyDown={(e) => {handleZipInput(e)}}
                             onChange={(e) => setUser({ ...user, contact: { ...user.contact, zip: e.target.value } })}
                         />
                     </div>
                 
                 </div>
-
-                
     
                 <button 
                     type="submit"

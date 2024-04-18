@@ -1,7 +1,9 @@
 ﻿using EducationAPI.DataAccess;
 using EducationAPI.Models;
+using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using System.Net;
 
 namespace EducationAPI.Controllers
@@ -35,6 +37,55 @@ namespace EducationAPI.Controllers
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "GetAllUsers()");
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpGet("SearchUsers/{searchString}")]
+		public async Task<ActionResult<List<User>>> SearchUsers(string searchString)
+		{
+			try
+			{
+				var searchWords = searchString.ToLower().Split(' ');
+
+				Expression<Func<User, bool>> predicate = u => false; // Start with a predicate that returns false
+
+				foreach (var word in searchWords)
+				{
+					var wordCopy = word; // Copy the word to avoid closure issues in the loop
+
+					// Add conditions to the predicate for each word
+					predicate = PredicateBuilder.Or(predicate, u =>
+							u.UserId.ToString().Contains(wordCopy) ||
+							u.FirstName.ToLower().Contains(wordCopy) ||
+							(u.MiddleName != null && u.MiddleName.ToLower().Contains(wordCopy)) ||
+							u.LastName.ToLower().Contains(wordCopy) ||
+							u.Email.ToLower().Contains(wordCopy) ||
+							u.Employer.ToLower().Contains(wordCopy) ||
+							u.JobTitle.ToLower().Contains(wordCopy) ||
+							(u.Contact != null && (
+									u.Contact.ContactId.ToString().Contains(wordCopy) ||
+									(u.Contact.Phone != null && u.Contact.Phone.Contains(wordCopy)) ||
+									(u.Contact.AddressLine1 != null && u.Contact.AddressLine1.ToLower().Contains(wordCopy)) ||
+									(u.Contact.AddressLine2 != null && u.Contact.AddressLine2.ToLower().Contains(wordCopy)) ||
+									(u.Contact.City != null && u.Contact.City.ToLower().Contains(wordCopy)) ||
+									(u.Contact.State != null && u.Contact.State.ToLower().Contains(wordCopy)) ||
+									(u.Contact.Zip != null && u.Contact.Zip.Contains(wordCopy))
+							))
+					);
+				}
+
+				var users = await _educationProgramContext.Users
+						.Include(u => u.Contact)
+						.Include(u => u.Student)
+						.Where(predicate)
+						.ToListAsync();
+
+				return users;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "SearchUsers({SearchString})", searchString);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
@@ -120,6 +171,32 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetUserByEmail/{email}")]
+		public async Task<ActionResult<User>> GetUserByEmail(string email)
+		{
+			try
+			{
+				var user = await _educationProgramContext.Users
+					.Include(u => u.Contact)
+					.FirstOrDefaultAsync(u => u.Email == email);
+
+				if (user == null)
+				{
+					_logger.LogError("GetUserByEmail({Email}) user not found", email);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_logger.LogInformation("GetUserByEmail({Email}), called", email);
+				return user;
+
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetUserByEmail({Email})", email);
+				return new StatusCodeResult ((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 		[HttpGet("CheckUserExistsByClerkId/{clerkId}")]
 		public async Task<ActionResult<bool>> CheckUserExistsByClerkId(string clerkId)
 		{
@@ -193,7 +270,6 @@ namespace EducationAPI.Controllers
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
-
 
 		[HttpGet("IsUserAdminByClerkId/{clerkId}")]
 		public async Task<ActionResult<bool>> IsUserAdminByClerkId(string clerkId)
@@ -328,8 +404,6 @@ namespace EducationAPI.Controllers
 			}
 		}
 
-
-
 		[HttpDelete("DeleteUserById/{id}")]
 		public async Task<ActionResult> DeleteUserById(int id)
 		{
@@ -348,6 +422,7 @@ namespace EducationAPI.Controllers
 
 				_educationProgramContext.Users.Remove(existingUser);
 				await _educationProgramContext.SaveChangesAsync();
+				_logger.LogInformation("DeleUserById({Id}) called", id);
 				return new StatusCodeResult((int)HttpStatusCode.OK);
 			}
 			catch (Exception ex)

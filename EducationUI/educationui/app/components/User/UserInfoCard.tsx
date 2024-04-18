@@ -1,12 +1,24 @@
 'use client';
 import { User } from "@/app/shared/types/sharedTypes";
+import { useRouter } from 'next/navigation';
+
 
 interface UserInfoCardProps {
     user: User;
+    viewOnly?: boolean;
 }
 
-const UserInfoCard: React.FC<UserInfoCardProps> = ({user}) => {
+const UserInfoCard: React.FC<UserInfoCardProps> = ({user, viewOnly = false}) => {
+    // constants
     const formattedPhoneNumber = user.contact?.phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+    const router = useRouter();
+
+    // handlers
+    const handleDeleteUser = () => {
+        console.log('Delete user');
+    }
+
+    // render
     return (
         <div className="bg-base-100 shawdow-md rounded-xl p-4 w-full">
             <h1 className="text-2xl text-center font-bold">{user.firstName} {user.lastName}</h1>
@@ -43,6 +55,25 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user}) => {
                     </div>
                 )}
             </div>
+
+            {viewOnly && (
+                <div className="mt-4 flex justify-end">
+                    <button 
+                        className="btn btn-primary text-white"
+                        onClick={() => router.push(`/admin/users/${user.userId}`)}
+                    >
+                        Edit
+                    </button>
+
+                    <button
+                        className="btn btn-error text-white ml-2"
+                        onClick={handleDeleteUser}
+                    >
+                        Delete
+                    </button>
+                </div>
+            )}
+            
         </div>
     );
 }
