@@ -20,6 +20,11 @@ const AdminNav
                 </Link>
             </li>
             <li>
+                <Link href="/admin/users" className="btn btn-ghost text-white">
+                    Users
+                </Link>
+            </li>
+            <li>
                 <Link href="/admin/attendance" className="btn btn-ghost text-white">
                     Attendance
                 </Link>

@@ -12,21 +12,22 @@ export interface Location {
   }
   
 export interface Class {
-    classId: number | null;
-    courseId: number | null;
-    scheduleStart: Date;
-    scheduleEnd: Date;
+    classId: number;
+    courseId: number;
+    scheduleStart: string;
+    scheduleEnd: string;
     attendances: Attendance[];
   }
   
 export interface Course {
-    courseId: number | null;
+    courseId: number;
     title: string;
     description: string;
     attendanceCredit: number;
-    completionCredit: number;
+    examCredit: number | null;
+    hasExam: boolean; 
     maxAttendance: number;
-    enrollmentDeadline: string;
+    enrollmentDeadline: Date;
     instructorName: string;
     instructorEmail: string;
     pdf: string | null; 
@@ -52,7 +53,7 @@ export interface Course {
   }
 
   export interface User {
-    userId: number | null;
+    userId: number;
     clerkId: string | null;
     firstName: string;
     lastName: string;

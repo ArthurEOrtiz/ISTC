@@ -4,6 +4,7 @@ using EducationAPI.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EducationAPI.Migrations
 {
     [DbContext(typeof(EducationProgramContext))]
-    partial class EducationProgramContextModelSnapshot : ModelSnapshot
+    [Migration("20240411145809_MakeExamCreditNullable")]
+    partial class MakeExamCreditNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -236,9 +238,6 @@ namespace EducationAPI.Migrations
                     b.Property<int?>("ExamCredit")
                         .HasColumnType("int");
 
-                    b.Property<bool>("HasExam")
-                        .HasColumnType("bit");
-
                     b.Property<string>("InstructorEmail")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -455,6 +454,7 @@ namespace EducationAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
 
                     b.Property<string>("ClerkId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")

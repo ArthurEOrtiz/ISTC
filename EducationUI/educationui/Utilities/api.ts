@@ -45,6 +45,16 @@ export async function getAllCourses() {
     }
 }
 
+export async function GetAllEnrollableCourses() {
+    try {
+        const response = await axiosInstance.get('Course/GetAllEnrollableCourses');
+        return response;
+    } catch (error : any) {
+        console.error('Error fetching courses:', error);
+        throw error.message;
+    }
+}
+
 export async function getCourseById(courseId: number) {
     try {
         const response = await axiosInstance.get(`Course/GetCourseById?id=${courseId}`);
@@ -88,10 +98,10 @@ export async function GetUserEnrolledCoursesById(studentId: Number) {
 export async function postCourse(course: Course) {
     try {
         const response = await axiosInstance.post('Course/PostCourse', course);
-        return response.data;
-    } catch (error) {
+        return response
+    } catch (error : any) {
         console.error('Error posting course:', error);
-        throw error;
+        throw error.message;
     }
 }
 
@@ -136,16 +146,16 @@ export async function DeleteCourseById(courseId: Number) {
 }
 
 // Class
-export async function AddClassByCourseId(courseId: Number, scheduleStart: Date, scheduleEnd: Date)
+export async function AddClassByCourseId(courseId: Number, scheduleStart: string, scheduleEnd: string)
 {
     try {
         const url = `Class/AddClassByCourseId?courseId=${courseId}&newStartDate=${scheduleStart}&newEndDate=${scheduleEnd}`;
 
         const response = await axiosInstance.post(url);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error adding class:', error);
-        throw error;
+        throw error.message;
     }
 }
 
@@ -159,25 +169,24 @@ export async function GetClassesByCourseId(courseId: Number) {
     }
 }
 
-export async function EditClassById (classId: Number, scheduleStart: Date, scheduleEnd: Date) {
+export async function EditClassById (classId: Number, scheduleStart: string, scheduleEnd: string) {
     try {
         const url = `Class/EditClassById?id=${classId}&newScheduleStart=${scheduleStart}&newScheduleStop=${scheduleEnd}`;
-
         const response = await axiosInstance.post(url);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error editing class:', error);
-        throw error;
+        throw error.message;
     }
 }
 
 export async function DeleteClassById(classId: Number) {
     try {
         const response = await axiosInstance.delete(`Class/DeleteClassById?id=${classId}`);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error deleting class:', error);
-        throw error;
+        throw error.message;
     }
 }
 
@@ -227,10 +236,40 @@ export async function deleteTopicById(topicId: Number) {
 export async function getAllUsers() {
     try {
         const response = await axiosInstance.get('User/GetAllUsers');
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching users:', error);
+        return error.message;
+    }
+}
+
+export async function SearchUsers(searchString: string) {
+    try {
+        const response = await axiosInstance.get(`User/SearchUsers/${searchString}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching users:', error);
+        return error.message;
+    }
+}
+
+export async function GetUserById(userId: Number) {
+    try {
+        const response = await axiosInstance.get(`User/GetUserById/${userId}`);
         return response.data;
     } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching user:', error);
         throw error;
+    }
+}
+
+export async function GetUserByEmail(email: string) {
+    try {
+        const response = await axiosInstance.get(`User/GetUserByEmail/${email}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching user:', error);
+        return error.message;
     }
 }
 
@@ -281,6 +320,16 @@ export async function checkUserExistsByClerkId(clerkId: String) {
     } catch (error) {
         console.error('Error fetching user:', error);
         throw error;
+    }
+}
+
+export async function CheckUserExistsByEmail(string: string){
+    try {
+        const response = await axiosInstance.get(`User/CheckUserExistsByEmail/${string}`);
+        return response
+    } catch (error: any) {
+        console.error('Error fetching user:', error);
+        return error.message;
     }
 }
 

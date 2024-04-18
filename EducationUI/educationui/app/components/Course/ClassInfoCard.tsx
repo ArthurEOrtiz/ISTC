@@ -1,30 +1,34 @@
 'use client';
 import { AddClassByCourseId, DeleteClassById, EditClassById } from "@/Utilities/api";
-import { ClassSchedule } from "@/app/shared/types/sharedTypes";
+import { Class } from "@/app/shared/types/sharedTypes";
 import { ChangeEvent, useEffect, useState } from "react";
+import moment from 'moment-timezone';
+import { on } from "events";
 
 interface ClassInfoCardProps {
-    classSchedule: ClassSchedule;
-    onAdd: (updatedClassSchdedule : ClassSchedule | null) => void;
+    class: Class;
+    onAdd: (updatedClassSchdedule : Class | null) => void;
     onDelete: (id: number | null) => void;
     editMode: boolean;
+    onError: (message: string) => void;
 };
 
 /**
  * Renders a card component for displaying class information. 
  * 
- * @param classSchedule - The class schedule object.
+ * @param class - The class object.
  * @param onAdd - Callback function to add a class schedule.
  * @param onDelete - Callback function to delete a class schedule.
  * @param editMode - Flag indicating whether the card is in edit mode.
  */
-const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDelete, editMode}) => {
+const ClassInfoCard: React.FC<ClassInfoCardProps> = ({class : cls, onAdd, onDelete, editMode, onError}) => {
     const [editClass, setEditClass] = useState<Boolean>(false);
-    const [oldClassSchedule, setOldClassSchedule ] = useState<ClassSchedule>(classSchedule);
-    const [editedClassSchedule, setEditedClassSchedule] = useState<ClassSchedule>(classSchedule);
+    const [editedClass, setEditedClass] = useState<Class>(cls);
+    const [classId, setClassId] = useState<number>(cls.classId);
     const [deleted, setDeleted] = useState<Boolean>(false);
+    
 
-    useEffect(() => {
+    useEffect(() => { // This allows the parent class to set the edit mode
         if (editMode) {
             setEditClass(true);
         }   
@@ -33,63 +37,67 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
 
     // Handlers
     const handleEdit = () => {
-        //console.log('Edit Class', oldClassSchedule.classId);
         setEditClass(true);
     }
 
     const handleSave = async () => {
+        
+        // If the classId is 0, then we are adding a new class
+        // Otherwise, we are editing an existing class.
          
-        if (oldClassSchedule?.classId == null) {
-            let responseData = null;
-            try {
-                responseData = await AddClassByCourseId(oldClassSchedule.courseId, editedClassSchedule.scheduleStart, editedClassSchedule.scheduleEnd);
-            } catch (error) {
-                throw error;
-            } finally {
-                if (responseData != null) {
-                    const newClass: ClassSchedule = responseData;
-                    setOldClassSchedule(newClass);
-                    setEditedClassSchedule(newClass);
-                    onAdd(newClass);
-                }
+        if (cls.classId == 0) {
+            const response = await AddClassByCourseId(cls.courseId, editedClass.scheduleStart, editedClass.scheduleEnd);
+            // This API will return the new class object with the classId set.
+            // If the response is successful, add the new class to the parent component
+            if (response.status === 201) {
+                const newClass: Class = response.data;
+                setEditedClass(newClass);
+                setClassId(newClass.classId);
+                onAdd(newClass);
+                setEditClass(false);
+               
+            } else
+            {
+                console.error(response);
             }
         }
-        else if (oldClassSchedule?.classId != null)
+        else // if cls.classId  != 0
         {
-            let responseData = null;
-            try {
-                responseData = await EditClassById(oldClassSchedule.classId, editedClassSchedule.scheduleStart, editedClassSchedule.scheduleEnd);
-            } catch (error) {
-                throw error;
-            } finally {
-                if (responseData != null) {
-                    setOldClassSchedule(editedClassSchedule);
-                    onAdd(editedClassSchedule);
-                }
+            const response = await EditClassById(cls.classId, editedClass.scheduleStart, editedClass.scheduleEnd);
+            if (response.status === 200) {
+                onAdd(editedClass);
+            } else {
+                console.error(response);
             }
         }
+
         setEditClass(false);
-  
     }
 
     const handleCancel = () => {
 
-        if (oldClassSchedule?.classId == null) {
+        if (cls.classId == 0) {
             onDelete(null);
             setDeleted(true);
         } else {
             setEditClass(false);
-            setEditedClassSchedule(oldClassSchedule);
+            setEditedClass(cls);
         }
 
     }
 
     const handleDelete = async () => {
 
-        if (oldClassSchedule.classId) {
-            await DeleteClassById(editedClassSchedule.classId);
+        if (cls.classId != 0) {
+
+            const response = await DeleteClassById(editedClass.classId);
             
-            onDelete(editedClassSchedule.classId);
+            if (response.status !== 200) {
+                onError('Error deleting class \n' + response);
+                return;
+            }
+            
+            onDelete(editedClass.classId);
             setDeleted(true);
 
         } else {
@@ -102,99 +110,79 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
 
 
     const handleStartDateChange = (event: ChangeEvent<HTMLInputElement>): void => {
-        const newStartDate = event.target.value;
-        const oldStartDate = editedClassSchedule.scheduleStart.toString();
 
-        // I just need to update the date part of the string
-        const oldStartTime = oldStartDate.split('T')[1];
-        const newStartDateTime = `${newStartDate}T${oldStartTime}`;
+        const updateDate = (date: string) => {
+            const oldTime = moment.utc(date).format('HH:mm:ss.SS');
+            return moment.utc(`${event.target.value}T${oldTime}`).format('YYYY-MM-DDTHH:mm:ss[Z]')
+        };
 
-        setEditedClassSchedule((prevState) => ({
+        const newStartDateTime = updateDate(editedClass.scheduleStart);
+        const newEndDateTime = updateDate(editedClass.scheduleEnd);
+
+        setEditedClass((prevState) => ({
             ...prevState,
-            scheduleStart: newStartDateTime as unknown as Date, 
+            scheduleStart: newStartDateTime, scheduleEnd: newEndDateTime,
         }));
 
     }
 
     const handleStartTimeChange = (event: ChangeEvent<HTMLInputElement>): void => {
-        const newStartTime = event.target.value;
-        const oldStartDate = editedClassSchedule.scheduleStart.toString();
 
-        const newStartTimeObject = new Date(`${oldStartDate.split('T')[0]}T${newStartTime}`);
-        const newStartTimeString = newStartTimeObject.toISOString().slice(0, -5);
-
-        setEditedClassSchedule((prevState) => ({
+        const newScheduleStart = updateTime(editedClass.scheduleStart, event.target.value)
+        
+        setEditedClass((prevState) => ({
             ...prevState,
-            scheduleStart: newStartTimeString as unknown as Date,
+            scheduleStart: newScheduleStart,
         }));
     }
 
     const handleEndTimeChange = (event: ChangeEvent<HTMLInputElement>): void => {
-        const newEndTime = event.target.value;
-        const oldEndDate = editedClassSchedule.scheduleEnd.toString();
+       
+        const newScheduleEnd = updateTime(editedClass.scheduleEnd, event.target.value)
         
-        const newEndTimeObject = new Date(`${oldEndDate.split('T')[0]}T${newEndTime}`);
-        const newEndTimeString = newEndTimeObject.toISOString().slice(0, -5);
-        
-        setEditedClassSchedule((prevState) => ({
+        setEditedClass((prevState) => ({
             ...prevState,
-            scheduleEnd: newEndTimeString as unknown as Date,
+            scheduleEnd: newScheduleEnd,
         }));
 
     }
 
     // Helper Methods
-    const getStartDate = (date: Date | null) => {
+
+    const updateTime = (date: string, time: string) => {
+        const localTime = moment.tz(date, 'America/Denver');
+        const [hours, minutes, seconds] = time.split(':').map(Number);
+        localTime.hours(hours).minutes(minutes).seconds(seconds);
+        return localTime.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    }
+   
+
+    const getStartDate = (date: string | null) => {
         
         if (date === null) {
             return null;
         }
 
-        const localDateTime = new Date(`${date}Z`);
-
-        const formattedDate = localDateTime.toLocaleDateString(
-            'en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                weekday: 'long',
-            }
-        );
-        return formattedDate;
+        return moment.utc(date).tz('America/Denver').format('dddd, MMMM DD, YYYY');
     }
 
-    const formatStringToDate = (dateString: Date) => {
-        const dateObject = new Date(`${dateString}z`);
-        const year = dateObject.getFullYear();
-        const month = (dateObject.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-        const day = dateObject.getDate().toString().padStart(2, '0');
-        return `${year}-${month}-${day}`;
+    const formatStringToDate = (dateString: string) => {
+        return moment(dateString).format('YYYY-MM-DD');
     }
 
-    const getTime = (date: Date) => {
-        const startTime = new Date(`${date}z`);
-        const formattedTime = startTime.toLocaleTimeString(
-            'en-US', {
-                hour: 'numeric',
-                minute: 'numeric',
-                timeZone: 'America/Denver'
-            }
-        );
-        return formattedTime;
+    const getTime = (date: string) => {
+        return moment.utc(date).tz('America/Denver').format('h:mm A'); 
     }
 
-    const formatTime = (time: Date) => {
-        const timeObject = new Date(`${time}z`);
-        const hours = timeObject.getHours().toString().padStart(2, '0'); // Ensure two digits for hours
-        const minutes = timeObject.getMinutes().toString().padStart(2, '0'); // Ensure two digits for minutes
-        return `${hours}:${minutes}`;
+    const formatTime = (time: string) => {
+        return moment.utc(time).tz('America/Denver').format('HH:mm');
     }
 
     if (deleted) {
         return null;
     }
 
-    if (!editClass || !oldClassSchedule) {
+    if (!editClass) {
         return (
             <div className="card w-1/2 bg-base-100 shadow-xl m-2">
 
@@ -209,7 +197,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
                                     Date:
                             </label>
                             <p id="date" className="text-base">
-                                {getStartDate(oldClassSchedule.scheduleStart)}
+                                {getStartDate(cls.scheduleStart)}
                             </p>
                         </div>
 
@@ -221,7 +209,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
                                     Class Id:
                             </label>
                             <p id="classId" className="text-base">
-                                {oldClassSchedule.classId}
+                                {classId}
                             </p>
                         </div>
  
@@ -231,11 +219,11 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
                     <div className="flex justify-between">
                         <div>
                             <label className="text-1xl font-bold" htmlFor="startTime">Start Time</label>
-                            <p id="startTime" className="text-base">{getTime(oldClassSchedule.scheduleStart)}</p>
+                            <p id="startTime" className="text-base">{getTime(cls.scheduleStart)}</p>
                         </div>
                         <div>
                             <label className="text-1xl font-bold" htmlFor="endTime">End Time</label>
-                            <p id="endTime" className="text-base">{getTime(oldClassSchedule.scheduleEnd)}</p>
+                            <p id="endTime" className="text-base">{getTime(cls.scheduleEnd)}</p>
                         </div>
                     </div>
                     <div className="card-actions justify-end">
@@ -263,7 +251,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
                         id="date" 
                         className="text-base"
                         onChange = {handleStartDateChange}
-                        defaultValue={formatStringToDate(oldClassSchedule.scheduleStart)}/>
+                        defaultValue={formatStringToDate(cls.scheduleStart)}/>
 
                     <div className="flex justify-between">
                         <div>
@@ -275,7 +263,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
                                 id="startTime" 
                                 className="text-base" 
                                 onChange = {handleStartTimeChange}
-                                defaultValue={formatTime(oldClassSchedule.scheduleStart)}/>
+                                defaultValue={formatTime(cls.scheduleStart)}/>
                         </div>
                         <div>
                             <label className="text-1xl font-bold mr-1" htmlFor="endTime">
@@ -286,7 +274,7 @@ const ClassInfoCard: React.FC<ClassInfoCardProps> = ({classSchedule, onAdd, onDe
                                 id="endTime" 
                                 className="text-base" 
                                 onChange = {handleEndTimeChange}
-                                defaultValue={formatTime(oldClassSchedule.scheduleEnd)}/>
+                                defaultValue={formatTime(cls.scheduleEnd)}/>
                         </div>
                     </div>
                     <div className="card-actions justify-end">

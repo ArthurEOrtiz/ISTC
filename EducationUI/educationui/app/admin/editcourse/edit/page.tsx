@@ -7,8 +7,6 @@ const EditCourse: React.FC = async () => {
     const courseJson = await getAllCourses();
     const courses = courseJson as Course[];
 
-    
-
     return (
         <CourseList courses={courses}/>
     );

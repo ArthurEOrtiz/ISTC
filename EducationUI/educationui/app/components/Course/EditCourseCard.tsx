@@ -12,10 +12,11 @@ interface CourseCardProps {
   onEdit?: (course: Course) => void; 
   viewOnly?: boolean;
   onAttendance?: (course: Course) => void;
+  clerkId: string;
 }
 
-const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, viewOnly}) => {
-  const { isSignedIn, user } = useUser();
+const CourseCard : React.FC<CourseCardProps> = ({course, clerkId, onEdit, onAttendance, viewOnly}) => {
+  const { isSignedIn } = useUser();
   const [ isConfirmationModalVisible, setIsConfirmationModalVisible ] = useState(false);
   const [ confirmationMessage, setConfirmationMessage ] = useState(''); 
   const [ confirmationTitle, setConfirmationTitle ] = useState('');
@@ -23,18 +24,16 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
   const [ errorMessage, setErrorMessage ] = useState('');
   const [ isEnrolled, setIsEnrolled ] = useState(false);
 
-  // This useEffect will check if the user is enrolled in the course when the component mounts.
+  // Effects
   useEffect(() => {
     if (viewOnly){
       const checkEnrollment = async () => {
-        if (!user) return;
-        console.log("Checking enrollment");
-        const response = await IsUserEnrolledInCourse(user.id, course.courseId as Number);
+        const response = await IsUserEnrolledInCourse(clerkId, course.courseId as Number);
         setIsEnrolled(response);
       }
     checkEnrollment();
     }
-  }, [user])
+  }, [clerkId])
 
   // Handlers
 
@@ -64,7 +63,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
 
 
   // Helpers
-  const formatToMountainTime = (utcDate: Date): string => {
+  const formatToMountainTime = (utcDate: string): string => {
 
     const inputDate =  `${utcDate}z`  
     const localTime = new Date(inputDate)
@@ -84,7 +83,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
       return
     }
 
-    const response = await EnrollStudentByClerkId(user.id, course.courseId as Number);
+    const response = await EnrollStudentByClerkId(clerkId, course.courseId as Number);
 
     switch (response.status) {
       case 500:
@@ -116,7 +115,17 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
       return
     }
 
-    const response = await UnenrollStudentByClerkId(user.id, course.courseId as Number);
+    const now = new Date();
+    const deadline = new Date(course.enrollmentDeadline);
+
+    if (deadline < now) {
+      setErrorMessage("You cannot unenroll from a course that has already started!")
+      setIsErrorModalVisible(true);
+      return;
+    }
+
+
+    const response = await UnenrollStudentByClerkId(clerkId, course.courseId as Number);
 
     switch (response.status) {
       case 500:
@@ -135,6 +144,8 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
     }
     
   }
+
+
 
   return (
     <div className="card-body">
@@ -174,6 +185,11 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
         <p>No classes have been defined for this course!</p>
       )}
 
+      <div>
+        <p className="text-1xl font-bold">Enrollment DeadLine</p>
+        <p>{new Date(course.enrollmentDeadline).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}</p>
+      </div>
+
       {!viewOnly && (
         <div className="card-actions justify-end">
           <button 
@@ -190,7 +206,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
         </div>
       )}
 
-      {viewOnly && !isEnrolled && (
+      {viewOnly && !isEnrolled && new Date(course.enrollmentDeadline) > new Date() && (
         <div className="card-actions justify-end">
           <button
             className="btn btn-primary text-white"
@@ -201,7 +217,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
         </div>
       )}
 
-      {viewOnly && isEnrolled && (
+      {viewOnly && isEnrolled && new Date(course.enrollmentDeadline) > new Date() && (
         <div className="card-actions justify-end">
           <p className="text-green-500">You are enrolled in this course</p>
           <button
@@ -210,6 +226,12 @@ const CourseCard : React.FC<CourseCardProps> = ({course, onEdit, onAttendance, v
             >
             Unenroll
             </button>
+        </div>
+      )}
+
+      {viewOnly && new Date(course.enrollmentDeadline) < new Date() && (
+        <div className="card-actions justify-end">
+          <p className="text-red-500">The enrollment deadline has passed</p>
         </div>
       )}
 

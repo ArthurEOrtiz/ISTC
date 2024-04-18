@@ -15,7 +15,18 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+        const { name, type } = e.target;
+        const value = type === 'checkbox' ? e.target.checked : e.target.value;
+
+        if (name === 'examCredit' && !editCourse.hasExam) {
+        
+            setEditCourse(prevState => ({
+                ...prevState,
+                examCredit: null
+            }));
+            return;
+            
+        }
 
         setEditCourse(prevState => ({
             ...prevState,
@@ -76,17 +87,25 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
     
     const toggleEditMode = () => {
         setEditMode(prevEditMode => !prevEditMode);
+
+        if (!editCourse.hasExam){
+            setEditCourse(prevState => ({
+                ...prevState,
+                examCredit: null
+            }));
+        }
+
         if (!editMode) {
             setEditCourse(course);
         }
 
         if (editMode) {
-            //console.log(editCourse);
+            
             onApply(editCourse);
         }
     }
 
-    const formatEnrollmentDeadline = (enrollmentDeadline: string | undefined | null): string => {
+    const formatEnrollmentDeadline = (enrollmentDeadline: Date): string => {
         if (!enrollmentDeadline) return '';
     
         const utcDate = new Date(enrollmentDeadline);
@@ -104,7 +123,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
         });
     };
 
-    const formatDate = (dateString: string | undefined): string => {
+    const formatDate = (dateString: Date): string => {
         if (!dateString) return ''; // Handle case when dateString is undefined
     
         const date = new Date(dateString);
@@ -212,7 +231,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             type="number"
                             name="attendanceCredit"
                             min={0}
-                            max={editCourse?.completionCredit}
+                            max={100}
                             defaultValue={editCourse?.attendanceCredit}
                             onChange={handleInputChange}
                             onKeyDown={handleNumericInput}
@@ -221,19 +240,6 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         : course?.attendanceCredit}</p>
                 </div>
 
-                <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Completion Credit:</strong> {editMode ?
-                        <input
-                            type="number"
-                            name="completionCredit"
-                            min={course?.attendanceCredit}
-                            max={100}
-                            defaultValue={editCourse?.completionCredit}
-                            onChange={handleInputChange}
-                            onKeyDown={handleNumericInput}
-                            className="border border-gray-300 rounded" />
-                            : course?.completionCredit}</p>
-                </div>
                 <div className="w-full sm:w-1/2  px-1 mb-2">
                     <p><strong>Max Attendance:</strong> {editMode ?
                         <input
@@ -245,7 +251,33 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             className="border border-gray-300 rounded"/>
                             : course?.maxAttendance}</p>
                 </div>
-                <div className="w-full sm:w-1/2  px-1 mb-2">
+
+                <div className="w-full sm:w-1/2 px-1 mb-2">
+                    <p><strong>Has Exam:</strong> {editMode ?
+                        <input
+                            type="checkbox"
+                            name="hasExam"
+                            defaultChecked={editCourse?.hasExam}
+                            onChange={handleInputChange}
+                            className="border border-gray-300 rounded"/>
+                            : course?.hasExam ? 'Yes' : 'No'}</p>
+                </div>
+
+                <div className="w-full sm:w-1/2 px-1 mb-2">
+                    <p><strong>Exam Credit:</strong> {editMode ?
+                        <input
+                            type="number"
+                            name="examCredit"
+                            min={0}
+                            max={100}
+                            defaultValue={editCourse?.examCredit || ''}
+                            onChange={handleInputChange}
+                            onKeyDown={handleNumericInput}
+                            className="border border-gray-300 rounded" />
+                            : course?.examCredit}</p>
+                </div>
+                
+                <div className="w-full px-1 mb-2">
                     <p><strong>Enrollment Deadline:</strong> {editMode ?
                         <input
                             type="date"

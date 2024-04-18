@@ -5,8 +5,10 @@ import ClassInfoCard from "./ClassInfoCard";
 import { useEffect, useState } from "react";
 import SavingModal from "../../shared/modals/SavingModal";
 import ConfirmationModal from "../../shared/modals/ConfirmationModal";
+import ErrorModel from "../../shared/modals/ErrorModal";
 import { useRouter } from "next/navigation";
 import { DeleteCourseById, UpdateCourseById } from "@/Utilities/api";
+import moment from "moment";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -39,6 +41,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+    const [errorMessages, setErrorMessages] = useState<string | null>(null);
     const router = useRouter();
     
     // Effects
@@ -104,13 +107,10 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     const handleOnClassAdd = (): void => {
-        const hasNullClass = courseInfo.classes.some(classSchedule => classSchedule.classId === null);
+        const hasNullClass = courseInfo.classes.some(classSchedule => classSchedule.classId === 0);
 
         if (hasNullClass) {
-            const modal = document.getElementById('warning_modal_class') as HTMLDialogElement | null;
-            if (modal) {
-                modal.showModal();
-            }
+            setErrorMessages('There is an unsaved new class, please save or remove class before adding a new class.');
             return;
         }
 
@@ -124,12 +124,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     const handleOnClassAdded = (updatedClassSchedule: Class | null): void => {
-        console.log("Updated Class Schedule", updatedClassSchedule);
+       
         if (updatedClassSchedule !==  null) {
-            const index = courseInfo.classes.findIndex(classSchedule => classSchedule.classId === null);
+            const index = courseInfo.classes.findIndex(classSchedule => classSchedule.classId === 0);
             if (index !== -1) {
                 const newClasses = [...courseInfo.classes];
-                console.log("New Classes", newClasses);
                 newClasses[index] = updatedClassSchedule;
                 setCourseInfo(prevCourse => {
                     return {
@@ -179,22 +178,18 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
 
     // Helper Methods 
     const addNewClass = (): void => {
-        const today = new Date();
-
-        today.setUTCHours(16,0,0,0);
-        const todayAt9AM = new Date(today)
         
-        today.setUTCHours(24,0,0,0);
-        const todayAt5PM = new Date(today) 
+        const todayAt9AMMountainTime = moment().utc().set({ hour: 15, minute: 0, second: 0 }).format();
+        const todayAt5PMMountainTime = moment().utc().set({ hour: 23, minute: 0, second: 0 }).format();
 
         const newClassSchedule: Class = {
-            classId: null,
+            classId: 0,
             courseId: course.courseId,
-            scheduleStart: todayAt9AM,
-            scheduleEnd: todayAt5PM,
+            scheduleStart: todayAt9AMMountainTime,
+            scheduleEnd: todayAt5PMMountainTime,
             attendances: []
         }
-        //console.log(newClassSchedule)
+        console.log(newClassSchedule)
         setCourseInfo(prevCourse => {
             return {
                 ...prevCourse,
@@ -206,21 +201,21 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
 
     const addNewClassPlusOneDay = (): void => {
         const lastClass = courseInfo.classes[courseInfo.classes.length - 1];
-        const scheduleStartPlusOneDay = new Date(`${lastClass.scheduleStart}Z`);
-        scheduleStartPlusOneDay.setDate(scheduleStartPlusOneDay.getDate() + 1);
-        const newScheduleStart = scheduleStartPlusOneDay.toISOString().slice(0, -5);
-        const scheduleEndPlusOneDay = new Date(`${lastClass.scheduleEnd}Z`);
-        
-        scheduleEndPlusOneDay.setDate(scheduleEndPlusOneDay.getDate() + 1);
-        const newScheduleEnd = scheduleEndPlusOneDay.toISOString().slice(0, -5);
+
+        const addOneDay = (dateString: string): string => {
+            const date = moment(dateString).add(1, 'days').format();
+            return date;
+        }
 
         const newClassSchedule: Class = {
-            classId: null,
+            classId: 0, 
             courseId: course.courseId,
-            scheduleStart: newScheduleStart as unknown as Date,
-            scheduleEnd: newScheduleEnd as unknown as Date,
+            scheduleStart: addOneDay(lastClass.scheduleStart),
+            scheduleEnd: addOneDay(lastClass.scheduleEnd), 
             attendances: []
         }
+
+        console.log(newClassSchedule);
         // Disable edit mode for all other classes 
         setEditModeIndex(null);
         // Add the new class with edit mode enabled 
@@ -272,15 +267,17 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </h1>
                 </div>
                 <div>
-                    <div className="">
-                        {courseInfo.classes.map((classSchedule, index) => (
+                    <div>
+                        {courseInfo.classes.map((cls, index) => (
                             <div key={index} className="flex justify-center">
                                 <ClassInfoCard 
-                                    key={classSchedule.classId}
-                                    classSchedule={classSchedule}
+                                    key={cls.classId}
+                                    class={cls}
                                     onAdd={handleOnClassAdded}
                                     onDelete={handleOnClassInfoCardDelete}
-                                    editMode={index === editModeIndex} />
+                                    editMode={index === editModeIndex}
+                                    onError={(message) => setErrorMessages(message)}
+                                     />
                             </div>
                         ))}
                     </div>
@@ -293,18 +290,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </div>
                 </div>
             </div>
-
-
-            <dialog id="warning_modal_class" className="modal">
-                <div className="modal-box">
-                    <form method="dialog">
-                    {/* if there is a button in form, it will close the modal */}
-                    <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                    </form>
-                    <h3 className="font-bold text-lg text-error">ERROR!</h3>
-                    <p className="py-4">There is an unsaved new class, please save or remove class before adding a new class.</p>
-                </div>
-            </dialog>
 
             {showConfirmationModal && (
                 <ConfirmationModal
@@ -319,7 +304,13 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                 <SavingModal text={'Saving Course...'} />
             )}
 
-
+            {errorMessages && (
+                <ErrorModel
+                    title='Error'
+                    message={errorMessages}
+                    onClose={() => setErrorMessages(null)} 
+                    />
+            )}
 
         </div>
     );

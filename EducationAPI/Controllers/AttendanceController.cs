@@ -93,10 +93,22 @@ namespace EducationAPI.Controllers
 					.Select(a => a.Class.Course)
 					.Distinct();
 
+				if (attendedCourses == null)
+				{
+					_logger.LogError("CalculateStudentCreditHours({StudentId}), error finding attended courses", studentId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
 				int accumulatedCredit = 0;
 
 				foreach (var course in attendedCourses)
 				{
+					if (course == null)
+					{
+						_logger.LogError("CalculateStudentCreditHours({StudentId}), error finding attended course", studentId);
+						continue;
+					}
+
 					var attendedClassIds = student.Attendances
 							.Where(a => a.Attended && a.Class.CourseId == course.CourseId)
 							.Select(a => a.ClassId)

@@ -4,6 +4,7 @@ import { Course } from '@/app/shared/types/sharedTypes';
 import CourseCard from './EditCourseCard';
 import { useRouter } from 'next/navigation';
 import AttendanceModal from '../Attendance/AttendanceModal';
+import { useUser } from '@clerk/clerk-react';
 
 interface CourseListProps {
     courses: Course[];
@@ -14,6 +15,7 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
     const [courseList , setCourseList] = React.useState<Course[]>(courses);
     const [course, setCourse] = React.useState<Course | null>(null);
     const [searchString , setSearchString] = React.useState<string>('');
+    const { user } = useUser();
     const router = useRouter();
 
     useEffect(() => {
@@ -29,6 +31,16 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
             setCourseList(courses);
         }
     }, [searchString]);
+
+    useEffect(() => {
+        setCourseList(courseList.sort(compareDates));
+    }, [courseList]);
+
+    const compareDates = (a: Course, b: Course): number => {
+        const dateA = new Date(a.enrollmentDeadline);
+        const dateB = new Date(b.enrollmentDeadline);
+        return dateA.getTime() - dateB.getTime();
+    }
 
     const handleCourseCardOnEdit = (course: Course): void  => {
         router.push(`/admin/editcourse/edit/course/${course.courseId}`);
@@ -66,13 +78,16 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
                         key={index} 
                         className="card w-full bg-base-100 shadow-xl"
                     >
-                    
+                     {user ? (
                         <CourseCard 
-                            course={course} 
-                            onEdit={handleCourseCardOnEdit} 
-                            onAttendance={handleCourseCardOnAttendance}
-                            viewOnly={viewOnly}
+                        course={course} 
+                        onEdit={handleCourseCardOnEdit} 
+                        onAttendance={handleCourseCardOnAttendance}
+                        viewOnly={viewOnly}
+                        clerkId={user.id}
                         />
+                    ) : null}
+                        
 
                     </div>
                 ))}

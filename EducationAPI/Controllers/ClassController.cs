@@ -150,6 +150,7 @@ namespace EducationAPI.Controllers
 		/// <param name="id"><see cref="int"/> of <see cref="Class.ClassId"/></param>
 		/// <returns>Status code 200</returns>
 		[HttpDelete("DeleteClassById")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
 		public async Task<IActionResult> DeleteClassById(int id)
 		{
 			try
@@ -191,6 +192,7 @@ namespace EducationAPI.Controllers
 		/// The <see cref="Class"/> instance created for the <see cref="Course"/>, and status code 201. 
 		/// </returns>
 		[HttpPost("AddClassByCourseId")]
+		[ProducesResponseType(StatusCodes.Status201Created)]
 		public async Task<ActionResult> AddClassByCourseId(int courseId, DateTime newStartDate, DateTime newEndDate)
 		{
 			try
@@ -216,17 +218,14 @@ namespace EducationAPI.Controllers
 				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("AddClassByCourseId({CourseId}, {NewStartDate}, {NewEndDate}", courseId, newStartDate, newEndDate);
-				//return new StatusCodeResult((int)HttpStatusCode.OK);
+				
 				return new CreatedAtActionResult(nameof(GetClassById), "Class", new {id = newClass.ClassId }, newClass);
-
-
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "AddClassByCourseId({CourseId}, {NewStartDate}, {NewEndDate}", courseId, newStartDate, newEndDate);
 				return new StatusCodeResult((int)(HttpStatusCode.InternalServerError));
 			}
-
 		}
 
 	}

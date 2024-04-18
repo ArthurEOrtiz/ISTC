@@ -22,9 +22,10 @@ namespace EducationAPI.Controllers
 		/// <summary>
 		/// Gets all Course records from the data base. 
 		/// </summary>
-		/// <returns>
-		/// <see cref="List{T}"/> of <see cref="Course"/> with a <see cref="List{T}"/> of children 
-		/// <see cref="Class"/>
+		/// <returns> 
+		/// A <see cref="List{Course}"/> of <see cref="Course"/> with a <see cref="List{T}"/> of children 
+		/// <see cref="Class"/>, a <see cref="List{T}"/> of children <see cref="Topic"/>, and the linked 
+		/// <see cref="Location"/>		
 		/// </returns>
 		[HttpGet("GetAllCourses")]
 		public async Task<ActionResult<List<Course>>> GetAllCourses()
@@ -42,6 +43,54 @@ namespace EducationAPI.Controllers
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "GetAllCourses()");
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpGet("GetAllEnrollableCourses")]
+		public async Task<ActionResult<List<Course>>> GetAllEnrollableCourses()
+		{
+			try
+			{
+				var today = DateTime.Today;
+				var enrollableCourses = new List<Course>();
+
+				var courses = await _educationProgramContext.Courses
+					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
+					.Include(c => c.Topics)
+					.Include(c => c.Location)
+					.Where(c => c.EnrollmentDeadline >= today)
+					.ToListAsync();
+
+				if (courses == null)
+				{
+					_logger.LogError("GetAllEnrollableCourse(), could not find courses.");
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				foreach (Course course in courses)
+				{
+					int MaxAttendance = course.MaxAttendance;
+					var firstClass = course.Classes.FirstOrDefault();
+					if (firstClass == null)
+					{
+						_logger.LogError("GetAllEnrollableCourse(), could not find class");
+						return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					}
+
+					if (firstClass.Attendances.Count < MaxAttendance)
+					{
+						enrollableCourses.Add(course);
+					}
+				}
+
+				_logger.LogInformation("GetAllEnrollableCourse(), called");
+				return enrollableCourses;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetAllEnrollableCourses()");
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
@@ -185,6 +234,64 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("GetUserCompletedCourses/{userId}")]
+		public async Task<ActionResult<List<Course>>> GetUserCompletedCourses(int userId)
+		{
+			try
+			{
+				var user = await _educationProgramContext.Users
+					.Include(u => u.Student)
+						.ThenInclude(s => s.Attendances)
+							.ThenInclude(a => a.Class)
+								.ThenInclude(c => c.Course)
+					.FirstOrDefaultAsync(u => u.UserId == userId);
+
+				if (user == null)
+				{
+					_logger.LogError("GetUserCompletedCourses({UserId}, user not found.", userId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				var attendedCourses = user.Student.Attendances
+					.Where(a => a.Attended)
+					.Select(a => a.Class.Course)
+					.Distinct();
+
+				var completedCourses = new List<Course>();
+
+	
+
+				foreach (var course in attendedCourses)
+				{
+					if (course == null) continue;
+
+					var attendedClassIds = user.Student.Attendances
+							.Where(a => a.Attended && a.Class.CourseId == course.CourseId)
+							.Select(a => a.ClassId)
+							.ToList();
+
+					var totalClassCount = course.Classes.Count;
+
+					var attendedClassCount = await _educationProgramContext.Classes
+							.Where(c => attendedClassIds.Contains(c.ClassId))
+							.CountAsync();
+
+					if (totalClassCount == attendedClassCount)
+					{
+						completedCourses.Add(course);
+					}
+				}
+
+				_logger.LogInformation("GetUserCompletedCourses({UserId}), called", userId);
+				return completedCourses;
+			}
+			catch(Exception ex)
+			{
+				_logger.LogError(ex,"GetUserCompletedCourses({UserId}", userId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 		[HttpGet("GetCoursesByDateRange")]
 		public async Task<ActionResult<List<Course>>> GetCoursesByDateRange(DateTime startDate, DateTime endDate)
 		{
@@ -239,6 +346,7 @@ namespace EducationAPI.Controllers
 		/// The instance of <see cref="Course"/> Created. 
 		/// </returns>
 		[HttpPost("PostCourse")]
+		[ProducesResponseType((int)HttpStatusCode.Created)]
 		public async Task<ActionResult> PostCourse(Course course)
 		{
 			try
@@ -260,12 +368,18 @@ namespace EducationAPI.Controllers
 					}
 				}
 
+				// Set the Course property for each Class in the Course
+				foreach ( var @class in course.Classes)
+				{
+					@class.Course = course;
+				}
+
 				_educationProgramContext.Courses.Add(course);
 				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("PostCourse {Course} called", course);
 				// Should return a 201 status code. 
-				return new StatusCodeResult((int)HttpStatusCode.OK);
+				return new StatusCodeResult((int)HttpStatusCode.Created);
 			}
 			catch (Exception ex)
 			{

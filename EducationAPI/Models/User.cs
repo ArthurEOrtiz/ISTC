@@ -9,7 +9,7 @@ namespace EducationAPI.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int UserId { get; set; }
 
-		public string ClerkId { get; set; } = null!;
+		public string? ClerkId { get; set; }
 
 		[MaxLength(50)]
 		public string FirstName { get; set; } = null!;

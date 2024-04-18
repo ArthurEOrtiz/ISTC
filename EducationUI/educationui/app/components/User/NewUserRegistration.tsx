@@ -1,25 +1,75 @@
 'use client';
-import { PostUser } from "@/Utilities/api";
+import { CheckUserExistsByEmail, GetUserByEmail, PostUser, UpdateUser } from "@/Utilities/api";
 import NewUserForm from "./NewUserForm";
-import { User } from "@/app/shared/types/sharedTypes";
-import { useState } from "react";
+import { Contact, Student, User } from "@/app/shared/types/sharedTypes";
+import { useEffect, useState } from "react";
 import ErrorModal from "@/app/shared/modals/ErrorModal";
 import { redirect } from "next/navigation";
+import { useUser } from "@clerk/clerk-react";
 
-
+/*
+* This page registers new users. Effectively it marries the Clerk user to the education
+* database. It handles 2 scenarios:
+* 1. The user has been signed up by another user, and needs to confirm their information.
+* 2. The user had not signed up yet, and needs to fill out their information.
+*/
 const NewUserRegistration: React.FC = () => {
-    const [showErrorMessage, setShowErrorMessage] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
-    
-    const handleNewUserFormOnSubmit = async (user: User) => {
-        console.log(user);
-        const response = await PostUser(user);
+    const { user: clerkUser } = useUser();
+    const [ user, setUser ] = useState<User | null>(null);
+    const [ showErrorMessage, setShowErrorMessage ] = useState(false);
+    const [ errorMessage, setErrorMessage ] = useState('');
+    const [ isNewUser, setIsNewUser ] = useState(false);    
 
-        if (response.status === 200) {
-             window.location.reload();
+    //Effect
+    useEffect(() => {
+        if (clerkUser?.primaryEmailAddress?.emailAddress) {
+            const email = clerkUser.primaryEmailAddress.emailAddress;
+            const usr = getUserByEmail(email);
+            usr.then((user) => {
+                if (user) {
+                    setUser({
+                        userId: user.userId,
+                        clerkId: clerkUser.id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        middleName: user.middleName,
+                        email: user.email,
+                        employer: user.employer,
+                        jobTitle: user.jobTitle,
+                        isAdmin: user.isAdmin,
+                        isStudent: user.isStudent,
+                        student: user.student,
+                        contact: user.contact
+                    });
+                    setIsNewUser(false);
+                } else {
+                    setUser({
+                        userId: 0,
+                        clerkId: clerkUser.id,
+                        firstName: clerkUser.firstName || '',
+                        lastName: clerkUser.lastName || '',
+                        middleName: '',
+                        email: clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses[0].emailAddress || '',
+                        employer: '',
+                        jobTitle: '',
+                        isAdmin: false,
+                        isStudent: true,
+                        student: {} as Student,
+                        contact: {} as Contact
+                    });
+                    setIsNewUser(true);
+                }
+            });
+            
+        }
+    }, [clerkUser?.primaryEmailAddress?.emailAddress]);
+
+    // handlers
+    const handleNewUserFormOnSubmit = (user: User) => {
+        if (isNewUser) {
+            addNewUser(user);
         } else {
-            setErrorMessage(response);
-            setShowErrorMessage(true);
+            updateUser(user);
         }
     }
 
@@ -28,6 +78,56 @@ const NewUserRegistration: React.FC = () => {
         redirect('/');
     }
 
+    const handleNewUserFormError = (error: string): void => {
+        setShowErrorMessage(true);
+        setErrorMessage(error);
+    }
+
+    // Helpers
+    const doesUserExist = async (email: string) => {
+        const response = await CheckUserExistsByEmail(email);
+        if (response.status === 200) {
+            return response.data;
+        } else {
+            setErrorMessage(response);
+            setShowErrorMessage(true);
+            return false;
+        }
+    }
+
+    const getUserByEmail = async (email: string): Promise<User | null> => {
+        const doesUserExists = await doesUserExist(email);
+        if (doesUserExists) {
+            const response = await GetUserByEmail(email);
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                setErrorMessage(response);
+                setShowErrorMessage(true);
+            }
+        }
+        return null;
+    }
+
+    const addNewUser = async (user: User) => {
+        const response = await PostUser(user);
+        if (response.status === 200) {
+            window.location.reload();
+        } else {
+            setErrorMessage(response);
+            setShowErrorMessage(true);
+        }
+    }
+
+    const updateUser = async (user: User) => {
+        const response = await UpdateUser(user);
+        if (response.status === 200) {
+            window.location.reload();
+        } else {
+            setErrorMessage(response);
+            setShowErrorMessage(true);
+        }
+    }
 
     return (
         <div>
@@ -37,9 +137,13 @@ const NewUserRegistration: React.FC = () => {
             </div>
             <div className="flex justify-center">
                 <div className="w-1/2">
+         
                     <NewUserForm 
-                        onSubmit={handleNewUserFormOnSubmit} 
+                    onSubmit={handleNewUserFormOnSubmit} 
+                    onError={handleNewUserFormError}
+                    user={user}
                     />
+         
                 </div>
             </div>
             {showErrorMessage && (
