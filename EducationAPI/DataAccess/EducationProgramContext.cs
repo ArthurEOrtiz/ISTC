@@ -15,11 +15,12 @@ namespace EducationAPI.DataAccess
 		public DbSet<Class> Classes { get; set; } = null!;
 		public DbSet<Contact> Contacts { get; set; } = null!;
 		public DbSet<Course> Courses { get; set; } = null!;
+		public DbSet<Exam> Exams { get; set; } = null!;
 		public DbSet<Location> Locations { get; set; } = null!;
 		public DbSet<Student> Students { get; set; } = null!;
-		public DbSet<User> Users { get; set; } = null!;
 		public DbSet<Topic> Topics { get; set; } = null!;
-		public DbSet<Exam> Exams { get; set; } = null!;
+		public DbSet<User> Users { get; set; } = null!;
+		public DbSet<WaitList> WaitLists { get; set; } = null!;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -40,22 +41,35 @@ namespace EducationAPI.DataAccess
 
 			modelBuilder.Entity<Attendance>()
 				.ToTable("Attendance", b => b.IsTemporal());
-			modelBuilder.Entity<Class>()
-				.ToTable("Classes", b => b.IsTemporal());
-			modelBuilder.Entity<Contact>()
-				.ToTable("Contact", b => b.IsTemporal());
-			modelBuilder.Entity<Course>()
-				.ToTable("Courses", b => b.IsTemporal());
-			modelBuilder.Entity<Location>()
-				.ToTable("Location", b => b.IsTemporal());
-			modelBuilder.Entity<Student>()
-				.ToTable("Students", b => b.IsTemporal());
-			modelBuilder.Entity<User>()
-				.ToTable("Users", b => b.IsTemporal());
-			modelBuilder.Entity<Topic>()
-				.ToTable("Topics", b => b.IsTemporal());
+
 			modelBuilder.Entity<Exam>()
 				.ToTable("Exams", b => b.IsTemporal());
+
+			modelBuilder.Entity<Class>()
+				.ToTable("Classes", b => b.IsTemporal());
+
+			modelBuilder.Entity<Contact>()
+				.ToTable("Contact", b => b.IsTemporal());
+
+			modelBuilder.Entity<Course>()
+				.ToTable("Courses", b => b.IsTemporal());
+
+			modelBuilder.Entity<Location>()
+				.ToTable("Location", b => b.IsTemporal());
+
+			modelBuilder.Entity<Topic>()
+				.ToTable("Topics", b => b.IsTemporal());
+
+			modelBuilder.Entity<Student>()
+				.ToTable("Students", b => b.IsTemporal());
+
+			modelBuilder.Entity<User>()
+				.ToTable("Users", b => b.IsTemporal());
+
+			modelBuilder.Entity<WaitList>()
+				.ToTable("WaitLists", b => b.IsTemporal());
+			
+			
 		}
 	}
 }
