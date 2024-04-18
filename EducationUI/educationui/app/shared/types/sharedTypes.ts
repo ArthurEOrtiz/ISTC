@@ -53,7 +53,7 @@ export interface Course {
   }
 
   export interface User {
-    userId: number | null;
+    userId: number;
     clerkId: string | null;
     firstName: string;
     lastName: string;
