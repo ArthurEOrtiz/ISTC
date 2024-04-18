@@ -4,6 +4,7 @@ using EducationAPI.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EducationAPI.Migrations
 {
     [DbContext(typeof(EducationProgramContext))]
-    partial class EducationProgramContextModelSnapshot : ModelSnapshot
+    [Migration("20240418180448_AddExamTable")]
+    partial class AddExamTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,7 +232,7 @@ namespace EducationAPI.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime>("EnrollmentDeadline")
+                    b.Property<DateTime?>("EnrollmentDeadline")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("ExamCredit")
@@ -634,7 +636,7 @@ namespace EducationAPI.Migrations
             modelBuilder.Entity("EducationAPI.Models.Exam", b =>
                 {
                     b.HasOne("EducationAPI.Models.Course", "Course")
-                        .WithMany("Exams")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -667,8 +669,6 @@ namespace EducationAPI.Migrations
             modelBuilder.Entity("EducationAPI.Models.Course", b =>
                 {
                     b.Navigation("Classes");
-
-                    b.Navigation("Exams");
                 });
 
             modelBuilder.Entity("EducationAPI.Models.Student", b =>

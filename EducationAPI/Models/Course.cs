@@ -19,6 +19,7 @@ namespace EducationAPI.Models
 		{
 			Classes = new HashSet<Class>();
 			Topics = new HashSet<Topic>();	
+			Exams = new HashSet<Exam>();
 		}
 
 		[Key]
@@ -42,7 +43,7 @@ namespace EducationAPI.Models
 
 		public int MaxAttendance { get; set; }
 
-		public DateTime? EnrollmentDeadline { get; set; }
+		public DateTime EnrollmentDeadline { get; set; }
 
 		[MaxLength(50)]
 		public string? InstructorName { get; set; }
@@ -62,5 +63,7 @@ namespace EducationAPI.Models
 		public virtual ICollection<Topic> Topics { get; set; }
 
 		public virtual ICollection<Class> Classes { get; set; }
+
+		public virtual ICollection<Exam> Exams { get; set; } 
 	}
 }

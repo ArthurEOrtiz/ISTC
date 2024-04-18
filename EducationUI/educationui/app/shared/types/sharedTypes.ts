@@ -22,16 +22,16 @@ export interface Class {
 export interface Course {
     courseId: number;
     title: string;
-    description: string;
+    description: string | null;
     attendanceCredit: number;
+    hasExam: boolean;
     examCredit: number | null;
-    hasExam: boolean; 
     maxAttendance: number;
     enrollmentDeadline: Date;
-    instructorName: string;
+    instructorName: string | null;
     instructorEmail: string;
     pdf: string | null; 
-    locationId: number | null;
+    locationId: number;
     location: Location;
     topics: Topic[] | null;
     classes: Class[];
@@ -77,8 +77,8 @@ export interface Course {
   }
 
   export interface Contact {
-    contactId: number | null;
-    userId: number | null;
+    contactId: number;
+    userId: number;
     phone: string | null;
     addressLine1: string | null;
     addressLine2: string | null;

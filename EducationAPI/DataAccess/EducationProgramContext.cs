@@ -19,6 +19,7 @@ namespace EducationAPI.DataAccess
 		public DbSet<Student> Students { get; set; } = null!;
 		public DbSet<User> Users { get; set; } = null!;
 		public DbSet<Topic> Topics { get; set; } = null!;
+		public DbSet<Exam> Exams { get; set; } = null!;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -53,6 +54,8 @@ namespace EducationAPI.DataAccess
 				.ToTable("Users", b => b.IsTemporal());
 			modelBuilder.Entity<Topic>()
 				.ToTable("Topics", b => b.IsTemporal());
+			modelBuilder.Entity<Exam>()
+				.ToTable("Exams", b => b.IsTemporal());
 		}
 	}
 }
