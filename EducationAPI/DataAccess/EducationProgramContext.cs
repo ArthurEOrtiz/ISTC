@@ -40,7 +40,7 @@ namespace EducationAPI.DataAccess
 			*/
 
 			modelBuilder.Entity<Attendance>()
-				.ToTable("Attendance", b => b.IsTemporal());
+				.ToTable("Attendances", b => b.IsTemporal());
 
 			modelBuilder.Entity<Exam>()
 				.ToTable("Exams", b => b.IsTemporal());
@@ -49,13 +49,13 @@ namespace EducationAPI.DataAccess
 				.ToTable("Classes", b => b.IsTemporal());
 
 			modelBuilder.Entity<Contact>()
-				.ToTable("Contact", b => b.IsTemporal());
+				.ToTable("Contacts", b => b.IsTemporal());
 
 			modelBuilder.Entity<Course>()
 				.ToTable("Courses", b => b.IsTemporal());
 
 			modelBuilder.Entity<Location>()
-				.ToTable("Location", b => b.IsTemporal());
+				.ToTable("Locations", b => b.IsTemporal());
 
 			modelBuilder.Entity<Topic>()
 				.ToTable("Topics", b => b.IsTemporal());

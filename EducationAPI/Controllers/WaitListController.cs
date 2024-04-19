@@ -84,7 +84,7 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var waitListToUpdate = await _educationProgramContext.WaitLists
-				.FirstOrDefaultAsync(w => w.WaitListId == waitList.WaitListId);
+					.FirstOrDefaultAsync(w => w.WaitListId == waitList.WaitListId);
 
 				if (waitListToUpdate == null)
 				{
