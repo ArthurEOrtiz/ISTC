@@ -142,11 +142,11 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                     <input
                         type="text"
                         name="title"
-                        defaultValue={editCourse?.title}
+                        defaultValue={editCourse.title}
                         onChange={handleInputChange}
                         className="border border-gray-300 rounded"
                 
-                    /> : course?.title}</h1>
+                    /> : course.title}</h1>
 
                 <div className="mb-4 mt-1">
 
@@ -157,13 +157,13 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             <textarea
                                 name="description"
                                 maxLength = {255}
-                                defaultValue={editCourse.description}
+                                defaultValue={editCourse.description || ""}
                                 onChange={handleTextAreaChange}
-                                className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                                 />
-                            <CharacterCounter value={editCourse.description} limit={255} />
+                            <CharacterCounter value={course.description ?? ""} limit={500} />
                         </>
-                        : course?.description}
+                        : course.description}
                 </div>
 
                 <div className="mb-4">
@@ -210,20 +210,20 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             type="text"
                             name="instructorName"
                             maxLength={50}
-                            defaultValue={editCourse?.instructorName}
+                            defaultValue={editCourse.instructorName || ''}
                             onChange={handleInputChange}
                             className="border border-gray-300 rounded"/>
-                            : course?.instructorName}</p>
+                            : course.instructorName}</p>
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
                     <p><strong>Email:</strong> {editMode?
                         <input
                             type="email"
                             name="instructorEmail"
-                            defaultValue={editCourse?.instructorEmail}
+                            defaultValue={editCourse.instructorEmail || ''}
                             onChange={handleInputChange}
                             className="border border-gray-300 rounded"/>
-                            : course?.instructorEmail}</p>
+                            : course.instructorEmail}</p>
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
                     <p><strong>Attendance Credit:</strong> {editMode ?
@@ -232,12 +232,12 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             name="attendanceCredit"
                             min={0}
                             max={100}
-                            defaultValue={editCourse?.attendanceCredit}
+                            defaultValue={editCourse.attendanceCredit || ''}
                             onChange={handleInputChange}
                             onKeyDown={handleNumericInput}
                             className="border border-gray-300 rounded"
                         />
-                        : course?.attendanceCredit}</p>
+                        : course.attendanceCredit}</p>
                 </div>
 
                 <div className="w-full sm:w-1/2  px-1 mb-2">
@@ -245,11 +245,11 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="number"
                             name="maxAttendance"
-                            defaultValue={editCourse?.maxAttendance}
+                            defaultValue={editCourse.maxAttendance}
                             onChange={handleInputChange}
                             onKeyDown={handleNumericInput}
                             className="border border-gray-300 rounded"/>
-                            : course?.maxAttendance}</p>
+                            : course.maxAttendance}</p>
                 </div>
 
                 <div className="w-full sm:w-1/2 px-1 mb-2">
@@ -257,10 +257,10 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                         <input
                             type="checkbox"
                             name="hasExam"
-                            defaultChecked={editCourse?.hasExam}
+                            defaultChecked={editCourse.hasExam}
                             onChange={handleInputChange}
                             className="border border-gray-300 rounded"/>
-                            : course?.hasExam ? 'Yes' : 'No'}</p>
+                            : course.hasExam ? 'Yes' : 'No'}</p>
                 </div>
 
                 <div className="w-full sm:w-1/2 px-1 mb-2">
@@ -270,11 +270,11 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             name="examCredit"
                             min={0}
                             max={100}
-                            defaultValue={editCourse?.examCredit || ''}
+                            defaultValue={editCourse.examCredit || ''}
                             onChange={handleInputChange}
                             onKeyDown={handleNumericInput}
                             className="border border-gray-300 rounded" />
-                            : course?.examCredit}</p>
+                            : course.examCredit}</p>
                 </div>
                 
                 <div className="w-full px-1 mb-2">
@@ -285,7 +285,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             defaultValue={formatDate(editCourse?.enrollmentDeadline)}
                             onChange={handleInputChange}
                             className="border border-gray-300 rounded"/>
-                            : formatEnrollmentDeadline(course?.enrollmentDeadline)}</p>
+                            : formatEnrollmentDeadline(course.enrollmentDeadline)}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
                     <p><strong>PDF:</strong> {editMode ?
@@ -295,7 +295,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             defaultValue={editCourse?.pdf || ''}
                             onChange={handleInputChange}
                             className="border border-gray-300 rounded"/>
-                            : course?.pdf}</p>
+                            : course.pdf}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
                     <p><strong>Location:</strong> {editMode ? 
@@ -305,7 +305,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             defaultValue={editCourse?.location?.description || ''}
                             onChange={(e) => handleLocationInputChange(e, 'description')}
                             className="border border-gray-300 rounded w-1/2"/>
-                            : course?.location?.description}</p>
+                            : course.location.description}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
                     <p><strong>Room:</strong> {editMode ?
@@ -315,7 +315,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             defaultValue={editCourse?.location?.room || ''}
                             onChange={(e) => handleLocationInputChange(e, "room")}
                             className="border border-gray-300 rounded"/>
-                            : course?.location?.room}</p>
+                            : course.location.room}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
                     <p><strong>Remote Link:</strong> {editMode ? 
@@ -325,7 +325,7 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             defaultValue={editCourse?.location?.remoteLink || ''}
                             onChange={(e)=> handleLocationInputChange(e, "remoteLink")}
                             className="border border-gray-300 rounded w-1/2" />
-                            : course?.location?.remoteLink}</p>
+                            : course.location.remoteLink}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
                     <p><strong>Address Line 1:</strong> {editMode ?
@@ -333,10 +333,10 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             type="text"
                             name="locationAddressLine1"
                             maxLength={50}
-                            defaultValue={editCourse?.location?.addressLine1}
+                            defaultValue={editCourse.location.addressLine1 || ''}
                             onChange={(e) => handleLocationInputChange(e, "addressLine1")}
                             className="border border-gray-300 rounded w-1/2" />
-                            : course?.location?.addressLine1}</p>
+                            : course.location.addressLine1}</p>
                 </div>
                 <div className="w-full px-1 mb-2">
                     <p><strong>Address Line 2:</strong> {editMode ?
@@ -344,10 +344,10 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             type="text"
                             name="locationAddressLine2"
                             maxLength={50}
-                            defaultValue={editCourse?.location?.addressLine2 || ''}
+                            defaultValue={editCourse.location.addressLine2 || ''}
                             onChange={(e) => handleLocationInputChange(e, "addressLine2")}
                             className="border border-gray-300 rounded w-1/2" />
-                            : course?.location?.addressLine2}</p>
+                            : course.location.addressLine2}</p>
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
                     <p><strong>City:</strong> {editMode ?
@@ -355,10 +355,10 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             type="text"
                             name="locationCity"
                             maxLength={50}
-                            defaultValue={editCourse?.location?.city}
+                            defaultValue={editCourse.location.city || ''}
                             onChange={(e) => handleLocationInputChange(e, "city")}
                             className="border border-gray-300 rounded" />
-                            : course?.location?.city}</p>
+                            : course.location.city}</p>
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
                     <p><strong>State:</strong> {editMode ?
@@ -366,10 +366,10 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             type="text"
                             name="locationState"
                             maxLength={50}
-                            defaultValue={editCourse?.location?.state}
+                            defaultValue={editCourse.location.state || ''}
                             onChange={(e) => handleLocationInputChange(e, "state")}
                             className="border border-gray-300 rounded" />
-                            : course?.location?.state}</p>
+                            : course.location.state}</p>
                 </div>
                 <div className="w-full sm:w-1/2 px-1 mb-2">
                     <p><strong>Zip:</strong> {editMode ?
@@ -377,11 +377,11 @@ const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
                             type="text"
                             name="locationZip"
                             maxLength={10}
-                            defaultValue={editCourse?.location?.postalCode}
+                            defaultValue={editCourse.location.postalCode ||''}
                             onChange={(e) => handleLocationInputChange(e, "postalCode")}
                             onKeyDown={handleNumericInput}
                             className="border border-gray-300 rounded" />
-                            : course?.location?.postalCode}</p>
+                            : course.location.postalCode}</p>
                 </div>
             </div>
             <button 

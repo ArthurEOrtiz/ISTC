@@ -174,16 +174,19 @@ const AddCourse: React.FC = () => {
             ) : (
                 
                 <>
-                    <div >
+                    <div>
                             <button
                                 className="btn btn-primary text-white mb-4"
                                 onClick={handleSaveCourse}
-                            >Save Course</button>
+                            >
+                                Save Course
+                            </button>
                     </div>
                     
                     <div>
                         <CourseInfoCard course={course} onApply={handleCourseInfoCardOnApply} />
                     </div>
+
                     <div>
                         {course.classes.map((classItem, index) => (
                             
@@ -198,16 +201,20 @@ const AddCourse: React.FC = () => {
                             </div>
                             ))
                         }
-                        <div className = "mt-2">
+                        <div className="mt-2">
                             <button
                                 className="btn btn-primary text-white"
                                 onClick={handleAddClass}
-                            >Add Class</button>
+                            >
+                                Add Class
+                            </button>
 
-                            <button
+                            {/* <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
-                            >Console Log Course</button>
+                            >
+                                Console Log Course
+                            </button> */}
 
                         </div>
                     </div>
