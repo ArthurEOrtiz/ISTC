@@ -34,12 +34,14 @@ export interface Course {
   maxAttendance: number;
   enrollmentDeadline: Date;
   instructorName: string | null;
-  instructorEmail: string;
+  instructorEmail: string | null;
   pdf: string | null; 
   locationId: number;
   location: Location;
-  topics: Topic[] | null;
+  topics: Topic[];
   classes: Class[];
+  Exams: Exam[];
+  WaitLists: WaitList[];
 }
 
 export interface Exam {
@@ -50,15 +52,15 @@ export interface Exam {
 }
 
 export interface Location {
-  locationId: number | null;
+  locationId: number;
   description: string | null;
   room: string | null;
   remoteLink: string | null;
-  addressLine1: string;
+  addressLine1: string | null;
   addressLine2: string | null;
-  city: string;
-  state: string;
-  postalCode: string;
+  city: string | null;
+  state: string | null;
+  postalCode: string | null;
 }
 
 export interface Student {
@@ -90,6 +92,14 @@ export interface User {
   isStudent: boolean;
   student : Student | null;
   contact: Contact;
+}
+
+export interface WaitList {
+  waitListId: number;
+  courseId: number;
+  userId: number;
+  dateAdded: Date;
+  toEnroll: boolean;  
 }
   
 

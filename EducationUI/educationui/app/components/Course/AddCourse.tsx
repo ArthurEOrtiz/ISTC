@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import SavingModal from '../../shared/modals/SavingModal';
 import { postCourse } from '@/Utilities/api';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
-import { cp } from 'fs';
+
 
 /**
  * Component for adding a new course. 

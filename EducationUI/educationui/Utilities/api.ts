@@ -101,7 +101,7 @@ export async function postCourse(course: Course) {
         return response
     } catch (error : any) {
         console.error('Error posting course:', error);
-        throw error.message;
+        return error.message;
     }
 }
 
