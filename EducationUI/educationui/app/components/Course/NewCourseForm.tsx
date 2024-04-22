@@ -17,7 +17,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
         examCredit: null,
         hasExam: false,
         maxAttendance: 0,
-        enrollmentDeadline: new Date(new Date().setDate(new Date().getDate() + 1)), // today plus on day.
+        enrollmentDeadline: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1), // today plus on day.
         instructorName: null,
         instructorEmail: null,
         pdf: null,

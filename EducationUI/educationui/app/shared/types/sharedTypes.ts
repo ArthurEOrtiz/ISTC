@@ -90,7 +90,7 @@ export interface User {
   jobTitle: string; 
   isAdmin: boolean;
   isStudent: boolean;
-  student : Student | null;
+  student : Student;
   contact: Contact;
 }
 

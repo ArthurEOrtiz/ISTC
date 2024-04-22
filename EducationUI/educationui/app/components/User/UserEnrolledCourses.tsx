@@ -15,32 +15,24 @@ const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
 
     useEffect(() => {
         const fetchUserAttendance = async () => {
-            const studentId = user?.student?.studentId;
-            if (!studentId) {
-                //TODO: Handle error  
-                return;  
-            }
-            const response = await GetUserEnrolledCoursesById(studentId);
-            switch (response.status) {
-                case 200:
-                    // Sort the courses by enrollmentDeadline
-                    const sortedCourses = response.data.sort((a: Course, b: Course) => {
-                        return new Date(a.enrollmentDeadline).getTime() - new Date(b.enrollmentDeadline).getTime();
-                    });
-                    const reversedCourses = sortedCourses.reverse();
-                    setCourses(reversedCourses);
-                    break;
-                case 404:
-                    setErrorMessage('There was an error finding courses for this user.');
-                    setShowErrorModal(true);
-                    break;
-                default:
-                    break;
+            
+            const response = await GetUserEnrolledCoursesById(user.userId);
+            
+            if (response.status !== 200){
+                setErrorMessage(`There was an error finding courses for this user. ${response}`);
+                setShowErrorModal(true);
+            } else {
+                // Sort the courses by enrollmentDeadline
+                const sortedCourses = response.data.sort((a: Course, b: Course) => {
+                    return new Date(a.enrollmentDeadline).getTime() - new Date(b.enrollmentDeadline).getTime();
+                });
+                const reversedCourses = sortedCourses.reverse();
+                setCourses(reversedCourses);
             }
         }
         fetchUserAttendance();
     }
-    , [courses]);
+    , []);
 
     return (
         <div className='bg-base-100 shadow-md rounded-xl p-4 w-full'>

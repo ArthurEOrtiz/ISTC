@@ -133,7 +133,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     const handleEditEmployerModalOnSubmit = async (editUser: User) => {
         
         const response = await UpdateUser(editUser);
-
+        console.log("editUser", editUser)
+        console.log(response.status);
         switch (response.status) {
             case 200:
                 setUser(response.data);

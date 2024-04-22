@@ -209,12 +209,12 @@ const AddCourse: React.FC = () => {
                                 Add Class
                             </button>
 
-                            {/* <button
+                            <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
                             >
                                 Console Log Course
-                            </button> */}
+                            </button>
 
                         </div>
                     </div>

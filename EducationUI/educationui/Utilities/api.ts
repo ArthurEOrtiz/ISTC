@@ -85,9 +85,9 @@ export async function getCoursesByDateRange(startDate: string, endDate: string) 
     }
 }
 
-export async function GetUserEnrolledCoursesById(studentId: Number) {
+export async function GetUserEnrolledCoursesById(userId: Number) {
     try {
-        const response = await axiosInstance.get(`Course/GetUserEnrolledCoursesById/${studentId}`);
+        const response = await axiosInstance.get(`Course/GetUserEnrolledCoursesById/${userId}`);
         return response;
     } catch (error: any) {
         console.error('Error fetching courses:', error);
