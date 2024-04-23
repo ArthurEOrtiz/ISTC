@@ -1,5 +1,5 @@
 import { Topic } from "@/app/shared/types/sharedTypes";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CharacterCounter from "../../shared/CharacterCounter";
 
 interface NewTopicFormProps {
