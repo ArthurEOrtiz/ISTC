@@ -167,8 +167,6 @@ const CourseCard : React.FC<CourseCardProps> = ({course, clerkId, onEdit, onAtte
           </div>
         )}
       </div>
-
-
       
       {course.classes && course.classes.length > 0 ? (
         <div className="flex justify-between">

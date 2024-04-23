@@ -85,12 +85,12 @@ const NewClass: React.FC<NewClassProps> = ({scheduleStart, scheduleEnd,  onDelet
     }
 
     return (
-        <div className="bg-base-100 shadow-md rounded-xl p-4 relative">
+        <div>
             <button
-                className="absolute top-0 right-0 mr-2 mt-1 bg-red-500 text-white px-2 py-1 rounded-full font-bold"
+                className="absolute top-0 right-0 mr-2 mt-1 text-error px-2 py-1 rounded-full font-bold"
                 onClick={handleRemoveClick}
             >
-                x
+                Delete
             </button>
             <div className="flex flex-wrap -mx-3 mb-6">
                 <div className="w-full px-3 mb-6 md:w-1/3 md:mb-0">

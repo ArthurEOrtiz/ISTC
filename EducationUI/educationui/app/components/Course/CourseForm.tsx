@@ -3,41 +3,14 @@ import { Course } from "@/app/shared/types/sharedTypes";
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 import CharacterCounter from "../../shared/CharacterCounter";
 
-interface NewCourseFormProps {
+interface CourseFormProps {
     onSubmit: (course : Course) => void;
+    course: Course;
 }
 
-const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
-
-    const [course , setCourse] = useState<Course>({
-        courseId: 0,
-        title: '',
-        description: null,
-        attendanceCredit: 0,
-        examCredit: null,
-        hasExam: false,
-        maxAttendance: 0,
-        enrollmentDeadline: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1), // today plus on day.
-        instructorName: null,
-        instructorEmail: null,
-        pdf: null,
-        locationId: 0,
-        location: {
-            locationId: 0,
-            description: null,
-            room: null,
-            remoteLink: null,
-            addressLine1: null,
-            addressLine2: null,
-            city: 'Boise',
-            state: 'ID',
-            postalCode: null,
-        },
-        topics: [],
-        classes: [],
-        Exams: [],
-        WaitLists: [],
-    });
+const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }) => {
+    
+    const [course, setCourse] = useState<Course>(inboundCourse);
 
     const [titleTouched, setTitleTouched] = useState<boolean>(false);
     const [istitleValid, setIsTitleValid] = useState<boolean>();
@@ -59,9 +32,37 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
     const isFormValid = istitleValid && isEmailValid && isAttendanceCreditValid && isExamCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid;
 
+    // effects
+
+    useEffect(() => {
+        setCourse(inboundCourse);
+    }, [inboundCourse]);
+
     useEffect(() => {
         setIsExamCreditValid(validateExamCredit(course.examCredit, course.hasExam));
     }, [course.examCredit, course.hasExam]);
+
+    useEffect(() => {
+        if (course.title !== '') {
+            // setTitleTouched(true);
+            setIsTitleValid(true);
+        }
+
+        if (course.attendanceCredit > 0) {
+            // setAttendanceCreditTouched(true);
+            setIsAttendanceCreditValid(true);
+        }
+
+        if (course.maxAttendance > 0) {
+            // setAttendanceCreditTouched(true);
+            setIsMaxAttendanceValid(true);
+        }
+
+        // if (course.enrollmentDeadline > new Date()) {
+        //     // setEnrollmentDeadlineTouched(true);
+        //     setIsEnrollmentDeadlineValid(true);
+        // }
+    }, [course])
 
     // Handlers
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -74,8 +75,8 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
     
         switch (true) {
             case id === 'description': {
-                // Limit description to 255 characters
-                const truncatedValue = value.slice(0, 255);
+                // Limit description to 500 characters
+                const truncatedValue = value.slice(0, 500);
                 setCourse((prevCourse) => ({
                     ...prevCourse,
                     description: truncatedValue,
@@ -206,7 +207,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="bg-base-100 shadow-md rounded-xl px-8 pt-6 pb-8 mb-4">
+        <form onSubmit={handleSubmit}>
 
             <div className="mb-4">
                 <label
@@ -221,6 +222,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     id="title"
                     type="text"
                     placeholder="Title"
+                    defaultValue={course.title}
                     required
                     maxLength={50}
                     onChange = {handleChange}
@@ -243,8 +245,10 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                     id="description"
                     placeholder="Optional"
+                    defaultValue={course.description ?? ''}
                     maxLength={500}
                     onChange = {handleChange}
+                    rows={5}
                 />
                 <div className="flex justify-between">
                     <p className="text-xs text-green-600 italic">Optional</p>
@@ -266,6 +270,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         id="instructorName"
                         type="text"
                         placeholder="John Doe"
+                        defaultValue={course?.instructorName || ''}
                         maxLength={50}
                         onChange = {handleChange}
                     />
@@ -284,6 +289,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         id="instructorEmail"
                         type="email"
                         placeholder="valid@Email.com"
+                        defaultValue={course?.instructorEmail || ''}
                         onChange = {handleChange}
                         onBlur={handleEmailBlur}
                     />
@@ -310,6 +316,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         min={1}
                         max={100}
                         placeholder="1-100"
+                        defaultValue={course.attendanceCredit}
                         onChange = {handleChange}
                         onBlur={handleAttendanceCreditBlur}
                     />
@@ -333,6 +340,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         min={1}
                         max={999}
                         placeholder="1-999"
+                        defaultValue={course.maxAttendance}
                         onChange = {handleChange}
                         onBlur={handleMaxAttendanceBlur}
                     />
@@ -378,6 +386,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                             min={1}
                             max={100}
                             placeholder="1-100"
+                            defaultValue={course?.examCredit || 1}
                             onChange = {handleChange}
                             onBlur={handleExamCreditBlur}
                         />
@@ -444,6 +453,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     id="location.description"
                     type="text"
                     placeholder="Chinden Campus"
+                    defaultValue={course?.location?.description || ''}
                     maxLength={50}
                     onChange={handleChange}
                 />
@@ -464,8 +474,8 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         id="location.room"
                         type="text"
                         placeholder="123B"
-                        maxLength={50}
                         defaultValue={course?.location?.room || ''}
+                        maxLength={50}
                         onChange={handleChange}
                     />
                     <p className="text-xs text-green-600 italic">Optional</p>
@@ -483,6 +493,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         id="location.remoteLink"
                         type="url"
                         placeholder="https://zoom.us/j/1234567890?pwd=abc123"
+                        defaultValue={course?.location?.remoteLink || ''}
                         onChange={handleChange}
                     />
                     <p className="text-xs text-green-600 italic">Optional</p>
@@ -502,6 +513,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     id="location.addressLine1"
                     type="text"
                     placeholder="123 Main St"
+                    defaultValue={course?.location?.addressLine1 || ''}
                     maxLength={50}
                     onChange={handleChange}
                 />
@@ -520,8 +532,8 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     id="location.addressLine2"
                     type="text"
                     placeholder="Apt 3A"
-                    maxLength={50}
                     defaultValue={course?.location?.addressLine2 || ''}
+                    maxLength={50}
                     onChange={handleChange}
                 />
                 <p className="text-xs text-green-600 italic">Optional</p>
@@ -626,6 +638,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         id="location.postalCode"
                         type="text"
                         placeholder="83714"
+                        defaultValue={course?.location?.postalCode || ''}
                         onKeyDown = {preventCharInput}
                         onChange = {handleChange}
                     />
@@ -640,7 +653,7 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     type="submit"
                     disabled={!isFormValid}
                 >
-                    Continue To Add Classes
+                    Submit
                 </button>
                 {!isFormValid && <p className="text-error text-xs italic w-1/2">Please fill out all required fields.</p>}
             </div>
@@ -648,5 +661,5 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
   );
 }
 
-export default NewCourseForm;
+export default CourseForm;
 

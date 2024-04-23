@@ -1,417 +1,247 @@
-import { Course, Topic } from "@/app/shared/types/sharedTypes";
-import { useState } from "react";
-import CharacterCounter from "../../shared/CharacterCounter";
-import SelectTopicModal from "../Topics/SelectTopicModal";
+import { Course } from "@/app/shared/types/sharedTypes";
+import moment from 'moment-timezone';
 
-interface CourseCardProps {
-    course : Course; 
-    onApply: (course: Course) => void;
+interface CourseInfoCardProps {
+    course: Course;
+    expanded?: boolean;
 };
 
-
-const CourseInfoCard : React.FC<CourseCardProps> = ({course, onApply}) => {
-    const [editMode, setEditMode] = useState<boolean>(false);
-    const [editCourse, setEditCourse] = useState<Course>(course);
-    const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, type } = e.target;
-        const value = type === 'checkbox' ? e.target.checked : e.target.value;
-
-        if (name === 'examCredit' && !editCourse.hasExam) {
-        
-            setEditCourse(prevState => ({
-                ...prevState,
-                examCredit: null
-            }));
-            return;
-            
-        }
-
-        setEditCourse(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
-    const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setEditCourse(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
-    const handleLocationInputChange = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        parentKey: keyof Course['location']
-    ) => {
-        const { name, value } = e.target;
-        
-        setEditCourse((prevEditCourse) => ({
-            ...prevEditCourse,
-            location: {
-                ...prevEditCourse.location,
-                [parentKey]: value,
-            },
-        }));
-    };
-
-    const handleNumericInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        // Allow only arrow keys
-        if (!(e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "Tab" || e.key === "Backspace" || e.key === "Delete" || e.key === "Enter" || e.key === "Escape" || e.key === "Home" || e.key === "End" )) {
-            e.preventDefault();
-        }
-    };
-
-    const handleCancel = () => {
-        setEditCourse(course);
-        setEditMode(false);
+const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true }) => {
+    // helpers
+    const formatToMountainTime = (utcDate: string): string => {
+        const mountainTime = moment.utc(utcDate).tz('America/Denver').format('dddd, MMMM Do YYYY, h:mm a');
+        return mountainTime;
     }
 
-    const handleEditTopics = () => {
-        setShowSelectTopicModal(true);
-    };
+    return (
+        <div className="space-y-2">
+            <p className="text-2xl font-bold">{course.title}</p>
+            <p className="text-1xl font-bold">Topics</p>
+           
+            {course.topics && course.topics.length > 0 ? (
+            course.topics.map((topic, index) => (
+                <div key={index} className="mr-2 mb-1">
+                <div className="badge badge-primary p-3">
+                    <p className="font-bold text-white">{topic.title}</p>
+                </div>
+                </div>
+            ))
+            ) : (
+            <div className="badge badge-error p-3">
+                <p className="font-bold text-white">None</p>
+            </div>
+            )}
 
-    const handleSelectTopicModalClose = () => {
-        setShowSelectTopicModal(false);
-    };
-
-    const handleSelectTopicaModalSelect = (topics: Topic[]) => {
-        setEditCourse((prevEditCourse) => ({
-            ...prevEditCourse,
-            topics: topics,
-        }));
-        setShowSelectTopicModal(false);
-    };
-    
-    const toggleEditMode = () => {
-        setEditMode(prevEditMode => !prevEditMode);
-
-        if (!editCourse.hasExam){
-            setEditCourse(prevState => ({
-                ...prevState,
-                examCredit: null
-            }));
-        }
-
-        if (!editMode) {
-            setEditCourse(course);
-        }
-
-        if (editMode) {
+            <p className="text-base">{course.description}</p>
             
-            onApply(editCourse);
-        }
-    }
+            <div className="flex">
 
-    const formatEnrollmentDeadline = (enrollmentDeadline: Date): string => {
-        if (!enrollmentDeadline) return '';
-    
-        const utcDate = new Date(enrollmentDeadline);
-    
-        if (isNaN(utcDate.getTime())) {
-            throw new Error('Invalid date format');
-        }
-    
-        return utcDate.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            timeZone: 'UTC'
-        });
-    };
-
-    const formatDate = (dateString: Date): string => {
-        if (!dateString) return ''; // Handle case when dateString is undefined
-    
-        const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-    
-        return `${year}-${month}-${day}`;
-    };
-
-    return(
-        <div className="bg-base-100 shadow-md rounded-xl p-4">
-
-            <div className="mb-2">
-                <h1 className="text-xl font-bold"> {editMode ?
-                    <input
-                        type="text"
-                        name="title"
-                        defaultValue={editCourse.title}
-                        onChange={handleInputChange}
-                        className="border border-gray-300 rounded"
-                
-                    /> : course.title}</h1>
-
-                <div className="mb-4 mt-1">
-
-                    <strong>Description: </strong> 
-
-                    {editMode ?
-                        <>
-                            <textarea
-                                name="description"
-                                maxLength = {255}
-                                defaultValue={editCourse.description || ""}
-                                onChange={handleTextAreaChange}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-                                />
-                            <CharacterCounter value={course.description ?? ""} limit={500} />
-                        </>
-                        : course.description}
+                <div className="flex w-full">
+                    <div className="flex space-x-2">
+                        <p className="text-1xl font-bold">Instructor :</p>
+                        {course.instructorName ? (
+                            <p className="text-base">{course.instructorName}</p>
+                        ) : (
+                            <p className="text-error">None</p>
+                        )}
+                    </div>
                 </div>
 
-                <div className="mb-4">
-
-                    <strong>Topics: </strong> 
-                    
-                    <div className="flex flex-wrap mt-1">
-                
-                        {editCourse.topics && editCourse.topics.length > 0 ? (
-                            editCourse.topics.map((topic, index) => (
-                                <div key={index} className="mr-2 mb-1">
-                                    <div className="badge badge-primary p-3">
-                                        <p className="font-bold text-white">{topic.title}</p>
-                                    </div>
-                                </div>
-                            ))
+                <div className="flex w-full">
+                    <div className="flex space-x-2">
+                        <p className="text-1xl font-bold">Instructor Email :</p>
+                        {course.instructorEmail ? (
+                            <p className="text-base">{course.instructorEmail}</p>
                         ) : (
-                            <div className="badge badge-error p-3">
-                                <p className="font-bold text-white">None</p>
+                            <p className="text-error">None</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        
+            <div className="flex justify-between">
+                {course.classes && course.classes.length > 0 ? (
+                    <>
+                        <div className="w-full">
+                            <p className="text-1xl font-bold">Start Date</p>
+                            <p>{formatToMountainTime(course.classes[0].scheduleStart)}</p>
+                        </div>
+                        <div className="w-full">
+                            <p className="text-1xl font-bold">End Date</p>
+                            <p>{formatToMountainTime(course.classes[course.classes.length - 1].scheduleEnd)}</p>
+                        </div>
+                    </>    
+                    ) : (
+                        <p className="text-error">No classes have been defined for this course!</p>
+                    )}
+            </div>
+
+            <div>
+                <p className="text-1xl font-bold">Enrollment Deadline</p>
+                <p>{new Date(course.enrollmentDeadline).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}</p>
+            </div>
+
+            {expanded && (
+                <div className="space-y-2">
+                    
+                    <hr></hr>
+
+                    <div className="flex">
+
+                        <div className="flex w-full">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Has Exam? :</p>
+                                {course.hasExam ? (
+                                    <p className="text-base">Yes</p>
+                                ) : (
+                                    <p className="text-error">No</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {course.hasExam && (
+                            <div className="flex w-full">
+                                <div className="flex space-x-2">
+                                    <p className="text-1xl font-bold">Exam Credit :</p>
+                                    {course.examCredit ? (
+                                        <p className="text-base">{course.examCredit}</p>
+                                    ) : (
+                                        <p className="text-error">None</p>
+                                    )}
+                                </div>
                             </div>
                         )}
-
-
-                        {editMode ?
-                            <button
-                                className="btn btn-xs btn-accent text-white ml-4"
-                                onClick={handleEditTopics}>
-                                    ...Edit Topics
-                            </button>
-                            : ''}
                         
                     </div>
+        
+                    <div className="flex">
+
+                        <div className="flex w-full">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Attendance Credit :</p>
+                                <p className="text-base">{course.attendanceCredit}</p>
+                            </div>
+                        </div>
 
                     
+                        <div className="flex w-full">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Max Attendance :</p>
+                                <p className="text-base">{course.maxAttendance}</p>
+                            </div>
+                        </div>
+                    
+                    </div>
 
-                </div>
-
-            </div>
-
-            <div className="flex flex-wrap -mx-1">
-                <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Instructor:</strong> {editMode ?
-                        <input
-                            type="text"
-                            name="instructorName"
-                            maxLength={50}
-                            defaultValue={editCourse.instructorName || ''}
-                            onChange={handleInputChange}
-                            className="border border-gray-300 rounded"/>
-                            : course.instructorName}</p>
-                </div>
-                <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Email:</strong> {editMode?
-                        <input
-                            type="email"
-                            name="instructorEmail"
-                            defaultValue={editCourse.instructorEmail || ''}
-                            onChange={handleInputChange}
-                            className="border border-gray-300 rounded"/>
-                            : course.instructorEmail}</p>
-                </div>
-                <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Attendance Credit:</strong> {editMode ?
-                        <input
-                            type="number"
-                            name="attendanceCredit"
-                            min={0}
-                            max={100}
-                            defaultValue={editCourse.attendanceCredit || ''}
-                            onChange={handleInputChange}
-                            onKeyDown={handleNumericInput}
-                            className="border border-gray-300 rounded"
-                        />
-                        : course.attendanceCredit}</p>
-                </div>
-
-                <div className="w-full sm:w-1/2  px-1 mb-2">
-                    <p><strong>Max Attendance:</strong> {editMode ?
-                        <input
-                            type="number"
-                            name="maxAttendance"
-                            defaultValue={editCourse.maxAttendance}
-                            onChange={handleInputChange}
-                            onKeyDown={handleNumericInput}
-                            className="border border-gray-300 rounded"/>
-                            : course.maxAttendance}</p>
-                </div>
-
-                <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Has Exam:</strong> {editMode ?
-                        <input
-                            type="checkbox"
-                            name="hasExam"
-                            defaultChecked={editCourse.hasExam}
-                            onChange={handleInputChange}
-                            className="border border-gray-300 rounded"/>
-                            : course.hasExam ? 'Yes' : 'No'}</p>
-                </div>
-
-                <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Exam Credit:</strong> {editMode ?
-                        <input
-                            type="number"
-                            name="examCredit"
-                            min={0}
-                            max={100}
-                            defaultValue={editCourse.examCredit || ''}
-                            onChange={handleInputChange}
-                            onKeyDown={handleNumericInput}
-                            className="border border-gray-300 rounded" />
-                            : course.examCredit}</p>
-                </div>
+                    <hr></hr>
                 
-                <div className="w-full px-1 mb-2">
-                    <p><strong>Enrollment Deadline:</strong> {editMode ?
-                        <input
-                            type="date"
-                            name="enrollmentDeadline"
-                            defaultValue={formatDate(editCourse?.enrollmentDeadline)}
-                            onChange={handleInputChange}
-                            className="border border-gray-300 rounded"/>
-                            : formatEnrollmentDeadline(course.enrollmentDeadline)}</p>
-                </div>
-                <div className="w-full px-1 mb-2">
-                    <p><strong>PDF:</strong> {editMode ?
-                        <input
-                            type="text"
-                            name="pdf"
-                            defaultValue={editCourse?.pdf || ''}
-                            onChange={handleInputChange}
-                            className="border border-gray-300 rounded"/>
-                            : course.pdf}</p>
-                </div>
-                <div className="w-full px-1 mb-2">
-                    <p><strong>Location:</strong> {editMode ? 
-                        <input
-                            type="text"
-                            name="locationDescription"
-                            defaultValue={editCourse?.location?.description || ''}
-                            onChange={(e) => handleLocationInputChange(e, 'description')}
-                            className="border border-gray-300 rounded w-1/2"/>
-                            : course.location.description}</p>
-                </div>
-                <div className="w-full px-1 mb-2">
-                    <p><strong>Room:</strong> {editMode ?
-                        <input
-                            type="text"
-                            name="locationRoom"
-                            defaultValue={editCourse?.location?.room || ''}
-                            onChange={(e) => handleLocationInputChange(e, "room")}
-                            className="border border-gray-300 rounded"/>
-                            : course.location.room}</p>
-                </div>
-                <div className="w-full px-1 mb-2">
-                    <p><strong>Remote Link:</strong> {editMode ? 
-                        <input
-                            type="url"
-                            name="locationUrl"
-                            defaultValue={editCourse?.location?.remoteLink || ''}
-                            onChange={(e)=> handleLocationInputChange(e, "remoteLink")}
-                            className="border border-gray-300 rounded w-1/2" />
-                            : course.location.remoteLink}</p>
-                </div>
-                <div className="w-full px-1 mb-2">
-                    <p><strong>Address Line 1:</strong> {editMode ?
-                        <input
-                            type="text"
-                            name="locationAddressLine1"
-                            maxLength={50}
-                            defaultValue={editCourse.location.addressLine1 || ''}
-                            onChange={(e) => handleLocationInputChange(e, "addressLine1")}
-                            className="border border-gray-300 rounded w-1/2" />
-                            : course.location.addressLine1}</p>
-                </div>
-                <div className="w-full px-1 mb-2">
-                    <p><strong>Address Line 2:</strong> {editMode ?
-                        <input
-                            type="text"
-                            name="locationAddressLine2"
-                            maxLength={50}
-                            defaultValue={editCourse.location.addressLine2 || ''}
-                            onChange={(e) => handleLocationInputChange(e, "addressLine2")}
-                            className="border border-gray-300 rounded w-1/2" />
-                            : course.location.addressLine2}</p>
-                </div>
-                <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>City:</strong> {editMode ?
-                        <input 
-                            type="text"
-                            name="locationCity"
-                            maxLength={50}
-                            defaultValue={editCourse.location.city || ''}
-                            onChange={(e) => handleLocationInputChange(e, "city")}
-                            className="border border-gray-300 rounded" />
-                            : course.location.city}</p>
-                </div>
-                <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>State:</strong> {editMode ?
-                        <input
-                            type="text"
-                            name="locationState"
-                            maxLength={50}
-                            defaultValue={editCourse.location.state || ''}
-                            onChange={(e) => handleLocationInputChange(e, "state")}
-                            className="border border-gray-300 rounded" />
-                            : course.location.state}</p>
-                </div>
-                <div className="w-full sm:w-1/2 px-1 mb-2">
-                    <p><strong>Zip:</strong> {editMode ?
-                        <input
-                            type="text"
-                            name="locationZip"
-                            maxLength={10}
-                            defaultValue={editCourse.location.postalCode ||''}
-                            onChange={(e) => handleLocationInputChange(e, "postalCode")}
-                            onKeyDown={handleNumericInput}
-                            className="border border-gray-300 rounded" />
-                            : course.location.postalCode}</p>
-                </div>
-            </div>
-            <button 
-                className="btn btn-primary text-white m-1"
-                onClick={toggleEditMode}>
-                    {editMode ? 'Apply' : 'Edit'}
-            </button>
+                    {course.location !== null ? (
+                    <div className="space-y-2">
+                        <div className="flex w-full">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Location :</p>
+                                {course.location.description ? (
+                                    <p className="text-base">{course.location.description}</p>
+                                ) : (
+                                    <p className="text-error">None</p>
+                                )}
+                            </div>
+                        </div>
+                        
+                        <div className="flex">
+                            <div className="flex w-full"> 
+                                <div className="flex space-x-2">
+                                    <p className="text-1xl font-bold">Room :</p>
+                                    {course.location.room ? (
+                                        <p className="text-base">{course.location.room}</p>
+                                    ) : (
+                                        <p className="text-error">None</p>
+                                    )}
+                                </div>
+                            </div>
 
-            {editMode &&(
-                <button
-                    className="btn btn-warning text-white m-1"
-                    onClick={handleCancel}>
-                        Cancel
-                </button>
-            )}
+                            <div className="flex w-full">
+                                <div className="flex space-x-2">
+                                    <p className="text-1xl font-bold">Remote Link :</p>
+                                    {course.location.remoteLink ? (
+                                        <p className="text-base">{course.location.remoteLink}</p>
+                                    ) : (
+                                        <p className="text-error">None</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
 
-            {showSelectTopicModal && (
-                <SelectTopicModal
-                    open={showSelectTopicModal}
-                    onClose={handleSelectTopicModalClose}
-                    onSelect={(topics: Topic[]) => {handleSelectTopicaModalSelect(topics)}}
-                    topics={editCourse?.topics || []}
-                />
-            )}
+                
+                        <div className="flex w-full">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Address Line 1 :</p>
+                                {course.location.addressLine1 ? (
+                                    <p className="text-base">{course.location.addressLine1}</p>
+                                ) : (
+                                    <p className="text-error">None</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex w-full">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Address Line 2 :</p>
+                                {course.location.addressLine2 ? (
+                                    <p className="text-base">{course.location.addressLine2}</p>
+                                ) : (
+                                    <p className="text-error">None</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex">
+                            <div className="flex w-full">
+                                <div className="flex space-x-2">
+                                    <p className="text-1xl font-bold">City :</p>
+                                    {course.location.city ? (
+                                        <p className="text-base">{course.location.city}</p>
+                                    ) : (
+                                        <p className="text-error">None</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex w-full">
+                                <div className="flex space-x-2">
+                                    <p className="text-1xl font-bold">State :</p>
+                                    {course.location.state ? (
+                                        <p className="text-base">{course.location.state}</p>
+                                    ) : (
+                                        <p className="text-error">None</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex w-full">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Zip Code :</p>
+                                {course.location.postalCode ? (
+                                    <p className="text-base">{course.location.postalCode}</p>
+                                ) : (
+                                    <p className="text-error">None</p>
+                                )}
+                            </div>
+                        </div>
+                
+
+                    </div>   
+                    ) : (
+                        <p className="text-error">No location has been defined for this course!</p>
+                    )}
+        
+                </div>   
+            )} 
 
         </div>
+    )
 
-        
-
-    );
-}
+};
 
 export default CourseInfoCard;
