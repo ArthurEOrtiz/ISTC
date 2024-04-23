@@ -4,6 +4,7 @@ using EducationAPI.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EducationAPI.Migrations
 {
     [DbContext(typeof(EducationProgramContext))]
-    partial class EducationProgramContextModelSnapshot : ModelSnapshot
+    [Migration("20240418180448_AddExamTable")]
+    partial class AddExamTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,7 +95,7 @@ namespace EducationAPI.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Attendances", (string)null);
+                    b.ToTable("Attendance", (string)null);
 
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                         {
@@ -201,7 +203,7 @@ namespace EducationAPI.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Contacts", (string)null);
+                    b.ToTable("Contact", (string)null);
 
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                         {
@@ -227,10 +229,10 @@ namespace EducationAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime>("EnrollmentDeadline")
+                    b.Property<DateTime?>("EnrollmentDeadline")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("ExamCredit")
@@ -240,6 +242,7 @@ namespace EducationAPI.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("InstructorEmail")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InstructorName")
@@ -388,7 +391,7 @@ namespace EducationAPI.Migrations
 
                     b.HasKey("LocationId");
 
-                    b.ToTable("Locations", (string)null);
+                    b.ToTable("Location", (string)null);
 
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                         {
@@ -460,8 +463,8 @@ namespace EducationAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TopicId"), 1L, 1);
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()
@@ -565,58 +568,6 @@ namespace EducationAPI.Migrations
                     ));
                 });
 
-            modelBuilder.Entity("EducationAPI.Models.WaitList", b =>
-                {
-                    b.Property<int>("WaitListId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WaitListId"), 1L, 1);
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int")
-                        .HasColumnName("course_Id");
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("PeriodEnd")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("PeriodEnd");
-
-                    b.Property<DateTime>("PeriodStart")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("PeriodStart");
-
-                    b.Property<bool>("ToEnroll")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("WaitListId");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("WaitLists", (string)null);
-
-                    b.ToTable(tb => tb.IsTemporal(ttb =>
-                        {
-                            ttb
-                                .HasPeriodStart("PeriodStart")
-                                .HasColumnName("PeriodStart");
-                            ttb
-                                .HasPeriodEnd("PeriodEnd")
-                                .HasColumnName("PeriodEnd");
-                        }
-                    ));
-                });
-
             modelBuilder.Entity("CourseTopic", b =>
                 {
                     b.HasOne("EducationAPI.Models.Course", null)
@@ -685,7 +636,7 @@ namespace EducationAPI.Migrations
             modelBuilder.Entity("EducationAPI.Models.Exam", b =>
                 {
                     b.HasOne("EducationAPI.Models.Course", "Course")
-                        .WithMany("Exams")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -710,25 +661,6 @@ namespace EducationAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("EducationAPI.Models.WaitList", b =>
-                {
-                    b.HasOne("EducationAPI.Models.Course", "Course")
-                        .WithMany("WaitLists")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EducationAPI.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("EducationAPI.Models.Class", b =>
                 {
                     b.Navigation("Attendances");
@@ -737,10 +669,6 @@ namespace EducationAPI.Migrations
             modelBuilder.Entity("EducationAPI.Models.Course", b =>
                 {
                     b.Navigation("Classes");
-
-                    b.Navigation("Exams");
-
-                    b.Navigation("WaitLists");
                 });
 
             modelBuilder.Entity("EducationAPI.Models.Student", b =>

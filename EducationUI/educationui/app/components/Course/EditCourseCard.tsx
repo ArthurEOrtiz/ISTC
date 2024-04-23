@@ -28,7 +28,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, clerkId, onEdit, onAtte
   useEffect(() => {
     if (viewOnly){
       const checkEnrollment = async () => {
-        const response = await IsUserEnrolledInCourse(clerkId, course.courseId as Number);
+        const response = await IsUserEnrolledInCourse(clerkId, course.courseId);
         setIsEnrolled(response);
       }
     checkEnrollment();
@@ -83,7 +83,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, clerkId, onEdit, onAtte
       return
     }
 
-    const response = await EnrollStudentByClerkId(clerkId, course.courseId as Number);
+    const response = await EnrollStudentByClerkId(clerkId, course.courseId);
 
     switch (response.status) {
       case 500:
@@ -125,7 +125,7 @@ const CourseCard : React.FC<CourseCardProps> = ({course, clerkId, onEdit, onAtte
     }
 
 
-    const response = await UnenrollStudentByClerkId(clerkId, course.courseId as Number);
+    const response = await UnenrollStudentByClerkId(clerkId, course.courseId);
 
     switch (response.status) {
       case 500:
@@ -167,8 +167,6 @@ const CourseCard : React.FC<CourseCardProps> = ({course, clerkId, onEdit, onAtte
           </div>
         )}
       </div>
-
-
       
       {course.classes && course.classes.length > 0 ? (
         <div className="flex justify-between">

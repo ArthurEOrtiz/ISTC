@@ -133,7 +133,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     const handleEditEmployerModalOnSubmit = async (editUser: User) => {
         
         const response = await UpdateUser(editUser);
-
+        console.log("editUser", editUser)
+        console.log(response.status);
         switch (response.status) {
             case 200:
                 setUser(response.data);
@@ -243,13 +244,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                     
                 </div>
                 <div className='basis-1/4'>
-                    <div className="ml-2 ">
+                    <div className='ml-2'>
                         <div className='flex flex-col pr-2'>
 
 
                             <ul className='menu bg-base-100 rounded-box w-full'>
                                 <li>
-                                    <h2 className=" text-2xl"> User Actions</h2>
+                                    <a className="text-2xl">User Actions</a>
                                 </li>
                                 <ul>
                                     <details open>

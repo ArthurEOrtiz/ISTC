@@ -1,50 +1,22 @@
 'use client';
 import { Course } from "@/app/shared/types/sharedTypes";
-import { ChangeEvent, FocusEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 import CharacterCounter from "../../shared/CharacterCounter";
 
-interface NewCourseFormProps {
+interface CourseFormProps {
     onSubmit: (course : Course) => void;
+    course: Course;
 }
 
-const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
-
-    const [course , setCourse] = useState<Course>({
-        courseId: 0,
-        title: '',
-        description: '',
-        attendanceCredit: 0,
-        examCredit: null,
-        hasExam: false,
-        maxAttendance: 0,
-        enrollmentDeadline: new Date(new Date().setDate(new Date().getDate() + 1)), // today plus on day.
-        instructorName: '',
-        instructorEmail: '',
-        pdf: null,
-        locationId: 0,
-        location: {
-            locationId: 0,
-            description: null,
-            room: null,
-            remoteLink: null,
-            addressLine1: '',
-            addressLine2: null,
-            city: '',
-            state: 'ID',
-            postalCode: ''
-        },
-        topics: [],
-        classes: []
-    });
+const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }) => {
+    
+    const [course, setCourse] = useState<Course>(inboundCourse);
 
     const [titleTouched, setTitleTouched] = useState<boolean>(false);
     const [istitleValid, setIsTitleValid] = useState<boolean>();
 
     const [emailTouched, setEmailTouched] = useState<boolean>(false);  
-    const [isEmailValid, setIsEmailValid] = useState<boolean>();
-
-    const [instructorNameTouched, setInstructorNameTouched] = useState<boolean>(false);
-    const [isInstructorNameValid, setIsInstructorNameValid] = useState<boolean>();
+    const [isEmailValid, setIsEmailValid] = useState<boolean>(true);
 
     const [attendanceCreditTouched, setAttendanceCreditTouched] = useState<boolean>(false);
     const [isAttendanceCreditValid, setIsAttendanceCreditValid] = useState<boolean>();
@@ -58,22 +30,39 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
     const [enrollmentDeadlineTouched, setEnrollmentDeadlineTouched] = useState<boolean>(true);
     const [isEnrollmentDeadlineValid, setIsEnrollmentDeadlineValid] = useState<boolean>(true);
 
-    const [addressLine1Touched, setAddressLine1Touched] = useState<boolean>(false);
-    const [isAddressLine1Valid, setIsAddressLine1Valid] = useState<boolean>();
+    const isFormValid = istitleValid && isEmailValid && isAttendanceCreditValid && isExamCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid;
 
-    const [cityTouched, setCityTouched] = useState<boolean>(false);
-    const [isCityValid, setIsCityValid] = useState<boolean>();
+    // effects
 
-    const [postalCodeTouched, setPostalCodeTouched] = useState<boolean>(false);
-    const [isPostalCodeValid, setIsPostalCodeValid] = useState<boolean>();
-
-    
-
-    const isFormValid = istitleValid && isEmailValid && isInstructorNameValid && isAttendanceCreditValid && isExamCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid && isAddressLine1Valid && isCityValid && isPostalCodeValid;
+    useEffect(() => {
+        setCourse(inboundCourse);
+    }, [inboundCourse]);
 
     useEffect(() => {
         setIsExamCreditValid(validateExamCredit(course.examCredit, course.hasExam));
     }, [course.examCredit, course.hasExam]);
+
+    useEffect(() => {
+        if (course.title !== '') {
+            // setTitleTouched(true);
+            setIsTitleValid(true);
+        }
+
+        if (course.attendanceCredit > 0) {
+            // setAttendanceCreditTouched(true);
+            setIsAttendanceCreditValid(true);
+        }
+
+        if (course.maxAttendance > 0) {
+            // setAttendanceCreditTouched(true);
+            setIsMaxAttendanceValid(true);
+        }
+
+        // if (course.enrollmentDeadline > new Date()) {
+        //     // setEnrollmentDeadlineTouched(true);
+        //     setIsEnrollmentDeadlineValid(true);
+        // }
+    }, [course])
 
     // Handlers
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -86,8 +75,8 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
     
         switch (true) {
             case id === 'description': {
-                // Limit description to 255 characters
-                const truncatedValue = value.slice(0, 255);
+                // Limit description to 500 characters
+                const truncatedValue = value.slice(0, 500);
                 setCourse((prevCourse) => ({
                     ...prevCourse,
                     description: truncatedValue,
@@ -139,52 +128,29 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
         }
     };
 
-    const handleIntInput = (event: FormEvent<HTMLInputElement>, minValue: number, maxValue: number): void => {
-        const inputValue = event.currentTarget.value;
-        const prevValue = event.currentTarget.getAttribute('data-prev-value');
-    
-        // Remove any non-alphanumeric characters
-        const sanitizedValue = inputValue.replace(/[^0-9]/g, '');
-    
-        if (sanitizedValue === '') {
-            // If input is empty, clear the previous value attribute
-            event.currentTarget.removeAttribute('data-prev-value');
-        } else {
-            const parsedValue = parseInt(sanitizedValue);
-    
-            if (isNaN(parsedValue) || parsedValue < minValue || parsedValue > maxValue) {
-                // If input is incorrect, restore the previous value if available
-                if (prevValue !== null) {
-                    event.currentTarget.value = prevValue;
-                } else {
-                    event.currentTarget.value = '';
-                }
-            } else {
-                // Store the current value as the previous value
-                event.currentTarget.setAttribute('data-prev-value', sanitizedValue);
-                event.currentTarget.value = sanitizedValue;
-            }
+    const preventCharInput = (event: React.KeyboardEvent<HTMLInputElement>): void => {
+        const validKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+        // Prevent non-numeric input
+        if (!/[0-9]/.test(event.key) && !validKeys.includes(event.key)) {
+            event.preventDefault();
         }
-    };
+    }
     
     const handleCourseTitleBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setTitleTouched(true);
         setIsTitleValid(!!event.target.value);
     }
 
-    const handleInstructorNameBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
-        setInstructorNameTouched(true);
-        setIsInstructorNameValid(!!event.target.value);
-    }
-
     const handleEmailBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setEmailTouched(true);
+
+        if (event.target.value === '') {
+            setIsEmailValid(true);
+            return;
+        }
+        
         const isValid = validatEamil(event.target.value);
         setIsEmailValid(isValid);
-    }
-
-    const handleCreditInput = (event: FormEvent<HTMLInputElement>): void => {
-        handleIntInput(event, 0, 100);
     }
 
     const handleAttendanceCreditBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
@@ -205,10 +171,6 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
         setIsExamCreditValid(isValid);
     }
 
-    const handleMaxAttendanceInput = (event: FormEvent<HTMLInputElement>): void => {
-        handleIntInput(event, 1, 999);
-    }
-
     const handleMaxAttendanceBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setMaxAttendanceTouched(true);
         const isValid = event.target.value !== '' && parseInt(event.target.value) > 0 && parseInt(event.target.value) <= 999;
@@ -219,26 +181,6 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
         setEnrollmentDeadlineTouched(true);
         const isValid = validateEnrollmentDeadline(event.target.value);
         setIsEnrollmentDeadlineValid(isValid);
-    }
-
-    const handleAddressLine1Blur = (event: FocusEvent<HTMLInputElement, Element>): void => {
-        setAddressLine1Touched(true);
-        setIsAddressLine1Valid(!!event.target.value);
-    }
-
-    const handleCityBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
-        setCityTouched(true);
-        setIsCityValid(!!event.target.value);
-    }
-
-    const handlePostalCodeInput = (event: FormEvent<HTMLInputElement>): void => {
-        handleIntInput(event, 0, 99999);
-    }
-
-    const handlePostalCodeBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
-        setPostalCodeTouched(true);
-        const isValid = event.target.value !== '' && parseInt(event.target.value) > 0 && parseInt(event.target.value) <= 99999;
-        setIsPostalCodeValid(isValid);
     }
 
     // helper methods.
@@ -262,12 +204,10 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
         }
 
         return credit > 0 && credit <= 100;
-
     }
 
-
     return (
-        <form onSubmit={handleSubmit} className="bg-base-100 shadow-md rounded-xl px-8 pt-6 pb-8 mb-4">
+        <form onSubmit={handleSubmit}>
 
             <div className="mb-4">
                 <label
@@ -276,17 +216,22 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                 >
                     Title
                 </label>
+                
                 <input
-                    className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!istitleValid && titleTouched? 'border-red-500' : ''}`}
+                    className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!istitleValid && titleTouched? 'border-error' : ''}`}
                     id="title"
                     type="text"
                     placeholder="Title"
-                    value = {course?.title}
+                    defaultValue={course.title}
+                    required
                     maxLength={50}
                     onChange = {handleChange}
                     onBlur={handleCourseTitleBlur}
                 />
-                {!istitleValid && titleTouched && <p className="text-red-500 text-xs italic">Please enter a Title.</p>}
+                
+                <p className="text-error text-xs italic">
+                    {(!istitleValid && titleTouched) ? 'Please enter a Title.' : 'Required'}
+                </p>
             </div>
 
             <div className="mb-4">
@@ -297,14 +242,18 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                     Course Description
                 </label>
                 <textarea
-                    className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                     id="description"
                     placeholder="Optional"
-                    value = {course.description}
-                    maxLength={255}
+                    defaultValue={course.description ?? ''}
+                    maxLength={500}
                     onChange = {handleChange}
+                    rows={5}
                 />
-                <CharacterCounter value={course.description} limit={255} />
+                <div className="flex justify-between">
+                    <p className="text-xs text-green-600 italic">Optional</p>
+                    <CharacterCounter value={course.description ?? ""} limit={500} />
+                </div>
             </div>
 
             <div className="flex justify-between">
@@ -317,16 +266,15 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         Instructor Name
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isInstructorNameValid && instructorNameTouched ? 'border-red-500' : ''}`}
+                        className='shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
                         id="instructorName"
                         type="text"
                         placeholder="John Doe"
-                        value = {course?.instructorName}
+                        defaultValue={course?.instructorName || ''}
                         maxLength={50}
                         onChange = {handleChange}
-                        onBlur={handleInstructorNameBlur}
                     />
-                    {!isInstructorNameValid && instructorNameTouched && <p className="text-red-500 text-xs italic">Please enter an instructor name.</p>}
+                    <p className="text-xs text-green-600 italic">Optional</p>
                 </div>
 
                 <div className="mb-4 w-1/2 pl-2">
@@ -337,15 +285,17 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         Instructor Email
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isEmailValid && emailTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isEmailValid && emailTouched ? 'border-error' : ''}`}
                         id="instructorEmail"
                         type="email"
                         placeholder="valid@Email.com"
-                        value = {course?.instructorEmail}
+                        defaultValue={course?.instructorEmail || ''}
                         onChange = {handleChange}
                         onBlur={handleEmailBlur}
                     />
-                    {!isEmailValid && emailTouched && <p className="text-red-500 text-xs italic">Please enter a valid email.</p>}
+                    <p className={`text-xs italic ${isEmailValid? ('text-green-600') : ('text-error')}`}>
+                        {isEmailValid ? 'Optional' : 'Please enter a valid email.'}
+                    </p>
                 </div>
 
             </div>
@@ -360,38 +310,43 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         Attendance Credit
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isAttendanceCreditValid && attendanceCreditTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isAttendanceCreditValid && attendanceCreditTouched ? 'border-error' : ''}`}
                         id="attendanceCredit"
-                        type="text"
-                        onInput={handleCreditInput}
+                        type="number"
+                        min={1}
+                        max={100}
                         placeholder="1-100"
-                        value = {course?.attendanceCredit}
+                        defaultValue={course.attendanceCredit}
                         onChange = {handleChange}
                         onBlur={handleAttendanceCreditBlur}
                     />
-                    {!isAttendanceCreditValid && attendanceCreditTouched && <p className="text-red-500 text-xs italic">Please enter a valid attendance credit.</p>}
+                    <p className="text-error text-xs italic">
+                        {(!isAttendanceCreditValid && attendanceCreditTouched) ? 'Please enter a valid attendance credit.' : 'Required'}
+                    </p>
+                
                 </div>
-
-
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block  text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="maxAttendance"
                     >
                         Max Attendance
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isMaxAttendanceValid && maxAttendanceTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!isMaxAttendanceValid && maxAttendanceTouched ? 'border-error' : ''}`}
                         id="maxAttendance"
-                        type="text"
-                        onInput={handleMaxAttendanceInput}
+                        type="number"
+                        min={1}
+                        max={999}
                         placeholder="1-999"
-                        value = {course?.maxAttendance}
+                        defaultValue={course.maxAttendance}
                         onChange = {handleChange}
                         onBlur={handleMaxAttendanceBlur}
                     />
-                    {!isMaxAttendanceValid && maxAttendanceTouched && <p className="text-red-500 text-xs italic">Please enter a valid max attendance.</p>}
+                    <p className="text-error text-xs italic">
+                        {(!isMaxAttendanceValid && maxAttendanceTouched) ? 'Please enter a valid max attendance.' : 'Required'}
+                    </p>
                 </div>
 
             </div>
@@ -400,16 +355,16 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
 
                 <div className="mb-4 w-1/2 pr-2">
                     <label
-                        className="block  text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="hasExam"
                     >
                         Has Exam
                     </label>
                     <select
-                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="hasExam"
                         onChange = {handleChange}
-                        defaultValue = {course?.hasExam.toString()}
+                        defaultValue = {course.hasExam.toString()}
                     >
                         <option value="true">Yes</option>
                         <option value="false">No</option>
@@ -419,194 +374,203 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                 {course.hasExam && (
                     <div className="mb-4 w-1/2 pl-2">
                         <label
-                            className="block  text-sm font-bold mb-2"
+                            className="block text-sm font-bold mb-2"
                             htmlFor="examCredit"
                         >
                             Exam Credit
                         </label>
                         <input
-                            className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isExamCreditValid && examCreditTouched ? 'border-red-500' : ''}`}
-                            id="completionCredit"
-                            type="text"
-                            onInput={handleCreditInput}
+                            className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!isExamCreditValid && examCreditTouched ? 'border-error' : ''}`}
+                            id="examCredit"
+                            type="number"
+                            min={1}
+                            max={100}
                             placeholder="1-100"
-                            defaultValue = {course?.examCredit || '' }
+                            defaultValue={course?.examCredit || 1}
                             onChange = {handleChange}
                             onBlur={handleExamCreditBlur}
                         />
-                        {!isExamCreditValid && examCreditTouched && <p className="text-red-500 text-xs italic">Please enter a valid completion credit.</p>}
+                        <p className="text-error text-xs italic">
+                            {(!isExamCreditValid && examCreditTouched) ? 'Please enter a valid exam credit.' : 'Required'}
+                        </p>
+
+                        
                     </div>
                 )}
             </div>
 
             <div className="flex justify-between">
-                
+
                 <div className="mb-4 w-1/2 pr-2">
                     <label
-                        className="block  text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="enrollmentDeadline"
                     >
                         Enrollment Deadline
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isEnrollmentDeadlineValid && enrollmentDeadlineTouched ? 'border-red-500' : ''}`}
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!isEnrollmentDeadlineValid && enrollmentDeadlineTouched ? 'border-error' : ''}`}
                         id="enrollmentDeadline"
-                        min = {new Date().toISOString().split('T')[0]}
+                        min={new Date().toISOString().split('T')[0]}
                         type="date"
-                        value = {course?.enrollmentDeadline?.toISOString().split('T')[0]}
-                        onChange = {handleChange}
+                        value={course.enrollmentDeadline.toISOString().split('T')[0]}
+                        onChange={handleChange}
                         onBlur={handleEnrollmentDeadlineBlur}
                     />
-                    {!isEnrollmentDeadlineValid && enrollmentDeadlineTouched && <p className="text-red-500 text-xs italic">Please enter a valid enrollment deadline.</p>}
+                    <p className="text-error text-xs italic">
+                        {(!isEnrollmentDeadlineValid && enrollmentDeadlineTouched) ? 'Please enter a valid enrollment deadline.' : 'Required'}
+                    </p>
                 </div>
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block  text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="pdf"
                     >
                         PDF
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="pdf"
                         type="text"
-                        placeholder='PDF URL, Optional'
-                        value = {course?.pdf || ''}
-                        onChange = {handleChange}
+                        placeholder='PDF URL'
+                        onChange={handleChange}
                     />
+                    <p className="text-xs text-green-600 italic">Optional</p>
                 </div>
 
             </div>
 
             <div className="mb-4">
                 <label
-                    className="block  text-sm font-bold mb-2"
+                    className="block text-sm font-bold mb-2"
                     htmlFor="location.description"
                 >
                     Location Description
                 </label>
                 <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                     id="location.description"
                     type="text"
-                    placeholder="Optional"
+                    placeholder="Chinden Campus"
+                    defaultValue={course?.location?.description || ''}
                     maxLength={50}
-                    defaultValue = {course?.location?.description || ''}
-                    onChange = {handleChange}
+                    onChange={handleChange}
                 />
+                <p className="text-xs text-green-600 italic">Optional</p>
             </div>
 
             <div className="flex justify-between">
 
                 <div className="mb-4 w-1/2 pr-2">
                     <label
-                        className="block  text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="location.room"
-                        >
+                    >
                         Room
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="location.room"
                         type="text"
-                        placeholder="Optional"
+                        placeholder="123B"
+                        defaultValue={course?.location?.room || ''}
                         maxLength={50}
-                        defaultValue = {course?.location?.room || ''}
-                        onChange = {handleChange}
+                        onChange={handleChange}
                     />
+                    <p className="text-xs text-green-600 italic">Optional</p>
                 </div>
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block  text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="location.remoteLink"
                     >
                         Remote Link
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="location.remoteLink"
                         type="url"
                         placeholder="https://zoom.us/j/1234567890?pwd=abc123"
-                        defaultValue = {course?.location?.remoteLink || ''}
-                        onChange = {handleChange}
+                        defaultValue={course?.location?.remoteLink || ''}
+                        onChange={handleChange}
                     />
+                    <p className="text-xs text-green-600 italic">Optional</p>
                 </div>
 
             </div>
 
             <div className="mb-4">
                 <label
-                    className="block  text-sm font-bold mb-2"
+                    className="block text-sm font-bold mb-2"
                     htmlFor="location.addressLine1"
                 >
                     Address Line 1
                 </label>
                 <input
-                    className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isAddressLine1Valid && addressLine1Touched ? 'border-red-500' : ''}`}
+                    className='shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
                     id="location.addressLine1"
                     type="text"
                     placeholder="123 Main St"
-                    defaultValue = {course?.location?.addressLine1}
+                    defaultValue={course?.location?.addressLine1 || ''}
                     maxLength={50}
-                    onChange = {handleChange}
-                    onBlur={handleAddressLine1Blur}
+                    onChange={handleChange}
                 />
-                {!isAddressLine1Valid && addressLine1Touched && <p className="text-red-500 text-xs italic">Please enter an address.</p>}
+                <p className="text-xs text-green-600 italic">Optional</p>
             </div>
 
             <div className="mb-4">
                 <label
-                    className="block  text-sm font-bold mb-2"
+                    className="block text-sm font-bold mb-2"
                     htmlFor="location.addressLine2"
                 >
                     Address Line 2
                 </label>
                 <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline "
+                    className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline "
                     id="location.addressLine2"
                     type="text"
-                    placeholder="Optional"
+                    placeholder="Apt 3A"
+                    defaultValue={course?.location?.addressLine2 || ''}
                     maxLength={50}
-                    defaultValue = {course?.location?.addressLine2 || ''}
-                    onChange = {handleChange}
+                    onChange={handleChange}
                 />
+                <p className="text-xs text-green-600 italic">Optional</p>
             </div>
 
             <div className="flex justify-between">
 
                 <div className="mb-4 w-1/2 pr-2">
                     <label
-                        className="block  text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="location.city"
-                        >
+                    >
                         City
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isCityValid && cityTouched ? 'border-red-500' : ''}`}
+                        className='shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
                         id="location.city"
                         type="text"
                         placeholder="Boise"
-                        defaultValue = {course?.location?.city}
-                        onChange = {handleChange}
-                        onBlur = {handleCityBlur}
+                        defaultValue={course?.location?.city || ''}
+                        onChange={handleChange}
                     />
-                    {!isCityValid && cityTouched && <p className="text-red-500 text-xs italic">Please enter a city.</p>}
+                    <p className="text-xs text-green-600 italic">Optional</p>
                 </div>
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block  text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="location.state"
                     >
                         State
                     </label>
                     <select
-                        className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="location.state"
-                        onChange = {handleChange}
-                        defaultValue = {course?.location?.state}
+                        onChange={handleChange}
+                        defaultValue={course?.location?.state || 'ID'}
                     >
                         <option value="AL">Alabama</option>
                         <option value="AK">Alaska</option>
@@ -659,43 +623,43 @@ const NewCourseForm: React.FC<NewCourseFormProps> = ({onSubmit}) => {
                         <option value="WI">Wisconsin</option>
                         <option value="WY">Wyoming</option>
                     </select>
+                    <p className="text-xs text-green-600 italic">Optional</p>
                 </div>
 
                 <div className="mb-4 w-1/2 pl-2">
                     <label
-                        className="block  text-sm font-bold mb-2"
+                        className="block text-sm font-bold mb-2"
                         htmlFor="location.postalCode"
                     >
                         Zip Code
                     </label>
                     <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isPostalCodeValid && postalCodeTouched ? 'border-red-500' : ''}`}
+                        className='shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
                         id="location.postalCode"
                         type="text"
-                        placeholder="83706"
-                        onInput = {handlePostalCodeInput}
-                        defaultValue = {course?.location?.postalCode}
+                        placeholder="83714"
+                        defaultValue={course?.location?.postalCode || ''}
+                        onKeyDown = {preventCharInput}
                         onChange = {handleChange}
-                        onBlur = {handlePostalCodeBlur}
                     />
-                    {!isPostalCodeValid && postalCodeTouched && <p className="text-red-500 text-xs italic">Please enter a valid Zip Code.</p>}
+                    <p className="text-xs text-green-600 italic">Optional</p>
                 </div>  
             </div>
 
 
             <div className="flex items-center justify-between">
                 <button
-                    className={`btn btn-primary text-white  py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : ''}`}
+                    className={`btn btn-primary text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : ''}`}
                     type="submit"
                     disabled={!isFormValid}
                 >
-                    Continue To Add Classes
+                    Submit
                 </button>
-                {!isFormValid && <p className="text-red-500 text-xs italic w-1/2">Please fill out all required fields.</p>}
+                {!isFormValid && <p className="text-error text-xs italic w-1/2">Please fill out all required fields.</p>}
             </div>
         </form>
   );
 }
 
-export default NewCourseForm;
+export default CourseForm;
 

@@ -63,7 +63,6 @@ namespace EducationAPI.Controllers
 			}
 		}
 
-
 		[HttpPost("PostTopic")]
 		public async Task<ActionResult> PostTopic (Topic topic)
 		{
@@ -130,12 +129,12 @@ namespace EducationAPI.Controllers
 
 				await _educationProgramContext.SaveChangesAsync();
 
-				_logger.LogInformation("UpdateTopicById({Id}. {UpdatedTopic}) called", id, updatedTopic);
+				_logger.LogInformation("UpdateTopicById({Id}, {UpdatedTopic}) called", id, updatedTopic);
 				return existingTopic;
 
 			} catch (Exception ex)
 			{
-				_logger.LogError(ex, "UpdateTopicById({Id}. {UpdatedTopic})", id, updatedTopic);
+				_logger.LogError(ex, "UpdateTopicById({Id}, {UpdatedTopic})", id, updatedTopic);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}

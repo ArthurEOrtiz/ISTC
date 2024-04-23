@@ -1,8 +1,7 @@
 'use client';
 import { Course, Topic } from '@/app/shared/types/sharedTypes';
 import { useEffect, useState } from 'react';
-import NewCourseForm from './NewCourseForm';
-import CourseInfoCard from './CourseInfoCard';
+import CourseForm from './CourseForm';
 import NewClass from './NewClass';
 import SelectTopicModal from '../Topics/SelectTopicModal';
 import ConfirmationModal from '../../shared/modals/ConfirmationModal';
@@ -10,7 +9,9 @@ import { useRouter } from 'next/navigation';
 import SavingModal from '../../shared/modals/SavingModal';
 import { postCourse } from '@/Utilities/api';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
-import { cp } from 'fs';
+import CourseInfoCard from './CourseInfoCard';
+import CourseInfoModal from './CourseInfoModal';
+
 
 /**
  * Component for adding a new course. 
@@ -18,8 +19,39 @@ import { cp } from 'fs';
  * creating a new course. It Contains the NewCourseForm, CourseInfoCard, NewClass, and Select
  * TopicModal components.
  */
-const AddCourse: React.FC = () => {    
-    const [course, setCourse] = useState<Course>();
+const AddCourse: React.FC = () => {
+    const defaultCourse : Course = {
+        courseId: 0,
+        title: '',
+        description: null,
+        attendanceCredit: 0,
+        examCredit: null,
+        hasExam: false,
+        maxAttendance: 0,
+        enrollmentDeadline: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1), // today plus on day, no time.
+        instructorName: null,
+        instructorEmail: null,
+        pdf: null,
+        locationId: 0,
+        location: {
+            locationId: 0,
+            description: null,
+            room: null,
+            remoteLink: null,
+            addressLine1: null,
+            addressLine2: null,
+            city: 'Boise',
+            state: 'ID',
+            postalCode: null,
+        },
+        topics: [],
+        classes: [],
+        Exams: [],
+        WaitLists: [],
+    };
+
+    const [course, setCourse] = useState<Course>(defaultCourse);
+    const [showCourseForm, setShowCourseForm] = useState<boolean>(false);
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -82,21 +114,6 @@ const AddCourse: React.FC = () => {
         };
     };
 
-    const handleSaveCourse = async () => {
-        setShowConfirmationModal(true);
-    };
-
-    // Event Handlers for Components
-
-    // NewCourseForm
-    const handleNewCourseFormOnSubmit = (course: Course) => {
-        setCourse(course);
-    }
-
-    const handleCourseInfoCardOnApply = (course: Course) => {
-        setCourse(course);
-    }
-
     // NewClass
     const handleNewClassOnDelete = (index: number) => {
         if (course) {
@@ -154,7 +171,7 @@ const AddCourse: React.FC = () => {
         console.log(response);
         if (response.status === 201) {
             setIsSaving(false);
-            setCourse(undefined);
+            
             router.push('/admin/editcourse/edit');
         } else {
             setIsSaving(false);
@@ -167,27 +184,43 @@ const AddCourse: React.FC = () => {
         setShowConfirmationModal(false);
     }
 
+    const handleCourseInfoModalSubmit = (c: Course): void => {
+        setShowCourseForm(false);
+        setCourse(c);
+    }
+
     return (
-        <>
-            {course === undefined ? (
-                <NewCourseForm onSubmit={handleNewCourseFormOnSubmit}/>
+        <div className='w-full m-4'>
+            {course.title === '' ? (
+                <div className='flex justify-center'>
+                    <div className='bg-base-100 shadow-md rounded-xl px-8 pt-6 pb-8 mb-4 w-2/3'>
+                        <CourseForm course={course} onSubmit={(course) => setCourse(course)}/>
+                    </div>
+                </div>
             ) : (
-                
-                <>
-                    <div >
-                            <button
-                                className="btn btn-primary text-white mb-4"
-                                onClick={handleSaveCourse}
-                            >Save Course</button>
+                <div>
+                        
+                    <div className='bg-base-100 shadow-md rounded-xl p-5'>
+                        <CourseInfoCard course={course} />
+                        <button 
+                            className='btn btn-primary text-white mt-2'
+                            onClick={()=>setShowCourseForm(true)}
+                            >
+                                Edit Course Information
+                        </button>
+                        <button 
+                            className='btn btn-primary text-white ml-2 mt-2'
+                            onClick={()=>setShowSelectTopicModal(true)}
+                            >
+                                Select Topics
+                        </button>
                     </div>
-                    
-                    <div>
-                        <CourseInfoCard course={course} onApply={handleCourseInfoCardOnApply} />
-                    </div>
+
                     <div>
                         {course.classes.map((classItem, index) => (
                             
-                            <div className="mt-2" key={index}> 
+                            <div className="bg-base-100 shadow-md rounded-xl p-4 relative mt-2" key={index}> 
+                                <h2 className="text-xl font-bold mb-2">Class {index + 1}</h2>
                                 <NewClass
                                     scheduleStart={classItem.scheduleStart}
                                     scheduleEnd={classItem.scheduleEnd}
@@ -198,21 +231,23 @@ const AddCourse: React.FC = () => {
                             </div>
                             ))
                         }
-                        <div className = "mt-2">
+                        <div className="mt-2">
                             <button
-                                className="btn btn-primary text-white"
+                                className="btn bg-green-600 border-none text-white"
                                 onClick={handleAddClass}
-                            >Add Class</button>
-
-                            <button
+                            >
+                                Add Class
+                            </button>
+                            
+                            {/* <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
-                            >Console Log Course</button>
-
+                            >
+                                Console Log Course
+                            </button> */}
                         </div>
                     </div>
-                </>
-
+                </div>
             )}
 
             {/* Dialogs - also known as Modals */}
@@ -224,6 +259,13 @@ const AddCourse: React.FC = () => {
                     topics={course?.topics || []} 
                     /> 
             )}
+
+            <CourseInfoModal
+                course={course}
+                isVisable={showCourseForm}
+                onSubmit={(c) => handleCourseInfoModalSubmit(c)}
+                onClose={()=>setShowCourseForm(false)}
+            />
 
             {showConfirmationModal && (
                 <ConfirmationModal 
@@ -247,7 +289,7 @@ const AddCourse: React.FC = () => {
                 />
             )}
 
-        </>
+        </div>
     );
 }
 

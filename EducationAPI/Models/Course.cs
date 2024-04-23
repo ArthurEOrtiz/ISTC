@@ -17,8 +17,11 @@ namespace EducationAPI.Models
 	{
 		public Course()
 		{
+			Location = new Location();
 			Classes = new HashSet<Class>();
 			Topics = new HashSet<Topic>();	
+			Exams = new HashSet<Exam>();
+			WaitLists = new HashSet<WaitList>();
 		}
 
 		[Key]
@@ -29,7 +32,7 @@ namespace EducationAPI.Models
 		[MaxLength(50)]
 		public string Title { get; set; } = null!;
 
-		[MaxLength(255)]
+		[MaxLength(500)]
 		public string? Description { get; set; }
 
 		[Range(0, 100)]
@@ -42,14 +45,13 @@ namespace EducationAPI.Models
 
 		public int MaxAttendance { get; set; }
 
-		public DateTime? EnrollmentDeadline { get; set; }
+		public DateTime EnrollmentDeadline { get; set; }
 
 		[MaxLength(50)]
 		public string? InstructorName { get; set; }
 
-		[Required]
 		[EmailAddress]
-		public string InstructorEmail { get; set; } = null!;
+		public string? InstructorEmail { get; set; }
 
 		[FileExtensions(Extensions = "pdf", ErrorMessage = "The file must be a PDF.")]
 		public string? Pdf { get; set; }
@@ -57,10 +59,14 @@ namespace EducationAPI.Models
 		public int LocationId { get; set; }
 
 		[ForeignKey("LocationId")]
-		public virtual Location Location { get; set; } = null!;
+		public virtual Location Location { get; set; } 
 
 		public virtual ICollection<Topic> Topics { get; set; }
 
 		public virtual ICollection<Class> Classes { get; set; }
+
+		public virtual ICollection<Exam> Exams { get; set; }
+		
+		public virtual ICollection<WaitList> WaitLists { get; set; }
 	}
 }

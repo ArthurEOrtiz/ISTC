@@ -1,8 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
-using System.Runtime.Serialization;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace EducationAPI.Models
@@ -21,7 +18,7 @@ namespace EducationAPI.Models
 		[MaxLength(50)]
 		public string Title { get; set; } = null!;
 
-		[MaxLength(255)]
+		[MaxLength(500)]
 		public string? Description { get; set; }
 
 		[JsonIgnore]
