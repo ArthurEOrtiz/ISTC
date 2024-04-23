@@ -10,17 +10,6 @@ interface TopicListProps {
 
 const TopicList: React.FC<TopicListProps> = ({ topics }) => {
     const [topicList, setTopicList] = useState<Topic[]>(topics);
-    const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
-
-    const handleToggleSelect = (topicId: number) => {
-        setSelectedTopics(prevSelected => {
-            if (prevSelected.includes(topicId)) {
-                return prevSelected.filter(id => id !== topicId);
-            } else {
-                return [...prevSelected, topicId];
-            }
-        });
-    };
 
     const handleTopicInfoCardOnApply = async (topic: Topic) => {
         console.log(topic);
