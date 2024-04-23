@@ -106,11 +106,11 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
                         <textarea
                             name="description"
                             className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
-                            maxLength={255}
-                            defaultValue={editTopic.description}
+                            maxLength={500}
+                            defaultValue={editTopic.description|| ''}
                             onChange={(e) => setEditTopic({ ...editTopic, description: e.target.value })}
                         />
-                        <CharacterCounter value={editTopic.description} limit={255} />
+                        <CharacterCounter value={editTopic.description ?? ''} limit={500} />
                     </>
 
                 : topic.description}

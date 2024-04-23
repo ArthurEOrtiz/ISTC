@@ -1,6 +1,6 @@
 'use client';
 import { Topic } from "@/app/shared/types/sharedTypes"
-import NewTopicForm from "./NewTopicForm"
+import TopicForm from "./TopicForm"
 import { useState } from "react";
 import TopicInfoCard from "./TopicInfoCard";
 import ConfirmationModal from "../../shared/modals/ConfirmationModal";
@@ -9,7 +9,14 @@ import SavingModal from "../../shared/modals/SavingModal";
 import { postTopic } from "@/Utilities/api";
 
 const AddTopic: React.FC = () => {
-    const [topic, setTopic] = useState<Topic>();
+    const defaultTopic: Topic = {
+        topicId: 0,
+        title: "",
+        description: null,
+        courses: []
+    }
+
+    const [topic, setTopic] = useState<Topic>(defaultTopic);
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const router = useRouter();
@@ -45,11 +52,14 @@ const AddTopic: React.FC = () => {
     }
 
     return (
-        <>
-            {topic === undefined ? (
-                <NewTopicForm onSubmit={ handleNewTopicFormOnSubmit} />
+        <div className='w-1/2'>
+            {topic.title === '' ? (
+                <div className='bg-base-100 shadow-md rounded-xl '>
+                    <TopicForm onSubmit={ handleNewTopicFormOnSubmit} topic={topic} />
+                </div>
+                
             ): (
-                <>
+                <div>
                     <TopicInfoCard topic={topic} onApply={handleTopicInfoCardOnApply} />
                     <button 
                         onClick={handleSaveTopic}
@@ -57,7 +67,7 @@ const AddTopic: React.FC = () => {
                     >
                         Save Topic
                     </button>
-                </>
+                </div>
             )}
 
             {showConfirmationModal && (
@@ -72,7 +82,7 @@ const AddTopic: React.FC = () => {
             {isSaving && (
                 <SavingModal text={"Saving Topic..."} />
             )}
-        </>
+        </div>
 
        
     );
