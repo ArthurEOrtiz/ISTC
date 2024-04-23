@@ -73,10 +73,10 @@ export interface Student {
 }
 
 export interface Topic {
-  topicId: number | null;
+  topicId: number;
   title: string;
-  description: string;
-  courses: Course[] | null;
+  description: string | null;
+  courses: Course[];
 }
 
 export interface User {

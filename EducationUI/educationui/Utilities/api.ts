@@ -204,10 +204,10 @@ export async function postTopic(topic: Topic) {
 export async function getAllTopics() {
     try {
         const response = await axiosInstance.get('Topic/GetAllTopics');
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error fetching topics:', error);
-        throw error;
+        throw error.message;
     }
 }
 
