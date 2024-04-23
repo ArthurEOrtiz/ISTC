@@ -33,7 +33,6 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
     const isFormValid = istitleValid && isEmailValid && isAttendanceCreditValid && isExamCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid;
 
     // effects
-
     useEffect(() => {
         setCourse(inboundCourse);
     }, [inboundCourse]);
@@ -44,24 +43,16 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
 
     useEffect(() => {
         if (course.title !== '') {
-            // setTitleTouched(true);
             setIsTitleValid(true);
         }
 
         if (course.attendanceCredit > 0) {
-            // setAttendanceCreditTouched(true);
             setIsAttendanceCreditValid(true);
         }
 
         if (course.maxAttendance > 0) {
-            // setAttendanceCreditTouched(true);
             setIsMaxAttendanceValid(true);
         }
-
-        // if (course.enrollmentDeadline > new Date()) {
-        //     // setEnrollmentDeadlineTouched(true);
-        //     setIsEnrollmentDeadlineValid(true);
-        // }
     }, [course])
 
     // Handlers
