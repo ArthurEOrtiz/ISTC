@@ -1,5 +1,4 @@
 import TopicCatalog from "@/app/components/Topics/TopicCatalog";
-import TopicList from "@/app/components/Topics/TopicList";
 
 const EditTopicPage: React.FC = async() => {
 
