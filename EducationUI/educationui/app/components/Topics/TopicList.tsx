@@ -25,7 +25,7 @@ const TopicList: React.FC<TopicListProps> = ({ topics }) => {
     const handleTopicInfoCardOnApply = async (topic: Topic) => {
         console.log(topic);
         try {
-            const response = await updateTopicById(topic.topicId!, topic);
+            const response = await updateTopicById(topic.topicId, topic);
             const index = topicList.findIndex(topic => topic.topicId === response.topicId);
             if (index !== -1) {
                 const newTopicList = [...topicList];
@@ -51,7 +51,9 @@ const TopicList: React.FC<TopicListProps> = ({ topics }) => {
     }
 
     return (
+        
         <div className="flex flex-wrap justify-center gap-4 p-4">
+            
             {topicList.map((topic, index) => (
                 <div key={index} className="card w-full">
                     <label className="flex items-center">

@@ -6,7 +6,7 @@ interface SelectTopicModalProps {
     open: boolean;
     onClose: () => void;
     onSelect: (topics: Topic[]) => void;
-    topics: Topic[]; // Topics from AddCourseComponent
+    topics: Topic[];
 }
 
 const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSelect, topics: preselectedTopics }) => {
@@ -17,15 +17,14 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
 
     useEffect(() => {
         const fetchTopics = async () => {
-            try {
-                setLoading(true);
-                const responseData = await getAllTopics();
-                setTopics(responseData);
-            } catch (error) {
-                setError('Failed to fetch topics');
-            } finally {
-                setLoading(false);
+           setLoading(true);
+           const response = await getAllTopics();
+           if (response.status === 200) {
+               setTopics(response.data);
+            } else {
+                setError(`Failed to fetch topics \n ${response}`);
             }
+            setLoading(false);
         };
 
         if (open) {
@@ -58,7 +57,7 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
                 {loading ? (
                     <span className="loading loading-spinner loading-xs"></span>
                 ) : error ? (
-                    <p>{error}</p>
+                    <p className='text-error'>{error}</p>
                 ) : (
                     <>
                         <p className="text-lg mb-4">Please select topics from the list below</p>
@@ -80,7 +79,7 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
                     </>
                 )}
                 <div className="flex justify-between">
-                    <button onClick={handleSelect} className="btn btn-primary text-white px-4 py-2 mr-2">Select</button>
+                    <button onClick={handleSelect} className="btn btn-primary text-white px-4 py-2 mr-2">Apply Selection</button>
                     <button onClick={onClose} className="btn btn-ghost dark:text-white px-4 py-2">Cancel</button>
                 </div>
             </div>
