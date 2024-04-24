@@ -35,8 +35,6 @@ const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}
                         user={user} 
                         isAdmin={isAdmin}
                         onError={(m) => onError(m)}
-                        handleManageAttendanceClick={(c) => {console.log(c)}}
-
                     />
                 </div>
             ))}

@@ -1,6 +1,6 @@
 import { Course, User, WaitList } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { DeleteWaitListById, IsUserEnrolledInCourse, IsUserWaitListed, PostWaitList } from "@/Utilities/api";
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
 
@@ -9,16 +9,9 @@ interface CourseActionContainerProps {
     user: User; 
     isAdmin: boolean;
     onError: (message: string) => void;
-    handleManageAttendanceClick: (course: Course) => void;
-    handleEditCourseClick?: (course: Course) => void;
-    handleDeleteCourseClick?: (course: Course) => void;
-    handleViewCourseClick?: (course: Course) => void;
 }
 
-const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, user, isAdmin, onError, handleManageAttendanceClick, handleEditCourseClick, handleDeleteCourseClick, handleViewCourseClick}) => {
-    // console.log(user);
-    // console.log(course);
-    // console.log(course.waitLists);
+const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, user, isAdmin, onError}) => {
     const [isEnrolled, setIsEnrolled] = useState<boolean>(false);
     const [isWaitListed, setIsWaitListed] = useState<boolean>(false);
     const [waitList, setWaitList] = useState<WaitList>();
@@ -38,14 +31,12 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     useEffect(() => {
         checkUserEnrollment();
         checkUserWaitList();
-        checkIfUserIsWaitListed();
     }, []);
 
     useEffect(() => {
         checkUserWaitList();
     }
     , [waitList]);
-
     
     // handlers
     const handleEnrollmentClick = () => {
@@ -79,7 +70,6 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
         }
     }
 
-
     // helpers
     const checkUserEnrollment = async() => {
          const response = await IsUserEnrolledInCourse(user.clerkId!, course.courseId);
@@ -102,7 +92,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     const waitListUser = async() => {
 
         resetConfirmationModal();
-        // console.log(defaultWaitList);
+       
         const response = await PostWaitList(defaultWaitList);
         if (response.status === 201) {
             setWaitList(response.data);
@@ -130,21 +120,11 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
         
     }
 
-    const checkIfUserIsWaitListed = () => {
-        const waitList = course.waitLists.find(wl => wl.userId === user.userId);
-        if (waitList) {
-            setWaitList(waitList);
-            setIsWaitListed(true);
-        }
-    }
-
-
     const resetConfirmationModal = () => { 
         setConfirmationTitle('');
         setConfirmationMessage('');
         setShowConfirmationModal(false);
     }
-
     
     return (
         <div>
