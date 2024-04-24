@@ -15,7 +15,11 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
 
     return (
         <div className="space-y-2">
-            <p className="text-2xl font-bold">{course.title}</p>
+            <div className="flex justify-between">
+                <p className="text-2xl font-bold">{course.title}</p>
+                <p className="text-base">Course Id: {course.courseId}</p>
+            </div>
+            
             <div className="flex space-x-2">
                 <p className="text-1xl font-bold">Topics</p>
                 

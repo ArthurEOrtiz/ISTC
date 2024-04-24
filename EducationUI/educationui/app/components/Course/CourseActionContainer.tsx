@@ -3,6 +3,8 @@ import CourseInfoCard from "./CourseInfoCard";
 import { useEffect, useState } from "react";
 import { DeleteWaitListById, IsUserEnrolledInCourse, IsUserWaitListed, PostWaitList } from "@/Utilities/api";
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
+import AttendanceModal from "../Attendance/AttendanceModal";
+import EnrollmentModal from "../Enrollment/EnrollmentModal";
 
 interface CourseActionContainerProps {
     course: Course;
@@ -68,6 +70,10 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                 removeUserFromWaitList();
                 break;
         }
+    };
+
+    const handleManageAttendanceClick = () => {
+        console.log('Manage Attendance');
     }
 
     // helpers
@@ -78,7 +84,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
          } else {
                 onError(`Failed to check user enrollment. \n ${response as unknown as string}`);
          }
-    }
+    };
 
     const checkUserWaitList = async() => {
         const response = await IsUserWaitListed(course.courseId, user.userId);
@@ -87,7 +93,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
         } else {
             onError(`Failed to check user wait list. \n ${response as unknown as string}`);
         }
-    }
+    };
 
     const waitListUser = async() => {
 
@@ -100,7 +106,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
             onError(`Failed to wait list user. \n ${response as unknown as string}`);
         }
         
-    }
+    };
 
     const removeUserFromWaitList = async() => {
 
@@ -118,13 +124,13 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
             onError(`Failed to remove user from wait list. \n ${response as unknown as string}`);
         }
         
-    }
+    };
 
     const resetConfirmationModal = () => { 
         setConfirmationTitle('');
         setConfirmationMessage('');
         setShowConfirmationModal(false);
-    }
+    };
     
     return (
         <div>
@@ -136,17 +142,26 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                             <div className="flex space-x-2">
                                 <button 
                                     className="btn btn-primary text-white"
-                                    onClick={() => handleEditCourseClick && handleEditCourseClick(course)}>
+                                    >
                                         Edit Course
                                 </button>
+                                <button
+                                    className="btn btn-primary text-white"
+                                    >
+                                        Enroll Students
+                                </button>
+
                                 <button 
                                     className="btn btn-primary text-white"
-                                    onClick={() => handleManageAttendanceClick(course)}>
+                                    onClick={handleManageAttendanceClick}
+                                    >
                                         Manage Attendance
                                 </button>
                                 <button 
                                     className="btn btn-error text-white"
-                                    onClick={() => handleDeleteCourseClick && handleDeleteCourseClick(course)}>Delete Course</button>
+                                    >
+                                        Delete Course
+                                </button>
                             </div>
                         </div>
                     )}
@@ -163,7 +178,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
 
                                 <button 
                                     className="btn btn-primary text-white"
-                                    onClick={() => handleViewCourseClick && handleViewCourseClick(course)}>
+                                    >
                                         View Course
                                 </button>
 
@@ -175,6 +190,19 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                 </div>
             </div>
             <div>
+            
+                <EnrollmentModal
+                    course={course}
+                    isOpen={false}
+                    onExit={() => console.log('Exit')}
+                />
+
+                <AttendanceModal
+                    course={course}
+                    isOpen={false}
+                    onExit={() => console.log('Exit')}
+                />
+
                 {showConfirmationModal && (
                     <ConfirmationModal 
                         title={confirmationTitle || ''}
