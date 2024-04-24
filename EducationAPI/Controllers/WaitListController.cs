@@ -1,7 +1,7 @@
 ﻿using EducationAPI.DataAccess;
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace EducationAPI.Controllers
@@ -69,7 +69,7 @@ namespace EducationAPI.Controllers
 				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("PostWaitList({WaitList}) called", waitList);
-				return new StatusCodeResult((int)HttpStatusCode.Created);
+				return new CreatedAtActionResult(nameof(GetWaitListById), "WaitList", new { id = waitList.WaitListId}, waitList);
 			}
 			catch (Exception ex)
 			{
@@ -126,6 +126,41 @@ namespace EducationAPI.Controllers
 			catch(Exception ex)
 			{
 				_logger.LogError(ex, "DeleteWaitListById({Id})", id);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpGet("IsUserWaitListed/{courseId}/{userId}")]
+		public async Task<ActionResult<bool>> IsUserWaitListed(int courseId, int userId)
+		{
+			try
+			{
+				var course = await _educationProgramContext.Courses
+					.Include(c => c.WaitLists)
+					.FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+				if (course == null)
+				{
+					_logger.LogError("IsUserWaitListed({CourseId},{UserId}), course not found.", courseId, userId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				var user = await _educationProgramContext.Users
+					.FirstOrDefaultAsync(u => u.UserId == userId);
+
+				if (user == null)
+				{
+					_logger.LogError("IsUserWaitListed({CourseId},{UserId}), user not found.", courseId, userId);
+					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+				}
+
+				_logger.LogInformation("IsUserWaitListed({CourseId},{UserId}), called", courseId, userId);
+				return course.WaitLists.Any(wl => wl.UserId == userId);
+
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex,"IsUserWaitListed({CourseId},{UserId})", courseId, userId);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}

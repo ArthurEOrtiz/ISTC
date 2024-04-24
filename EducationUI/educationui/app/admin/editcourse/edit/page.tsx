@@ -1,14 +1,12 @@
+import CourseCatalog from '@/app/components/Course/CourseCatalog';
 import React from 'react';
-import { getAllCourses } from '@/Utilities/api';
-import { Course } from '@/app/shared/types/sharedTypes';
-import CourseList from '@/app/components/Course/CourseList';
+
 
 const EditCourse: React.FC = async () => {
-    const courseJson = await getAllCourses();
-    const courses = courseJson as Course[];
+    
 
     return (
-        <CourseList courses={courses}/>
+        <CourseCatalog isAdmin={true}/>
     );
 };
 

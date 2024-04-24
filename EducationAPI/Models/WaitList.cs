@@ -22,13 +22,5 @@ namespace EducationAPI.Models
 
 		public bool ToEnroll { get; set; }
 
-		[JsonIgnore]
-		[ForeignKey("CourseId")]
-		public Course Course { get; set; } = null!;
-
-		[JsonIgnore]
-		[ForeignKey("UserId")]
-		public User User { get; set; } = null!;
-
 	}
 }

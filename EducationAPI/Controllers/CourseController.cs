@@ -32,10 +32,11 @@ namespace EducationAPI.Controllers
 		{
 			try
 			{
-				var courses = await  _educationProgramContext.Courses
+				var courses = await _educationProgramContext.Courses
 					.Include(c => c.Classes)
 					.Include(c => c.Topics)
 					.Include(c => c.Location)
+					.Include(c => c.WaitLists)
 					.ToListAsync();
 
 				return courses;
@@ -60,6 +61,7 @@ namespace EducationAPI.Controllers
 						.ThenInclude(c => c.Attendances)
 					.Include(c => c.Topics)
 					.Include(c => c.Location)
+					.Include (c => c.WaitLists)
 					.Where(c => c.EnrollmentDeadline >= today)
 					.ToListAsync();
 

@@ -1,4 +1,4 @@
-import { Course, Topic, User } from '@/app/shared/types/sharedTypes';
+import { Course, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
 import axios from 'axios';
 import https from 'https';
 
@@ -38,10 +38,10 @@ export async function CalculateStudentCreditHours(studentId: Number) {
 export async function getAllCourses() {
     try {
         const response = await axiosInstance.get('Course/GetAllCourses');
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error : any) {
         console.error('Error fetching courses:', error);
-        throw error;
+        return error.message;
     }
 }
 
@@ -207,7 +207,7 @@ export async function getAllTopics() {
         return response;
     } catch (error: any) {
         console.error('Error fetching topics:', error);
-        throw error.message;
+        return error.message;
     }
 }
 
@@ -346,10 +346,10 @@ export async function IsUserAdminByClerkId(clerkId: String) {
 export async function IsUserEnrolledInCourse(clerkId: String, courseId: Number) {
     try {
         const response = await axiosInstance.get(`User/IsUserEnrolledInCourse/${clerkId}/${courseId}`);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error fetching user:', error);
-        throw error;
+        return error.message;
     }
 }
 
@@ -394,3 +394,66 @@ export async function getStudentIdByClerkId(clerkId: String) {
         throw error.message;
     }
 }
+
+// WaitList
+
+export async function GetAllWaitList() {
+    try {
+        const response = await axiosInstance.get('WaitList/GetAllWaitList');
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function GetWaitListById(waitListId: Number) {
+    try {
+        const response = await axiosInstance.get(`WaitList/GetWaitListById/${waitListId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function PostWaitList(waitList: WaitList) {
+    try {
+        const response = await axiosInstance.post('WaitList/PostWaitList', waitList);
+        return response;
+    } catch (error: any) {
+        console.error('Error posting waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function UpdateWaitList(waitList: WaitList) {
+    try {
+        const response = await axiosInstance.put('WaitList/UpdateWaitList', waitList);
+        return response;
+    } catch (error: any) {
+        console.error('Error updating waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function DeleteWaitListById(waitListId: Number) {
+    try {
+        const response = await axiosInstance.delete(`WaitList/DeleteWaitListById/${waitListId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error deleting waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function IsUserWaitListed(courseId: Number, userId: Number) {
+    try {
+        const response = await axiosInstance.get(`WaitList/IsUserWaitListed/${courseId}/${userId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching waitlist:', error);
+        return error.message;
+    }
+}
+
