@@ -20,6 +20,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [confirmationTitle, setConfirmationTitle] = useState<string>();  
     const [confirmationMessage, setConfirmationMessage] = useState<string>();
+    const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false); 
   
     const defaultWaitList: WaitList = {
         waitListId: 0,
@@ -75,6 +76,11 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     const handleManageAttendanceClick = () => {
         console.log('Manage Attendance');
     }
+
+    const handleEnrollmentModelError = (message: string) => {
+        setShowEnrollmentModal(false);
+        onError(message);
+    };
 
     // helpers
     const checkUserEnrollment = async() => {
@@ -147,6 +153,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                                 </button>
                                 <button
                                     className="btn btn-primary text-white"
+                                    onClick={()=>setShowEnrollmentModal(true)}
                                     >
                                         Enroll Students
                                 </button>
@@ -189,12 +196,13 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                     
                 </div>
             </div>
-            <div>
+
             
                 <EnrollmentModal
                     course={course}
-                    isOpen={false}
-                    onExit={() => console.log('Exit')}
+                    isOpen={showEnrollmentModal}
+                    onExit={() => setShowEnrollmentModal(false)}
+                    onError={handleEnrollmentModelError}
                 />
 
                 <AttendanceModal
@@ -211,7 +219,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                         onCancel={() => setShowConfirmationModal(false)}
                     />
                 )}
-            </div>
+
         </div>
     );
 }

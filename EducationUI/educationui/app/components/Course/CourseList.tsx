@@ -27,7 +27,7 @@ const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}
     }
 
     return (
-        <div>
+        <div className='space-y-2'>
             {courseList.map((course: Course, index : number) => (
                 <div key={index} className="bg-base-100 rounded-xl p-4">
                     <CourseActionContainer 

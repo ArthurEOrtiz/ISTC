@@ -325,7 +325,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         <select
                             className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                             id="state"
-                            value={user.contact?.state ?? "ID"}
+                            value={user.contact.state ?? "ID"}
                             required
                             onChange={(e) => setUser({ ...user, contact: { ...user.contact, state: e.target.value } })}
                         >

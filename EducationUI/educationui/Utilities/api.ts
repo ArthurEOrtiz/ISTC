@@ -452,8 +452,17 @@ export async function IsUserWaitListed(courseId: Number, userId: Number) {
         const response = await axiosInstance.get(`WaitList/IsUserWaitListed/${courseId}/${userId}`);
         return response;
     } catch (error: any) {
-        console.error('Error fetching waitlist:', error);
+        console.error('Error checking waitlist:', error);
         return error.message;
     }
 }
 
+export async function GetCourseWaitList(courseId: Number) {
+    try {
+        const response = await axiosInstance.get(`WaitList/GetCourseWaitList/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching waitlist:', error);
+        return error.message;
+    }
+}
