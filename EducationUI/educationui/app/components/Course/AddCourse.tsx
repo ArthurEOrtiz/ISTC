@@ -46,8 +46,8 @@ const AddCourse: React.FC = () => {
         },
         topics: [],
         classes: [],
-        Exams: [],
-        WaitLists: [],
+        exams: [],
+        waitLists: [],
     };
 
     const [course, setCourse] = useState<Course>(defaultCourse);
