@@ -2,7 +2,6 @@ import ErrorModal from "@/app/shared/modals/ErrorModal";
 import { Course, User } from "@/app/shared/types/sharedTypes";
 import { GetUserEnrolledCoursesById } from "@/Utilities/api";
 import React, { useEffect, useState } from "react";
-import CourseCard from "../Course/EditCourseCard";
 
 interface UserEnrolledCoursesProps {
     user: User;
@@ -47,11 +46,8 @@ const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
                             key={index}
                             className='card w-full bg-base-300 shadow-xl'
                         >
-                            <CourseCard
-                                course={course}
-                                viewOnly={true}
-                                clerkId={user.clerkId!}
-                            />
+                            <p className='text-center p-4'>{course.title}</p>
+                            <p className='text-center p-4'>{course.description}</p>
                         </div> 
                     ))
                 ) : (

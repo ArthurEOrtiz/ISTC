@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+
 
 namespace EducationAPI.Models
 {
@@ -21,14 +21,6 @@ namespace EducationAPI.Models
 		public DateTime DateAdded { get; set; }
 
 		public bool ToEnroll { get; set; }
-
-		[JsonIgnore]
-		[ForeignKey("CourseId")]
-		public Course Course { get; set; } = null!;
-
-		[JsonIgnore]
-		[ForeignKey("UserId")]
-		public User User { get; set; } = null!;
 
 	}
 }

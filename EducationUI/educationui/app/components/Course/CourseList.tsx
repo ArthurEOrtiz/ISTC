@@ -1,39 +1,23 @@
 'use client';
-import React, { useEffect } from 'react';
-import { Course } from '@/app/shared/types/sharedTypes';
-import CourseCard from './EditCourseCard';
-import { useRouter } from 'next/navigation';
-import AttendanceModal from '../Attendance/AttendanceModal';
-import { useUser } from '@clerk/clerk-react';
+import React, { useEffect, useState } from 'react';
+import { Course, User } from '@/app/shared/types/sharedTypes';
+import CourseActionContainer from './CourseActionContainer';
+
 
 interface CourseListProps {
     courses: Course[];
-    viewOnly?: boolean;
+    user: User;
+    isAdmin: boolean;   
+    onError: (message: string) => void;
 }
 
-const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
-    const [courseList , setCourseList] = React.useState<Course[]>(courses);
-    const [course, setCourse] = React.useState<Course | null>(null);
-    const [searchString , setSearchString] = React.useState<string>('');
-    const { user } = useUser();
-    const router = useRouter();
+const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}) => {
+    const [courseList , setCourseList] = useState<Course[]>(courses);
 
     useEffect(() => {
-        if(searchString.length > 0){
-            const filteredCourses = courses.filter((course) => {
-                const titleMatch = course.title.toLowerCase().includes(searchString.toLowerCase());
-                const descriptionMatch = course.description.toLowerCase().includes(searchString.toLowerCase());
-                const topicsMatch = course.topics && course.topics.some((topic) => topic.title.toLowerCase().includes(searchString.toLowerCase()));
-                return titleMatch || descriptionMatch || topicsMatch;
-            });
-            setCourseList(filteredCourses);
-        } else {
-            setCourseList(courses);
+        if (courses.length > 0) {
+            setCourseList(courseList.sort(compareDates));
         }
-    }, [searchString]);
-
-    useEffect(() => {
-        setCourseList(courseList.sort(compareDates));
     }, [courseList]);
 
     const compareDates = (a: Course, b: Course): number => {
@@ -42,66 +26,18 @@ const CourseList: React.FC<CourseListProps> = ({courses, viewOnly}) => {
         return dateA.getTime() - dateB.getTime();
     }
 
-    const handleCourseCardOnEdit = (course: Course): void  => {
-        router.push(`/admin/editcourse/edit/course/${course.courseId}`);
-    }
-
-    const handleCourseCardOnAttendance = (course: Course): void => {
-        setCourse(course);
-    }
-
-    const handleAttendanceModalOnExit = (): void => {
-        setCourse(null);
-    }
-
     return (
-        <div>
-            {!viewOnly && <h1 className="text-3xl font-bold text-center mt-4">Courses</h1>}
-            
-
-            <div className='w-full flex justify-end mt-4 p-4'>
-                <div>
-                    <input 
-                        type="search"
-                        name="search" 
-                        id="search" 
-                        className="input input-bordered w-full pr-12 sm:text-sm rounded-md" 
-                        placeholder="Search courses..."
-                        onChange={(e) => setSearchString(e.target.value)}
-                     />
+        <div className='space-y-2'>
+            {courseList.map((course: Course, index : number) => (
+                <div key={index} className="bg-base-100 rounded-xl p-4">
+                    <CourseActionContainer 
+                        course={course}
+                        user={user} 
+                        isAdmin={isAdmin}
+                        onError={(m) => onError(m)}
+                    />
                 </div>
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-4 p-4">
-                {courseList.map((course, index) => (
-                    <div 
-                        key={index} 
-                        className="card w-full bg-base-100 shadow-xl"
-                    >
-                     {user ? (
-                        <CourseCard 
-                        course={course} 
-                        onEdit={handleCourseCardOnEdit} 
-                        onAttendance={handleCourseCardOnAttendance}
-                        viewOnly={viewOnly}
-                        clerkId={user.id}
-                        />
-                    ) : null}
-                        
-
-                    </div>
-                ))}
-            </div>
-
-            {course && (
-                <AttendanceModal 
-                    course={course}
-                    isOpen={true}
-                    onExit={handleAttendanceModalOnExit}
-                />
-            
-            )}
-
+            ))}
         </div>
     );
 }

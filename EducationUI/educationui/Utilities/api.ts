@@ -1,4 +1,4 @@
-import { Course, Topic, User } from '@/app/shared/types/sharedTypes';
+import { Course, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
 import axios from 'axios';
 import https from 'https';
 
@@ -38,10 +38,10 @@ export async function CalculateStudentCreditHours(studentId: Number) {
 export async function getAllCourses() {
     try {
         const response = await axiosInstance.get('Course/GetAllCourses');
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error : any) {
         console.error('Error fetching courses:', error);
-        throw error;
+        return error.message;
     }
 }
 
@@ -85,6 +85,16 @@ export async function getCoursesByDateRange(startDate: string, endDate: string) 
     }
 }
 
+export async function GetCourseEnrollment(courseId: Number) {
+    try {
+        const response = await axiosInstance.get(`Course/GetCourseEnrollment/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching course enrollment:', error);
+        return error.message;
+    }
+}
+
 export async function GetUserEnrolledCoursesById(userId: Number) {
     try {
         const response = await axiosInstance.get(`Course/GetUserEnrolledCoursesById/${userId}`);
@@ -115,23 +125,49 @@ export async function UpdateCourseById(courseId: Number, course: Course) {
     }
 }
 
-export async function EnrollStudentByClerkId(clerkId: String, courseId: Number){
+export async function EnrollUser(userId: Number, courseId: Number) {
     try {
-        const response = await axiosInstance.post(`Course/EnrollStudentByClerkId/${clerkId}/${courseId}`);
+        const response = await axiosInstance.post(`Course/EnrollUser/${userId}/${courseId}`);
         return response;
     } catch (error: any) {
-        console.error('Error enrolling student:', error);
-        return error.response;
+        console.error('Error enrolling user:', error);
+        return error.message;
     }
 }
 
-export async function UnenrollStudentByClerkId(clerkId: String, courseId: Number){
+export async function EnrollUsers(courseId: Number, users: User[]) {
+
+    const userIds = users.map((user: User) => user.userId);
+
     try {
-        const response = await axiosInstance.delete(`Course/UnenrollStudentByClerkId/${clerkId}/${courseId}`);
+        const response = await axiosInstance.post(`Course/EnrollUsers/${courseId}`, userIds);
         return response;
     } catch (error: any) {
-        console.error('Error enrolling student:', error);
-        return error.response;
+        console.error('Error enrolling users:', error);
+        return error.message;
+    }
+}
+
+export async function DropUser(userId: Number, courseId: Number) {
+    try {
+        const response = await axiosInstance.delete(`Course/DropUser/${userId}/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error dropping user:', error);
+        return error.message;
+    }
+}
+
+export async function DropUsers(courseId: Number, users: User[]) {
+
+    const userIds = users.map((user: User) => user.userId);
+
+    try {
+        const response = await axiosInstance.post(`Course/DropUsers/${courseId}`, userIds);
+        return response;
+    } catch (error: any) {
+        console.error('Error dropping users:', error);
+        return error.message;
     }
 }
 
@@ -207,7 +243,7 @@ export async function getAllTopics() {
         return response;
     } catch (error: any) {
         console.error('Error fetching topics:', error);
-        throw error.message;
+        return error.message;
     }
 }
 
@@ -346,10 +382,10 @@ export async function IsUserAdminByClerkId(clerkId: String) {
 export async function IsUserEnrolledInCourse(clerkId: String, courseId: Number) {
     try {
         const response = await axiosInstance.get(`User/IsUserEnrolledInCourse/${clerkId}/${courseId}`);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error fetching user:', error);
-        throw error;
+        return error.message;
     }
 }
 
@@ -392,5 +428,77 @@ export async function getStudentIdByClerkId(clerkId: String) {
     } catch (error: any) {
         console.error('Error fetching user:', error);
         throw error.message;
+    }
+}
+
+// WaitList
+
+export async function GetAllWaitList() {
+    try {
+        const response = await axiosInstance.get('WaitList/GetAllWaitList');
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function GetWaitListById(waitListId: Number) {
+    try {
+        const response = await axiosInstance.get(`WaitList/GetWaitListById/${waitListId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function PostWaitList(waitList: WaitList) {
+    try {
+        const response = await axiosInstance.post('WaitList/PostWaitList', waitList);
+        return response;
+    } catch (error: any) {
+        console.error('Error posting waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function UpdateWaitList(waitList: WaitList) {
+    try {
+        const response = await axiosInstance.put('WaitList/UpdateWaitList', waitList);
+        return response;
+    } catch (error: any) {
+        console.error('Error updating waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function DeleteWaitListById(waitListId: Number) {
+    try {
+        const response = await axiosInstance.delete(`WaitList/DeleteWaitListById/${waitListId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error deleting waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function IsUserWaitListed(courseId: Number, userId: Number) {
+    try {
+        const response = await axiosInstance.get(`WaitList/IsUserWaitListed/${courseId}/${userId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error checking waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function GetCourseWaitList(courseId: Number) {
+    try {
+        const response = await axiosInstance.get(`WaitList/GetCourseWaitList/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching waitlist:', error);
+        return error.message;
     }
 }

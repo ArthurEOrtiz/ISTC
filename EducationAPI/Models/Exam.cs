@@ -15,8 +15,8 @@ namespace EducationAPI.Models
 		public int CourseId { get; set; }
 
 		[Required]
-		[Column("user_id")]
-		public int UserId { get; set; }
+		[Column("student_id")]
+		public int StudentId { get; set; }
 
 		public bool HasPassed { get; set; } = false;
 
@@ -25,8 +25,8 @@ namespace EducationAPI.Models
 		public Course Course { get; set; } = null!;
 
 		[JsonIgnore]
-		[ForeignKey("UserId")]
-		public User User { get; set; } = null!;
+		[ForeignKey("StudentId")]
+		public Student Student { get; set; } = null!;
 
 	}
 }

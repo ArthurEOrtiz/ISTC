@@ -36,8 +36,14 @@ FROM WaitLists;
 SELECT *
 FROM Exams;
 
+--DELETE FROM Exams
+--WHERE course_id = 57;
+
 Select * 
 FROM Topics;
 
 SELECT *
 FROM CourseTopic;
+
+SELECT *
+FROM WaitLists;

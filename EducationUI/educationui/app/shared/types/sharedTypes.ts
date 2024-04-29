@@ -40,8 +40,8 @@ export interface Course {
   location: Location;
   topics: Topic[];
   classes: Class[];
-  Exams: Exam[];
-  WaitLists: WaitList[];
+  exams: Exam[];
+  waitLists: WaitList[];
 }
 
 export interface Exam {
