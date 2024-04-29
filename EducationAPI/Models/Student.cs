@@ -23,6 +23,8 @@ namespace EducationAPI.Models
 
 		public bool MappingCertified { get; set; } = false;
 
-		public virtual ICollection<Attendance> Attendances { get; set; } 
+		public virtual ICollection<Attendance> Attendances { get; set; }
+		
+		public virtual ICollection<Exam> Exams { get; set; } = new HashSet<Exam>();
 	}
 }

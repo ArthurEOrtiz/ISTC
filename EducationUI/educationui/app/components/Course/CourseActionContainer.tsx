@@ -5,6 +5,7 @@ import { DeleteWaitListById, IsUserEnrolledInCourse, IsUserWaitListed, PostWaitL
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
 import AttendanceModal from "../Attendance/AttendanceModal";
 import EnrollmentModal from "../Enrollment/EnrollmentModal";
+import { useRouter } from 'next/navigation';
 
 interface CourseActionContainerProps {
     course: Course;
@@ -21,6 +22,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     const [confirmationTitle, setConfirmationTitle] = useState<string>();  
     const [confirmationMessage, setConfirmationMessage] = useState<string>();
     const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false); 
+    const router = useRouter();
   
     const defaultWaitList: WaitList = {
         waitListId: 0,
@@ -148,6 +150,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                             <div className="flex space-x-2">
                                 <button 
                                     className="btn btn-primary text-white"
+                                    onClick={() => router.push(`/admin/editcourse/edit/course/${course.courseId}`)}
                                     >
                                         Edit Course
                                 </button>
@@ -163,11 +166,6 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                                     onClick={handleManageAttendanceClick}
                                     >
                                         Manage Attendance
-                                </button>
-                                <button 
-                                    className="btn btn-error text-white"
-                                    >
-                                        Delete Course
                                 </button>
                             </div>
                         </div>

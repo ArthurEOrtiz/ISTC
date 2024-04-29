@@ -85,6 +85,16 @@ export async function getCoursesByDateRange(startDate: string, endDate: string) 
     }
 }
 
+export async function GetCourseEnrollment(courseId: Number) {
+    try {
+        const response = await axiosInstance.get(`Course/GetCourseEnrollment/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching course enrollment:', error);
+        return error.message;
+    }
+}
+
 export async function GetUserEnrolledCoursesById(userId: Number) {
     try {
         const response = await axiosInstance.get(`Course/GetUserEnrolledCoursesById/${userId}`);
@@ -115,23 +125,49 @@ export async function UpdateCourseById(courseId: Number, course: Course) {
     }
 }
 
-export async function EnrollStudentByClerkId(clerkId: String, courseId: Number){
+export async function EnrollUser(userId: Number, courseId: Number) {
     try {
-        const response = await axiosInstance.post(`Course/EnrollStudentByClerkId/${clerkId}/${courseId}`);
+        const response = await axiosInstance.post(`Course/EnrollUser/${userId}/${courseId}`);
         return response;
     } catch (error: any) {
-        console.error('Error enrolling student:', error);
-        return error.response;
+        console.error('Error enrolling user:', error);
+        return error.message;
     }
 }
 
-export async function UnenrollStudentByClerkId(clerkId: String, courseId: Number){
+export async function EnrollUsers(courseId: Number, users: User[]) {
+
+    const userIds = users.map((user: User) => user.userId);
+
     try {
-        const response = await axiosInstance.delete(`Course/UnenrollStudentByClerkId/${clerkId}/${courseId}`);
+        const response = await axiosInstance.post(`Course/EnrollUsers/${courseId}`, userIds);
         return response;
     } catch (error: any) {
-        console.error('Error enrolling student:', error);
-        return error.response;
+        console.error('Error enrolling users:', error);
+        return error.message;
+    }
+}
+
+export async function DropUser(userId: Number, courseId: Number) {
+    try {
+        const response = await axiosInstance.delete(`Course/DropUser/${userId}/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error dropping user:', error);
+        return error.message;
+    }
+}
+
+export async function DropUsers(courseId: Number, users: User[]) {
+
+    const userIds = users.map((user: User) => user.userId);
+
+    try {
+        const response = await axiosInstance.post(`Course/DropUsers/${courseId}`, userIds);
+        return response;
+    } catch (error: any) {
+        console.error('Error dropping users:', error);
+        return error.message;
     }
 }
 
