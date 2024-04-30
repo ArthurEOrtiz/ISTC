@@ -483,6 +483,16 @@ export async function DeleteWaitListById(waitListId: Number) {
     }
 }
 
+export async function DeleteWaitListByUserIdCourseId(userId: Number, courseId: Number) {
+    try {
+        const response = await axiosInstance.delete(`WaitList/DeleteWaitListByUserIdCourseId/${userId}/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error deleting waitlist:', error);
+        return error.message;
+    }
+}
+
 export async function IsUserWaitListed(courseId: Number, userId: Number) {
     try {
         const response = await axiosInstance.get(`WaitList/IsUserWaitListed/${courseId}/${userId}`);
@@ -496,6 +506,36 @@ export async function IsUserWaitListed(courseId: Number, userId: Number) {
 export async function GetCourseWaitList(courseId: Number) {
     try {
         const response = await axiosInstance.get(`WaitList/GetCourseWaitList/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function GetWaitListByUserIdCourseId(userId: Number, courseId: Number) {
+    try {
+        const response = await axiosInstance.get(`WaitList/GetWaitListByUserIdCourseId/${userId}/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function GetEnrollmentQueue(courseId: Number) {
+    try {
+        const response = await axiosInstance.get(`WaitList/GetEnrollmentQueue/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function GetDropQueue(courseId: Number) {
+    try {
+        const response = await axiosInstance.get(`WaitList/GetDropQueue/${courseId}`);
         return response;
     } catch (error: any) {
         console.error('Error fetching waitlist:', error);
