@@ -1,5 +1,5 @@
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
-import { Course, User, WaitList } from "@/app/shared/types/sharedTypes";
+import { Course, User } from "@/app/shared/types/sharedTypes";
 import { DeleteWaitListByUserIdCourseId, DropUser, EnrollUser, EnrollUsers, getAllUsers, GetCourseEnrollment, GetDropQueue, GetEnrollmentQueue, SearchUsers } from "@/Utilities/api";
 import { useEffect, useState } from "react";
 
