@@ -66,8 +66,9 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var today = DateTime.Today;
-				var enrollableCourses = new List<Course>();
+				List<Course> enrollableCourses = new();
 
+				// Get all courses, that have an enrollment deadline on or after today
 				var courses = await _educationProgramContext.Courses
 					.Include(c => c.Classes)
 						.ThenInclude(c => c.Attendances)
@@ -84,6 +85,7 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
+				// FOR EACH course, retrieve the maximum attendance and the record of the first class.
 				foreach (Course course in courses)
 				{
 					int MaxAttendance = course.MaxAttendance;
@@ -93,9 +95,10 @@ namespace EducationAPI.Controllers
 						_logger.LogError("GetAllEnrollableCourse(), could not find class.");
 						return new StatusCodeResult((int)HttpStatusCode.NotFound);
 					}
-
+					// IF the number of students in attendance is less than the value of max attendance.
 					if (firstClass.Attendances.Count < MaxAttendance)
 					{
+						// THEN add the course to the list of enrollable courses. 
 						enrollableCourses.Add(course);
 					}
 				}
@@ -149,7 +152,7 @@ namespace EducationAPI.Controllers
 		}
 
 		/// <summary>
-		/// Returns Course from Topic Id. 
+		/// Returns a lists of Course by Topic.
 		/// </summary>
 		/// <param name="Id">Topic Id of <see cref="Topic"/></param>
 		/// <returns><see cref="List{T}"/> of <see cref="Topic"/></returns>
@@ -182,7 +185,7 @@ namespace EducationAPI.Controllers
 		}
 
 		/// <summary>
-		/// Retrieves a list of courses enrolled by a user identified by the specified user ID.
+		/// Retrieves a list of courses enrolled by a user identified their user ID.
 		/// </summary>
 		/// <param name="userId">The ID of the user whose enrolled courses are to be retrieved. <see cref="User.UserId"/></param>
 		/// <returns>
@@ -272,7 +275,7 @@ namespace EducationAPI.Controllers
 
 				if (user == null)
 				{
-					_logger.LogError("GetUserCompletedCourses({UserId}, user not found.", userId);
+					_logger.LogError("GetUserCompletedCourses({UserId}), user not found.", userId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -283,9 +286,19 @@ namespace EducationAPI.Controllers
 
 				var completedCourses = new List<Course>();
 
+				// If the user is not even enrolled in anything, just return and empty list.
+				// I might run into problems here later, WHAT IF, the course has been deleted?
+				if (attendedCourses.Any())
+				{
+					_logger.LogInformation("GetUserCompletedCourses({UserId}), called.", userId);
+					return completedCourses;
+				}
+
 				foreach (var course in attendedCourses)
 				{
-					if (course == null) continue;
+					// If we made it this far, course *should* not be null here, 
+					// but I put this in here to handle null warnings on course.
+					if (course == null) continue; 
 
 					var attendedClassIds = user.Student.Attendances
 							.Where(a => a.Attended && a.Class.CourseId == course.CourseId)
