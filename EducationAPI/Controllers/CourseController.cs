@@ -413,7 +413,6 @@ namespace EducationAPI.Controllers
 					.ToList();
 
 				// then find the user to each student using the student id
-
 				var users = await _educationProgramContext.Users
 					.Where(u => students.Select(s => s.UserId).Contains(u.UserId))
 					.ToListAsync();
