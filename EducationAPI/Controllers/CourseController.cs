@@ -66,8 +66,9 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var today = DateTime.Today;
-				var enrollableCourses = new List<Course>();
+				List<Course> enrollableCourses = new();
 
+				// Get all courses, that have an enrollment deadline on or after today
 				var courses = await _educationProgramContext.Courses
 					.Include(c => c.Classes)
 						.ThenInclude(c => c.Attendances)
@@ -84,6 +85,7 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
+				// FOR EACH course, retrieve the maximum attendance and the record of the first class.
 				foreach (Course course in courses)
 				{
 					int MaxAttendance = course.MaxAttendance;
@@ -93,9 +95,10 @@ namespace EducationAPI.Controllers
 						_logger.LogError("GetAllEnrollableCourse(), could not find class.");
 						return new StatusCodeResult((int)HttpStatusCode.NotFound);
 					}
-
+					// IF the number of students in attendance is less than the value of max attendance.
 					if (firstClass.Attendances.Count < MaxAttendance)
 					{
+						// THEN add the course to the list of enrollable courses. 
 						enrollableCourses.Add(course);
 					}
 				}
@@ -149,7 +152,7 @@ namespace EducationAPI.Controllers
 		}
 
 		/// <summary>
-		/// Returns Course from Topic Id. 
+		/// Returns a lists of Course by Topic.
 		/// </summary>
 		/// <param name="Id">Topic Id of <see cref="Topic"/></param>
 		/// <returns><see cref="List{T}"/> of <see cref="Topic"/></returns>
@@ -182,7 +185,7 @@ namespace EducationAPI.Controllers
 		}
 
 		/// <summary>
-		/// Retrieves a list of courses enrolled by a user identified by the specified user ID.
+		/// Retrieves a list of courses enrolled by a user identified their user ID.
 		/// </summary>
 		/// <param name="userId">The ID of the user whose enrolled courses are to be retrieved. <see cref="User.UserId"/></param>
 		/// <returns>
@@ -272,7 +275,7 @@ namespace EducationAPI.Controllers
 
 				if (user == null)
 				{
-					_logger.LogError("GetUserCompletedCourses({UserId}, user not found.", userId);
+					_logger.LogError("GetUserCompletedCourses({UserId}), user not found.", userId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -283,9 +286,19 @@ namespace EducationAPI.Controllers
 
 				var completedCourses = new List<Course>();
 
+				// If the user is not even enrolled in anything, just return and empty list.
+				// I might run into problems here later, WHAT IF, the course has been deleted?
+				if (attendedCourses.Any())
+				{
+					_logger.LogInformation("GetUserCompletedCourses({UserId}), called.", userId);
+					return completedCourses;
+				}
+
 				foreach (var course in attendedCourses)
 				{
-					if (course == null) continue;
+					// If we made it this far, course *should* not be null here, 
+					// but I put this in here to handle null warnings on course.
+					if (course == null) continue; 
 
 					var attendedClassIds = user.Student.Attendances
 							.Where(a => a.Attended && a.Class.CourseId == course.CourseId)
@@ -400,7 +413,6 @@ namespace EducationAPI.Controllers
 					.ToList();
 
 				// then find the user to each student using the student id
-
 				var users = await _educationProgramContext.Users
 					.Where(u => students.Select(s => s.UserId).Contains(u.UserId))
 					.ToListAsync();
@@ -637,7 +649,7 @@ namespace EducationAPI.Controllers
 
 				if (course == null)
 				{
-					_logger.LogError("EnrollUsers({CourseId}), Course not found!", courseId);
+					_logger.LogError("EnrollUsers({CourseId}), Course not found.", courseId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -651,7 +663,7 @@ namespace EducationAPI.Controllers
 
 					if (user == null)
 					{
-						_logger.LogError("EnrollUsers({UserId},{CourseId}), User not found!", userId, courseId);
+						_logger.LogError("EnrollUsers({UserId},{CourseId}), User not found.", userId, courseId);
 						return new StatusCodeResult((int)HttpStatusCode.NotFound);
 					}
 
@@ -659,14 +671,14 @@ namespace EducationAPI.Controllers
 
 					if (student == null)
 					{
-						_logger.LogError("EnrollUsers({UserId},{CourseId}), student not found!", userId, courseId);
+						_logger.LogError("EnrollUsers({UserId},{CourseId}), student not found.", userId, courseId);
 						return new StatusCodeResult((int)HttpStatusCode.NotFound);
 					}
 
 					// Check if the student is already enroll in the course
 					if (student.Attendances != null && student.Attendances.Any(a => a.Class != null && a.Class.CourseId == courseId))
 					{
-						_logger.LogError("EnrollUsers({UserId},{CourseId}), User is already enrolled in course", userId, courseId);
+						_logger.LogError("EnrollUsers({UserId},{CourseId}), User is already enrolled in course.", userId, courseId);
 						return new ObjectResult("Student is already enrolled in course")
 						{
 							StatusCode = (int)HttpStatusCode.Conflict
@@ -701,7 +713,7 @@ namespace EducationAPI.Controllers
 
 				await _educationProgramContext.SaveChangesAsync();
 
-				_logger.LogInformation("EnrollUsers({CourseId}), Course not found!", courseId);
+				_logger.LogInformation("EnrollUsers({CourseId}), called.", courseId);
 				return new StatusCodeResult((int)HttpStatusCode.Created);
 
 			}
@@ -745,7 +757,7 @@ namespace EducationAPI.Controllers
 
 				if (course == null)
 				{
-					_logger.LogError("DropUser({UserId},{CourseId}), Course not found!", userId, courseId);
+					_logger.LogError("DropUser({UserId},{CourseId}), Course not found.", userId, courseId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -759,7 +771,7 @@ namespace EducationAPI.Controllers
 
 				if (user == null)
 				{
-					_logger.LogError("DropUser({UserId},{CourseId}), User  not found!", userId, courseId);
+					_logger.LogError("DropUser({UserId},{CourseId}), User not found.", userId, courseId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -767,7 +779,7 @@ namespace EducationAPI.Controllers
 
 				if (student == null)
 				{
-					_logger.LogError("DropUser({UserId},{CourseId}), Student not found!", userId, courseId);
+					_logger.LogError("DropUser({UserId},{CourseId}), Student not found.", userId, courseId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -818,7 +830,7 @@ namespace EducationAPI.Controllers
 
 				if (course == null)
 				{
-					_logger.LogError("DropUsers({CourseId}), Course not found!", courseId);
+					_logger.LogError("DropUsers({CourseId}), Course not found.", courseId);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -834,7 +846,7 @@ namespace EducationAPI.Controllers
 
 					if (user == null)
 					{
-						_logger.LogError("DropUsers({UserId},{CourseId}), User  not found!", userId, courseId);
+						_logger.LogError("DropUsers({UserId},{CourseId}), User  not found.", userId, courseId);
 						return new StatusCodeResult((int)HttpStatusCode.NotFound);
 					}
 
@@ -842,7 +854,7 @@ namespace EducationAPI.Controllers
 
 					if (student == null)
 					{
-						_logger.LogError("DropUsers({UserId},{CourseId}), Student not found!", userId, courseId);
+						_logger.LogError("DropUsers({UserId},{CourseId}), Student not found.", userId, courseId);
 						return new StatusCodeResult((int)HttpStatusCode.NotFound);
 					}
 
@@ -891,7 +903,7 @@ namespace EducationAPI.Controllers
 
 				if (existingCourse == null)
 				{
-					_logger.LogError("DeleteCourseById({Id}), Course not found!", id);
+					_logger.LogError("DeleteCourseById({Id}), Course not found.", id);
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
@@ -903,7 +915,7 @@ namespace EducationAPI.Controllers
 				_educationProgramContext.Courses.Remove(existingCourse);
 				await _educationProgramContext.SaveChangesAsync();
 
-				_logger.LogInformation("DeleteCourseById {Id} called", id);
+				_logger.LogInformation("DeleteCourseById {Id} called.", id);
 				return new StatusCodeResult((int)HttpStatusCode.OK);
 			}
 			catch (Exception ex)

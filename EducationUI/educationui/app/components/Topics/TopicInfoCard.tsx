@@ -21,6 +21,7 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
         const fetchData = async () => {
     
             if (topic.topicId === 0) return setCourses([]);
+            
             setLoading(true);
             try {
                 const responseData = await getCoursesByTopicId(topic.topicId);

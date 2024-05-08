@@ -47,3 +47,6 @@ FROM CourseTopic;
 
 SELECT *
 FROM WaitLists;
+
+--DELETE FROM WaitLists
+--WHERE WaitListId = 18;

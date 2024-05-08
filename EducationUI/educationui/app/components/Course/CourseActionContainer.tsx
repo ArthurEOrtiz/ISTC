@@ -17,14 +17,14 @@ interface CourseActionContainerProps {
 const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, user, isAdmin, onError}) => {
     const [isEnrolled, setIsEnrolled] = useState<boolean>(false);
     const [isWaitListed, setIsWaitListed] = useState<boolean>(false);
-    const [waitList, setWaitList] = useState<WaitList>();
+    const [userWaitList, setUserWaitList] = useState<WaitList>(); 
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [confirmationTitle, setConfirmationTitle] = useState<string>();  
     const [confirmationMessage, setConfirmationMessage] = useState<string>();
     const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false); 
     const router = useRouter();
   
-    const defaultWaitList: WaitList = {
+    const defaultWaitListToEnroll: WaitList = {
         waitListId: 0,
         courseId: course.courseId,
         userId: user.userId,
@@ -32,16 +32,24 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
         toEnroll: true
     }
 
+    const defaultWaitListToDrop: WaitList = {
+        waitListId: 0,
+        courseId: course.courseId,
+        userId: user.userId,
+        dateAdded: new Date(),
+        toEnroll: false
+    }
+
     // effects
     useEffect(() => {
-        checkUserEnrollment();
-        checkUserWaitList();
+        checkIfUserIsEnrolledInCourse();
+        checkIfUserIsOnWaitList();
     }, []);
 
     useEffect(() => {
-        checkUserWaitList();
+        checkIfUserIsOnWaitList();
     }
-    , [waitList]);
+    , [userWaitList]);
     
     // handlers
     const handleEnrollmentClick = () => {
@@ -49,33 +57,45 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
         if (isEnrolled || isWaitListed) {
             if (isEnrolled) {
                 setConfirmationTitle('Drop Course');
-                setConfirmationMessage('Are you sure you want to drop this course?');
+                setConfirmationMessage('Are you sure you want to request to drop this course? A confirmation email will be sent to you upon approval.');
+                setShowConfirmationModal(true);
+                return;
                 
             }
             if (isWaitListed) {
                 setConfirmationTitle('Remove from Wait List');
                 setConfirmationMessage('Are you sure you want to remove yourself from the wait list of this course?');
+                setShowConfirmationModal(true);
+                return;
             }
         } else {
             setConfirmationTitle('Application Confirmation');
             setConfirmationMessage('Are you sure you want to apply to enroll in this course? You will be added to the wait list and a confirmation email will be sent to you upon approval.');
-            
+            setShowConfirmationModal(true);
         }
-        setShowConfirmationModal(true);
+        
     };
 
     const handleOnConfirm = () => { 
         switch (confirmationTitle) {
             case 'Application Confirmation':
-                waitListUser();
+                waitListUser(defaultWaitListToEnroll);
                 break;
             case 'Remove from Wait List':
                 removeUserFromWaitList();
                 break;
+            case 'Drop Course':
+                checkIfUserIsOnWaitList();
+                if (!isWaitListed) {
+                    waitListUser(defaultWaitListToDrop);
+                }
+                break;
         }
+
+        resetConfirmationModal();
     };
 
-    const handleManageAttendanceClick = () => {
+    const handleManageAttendanceClick = () => { 
         console.log('Manage Attendance');
     }
 
@@ -85,7 +105,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     };
 
     // helpers
-    const checkUserEnrollment = async() => {
+    const checkIfUserIsEnrolledInCourse = async() => {
          const response = await IsUserEnrolledInCourse(user.clerkId!, course.courseId);
          if (response.status === 200) {
                 setIsEnrolled(response.data);
@@ -94,7 +114,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
          }
     };
 
-    const checkUserWaitList = async() => {
+    const checkIfUserIsOnWaitList = async() => {
         const response = await IsUserWaitListed(course.courseId, user.userId);
         if (response.status === 200) {
             setIsWaitListed(response.data);
@@ -103,13 +123,11 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
         }
     };
 
-    const waitListUser = async() => {
-
-        resetConfirmationModal();
+    const waitListUser = async(waitList: WaitList) => {
        
-        const response = await PostWaitList(defaultWaitList);
+        const response = await PostWaitList(waitList);
         if (response.status === 201) {
-            setWaitList(response.data);
+            setUserWaitList(response.data);
         } else {
             onError(`Failed to wait list user. \n ${response as unknown as string}`);
         }
@@ -118,15 +136,14 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
 
     const removeUserFromWaitList = async() => {
 
-        resetConfirmationModal();
-        if (!waitList) {
+        if (!userWaitList) {
             onError('Wait list not found.');
             return;
         }
        
-        const response = await DeleteWaitListById(waitList.waitListId);
+        const response = await DeleteWaitListById(userWaitList.waitListId);
         if (response.status === 200) {
-            setWaitList(undefined);
+            setUserWaitList(undefined);
             setIsWaitListed(false);
         } else {
             onError(`Failed to remove user from wait list. \n ${response as unknown as string}`);
@@ -158,7 +175,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                                     className="btn btn-primary text-white"
                                     onClick={()=>setShowEnrollmentModal(true)}
                                     >
-                                        Enroll Students
+                                        Manage Enrollment
                                 </button>
 
                                 <button 
