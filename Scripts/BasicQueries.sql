@@ -50,3 +50,11 @@ FROM WaitLists;
 
 --DELETE FROM WaitLists
 --WHERE WaitListId = 18;
+
+SELECT *
+FROM PDFs;
+
+--DELETE FROM PDFs
+--wHERE PDFId = 1;
+
+

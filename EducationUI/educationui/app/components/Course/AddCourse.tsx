@@ -11,6 +11,7 @@ import { postCourse } from '@/Utilities/api';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
 import CourseInfoCard from './CourseInfoCard';
 import CourseInfoModal from './CourseInfoModal';
+import AddPDFModal from '../PDF/addPDFModal';
 
 
 /**
@@ -31,7 +32,7 @@ const AddCourse: React.FC = () => {
         enrollmentDeadline: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1), // today plus on day, no time.
         instructorName: null,
         instructorEmail: null,
-        pdf: null,
+        pDFId: 0,
         locationId: 0,
         location: {
             locationId: 0,
@@ -44,6 +45,7 @@ const AddCourse: React.FC = () => {
             state: 'ID',
             postalCode: null,
         },
+        pDF: null,
         topics: [],
         classes: [],
         exams: [],
@@ -53,6 +55,7 @@ const AddCourse: React.FC = () => {
     const [course, setCourse] = useState<Course>(defaultCourse);
     const [showCourseForm, setShowCourseForm] = useState<boolean>(false);
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
+    const [showPDFModal, setShowPDFModal] = useState<boolean>(false);
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [hasError, setHasError] = useState<boolean>(false);
@@ -198,27 +201,36 @@ const AddCourse: React.FC = () => {
                 </div>
             ) : (
                 <div>
-                        
                     <div className='bg-base-100 shadow-md rounded-xl p-5'>
-                        <CourseInfoCard course={course} />
-                        <button 
-                            className='btn btn-primary text-white mt-2'
-                            onClick={()=>setShowCourseForm(true)}
-                            >
-                                Edit Course Information
-                        </button>
-                        <button 
-                            className='btn btn-primary text-white ml-2 mt-2'
-                            onClick={()=>setShowSelectTopicModal(true)}
-                            >
-                                Select Topics
-                        </button>
-                        <button 
-                            className='btn bg-green-600 border-none text-white ml-2 mt-2'
-                            onClick={()=>setShowConfirmationModal(true)}
-                            >
-                                Save Course
-                        </button>
+                        <div className='mb-4 bg-base-300 rounded-xl p-4'>
+                            <CourseInfoCard course={course} />
+                        </div>
+                        <div className='mt-2 space-x-2'>
+                            <button 
+                                className='btn btn-primary text-white'
+                                onClick={()=>setShowCourseForm(true)}
+                                >
+                                    Edit Course Information
+                            </button>
+                            <button 
+                                className='btn btn-primary text-white'
+                                onClick={()=>setShowSelectTopicModal(true)}
+                                >
+                                    Select Topics
+                            </button>
+                            <button
+                                className='btn btn-primary text-white'
+                                onClick={() => setShowPDFModal(true)}
+                                >
+                                    Add PDF
+                            </button>
+                            <button 
+                                className='btn bg-green-600 border-none text-white'
+                                onClick={()=>setShowConfirmationModal(true)}
+                                >
+                                    Save Course
+                            </button>
+                        </div>
                     </div>
 
                     <div>
@@ -244,12 +256,12 @@ const AddCourse: React.FC = () => {
                                 Add Class
                             </button>
                             
-                            {/* <button
+                            <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
                             >
                                 Console Log Course
-                            </button> */}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -280,6 +292,13 @@ const AddCourse: React.FC = () => {
                     onCancel={handleConfirmationModalOnCancel}
                 />
             )}
+
+            <AddPDFModal
+                open={showPDFModal}
+                onClose={() => setShowPDFModal(false)}
+                onAdd={(pdf) => setCourse({...course, pDF: pdf, pDFId: pdf.pDFId})}
+                PDF={course.pDF}
+            />
 
             {isSaving && (
                 <SavingModal text={'Saving Course...'} />

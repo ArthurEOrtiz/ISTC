@@ -8,7 +8,7 @@ namespace EducationAPI.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
-	public class CourseController
+	public class CourseController : ControllerBase
 	{
 		private readonly EducationProgramContext _educationProgramContext;
 		private readonly ILogger<CourseController> _logger;
@@ -471,8 +471,7 @@ namespace EducationAPI.Controllers
 				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("PostCourse {Course} called.", course);
-				// Should return a 201 status code. 
-				return new StatusCodeResult((int)HttpStatusCode.Created);
+				return Created();
 			}
 			catch (Exception ex)
 			{

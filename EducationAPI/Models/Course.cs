@@ -18,6 +18,7 @@ namespace EducationAPI.Models
 		public Course()
 		{
 			Location = new Location();
+			PDF = new PDF();
 			Classes = new HashSet<Class>();
 			Topics = new HashSet<Topic>();	
 			Exams = new HashSet<Exam>();
@@ -53,13 +54,15 @@ namespace EducationAPI.Models
 		[EmailAddress]
 		public string? InstructorEmail { get; set; }
 
-		[FileExtensions(Extensions = "pdf", ErrorMessage = "The file must be a PDF.")]
-		public string? Pdf { get; set; }
+		public int? PDFId { get; set; }
 
 		public int LocationId { get; set; }
 
 		[ForeignKey("LocationId")]
-		public virtual Location Location { get; set; } 
+		public virtual Location Location { get; set; }
+
+		[ForeignKey("PDFId")]
+		public virtual PDF? PDF { get; set; }
 
 		public virtual ICollection<Topic> Topics { get; set; }
 

@@ -4,6 +4,7 @@ using EducationAPI.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EducationAPI.Migrations
 {
     [DbContext(typeof(EducationProgramContext))]
-    partial class EducationProgramContextModelSnapshot : ModelSnapshot
+    [Migration("20240508182751_RemovePDFfromCourse")]
+    partial class RemovePDFfromCourse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -252,9 +255,6 @@ namespace EducationAPI.Migrations
                     b.Property<int>("MaxAttendance")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PDFId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
@@ -273,8 +273,6 @@ namespace EducationAPI.Migrations
                     b.HasKey("CourseId");
 
                     b.HasIndex("LocationId");
-
-                    b.HasIndex("PDFId");
 
                     b.ToTable("Courses", (string)null);
 
@@ -412,14 +410,16 @@ namespace EducationAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PDFId"));
 
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
                     b.Property<byte[]>("Data")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("FileName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()
@@ -722,13 +722,7 @@ namespace EducationAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EducationAPI.Models.PDF", "PDF")
-                        .WithMany()
-                        .HasForeignKey("PDFId");
-
                     b.Navigation("Location");
-
-                    b.Navigation("PDF");
                 });
 
             modelBuilder.Entity("EducationAPI.Models.Exam", b =>
