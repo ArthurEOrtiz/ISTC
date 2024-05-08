@@ -25,10 +25,12 @@ namespace EducationAPI.Controllers
 		{
 			try
 			{
-				_logger.LogInformation("GetAllTopics() Called");
-				return await _educationProgramContext.Topics
-					.Include(t => t.Courses)
-					.ToListAsync();
+				var topics = await _educationProgramContext.Topics
+          .Include(t => t.Courses)
+          .ToListAsync();
+
+        _logger.LogInformation("GetAllTopics() Called");
+				return topics;
 			}
 			catch (Exception ex)
 			{

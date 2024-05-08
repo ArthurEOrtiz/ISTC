@@ -11,16 +11,16 @@ namespace EducationAPI.DataAccess
 		{
 		}
 
-		public DbSet<Attendance> Attendances { get; set; } = null!;
-		public DbSet<Class> Classes { get; set; } = null!;
-		public DbSet<Contact> Contacts { get; set; } = null!;
-		public DbSet<Course> Courses { get; set; } = null!;
-		public DbSet<Exam> Exams { get; set; } = null!;
-		public DbSet<Location> Locations { get; set; } = null!;
-		public DbSet<Student> Students { get; set; } = null!;
-		public DbSet<Topic> Topics { get; set; } = null!;
-		public DbSet<User> Users { get; set; } = null!;
-		public DbSet<WaitList> WaitLists { get; set; } = null!;
+		public DbSet<Attendance> Attendances { get; set; }
+		public DbSet<Class> Classes { get; set; }
+		public DbSet<Contact> Contacts { get; set; }
+		public DbSet<Course> Courses { get; set; } 
+		public DbSet<Exam> Exams { get; set; } 
+		public DbSet<Location> Locations { get; set; } 
+		public DbSet<Student> Students { get; set; } 
+		public DbSet<Topic> Topics { get; set; } 
+		public DbSet<User> Users { get; set; }
+		public DbSet<WaitList> WaitLists { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
