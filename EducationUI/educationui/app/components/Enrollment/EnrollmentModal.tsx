@@ -206,7 +206,6 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
                 <div className="grid grid-cols-2 grid-rows-2 gap-4 w-full h-5/6">
                         
                     {/* Students */}
-
                     <div className='bg-base-300 rounded-xl p-4'>
                         <div className="space-y-2 mb-2">
                             <div className="flex justify-between">
