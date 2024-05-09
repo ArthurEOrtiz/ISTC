@@ -35,10 +35,10 @@ export interface Course {
   enrollmentDeadline: Date;
   instructorName: string | null;
   instructorEmail: string | null;
-  pDFId: number | null;
+  pdfId: number | null;
   locationId: number;
   location: Location;
-  pDF: PDF | null;
+  pdf: PDF | null;
   topics: Topic[];
   classes: Class[];
   exams: Exam[];
@@ -65,7 +65,7 @@ export interface Location {
 }
 
 export interface PDF {
-  pDFId: number;
+  pdfId: number;
   courseId: number;
   fileName: string;
   data: string;

@@ -11,7 +11,8 @@ import { postCourse } from '@/Utilities/api';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
 import CourseInfoCard from './CourseInfoCard';
 import CourseInfoModal from './CourseInfoModal';
-import AddPDFModal from '../PDF/addPDFModal';
+import SelectPDFModal from '../PDF/SelectPDFModal';
+
 
 
 /**
@@ -32,7 +33,7 @@ const AddCourse: React.FC = () => {
         enrollmentDeadline: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1), // today plus on day, no time.
         instructorName: null,
         instructorEmail: null,
-        pDFId: 0,
+        pdfId: null,
         locationId: 0,
         location: {
             locationId: 0,
@@ -45,7 +46,7 @@ const AddCourse: React.FC = () => {
             state: 'ID',
             postalCode: null,
         },
-        pDF: null,
+        pdf: null,
         topics: [],
         classes: [],
         exams: [],
@@ -76,7 +77,6 @@ const AddCourse: React.FC = () => {
     
         let scheduleStart;
         let scheduleEnd;
-        
 
         if (course && course.classes.length > 0) {
             // If there are existing classes, get the last class's end time
@@ -171,9 +171,8 @@ const AddCourse: React.FC = () => {
         setShowConfirmationModal(false);
         const response = await postCourse(course as Course);
         console.log(response);
-        if (response.status === 201) {
+        if (response.status === 204) {
             setIsSaving(false);
-            
             router.push('/admin/editcourse/edit');
         } else {
             setIsSaving(false);
@@ -222,7 +221,7 @@ const AddCourse: React.FC = () => {
                                 className='btn btn-primary text-white'
                                 onClick={() => setShowPDFModal(true)}
                                 >
-                                    Add PDF
+                                    Select PDF
                             </button>
                             <button 
                                 className='btn bg-green-600 border-none text-white'
@@ -293,11 +292,18 @@ const AddCourse: React.FC = () => {
                 />
             )}
 
-            <AddPDFModal
+            <SelectPDFModal
                 open={showPDFModal}
                 onClose={() => setShowPDFModal(false)}
-                onAdd={(pdf) => setCourse({...course, pDF: pdf, pDFId: pdf.pDFId})}
-                PDF={course.pDF}
+                onAdd={(pdf) => {
+                    setCourse({...course, pdf: pdf, pdfId: pdf.pdfId})
+                    setShowPDFModal(false);
+                }}
+                onRemove={() => {
+                    setCourse({...course, pdf: null, pdfId: null})
+                    setShowPDFModal(false);
+                }}
+                PDF={course.pdf}
             />
 
             {isSaving && (
