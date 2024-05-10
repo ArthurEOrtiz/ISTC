@@ -1,17 +1,15 @@
 'use client';
 import { Class } from '@/app/shared/types/sharedTypes';
+import moment from 'moment-timezone';
 import React, { useEffect, useState } from 'react';
 
 
 interface NewClassProps {
     cls: Class; // Prop to receive the class object
-    // scheduleStart: string; // Prop to receive the schedule start date
-    // scheduleEnd: string; // Prop to receive the schedule end date
     onDelete: () => void; // Prop to receive the delete event
     onScheduleStartChange: (date: Date) => void; // Prop to receive the schedule start change event
     onScheduleEndChange: (date: Date) => void; // Prop to receive the schedule end change event
 }
-
 
 /**
  * Represents a component for creating a new class during course creation.
@@ -20,8 +18,6 @@ interface NewClassProps {
  *
  * @component
  * @param {Class} props.cls - The class object.
- * @param {Date} props.scheduleStart - The schedule start date.
- * @param {Date} props.scheduleEnd - The schedule end date.
  * @param {Function} props.onDelete - The delete event handler.
  * @param {Function} props.onScheduleStartChange - The schedule start change event handler.
  * @param {Function} props.onScheduleEndChange - The schedule end change event handler.
@@ -31,21 +27,26 @@ const NewClass: React.FC<NewClassProps> = ({cls,  onDelete, onScheduleStartChang
     const [start, setStart] = useState('');
     const [end, setEnd] = useState('');
 
+    // console.log("cls.scheduleStart: ", cls.scheduleStart) // 2024-05-27T15:00:00.000
+    // console.log("cls.scheduleEnd: ", cls.scheduleEnd) // 2024-05-27T23:00:00.000
 
     useEffect(() => {
-        // Extract date and time components from schedulStart. 
-        const startDate = cls.scheduleStart;
-        const startDateString = startDate.toISOString().split('T')[0];
-        const startTimeString = startDate.toTimeString().split(' ')[0].slice(0, 5);
+        //Extract start date and time from cls.scheduleStart 
+        const startDateInMountainTime = moment.utc(cls.scheduleStart).tz('America/Denver');
+        console.log("startDateInMountainTime: ", startDateInMountainTime.format());
+        
+        const startDateString = startDateInMountainTime.format('YYYY-MM-DD');
+        const startTimeString = startDateInMountainTime.local().format('HH:mm');
 
         setClassDate(startDateString);
         setStart(startTimeString);
     }, [cls]);
 
     useEffect(() => {
-        // Extract date and time components from schedulEnd. 
+        // Extract  time components from schedulEnd. 
         const endDate = cls.scheduleEnd;
-        const endTimeString = endDate.toTimeString().split(' ')[0].slice(0, 5);
+        const endDateInMountainTime = moment.utc(endDate).tz('America/Denver');
+        const endTimeString = endDateInMountainTime.local().format('HH:mm');
 
         setEnd(endTimeString);
     }, [cls]);

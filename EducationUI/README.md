@@ -4,7 +4,7 @@ Arthur Edward Ortiz
 
 
 **Description**
-The ISTC Education application is a platform designed to manage educational programs, courses, and student enrollments. Built with Next.js and utilizing a .Net API, it offers the administrators to create and manage courses, track attendance, and enroll students. With features such as role-based access control and comprehensive logging, EducationAPI ensures security and accountability throughout the educational program lifecycle. 
+The ISTC Education application is a platform designed to manage educational programs, courses, and student enrollments. Built with Next.js and utilizing a .Net 8 API, it offers the administrators to create and manage courses, track attendance, and enroll students. With features such as role-based access control and comprehensive logging, EducationAPI ensures security and accountability throughout the educational program lifecycle. 
 
 ***
 
@@ -19,6 +19,7 @@ The ISTC Education application is a platform designed to manage educational prog
 - [Clerk](https://clerk.com/docs)
 - [React-Big-Calendar](https://www.npmjs.com/package/react-big-calendar)
 - [React-Phone-Input-2](https://www.npmjs.com/package/react-phone-input-2)
+- Moment-TimeZone
 
 ***
 

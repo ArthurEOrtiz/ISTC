@@ -9,6 +9,7 @@ import ErrorModel from "../../shared/modals/ErrorModal";
 import { useRouter } from "next/navigation";
 import { DeleteCourseById, UpdateCourseById } from "@/Utilities/api";
 import moment from "moment";
+import NewClass from "./NewClass";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -81,7 +82,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     , [courseInfo]);
 
     // Event Handlers
-
     const handleOnCourseInfoCardSave = (updatedCourse: Course | null): void => {
         if (updatedCourse !== null) {
             setCourseInfo(updatedCourse);
@@ -179,8 +179,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     // Helper Methods 
     const addNewClass = (): void => {
         
-        const todayAt9AMMountainTime = moment().utc().set({ hour: 15, minute: 0, second: 0 }).format();
-        const todayAt5PMMountainTime = moment().utc().set({ hour: 23, minute: 0, second: 0 }).format();
+        const todayAt9AMMountainTime = moment().tz('America/Denver').set({ hour: 9, minute: 0, second: 0 }).toDate();
+        const todayAt5PMMountainTime = moment().tz('America/Denver').set({ hour: 17, minute: 0, second: 0 }).toDate();
 
         const newClassSchedule: Class = {
             classId: 0,
@@ -202,9 +202,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const addNewClassPlusOneDay = (): void => {
         const lastClass = courseInfo.classes[courseInfo.classes.length - 1];
 
-        const addOneDay = (dateString: string): string => {
-            const date = moment(dateString).add(1, 'days').format();
-            return date;
+        const addOneDay = (date: Date): Date => {
+            const output = moment(date).add(1, 'days').toDate();
+            return output as Date;
         }
 
         const newClassSchedule: Class = {
@@ -269,14 +269,23 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     <div>
                         {courseInfo.classes.map((cls, index) => (
                             <div key={index} className="flex justify-center">
-                                <ClassInfoCard 
+                                {/* <ClassInfoCard 
                                     key={cls.classId}
                                     class={cls}
                                     onAdd={handleOnClassAdded}
                                     onDelete={handleOnClassInfoCardDelete}
                                     editMode={index === editModeIndex}
                                     onError={(message) => setErrorMessages(message)}
+                                /> */}
+                                <NewClass
+                                    key={cls.classId}
+                                    cls={cls}
+                                    onDelete={() => handleOnClassInfoCardDelete(cls.classId)}
+                                    onScheduleStartChange={(date) => handleOnClassAdded({...cls, scheduleStart: date})}
+                                    onScheduleEndChange={(date) => handleOnClassAdded({...cls, scheduleEnd: date})}
                                 />
+                            
+
                             </div>
                         ))}
                     </div>
