@@ -16,7 +16,8 @@ namespace EducationAPI.DataAccess
 		public DbSet<Contact> Contacts { get; set; }
 		public DbSet<Course> Courses { get; set; } 
 		public DbSet<Exam> Exams { get; set; } 
-		public DbSet<Location> Locations { get; set; } 
+		public DbSet<Location> Locations { get; set; }
+		public DbSet<PDF> PDFs { get; set; }
 		public DbSet<Student> Students { get; set; } 
 		public DbSet<Topic> Topics { get; set; } 
 		public DbSet<User> Users { get; set; }
@@ -56,6 +57,9 @@ namespace EducationAPI.DataAccess
 
 			modelBuilder.Entity<Location>()
 				.ToTable("Locations", b => b.IsTemporal());
+
+			modelBuilder.Entity<PDF>()
+				.ToTable("PDFs", b => b.IsTemporal());
 
 			modelBuilder.Entity<Topic>()
 				.ToTable("Topics", b => b.IsTemporal());

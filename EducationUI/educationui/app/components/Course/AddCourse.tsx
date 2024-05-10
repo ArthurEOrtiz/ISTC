@@ -11,6 +11,8 @@ import { postCourse } from '@/Utilities/api';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
 import CourseInfoCard from './CourseInfoCard';
 import CourseInfoModal from './CourseInfoModal';
+import SelectPDFModal from '../PDF/SelectPDFModal';
+
 
 
 /**
@@ -31,7 +33,7 @@ const AddCourse: React.FC = () => {
         enrollmentDeadline: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1), // today plus on day, no time.
         instructorName: null,
         instructorEmail: null,
-        pdf: null,
+        pdfId: null,
         locationId: 0,
         location: {
             locationId: 0,
@@ -44,6 +46,7 @@ const AddCourse: React.FC = () => {
             state: 'ID',
             postalCode: null,
         },
+        pdf: null,
         topics: [],
         classes: [],
         exams: [],
@@ -53,6 +56,7 @@ const AddCourse: React.FC = () => {
     const [course, setCourse] = useState<Course>(defaultCourse);
     const [showCourseForm, setShowCourseForm] = useState<boolean>(false);
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
+    const [showPDFModal, setShowPDFModal] = useState<boolean>(false);
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [hasError, setHasError] = useState<boolean>(false);
@@ -73,7 +77,6 @@ const AddCourse: React.FC = () => {
     
         let scheduleStart;
         let scheduleEnd;
-        
 
         if (course && course.classes.length > 0) {
             // If there are existing classes, get the last class's end time
@@ -100,8 +103,10 @@ const AddCourse: React.FC = () => {
         const newClass = {
             classId: 0,
             courseId: 0,
-            scheduleStart: scheduleStart.toISOString(),
-            scheduleEnd: scheduleEnd.toISOString(),
+            scheduleStart: scheduleStart,
+            scheduleEnd: scheduleEnd,
+            // scheduleStart: scheduleStart.toISOString(),
+            // scheduleEnd: scheduleEnd.toISOString(),
             attendances: [],
         };
     
@@ -129,7 +134,7 @@ const AddCourse: React.FC = () => {
     const handleNewClassOnScheduleStartChange = (index: number, date: Date) => {
         if (course) {
             const newClasses = [...course.classes];
-            newClasses[index].scheduleStart = date.toISOString();
+            newClasses[index].scheduleStart = date;
             setCourse({
                 ...course,
                 classes: newClasses
@@ -140,7 +145,7 @@ const AddCourse: React.FC = () => {
     const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
         if (course) {
             const newClasses = [...course.classes];
-            newClasses[index].scheduleEnd = date.toISOString();
+            newClasses[index].scheduleEnd = date;
             setCourse({
                 ...course,
                 classes: newClasses
@@ -168,9 +173,8 @@ const AddCourse: React.FC = () => {
         setShowConfirmationModal(false);
         const response = await postCourse(course as Course);
         console.log(response);
-        if (response.status === 201) {
+        if (response.status === 204) {
             setIsSaving(false);
-            
             router.push('/admin/editcourse/edit');
         } else {
             setIsSaving(false);
@@ -198,37 +202,45 @@ const AddCourse: React.FC = () => {
                 </div>
             ) : (
                 <div>
-                        
                     <div className='bg-base-100 shadow-md rounded-xl p-5'>
-                        <CourseInfoCard course={course} />
-                        <button 
-                            className='btn btn-primary text-white mt-2'
-                            onClick={()=>setShowCourseForm(true)}
-                            >
-                                Edit Course Information
-                        </button>
-                        <button 
-                            className='btn btn-primary text-white ml-2 mt-2'
-                            onClick={()=>setShowSelectTopicModal(true)}
-                            >
-                                Select Topics
-                        </button>
-                        <button 
-                            className='btn bg-green-600 border-none text-white ml-2 mt-2'
-                            onClick={()=>setShowConfirmationModal(true)}
-                            >
-                                Save Course
-                        </button>
+                        <div className='mb-4 bg-base-300 rounded-xl p-4'>
+                            <CourseInfoCard course={course} />
+                        </div>
+                        <div className='mt-2 space-x-2'>
+                            <button 
+                                className='btn btn-primary text-white'
+                                onClick={()=>setShowCourseForm(true)}
+                                >
+                                    Edit Course Information
+                            </button>
+                            <button 
+                                className='btn btn-primary text-white'
+                                onClick={()=>setShowSelectTopicModal(true)}
+                                >
+                                    Select Topics
+                            </button>
+                            <button
+                                className='btn btn-primary text-white'
+                                onClick={() => setShowPDFModal(true)}
+                                >
+                                    Select PDF
+                            </button>
+                            <button 
+                                className='btn bg-green-600 border-none text-white'
+                                onClick={()=>setShowConfirmationModal(true)}
+                                >
+                                    Save Course
+                            </button>
+                        </div>
                     </div>
 
                     <div>
-                        {course.classes.map((classItem, index) => (
+                        {course.classes.map((cls, index) => (
                             
                             <div className="bg-base-100 shadow-md rounded-xl p-4 relative mt-2" key={index}> 
                                 <h2 className="text-xl font-bold mb-2">Class {index + 1}</h2>
                                 <NewClass
-                                    scheduleStart={classItem.scheduleStart}
-                                    scheduleEnd={classItem.scheduleEnd}
+                                    cls={cls}
                                     onDelete={() => handleNewClassOnDelete(index)}
                                     onScheduleStartChange={(date: Date) => handleNewClassOnScheduleStartChange(index, date)}
                                     onScheduleEndChange={(date: Date) => handleNewClassOnScheduleEndChange(index, date)}
@@ -244,12 +256,12 @@ const AddCourse: React.FC = () => {
                                 Add Class
                             </button>
                             
-                            {/* <button
+                            <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
                             >
                                 Console Log Course
-                            </button> */}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -280,6 +292,20 @@ const AddCourse: React.FC = () => {
                     onCancel={handleConfirmationModalOnCancel}
                 />
             )}
+
+            <SelectPDFModal
+                open={showPDFModal}
+                onClose={() => setShowPDFModal(false)}
+                onAdd={(pdf) => {
+                    setCourse({...course, pdf: pdf, pdfId: pdf.pdfId})
+                    setShowPDFModal(false);
+                }}
+                onRemove={() => {
+                    setCourse({...course, pdf: null, pdfId: null})
+                    setShowPDFModal(false);
+                }}
+                PDF={course.pdf}
+            />
 
             {isSaving && (
                 <SavingModal text={'Saving Course...'} />

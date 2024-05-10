@@ -1,4 +1,5 @@
 import { Course } from "@/app/shared/types/sharedTypes";
+import { DownloadPDF } from "@/Utilities/api";
 import moment from 'moment-timezone';
 
 interface CourseInfoCardProps {
@@ -12,6 +13,21 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
         const mountainTime = moment.utc(utcDate).tz('America/Denver').format('dddd, MMMM Do YYYY, h:mm a');
         return mountainTime;
     }
+
+    const downloadPDF = () => {
+        if (course.pdf?.data) {
+            const byteCharacters = atob(course.pdf.data);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], {type: "application/pdf"});
+            const url = URL.createObjectURL(blob);
+            return url;
+        }
+        return "#";
+    };
 
     return (
         <div className="space-y-2">
@@ -83,9 +99,36 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                     )}
             </div>
 
-            <div>
-                <p className="text-1xl font-bold">Enrollment Deadline</p>
-                <p>{new Date(course.enrollmentDeadline).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}</p>
+            <div className="flex justify-between">
+                <div className="w-full">
+                    <p className="text-1xl font-bold">Enrollment Deadline</p>
+                    <p>{new Date(course.enrollmentDeadline)
+                        .toLocaleDateString(
+                            'en-US', 
+                            {
+                                weekday: 'long', 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric'
+                            }
+                        )}
+                    </p>
+                </div>
+                <div className="w-full">
+                    <p className="text-1xl font-bold">PDF</p>
+                    {course.pdfId !== null ? (
+                        <a
+                            className="link link-info"
+                            href={downloadPDF()}
+                            download={course.pdf?.fileName}
+                        >
+                            {course.pdf?.fileName}
+                        </a>
+                    ) : (
+                        <p className="text-error">None</p>
+                    )}
+                </div>
+                
             </div>
 
             {expanded && (

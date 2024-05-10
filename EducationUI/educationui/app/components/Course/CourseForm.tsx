@@ -413,7 +413,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                     </p>
                 </div>
 
-                <div className="mb-4 w-1/2 pl-2">
+                {/* <div className="mb-4 w-1/2 pl-2">
                     <label
                         className="block text-sm font-bold mb-2"
                         htmlFor="pdf"
@@ -428,7 +428,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         onChange={handleChange}
                     />
                     <p className="text-xs text-green-600 italic">Optional</p>
-                </div>
+                </div> */}
 
             </div>
 

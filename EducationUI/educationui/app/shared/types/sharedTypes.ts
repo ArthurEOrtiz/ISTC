@@ -8,8 +8,8 @@ export interface Attendance {
 export interface Class {
   classId: number;
   courseId: number;
-  scheduleStart: string;
-  scheduleEnd: string;
+  scheduleStart: Date;
+  scheduleEnd: Date;
   attendances: Attendance[];
 }
 
@@ -35,9 +35,10 @@ export interface Course {
   enrollmentDeadline: Date;
   instructorName: string | null;
   instructorEmail: string | null;
-  pdf: string | null; 
+  pdfId: number | null;
   locationId: number;
   location: Location;
+  pdf: PDF | null;
   topics: Topic[];
   classes: Class[];
   exams: Exam[];
@@ -61,6 +62,13 @@ export interface Location {
   city: string | null;
   state: string | null;
   postalCode: string | null;
+}
+
+export interface PDF {
+  pdfId: number;
+  courseId: number;
+  fileName: string;
+  data: string;
 }
 
 export interface Student {

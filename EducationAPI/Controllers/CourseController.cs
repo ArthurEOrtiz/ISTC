@@ -8,7 +8,7 @@ namespace EducationAPI.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
-	public class CourseController
+	public class CourseController : ControllerBase
 	{
 		private readonly EducationProgramContext _educationProgramContext;
 		private readonly ILogger<CourseController> _logger;
@@ -38,6 +38,7 @@ namespace EducationAPI.Controllers
 					.Include(c => c.Topics)
 					.Include(c => c.Exams)
 					.Include(c => c.Location)
+					.Include(c => c.PDF)
 					.Include(c => c.WaitLists)
 					.ToListAsync();
 
@@ -75,6 +76,7 @@ namespace EducationAPI.Controllers
 					.Include(c => c.Topics)
 					.Include(c=> c.Exams)
 					.Include(c => c.Location)
+					.Include (c => c.PDF)
 					.Include (c => c.WaitLists)
 					.Where(c => c.EnrollmentDeadline >= today)
 					.ToListAsync();
@@ -134,15 +136,18 @@ namespace EducationAPI.Controllers
 						.Include(c => c.Topics)
 						.Include(c => c.Exams)
 						.Include(c => c.Location)
+						.Include(c => c.PDF)
+						.Include(c => c.WaitLists)
 						.FirstOrDefaultAsync(c => c.CourseId == id);
 
 				if (course == null)
 				{
 					_logger.LogError("GetCourseById({Id}), course not found.", id);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Course not found.");
 				}
 
-				return course;
+				//return course;
+				return Ok(course);
 			}
 			catch (Exception ex)
 			{
@@ -471,8 +476,7 @@ namespace EducationAPI.Controllers
 				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("PostCourse {Course} called.", course);
-				// Should return a 201 status code. 
-				return new StatusCodeResult((int)HttpStatusCode.Created);
+				return Created();
 			}
 			catch (Exception ex)
 			{

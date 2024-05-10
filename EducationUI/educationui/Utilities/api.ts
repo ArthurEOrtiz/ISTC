@@ -542,3 +542,15 @@ export async function GetDropQueue(courseId: Number) {
         return error.message;
     }
 }
+
+// PDF
+
+export async function DownloadPDF(pdfId: Number) {
+    try {
+        const response = await axiosInstance.get(`PDF/DownloadPDF/${pdfId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error downloading PDF:', error);
+        return error.message;
+    }
+}
