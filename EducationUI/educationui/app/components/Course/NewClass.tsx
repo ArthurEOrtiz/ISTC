@@ -27,13 +27,9 @@ const NewClass: React.FC<NewClassProps> = ({cls,  onDelete, onScheduleStartChang
     const [start, setStart] = useState('');
     const [end, setEnd] = useState('');
 
-    // console.log("cls.scheduleStart: ", cls.scheduleStart) // 2024-05-27T15:00:00.000
-    // console.log("cls.scheduleEnd: ", cls.scheduleEnd) // 2024-05-27T23:00:00.000
-
     useEffect(() => {
         //Extract start date and time from cls.scheduleStart 
         const startDateInMountainTime = moment.utc(cls.scheduleStart).tz('America/Denver');
-        console.log("startDateInMountainTime: ", startDateInMountainTime.format());
         
         const startDateString = startDateInMountainTime.format('YYYY-MM-DD');
         const startTimeString = startDateInMountainTime.local().format('HH:mm');

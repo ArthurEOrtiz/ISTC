@@ -88,7 +88,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         }
     }
 
-    const handleOnClassInfoCardDelete = (id: number | null): void => {
+    const handleOnClassCardDelete = (id: number | null): void => {
         if (id !== null) {
             setCourseInfo(prevCourse => {
                 return {
@@ -107,16 +107,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     const handleOnClassAdd = (): void => {
-        const hasNullClass = courseInfo.classes.some(classSchedule => classSchedule.classId === 0);
-
-        if (hasNullClass) {
-            setErrorMessages('There is an unsaved new class, please save or remove class before adding a new class.');
-            return;
-        }
 
         if (courseInfo.classes.length === 0 || courseInfo.classes === null) {
             addNewClass();
-
         } else {
             addNewClassPlusOneDay();
         }
@@ -188,24 +181,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         } else {
             setErrorMessages(response)
         }
-            
-        
         setIsSaving(false);
         setUnsavedChanges(false);
-
-
-
-
-        // try{
-        //    await UpdateCourseById(courseInfo.courseId!, courseInfo);
-        // }
-        // catch (error) {
-        //     throw error;
-        // }
-        // finally {
-        //     setIsSaving(false);
-        //     setUnsavedChanges(false);
-        // }
 
     }
 
@@ -253,8 +230,16 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     const addNewClassPlusOneDay = (): void => {
         const lastClass = courseInfo.classes[courseInfo.classes.length - 1];
 
-        const addOneDay = (date: Date): Date => {
-            const output = moment(date).add(1, 'days').toDate();
+        console.log("Last Class", typeof(lastClass.scheduleStart));
+
+        const addOneDay = (date: any): Date => {
+            let output: Date;   
+            if (typeof date === 'string') {
+            output = moment(date).utc(true).add(1, 'days').toDate();
+            } else {
+                output = moment(date).add(1, 'days').toDate();
+            }
+
             return output as Date;
         }
 
@@ -266,9 +251,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             attendances: []
         }
 
-        console.log(newClassSchedule);
+
         // Disable edit mode for all other classes 
-        setEditModeIndex(null);
+        // setEditModeIndex(null);
         // Add the new class with edit mode enabled 
         setCourseInfo(prevCourse => {
             return {
@@ -351,7 +336,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                                     <NewClass
                                         key={cls.classId}
                                         cls={cls}
-                                        onDelete={() => handleOnClassInfoCardDelete(cls.classId)}
+                                        onDelete={() => handleOnClassCardDelete(cls.classId)}
                                         onScheduleStartChange={(date) => handleClassScheduleStartChange(date, cls.classId)}
                                         onScheduleEndChange={(date) => handleClassScheduleEndChange(date, cls.classId)}
                                     />
