@@ -47,6 +47,7 @@ const SelectPDFModal: React.FC<SelectPDFModalProps> = ({ open, onAdd, onClose, o
                 </div>
                 <div className="space-y-4">
                     <p className="text-lg">Select a PDF file to upload</p>
+                    {error && <p className="text-error">{error}</p>}
                     <div>
                         <input
                             type="file"

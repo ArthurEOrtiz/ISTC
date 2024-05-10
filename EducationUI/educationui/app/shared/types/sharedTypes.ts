@@ -8,8 +8,8 @@ export interface Attendance {
 export interface Class {
   classId: number;
   courseId: number;
-  scheduleStart: string;
-  scheduleEnd: string;
+  scheduleStart: Date;
+  scheduleEnd: Date;
   attendances: Attendance[];
 }
 

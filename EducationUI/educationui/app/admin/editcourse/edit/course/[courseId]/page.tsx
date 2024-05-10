@@ -8,9 +8,9 @@ const CourseDetail: React.FC<{ params: { courseId: string } }> = async ({ params
     const course = courseJson as Course;
 
     return (
-        <>
+        <div className='flex justify-center'>
             <EditCourseInfo course={course} />
-        </>
+        </div>
   );
 }
 

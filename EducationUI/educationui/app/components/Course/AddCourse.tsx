@@ -103,8 +103,10 @@ const AddCourse: React.FC = () => {
         const newClass = {
             classId: 0,
             courseId: 0,
-            scheduleStart: scheduleStart.toISOString(),
-            scheduleEnd: scheduleEnd.toISOString(),
+            scheduleStart: scheduleStart,
+            scheduleEnd: scheduleEnd,
+            // scheduleStart: scheduleStart.toISOString(),
+            // scheduleEnd: scheduleEnd.toISOString(),
             attendances: [],
         };
     
@@ -132,7 +134,7 @@ const AddCourse: React.FC = () => {
     const handleNewClassOnScheduleStartChange = (index: number, date: Date) => {
         if (course) {
             const newClasses = [...course.classes];
-            newClasses[index].scheduleStart = date.toISOString();
+            newClasses[index].scheduleStart = date;
             setCourse({
                 ...course,
                 classes: newClasses
@@ -143,7 +145,7 @@ const AddCourse: React.FC = () => {
     const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
         if (course) {
             const newClasses = [...course.classes];
-            newClasses[index].scheduleEnd = date.toISOString();
+            newClasses[index].scheduleEnd = date;
             setCourse({
                 ...course,
                 classes: newClasses
@@ -233,13 +235,12 @@ const AddCourse: React.FC = () => {
                     </div>
 
                     <div>
-                        {course.classes.map((classItem, index) => (
+                        {course.classes.map((cls, index) => (
                             
                             <div className="bg-base-100 shadow-md rounded-xl p-4 relative mt-2" key={index}> 
                                 <h2 className="text-xl font-bold mb-2">Class {index + 1}</h2>
                                 <NewClass
-                                    scheduleStart={classItem.scheduleStart}
-                                    scheduleEnd={classItem.scheduleEnd}
+                                    cls={cls}
                                     onDelete={() => handleNewClassOnDelete(index)}
                                     onScheduleStartChange={(date: Date) => handleNewClassOnScheduleStartChange(index, date)}
                                     onScheduleEndChange={(date: Date) => handleNewClassOnScheduleEndChange(index, date)}

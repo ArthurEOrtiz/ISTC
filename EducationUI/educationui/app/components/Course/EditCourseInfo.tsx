@@ -228,9 +228,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     return (
-        <div>
-
-            <div>
+        <div className="w-full m-4">
+         
                 <div className="p-4">
                     <h1 className="p-s text-3xl text-center font-bold"> Course Id: {courseInfo.courseId}</h1>
                     {unsavedChanges && (
@@ -239,9 +238,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                         <span>Warning: Unsaved Changes detected!</span>
                       </div>)}
                 </div>
-
-                <div className="flex justify-center">              
-                        
+                
+                <div className="bg-base-100 shawdow-md rounded-xl p-5">
+                    <div className="mb-4 bg-base-300 rounded-xl p-4">
+                        <CourseInfoCard course={courseInfo} />
+                    </div>
+                    <div className="mt-2 space-x-2">
                         <button 
                             className="btn btn-error text-white mb-1 mr-1"
                             onClick={handleDeleteCourse}>
@@ -252,13 +254,10 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                             onClick = {handleSaveCourse}>
                                 Save Course
                         </button>
-                   
+                    </div>
+
                 </div>
-                
-                <div className="p-4">
-                    <CourseInfoCard course={courseInfo} onApply={handleOnCourseInfoCardSave} />
-                </div>
-            </div>
+          
             
             <div>
                 <div className="p-4">
@@ -277,7 +276,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                                     onDelete={handleOnClassInfoCardDelete}
                                     editMode={index === editModeIndex}
                                     onError={(message) => setErrorMessages(message)}
-                                     />
+                                />
                             </div>
                         ))}
                     </div>
