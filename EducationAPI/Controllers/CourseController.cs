@@ -146,6 +146,12 @@ namespace EducationAPI.Controllers
 					return NotFound("Course not found.");
 				}
 
+				// If the pdfId is null dont return a new instance of PDF
+				//if (course.PDFId == null)
+				//{
+				//	course.PDF = null;
+				//}
+
 				//return course;
 				return Ok(course);
 			}
@@ -494,29 +500,68 @@ namespace EducationAPI.Controllers
 					.Include(c => c.Classes)
 					.Include(c => c.Location)
 					.Include(c => c.Topics)
+					.Include(c => c.Exams)
+					.Include(c => c.PDF)
 					.FirstOrDefaultAsync(c => c.CourseId == id);
 
 				if (existingCourse == null)
 				{
 					_logger.LogError("UpdateCourseById({Id}, {UpdatedCourse}), Course not found!", id, updatedCourse);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Course not found.");
+
 				}
 
 				// Update scalar properties
 				_educationProgramContext.Entry(existingCourse).CurrentValues.SetValues(updatedCourse);
 
-				// Update topics. 
+				// Update topics.
+				// By first clearing the topics that are already in the existing course.
 				existingCourse.Topics.Clear();
+				// then get list of topic id's from the in coming course. 
+				var topicIds = updatedCourse.Topics.Select(t => t.TopicId).ToList();
+				// then find all the existing topics from that list.
+				var existingTopics = await _educationProgramContext.Topics
+					.Where(t => topicIds.Contains(t.TopicId))
+					.ToListAsync();	
 
-				foreach (var topic in updatedCourse.Topics)
+				// and add back in the the existing course
+				existingCourse.Topics = existingTopics;
+
+				// Update Classes.
+				foreach (var updatedClass in updatedCourse.Classes)
 				{
-					var existingTopic = await _educationProgramContext.Topics
-						.FirstOrDefaultAsync(t => t.TopicId == topic.TopicId);
+					var existingClass = existingCourse.Classes
+						.FirstOrDefault(c => c.ClassId == updatedClass.ClassId);
 
-					if (existingTopic != null)
+					if (existingClass != null)
 					{
-						existingCourse.Topics.Add(existingTopic);
+						// update existing classes
+						_educationProgramContext.Entry(existingClass).CurrentValues.SetValues(updatedClass);
 					}
+					else
+					{
+						// add new classes 
+						existingCourse.Classes.Add(updatedClass);
+					}
+				}
+				// Remove any classes that aren't in the updated course
+				foreach (var existingClass in existingCourse.Classes)
+				{
+					if (!updatedCourse.Classes.Any(c => c.ClassId == existingClass.ClassId))
+					{
+						existingCourse.Classes.Remove(existingClass);
+					}
+				}
+
+				// Update PDF.
+				// First check if it's even necessary, because PDF can be null. 
+				if (updatedCourse.PDF != null && existingCourse.PDF != null)
+				{
+					_educationProgramContext.Entry(existingCourse.PDF).CurrentValues.SetValues(updatedCourse.PDF);
+				}
+				else
+				{
+					existingCourse.PDF = updatedCourse.PDF;
 				}
 
 				await _educationProgramContext.SaveChangesAsync();

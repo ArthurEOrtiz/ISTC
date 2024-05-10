@@ -142,19 +142,70 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
         }
     }
 
+    const handleClassScheduleStartChange = (date: Date, classId: number): void => {
+        const updatedClasses = courseInfo.classes.map(classSchedule => {
+            if (classSchedule.classId === classId) {
+                return {
+                    ...classSchedule,
+                    scheduleStart: date
+                }
+            }
+            return classSchedule;
+        });
+        setCourseInfo(prevCourse => {
+            return {
+                ...prevCourse,
+                classes: updatedClasses
+            }
+        });
+    }
+
+    const handleClassScheduleEndChange = (date: Date, classId: number): void => {
+        const updatedClasses = courseInfo.classes.map(classSchedule => {
+            if (classSchedule.classId === classId) {
+                return {
+                    ...classSchedule,
+                    scheduleEnd: date
+                }
+            }
+            return classSchedule;
+        });
+        setCourseInfo(prevCourse => {
+            return {
+                ...prevCourse,
+                classes: updatedClasses
+            }
+        });
+    }
+
+
     const handleSaveCourse = async () => {
         console.log("Saving Course", courseInfo);
         setIsSaving(true);
-        try{
-           await UpdateCourseById(courseInfo.courseId!, courseInfo);
+        const response = await UpdateCourseById(courseInfo.courseId!, courseInfo);
+        if (response.status === 200) {
+            setCourseInfo(response.data);
+        } else {
+            setErrorMessages(response)
         }
-        catch (error) {
-            throw error;
-        }
-        finally {
-            setIsSaving(false);
-            setUnsavedChanges(false);
-        }
+            
+        
+        setIsSaving(false);
+        setUnsavedChanges(false);
+
+
+
+
+        // try{
+        //    await UpdateCourseById(courseInfo.courseId!, courseInfo);
+        // }
+        // catch (error) {
+        //     throw error;
+        // }
+        // finally {
+        //     setIsSaving(false);
+        //     setUnsavedChanges(false);
+        // }
 
     }
 
@@ -245,14 +296,20 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     </div>
                     <div className="mt-2 space-x-2">
                         <button 
-                            className="btn btn-error text-white mb-1 mr-1"
+                            className="btn btn-error text-white"
                             onClick={handleDeleteCourse}>
                                 Delete Course
                         </button>
                         <button
-                            className="btn btn-primary text-white mb-1"
+                            className="btn btn-primary text-white"
                             onClick = {handleSaveCourse}>
                                 Save Course
+                        </button>
+                        <button 
+                            onClick={() => console.log(courseInfo)}
+                            className="btn btn-primary text-white"
+                        >
+                            Log Course
                         </button>
                     </div>
 
@@ -277,13 +334,28 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                                     editMode={index === editModeIndex}
                                     onError={(message) => setErrorMessages(message)}
                                 /> */}
-                                <NewClass
-                                    key={cls.classId}
-                                    cls={cls}
-                                    onDelete={() => handleOnClassInfoCardDelete(cls.classId)}
-                                    onScheduleStartChange={(date) => handleOnClassAdded({...cls, scheduleStart: date})}
-                                    onScheduleEndChange={(date) => handleOnClassAdded({...cls, scheduleEnd: date})}
-                                />
+                                <div className="bg-base-100 shadow-md rounded-xl relative p-4 mt-2">
+                                    <div className="flex justify-between mb-2">
+                                        <h2 className="text-xl font-bold">Class {index + 1}</h2>
+                                        {/* <div className="flex items-center">
+                                            <label 
+                                                className="text-1xl font-bold mr-1"
+                                                htmlFor="classId">
+                                                    Class Id:
+                                            </label>
+                                            <p id="classId" className="text-base">
+                                                {cls.classId}
+                                            </p>
+                                        </div> */}
+                                    </div>
+                                    <NewClass
+                                        key={cls.classId}
+                                        cls={cls}
+                                        onDelete={() => handleOnClassInfoCardDelete(cls.classId)}
+                                        onScheduleStartChange={(date) => handleClassScheduleStartChange(date, cls.classId)}
+                                        onScheduleEndChange={(date) => handleClassScheduleEndChange(date, cls.classId)}
+                                    />
+                                </div>
                             
 
                             </div>

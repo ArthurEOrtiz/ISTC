@@ -18,7 +18,6 @@ namespace EducationAPI.Models
 		public Course()
 		{
 			Location = new Location();
-			PDF = new PDF();
 			Classes = new HashSet<Class>();
 			Topics = new HashSet<Topic>();	
 			Exams = new HashSet<Exam>();
