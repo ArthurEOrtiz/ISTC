@@ -105,15 +105,14 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
     const handleOnClassAdd = (): void => {
 
-        const lastClass = course.classes[course.classes.length - 1];
-        const lastClassAttendances = lastClass.attendances;
-        lastClassAttendances.forEach(attendance => {
-            attendance.attendanceId = 0;
-        });
-
         if (course.classes.length === 0 || course.classes === null) {
-            addNewClass(lastClassAttendances);
+            addNewClass();
         } else {
+            const lastClass = course.classes[course.classes.length - 1];
+            const lastClassAttendances = lastClass.attendances;
+            lastClassAttendances.forEach(attendance => {
+                attendance.attendanceId = 0;
+            });
             addNewClassPlusOneDay(lastClassAttendances);
         }
     }
@@ -186,7 +185,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     }
 
     // Helper Methods 
-    const addNewClass = (attendances : Attendance[]): void => {
+    const addNewClass = (): void => {
         
         const todayAt9AMMountainTime = moment().tz('America/Denver').set({ hour: 9, minute: 0, second: 0 }).toDate();
         const todayAt5PMMountainTime = moment().tz('America/Denver').set({ hour: 17, minute: 0, second: 0 }).toDate();
@@ -196,7 +195,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
             courseId: course.courseId,
             scheduleStart: todayAt9AMMountainTime,
             scheduleEnd: todayAt5PMMountainTime,
-            attendances: attendances
+            attendances: []
         }
         console.log(newClassSchedule)
         setCourse(prevCourse => {

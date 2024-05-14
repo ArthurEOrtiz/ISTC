@@ -144,7 +144,7 @@ export async function EnrollUsers(courseId: Number, users: User[]) {
         return response;
     } catch (error: any) {
         console.error('Error enrolling users:', error);
-        return error.message;
+        return error.response.data;
     }
 }
 
