@@ -743,7 +743,7 @@ namespace EducationAPI.Controllers
 					if (student.Attendances != null && student.Attendances.Any(a => a.Class != null && a.Class.CourseId == courseId))
 					{
 						_logger.LogError("EnrollUsers({UserId},{CourseId}), User is already enrolled in course.", userId, courseId);
-							return BadRequest("User already enrolled in course.");
+					  return BadRequest("User already enrolled in course.");
 					}
 
 					foreach (var @class in course.Classes)
