@@ -11,6 +11,7 @@ import moment from "moment";
 import NewClass from "./NewClass";
 import SelectPDFModal from "../PDF/SelectPDFModal";
 import ClassAttendanceModal from "../Attendance/ClassAttendanceModal";
+import CourseInfoModal from "./CourseInfoModal";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -42,6 +43,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+    const [showCourseInfoModal, setShowCourseInfoModal] = useState<boolean>(false);
     const [showPDFModal, setShowPDFModal] = useState<boolean>(false);
     const [showAttendanceModal, setShowAttendanceModal] = useState<Class | null>(null);
     const [errorMessages, setErrorMessages] = useState<string | null>(null);
@@ -165,6 +167,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
         } else {
             setErrorMessages(response)
         }
+        setIsSaving(false);
     }
 
     const handleDeleteCourse = () => {
@@ -257,6 +260,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                 <div className="mt-2 space-x-2">
                     <button
                         className="btn btn-primary text-white"
+                        onClick={() => setShowCourseInfoModal(true)}
                     >
                         Edit Course Information
                     </button>
@@ -378,6 +382,13 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                     onError={(message) => setErrorMessages(message)}
                 />
             )}
+
+            <CourseInfoModal
+                course={course}
+                isVisable={showCourseInfoModal}
+                onSubmit={(c) => setCourse(c)}
+                onClose={() => setShowCourseInfoModal(false)}
+            />
 
         </div>
     );
