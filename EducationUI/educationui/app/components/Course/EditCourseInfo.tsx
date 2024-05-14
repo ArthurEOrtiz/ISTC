@@ -1,5 +1,5 @@
 'use client';
-import { Attendance, Class, Course } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, Course, User } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import { useEffect, useState } from "react";
 import SavingModal from "../../shared/modals/SavingModal";
@@ -10,6 +10,7 @@ import { DeleteCourseById, UpdateCourse } from "@/Utilities/api";
 import moment from "moment";
 import NewClass from "./NewClass";
 import SelectPDFModal from "../PDF/SelectPDFModal";
+import ClassAttendanceModal from "../Attendance/ClassAttendanceModal";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -42,6 +43,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [showPDFModal, setShowPDFModal] = useState<boolean>(false);
+    const [showAttendanceModal, setShowAttendanceModal] = useState<Class | null>(null);
     const [errorMessages, setErrorMessages] = useState<string | null>(null);
     const router = useRouter();
     
@@ -80,6 +82,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
         }
     }
     , [course]);
+        
 
     // Event Handlers
     const handleOnClassCardDelete = (cls: Class): void => {
@@ -158,12 +161,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
         const response = await UpdateCourse(course);
         if (response.status === 200) {
             setCourse(response.data);
+            window.location.reload();
+            
         } else {
             setErrorMessages(response)
         }
-        setIsSaving(false);
-        setUnsavedChanges(false);
-
     }
 
     const handleDeleteCourse = () => {
@@ -241,7 +243,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
         <div className="w-full m-4">
          
             <div className="p-4">
-                <h1 className="p-s text-3xl text-center font-bold"> Course Id: {course.courseId}</h1>
+                <p className="p-s text-3xl text-center font-bold"> Edit Course </p>
                 {unsavedChanges && (
                     <div role="alert" className="alert alert-warning mt-3">
                     <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -254,21 +256,31 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                     <CourseInfoCard course={course} />
                 </div>
                 <div className="mt-2 space-x-2">
-                    <button 
-                        className="btn btn-error text-white"
-                        onClick={handleDeleteCourse}>
-                            Delete Course
+                    <button
+                        className="btn btn-primary text-white"
+                    >
+                        Edit Course Information
                     </button>
                     <button
                         className="btn btn-primary text-white"
-                        onClick = {handleSaveCourse}>
-                            Save Course
+                    >
+                        Select Topics 
                     </button>
                     <button
                         className="btn btn-primary text-white"
                         onClick={() => setShowPDFModal(true)}
                     >
-                        Add PDF
+                        Select PDF
+                    </button>
+                    <button
+                        className="btn bg-green-600 border-none text-white"
+                        onClick = {handleSaveCourse}>
+                            Save Course
+                    </button>
+                    <button 
+                        className="btn btn-error text-white"
+                        onClick={handleDeleteCourse}>
+                            Delete Course
                     </button>
                     <button 
                         onClick={() => console.log(course)}
@@ -278,56 +290,51 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                     </button>
                 </div>
             </div>
-          
+    
             
-        <div className="flex space-x-2">
-            <div className="w-full">
-                <div className="flex justify-center">
-                    <a className="p-s text-2xl font-bold">
-                        Classes
-                    </a>
-                </div>
-                <div>
-                    <div className="space-y-2">
-                        {course.classes.map((cls, index) => (
-                            <div key={index} className="flex justify-center">
-                                <div className="bg-base-100 shadow-md rounded-xl relative p-4">
-                                    <div className="flex justify-between mb-2">
-                                        <a className="text-xl font-bold">Class {index + 1}</a>
-                                    </div>
-                                    <NewClass
-                                        key={cls.classId}
-                                        cls={cls}
-                                        onDelete={(e) => handleOnClassCardDelete(e)}
-                                        onScheduleStartChange={(date) => handleClassScheduleStartChange(date, cls.classId)}
-                                        onScheduleEndChange={(date) => handleClassScheduleEndChange(date, cls.classId)}
-                                    />
-                                </div>
-                            
-
+            <div className="space-y-2">
+                {course.classes.map((cls, index) => (
+                    <div key={index} >
+                        <div className="bg-base-100 shadow-md rounded-xl relative p-4">
+                            <div className="mb-2">
+                                <p className="text-xl font-bold">Class {index + 1}</p>
                             </div>
-                        ))}
+                            <NewClass
+                                key={cls.classId}
+                                cls={cls}
+                                onDelete={(e) => handleOnClassCardDelete(e)}
+                                onScheduleStartChange={(date) => handleClassScheduleStartChange(date, cls.classId)}
+                                onScheduleEndChange={(date) => handleClassScheduleEndChange(date, cls.classId)}
+                            />
+                            <div className="space-x-2">
+                                <button
+                                    className="btn btn-primary btn-sm text-white"
+                                    onClick={() => setShowAttendanceModal(cls)}
+                                >
+                                    Attendance
+                                </button>
+                                <button
+                                    className="btn btn-primary btn-sm text-white"
+                                    onClick={() => console.log(cls)}
+                                >
+                                    Log Class
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex justify-center mt-2">
-                        <button 
-                            className="btn btn-primary text-white"
-                            onClick={handleOnClassAdd}>
-                                Add Class
-                        </button>
-                    </div>
+                ))}
+                
+                <div className="flex justify-center mt-2">
+                    <button 
+                        className="btn btn-primary text-white"
+                        onClick={handleOnClassAdd}>
+                            Add Class
+                    </button>
                 </div>
             </div>
-            <div className="w-full">
-                <div className="flex justify-center">
-                    <a className="p-s text-2xl font-bold">
-                        Attendance
-                    </a>
-                </div>
-                <div className="bg-base-100 shadow-md rounded-xl p-4">
-                   
-                </div>
-            </div>
-        </div>
+
+   
+
 
             {showConfirmationModal && (
                 <ConfirmationModal
@@ -363,6 +370,15 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                 }}
                 PDF={course.pdf}
             />
+
+            {showAttendanceModal && (
+                <ClassAttendanceModal
+                    class={showAttendanceModal}
+                    isOpen={true}
+                    onExit={() => setShowAttendanceModal(null)}
+                    onError={(message) => setErrorMessages(message)}
+                />
+            )}
 
         </div>
     );

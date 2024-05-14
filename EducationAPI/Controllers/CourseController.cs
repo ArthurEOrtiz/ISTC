@@ -413,7 +413,7 @@ namespace EducationAPI.Controllers
 				if (course == null)
 				{
 					_logger.LogError("GetCourseEnrollment({CourseId}), course not found.", courseId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Course not found.");
 				}
 
 				var students = course.Classes
@@ -425,7 +425,7 @@ namespace EducationAPI.Controllers
 
 				// then find the user to each student using the student id
 				var users = await _educationProgramContext.Users
-					.Where(u => students.Select(s => s.UserId).Contains(u.UserId))
+					.Where(u => students.Select(s => s!.UserId).Contains(u.UserId))
 					.ToListAsync();
 
 				_logger.LogInformation("GetCourseEnrollment({CourseId}), called.", courseId);

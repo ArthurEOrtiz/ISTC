@@ -193,7 +193,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
                 <div>
                     <div className='flex justify-between items-center mb-1'>
                         <p className="text-2xl font-bold">Enrollment Manager</p>
-                        <button onClick={onExit} className="text-error font-bold">X</button>
+                        <button onClick={onExit} className="text-3xl text-error font-bold">&times;</button>
                     </div>
 
                     <div className='mb-2'>

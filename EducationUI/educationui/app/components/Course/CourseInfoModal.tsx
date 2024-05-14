@@ -16,7 +16,7 @@ const CourseInfoModal: React.FC<CourseInfoModalProps> = ({course, isVisable, onS
                 <div className="bg-base-300 w-1/2 p-4 rounded-xl">
                     <div className="flex justify-between mb-2">
                         <h1 className="text-2xl font-bold">Course Information</h1>
-                        <button onClick={onClose} className="text-error font-bold">X</button>
+                        <button onClick={onClose} className="text-3xl text-error font-bold">&times;</button>
                     </div>
                     <div>
                         <CourseForm course={course} onSubmit={(c) => onSubmit(c)} />
