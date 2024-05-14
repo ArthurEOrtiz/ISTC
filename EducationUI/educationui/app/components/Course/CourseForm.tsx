@@ -404,7 +404,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         id="enrollmentDeadline"
                         min={new Date().toISOString().split('T')[0]}
                         type="date"
-                        value={course.enrollmentDeadline.toISOString().split('T')[0]}
+                        value={new Date(course.enrollmentDeadline).toISOString().split('T')[0]}
                         onChange={handleChange}
                         onBlur={handleEnrollmentDeadlineBlur}
                     />
