@@ -115,9 +115,9 @@ export async function postCourse(course: Course) {
     }
 }
 
-export async function UpdateCourseById(courseId: Number, course: Course) {
+export async function UpdateCourse(course: Course) {
     try {
-        const response = await axiosInstance.put(`Course/UpdateCourseById/${courseId}`, course);
+        const response = await axiosInstance.put('Course/UpdateCourse/', course);
         return response;
     } catch (error : any) {
         console.error('Error updating course:', error);

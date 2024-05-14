@@ -23,10 +23,10 @@ namespace EducationAPI.Models
 
 		[JsonIgnore]
 		[ForeignKey("StudentId")]
-		public Student Student { get; set; } = null!;
+		public Student? Student { get; set; } 
 
 		[JsonIgnore]
 		[ForeignKey("ClassId")]
-		public Class Class { get; set; } = null!;
+		public Class? Class { get; set; } 
 	}
 }

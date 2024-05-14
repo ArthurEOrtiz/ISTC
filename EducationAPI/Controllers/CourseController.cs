@@ -491,22 +491,23 @@ namespace EducationAPI.Controllers
 			}
 		}
 
-		[HttpPut("UpdateCourseById/{id}")]
-		public async Task<ActionResult<Course>> UpdateCourseById(int id, Course updatedCourse)
+		[HttpPut("UpdateCourse")]
+		public async Task<ActionResult<Course>> UpdateCourse(Course updatedCourse)
 		{
 			try
 			{
 				var existingCourse = await _educationProgramContext.Courses
 					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
 					.Include(c => c.Location)
 					.Include(c => c.Topics)
 					.Include(c => c.Exams)
 					.Include(c => c.PDF)
-					.FirstOrDefaultAsync(c => c.CourseId == id);
+					.FirstOrDefaultAsync(c => c.CourseId == updatedCourse.CourseId);
 
 				if (existingCourse == null)
 				{
-					_logger.LogError("UpdateCourseById({Id}, {UpdatedCourse}), Course not found!", id, updatedCourse);
+					_logger.LogError("UpdateCourse({UpdatedCourse}), Course not found!", updatedCourse);
 					return NotFound("Course not found.");
 
 				}
@@ -527,23 +528,26 @@ namespace EducationAPI.Controllers
 				// and add back in the the existing course
 				existingCourse.Topics = existingTopics;
 
-				// Update Classes.
-				foreach (var updatedClass in updatedCourse.Classes)
+        // Update Classes.
+				// for each class in the updated course . . . 
+        foreach (var updatedClass in updatedCourse.Classes)
 				{
+					// see if the class exists in the existing course
 					var existingClass = existingCourse.Classes
 						.FirstOrDefault(c => c.ClassId == updatedClass.ClassId);
 
 					if (existingClass != null)
 					{
-						// update existing classes
+						// if it does update the class
 						_educationProgramContext.Entry(existingClass).CurrentValues.SetValues(updatedClass);
 					}
 					else
 					{
-						// add new classes 
+						// if it doesn't, add the class.
 						existingCourse.Classes.Add(updatedClass);
 					}
 				}
+
 				// Remove any classes that aren't in the updated course
 				foreach (var existingClass in existingCourse.Classes)
 				{
@@ -566,12 +570,12 @@ namespace EducationAPI.Controllers
 
 				await _educationProgramContext.SaveChangesAsync();
 
-				_logger.LogInformation("UpdateCourseById({Id}, {UpdatedCourse}) called", id, updatedCourse);
+				_logger.LogInformation("UpdateCourse({UpdatedCourse}) called", updatedCourse);
 				return existingCourse;
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "UpdateCourseById({Id}, {UpdatedCourse})", id, updatedCourse);
+				_logger.LogError(ex, "UpdateCourse({UpdatedCourse})", updatedCourse);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}

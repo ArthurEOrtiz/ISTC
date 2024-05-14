@@ -7,6 +7,6 @@ namespace EducationAPI.DTO
 		public int TopicId { get; set; }
 		public string Title { get; set; } = null!;
 		public string Description { get; set; } = null!;
-		public List<Course>? Courses { get; set; }
+		public ICollection<Course>? Courses { get; set; }
 	}
 }

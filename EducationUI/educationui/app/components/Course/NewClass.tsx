@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 
 interface NewClassProps {
     cls: Class; // Prop to receive the class object
-    onDelete: () => void; // Prop to receive the delete event
+    onDelete: (cls: Class) => void; // Prop to receive the delete event
     onScheduleStartChange: (date: Date) => void; // Prop to receive the schedule start change event
     onScheduleEndChange: (date: Date) => void; // Prop to receive the schedule end change event
 }
@@ -49,7 +49,7 @@ const NewClass: React.FC<NewClassProps> = ({cls,  onDelete, onScheduleStartChang
     
     // Handlers 
     const handleRemoveClick = () => {
-        onDelete();
+        onDelete(cls);
     };
 
     const handleClassDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
