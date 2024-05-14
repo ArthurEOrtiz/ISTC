@@ -121,7 +121,7 @@ export async function UpdateCourse(course: Course) {
         return response;
     } catch (error : any) {
         console.error('Error updating course:', error);
-        return error.message;
+        return error.response.data;
     }
 }
 
