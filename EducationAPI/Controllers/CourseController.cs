@@ -146,13 +146,6 @@ namespace EducationAPI.Controllers
 					return NotFound("Course not found.");
 				}
 
-				// If the pdfId is null dont return a new instance of PDF
-				//if (course.PDFId == null)
-				//{
-				//	course.PDF = null;
-				//}
-
-				//return course;
 				return Ok(course);
 			}
 			catch (Exception ex)
@@ -609,6 +602,8 @@ namespace EducationAPI.Controllers
 			{
 				var course = await _educationProgramContext.Courses
 					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
+							.ThenInclude(a => a.Student)
 					.Include(c => c.Exams)
 					.Where(c => c.CourseId == courseId)
 					.FirstOrDefaultAsync();
@@ -616,7 +611,21 @@ namespace EducationAPI.Controllers
 				if (course == null)
 				{
 					_logger.LogError("EnrollUser({UserId},{CourseId}), Course not found.", userId, courseId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Course not found");
+				}
+
+				// Check the current enrollment in the course. 
+				var enrolledStudents = course.Classes
+					.SelectMany(c => c.Attendances)
+					.Where(a => a.Student != null)
+					.Select(a => a.Student)
+					.Distinct()
+					.ToList();
+
+				if (enrolledStudents.Count >= course.MaxAttendance)
+				{
+					_logger.LogError("EnrollUser({UserId}, {CourseId}), Course attandance full.", userId, courseId);
+					return BadRequest("Course attandance full.");
 				}
 
 				// Fetch the student
@@ -628,7 +637,7 @@ namespace EducationAPI.Controllers
 				if (user == null)
 				{
 					_logger.LogError("EnrollUser({UserId},{CourseId}), User not found.", userId, courseId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("User not found");
 				}
 
 				var student = user.Student;
@@ -636,7 +645,7 @@ namespace EducationAPI.Controllers
 				if (student == null)
 				{
 					_logger.LogError("EnrollUser({UserId},{CourseId}), student not found!", userId, courseId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Student not found.");
 				}
 
 				// Check if the student is already enroll in the course
@@ -696,6 +705,8 @@ namespace EducationAPI.Controllers
 			{
 				var course = await _educationProgramContext.Courses
 					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
+							.ThenInclude(a => a.Student)
 					.Include(c => c.Exams)
 					.Where(c => c.CourseId == courseId)
 					.FirstOrDefaultAsync();
@@ -706,12 +717,12 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				foreach (var userId in userIds)
+        foreach (var userId in userIds)
 				{
 					// Fetch the student
 					var user = await _educationProgramContext.Users
 							.Include(u => u.Student)
-							.ThenInclude(s => s.Attendances)
+								.ThenInclude(s => s.Attendances)
 							.FirstOrDefaultAsync(u => u.UserId == userId);
 
 					if (user == null)
@@ -732,10 +743,7 @@ namespace EducationAPI.Controllers
 					if (student.Attendances != null && student.Attendances.Any(a => a.Class != null && a.Class.CourseId == courseId))
 					{
 						_logger.LogError("EnrollUsers({UserId},{CourseId}), User is already enrolled in course.", userId, courseId);
-						return new ObjectResult("Student is already enrolled in course")
-						{
-							StatusCode = (int)HttpStatusCode.Conflict
-						};
+							return BadRequest("User already enrolled in course.");
 					}
 
 					foreach (var @class in course.Classes)
@@ -764,7 +772,21 @@ namespace EducationAPI.Controllers
 					
 				}
 
-				await _educationProgramContext.SaveChangesAsync();
+        // Check the current enrollment in the course. 
+        var enrolledStudents = course.Classes
+          .SelectMany(c => c.Attendances)
+          .Where(a => a.Student != null)
+          .Select(a => a.Student)
+          .Distinct()
+          .ToList();
+
+				if (enrolledStudents.Count > course.MaxAttendance)
+				{
+					_logger.LogError("EnrollerUsers({CourseId}), Course attendance exceeded.", courseId);
+					return BadRequest("Course attendance exceeded.");
+				}
+
+        await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("EnrollUsers({CourseId}), called.", courseId);
 				return new StatusCodeResult((int)HttpStatusCode.Created);
