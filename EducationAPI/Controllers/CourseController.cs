@@ -509,7 +509,6 @@ namespace EducationAPI.Controllers
 				{
 					_logger.LogError("UpdateCourse({UpdatedCourse}), Course not found!", updatedCourse);
 					return NotFound("Course not found.");
-
 				}
 
 				UpdateCourseStatus(updatedCourse);
@@ -546,6 +545,7 @@ namespace EducationAPI.Controllers
 					}
 					else
 					{
+						
 						// if it doesn't, add the class.
 						classesToAdd.Add(updatedClass);
 					}

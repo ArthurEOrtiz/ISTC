@@ -1,5 +1,5 @@
 'use client';
-import { Attendance, Class, Course, User } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, Course, Topic, User } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import { useEffect, useState } from "react";
 import SavingModal from "../../shared/modals/SavingModal";
@@ -12,6 +12,8 @@ import NewClass from "./NewClass";
 import SelectPDFModal from "../PDF/SelectPDFModal";
 import ClassAttendanceModal from "../Attendance/ClassAttendanceModal";
 import CourseInfoModal from "./CourseInfoModal";
+import SelectTopicModal from "../Topics/SelectTopicModal";
+import EnrollmentModal from "../Enrollment/EnrollmentModal";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -45,7 +47,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [showCourseInfoModal, setShowCourseInfoModal] = useState<boolean>(false);
     const [showPDFModal, setShowPDFModal] = useState<boolean>(false);
+    const [showTopicModal, setShowTopicModal] = useState<boolean>(false);
     const [showAttendanceModal, setShowAttendanceModal] = useState<Class | null>(null);
+    const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false);
     const [errorMessages, setErrorMessages] = useState<string | null>(null);
     const router = useRouter();
     
@@ -170,7 +174,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     const addNewClassPlusOneDay = (attendances : Attendance[]): void => {
         const lastClass = course.classes[course.classes.length - 1];
 
-        console.log("Last Class", typeof(lastClass.scheduleStart));
+       
 
         const addOneDay = (date: any): Date => {
             let output: Date;   
@@ -215,7 +219,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                 <div className="mb-4 bg-base-300 rounded-xl p-4">
                     <CourseInfoCard course={course} />
                 </div>
-                <div className="mt-2 space-x-2">
+                <div className="mt-2 space-x-2 space-y-2">
                     <button
                         className="btn btn-primary text-white"
                         onClick={() => setShowCourseInfoModal(true)}
@@ -224,6 +228,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                     </button>
                     <button
                         className="btn btn-primary text-white"
+                        onClick={() => setShowTopicModal(true)}
                     >
                         Select Topics 
                     </button>
@@ -234,7 +239,13 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                         Select PDF
                     </button>
                     <button
-                        className="btn bg-green-600 border-none text-white"
+                        className="btn btn-primary text-white"
+                        onClick={() => setShowEnrollmentModal(true)}
+                    >
+                        Manage Enrollment
+                    </button>
+                    <button
+                        className="btn btn-success text-white"
                         onClick = {handleSaveCourse}>
                             Save Course
                     </button>
@@ -261,7 +272,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                                 <p className="text-xl font-bold">Class {index + 1}</p>
                             </div>
                             <NewClass
-                                key={cls.classId}
                                 cls={cls}
                                 onDelete={() => handleOnClassDelete(index)}
                             />
@@ -342,9 +352,37 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
             <CourseInfoModal
                 course={course}
                 isVisable={showCourseInfoModal}
-                onSubmit={(c) => setCourse(c)}
+                onSubmit={(c) => {
+                    setCourse(c)
+                    setShowCourseInfoModal(false)
+                }}
                 onClose={() => setShowCourseInfoModal(false)}
             />
+       
+            <SelectTopicModal
+                open={showTopicModal}
+                onClose={() => setShowTopicModal(false)}
+                onSelect={(topics : Topic[]) => {
+                    setCourse({...course, topics: topics});
+                    setShowTopicModal(false);
+                }}
+                topics={course.topics}
+            />
+
+            <EnrollmentModal
+                isOpen={showEnrollmentModal}
+                course={incomingCourse}
+                onExit={() => {
+                    setShowEnrollmentModal(false)
+                    window.location.reload()
+                }}
+                onError={(message) => {
+                    setErrorMessages(message)
+                    setShowEnrollmentModal(false)
+                }}
+            />
+            
+
 
         </div>
     );
