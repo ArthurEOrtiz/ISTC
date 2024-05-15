@@ -1,19 +1,18 @@
 import { Attendance, Class, User } from "@/app/shared/types/sharedTypes";
 import { GetUserByStudentId } from "@/Utilities/api";
-import { fail } from "assert";
 import { useEffect, useState } from "react";
 
 interface ClassAttendanceModalProps {
-    class: Class;
+    attendances: Attendance[];
     isOpen: boolean;
     onExit: () => void;
     onError(message: string): void;
 }
 
-const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({ class: incomingClass, isOpen, onExit, onError }) => {
-    const [cls, setCls] = useState<Class>(incomingClass);
-    const [ attendances, setAttendances ] = useState<Attendance[]>(incomingClass.attendances);
+const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({ attendances: incomingAttendances, isOpen, onExit, onError }) => {
+    const [ attendances, setAttendances ] = useState<Attendance[]>(incomingAttendances);
     const [ enrolledUsers, setEnrolledUsers ] = useState<User[]>([]);
+    const [ isLoading, setIsLoading ] = useState(false);    
 
     useEffect(() => {
         getEnrolledUsers();
@@ -22,7 +21,7 @@ const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({ class: inco
 
 
     const getEnrolledUsers = async () => {
- 
+        setIsLoading(true);
         const responses = await Promise.all(
             attendances.map(attendance => GetUserByStudentId(attendance.studentId))
         );
@@ -33,6 +32,7 @@ const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({ class: inco
 
         setEnrolledUsers(users);
         failedResponses.forEach(response => onError(response));
+        setIsLoading(false);
     }
 
     return (
@@ -47,32 +47,21 @@ const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({ class: inco
                     </div>
                 </div>
                 <div className="modal-middle">
-                    {enrolledUsers.map((user) => (
-                        <div key={user.userId} className="flex items-center justify-between p-2 border-b">
-                            <p className="text-lg">{user.firstName} {user.lastName}</p>
-                            <div className="flex items-center">
-                                <label htmlFor={`attendance-${user.userId}`} className="mr-2">Attended</label>
-                                <input 
-                                    id={`attendance-${user.userId}`}
-                                    type="checkbox" 
-                                    className="w-5 h-5"
-                                    defaultChecked={attendances.find(attendance => attendance.studentId === user.student.studentId)?.attended}
-                                    onChange={(e) => {
-                                        const newAttendances = attendances.map(attendance => {
-                                            if (attendance.studentId === user.student.studentId){
-                                                return {
-                                                    ...attendance,
-                                                    attended: e.target.checked
-                                                }
-                                            }
-                                            return attendance;
-                                        });
-                                        setAttendances(newAttendances);
-                                    }}
-                                />
-                            </div>
+                    {isLoading ? (
+                        <div className="flex justify-center items-center">
+                            <span className="loading loading-spinner loading-lg"></span>
                         </div>
-                    ))}
+                        ) : (
+                        <div className="space-y-2">
+                            {enrolledUsers.map(user => (
+                                <div key={user.userId} className="flex justify-between items-center">
+                                    <p>{user.firstName} {user.lastName}</p>
+                                    <input type="checkbox" />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                            
                 </div>
                 <div className="modal-bottom space-x-2">
                     <button 

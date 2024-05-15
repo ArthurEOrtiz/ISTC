@@ -14,7 +14,6 @@ import ClassAttendanceModal from "../Attendance/ClassAttendanceModal";
 import CourseInfoModal from "./CourseInfoModal";
 import SelectTopicModal from "../Topics/SelectTopicModal";
 import EnrollmentModal from "../Enrollment/EnrollmentModal";
-import { deepEqual } from "assert";
 import { deepEquals } from "@/Utilities/deepEquality";
 
 interface EditCourseInfoProps {
@@ -50,7 +49,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     const [showCourseInfoModal, setShowCourseInfoModal] = useState<boolean>(false);
     const [showPDFModal, setShowPDFModal] = useState<boolean>(false);
     const [showTopicModal, setShowTopicModal] = useState<boolean>(false);
-    const [showAttendanceModal, setShowAttendanceModal] = useState<Class | null>(null);
+    const [showAttendanceModal, setShowAttendanceModal] = useState<Attendance[] | null>(null);
     const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false);
     const [errorMessages, setErrorMessages] = useState<string | null>(null);
     const router = useRouter();
@@ -93,10 +92,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
     // Event Handlers
     const handleOnClassDelete = (index: number): void => {
-        console.log("Deleting Class", index);
         const newClasses = [...course.classes];
         newClasses.splice(index, 1);
-        console.log("New Classes", newClasses);
         setCourse(prevCourse => {
             return {
                 ...prevCourse,
@@ -285,7 +282,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                             <div className="space-x-2">
                                 <button
                                     className="btn btn-primary btn-sm text-white"
-                                    onClick={() => setShowAttendanceModal(cls)}
+                                    onClick={() => setShowAttendanceModal(cls.attendances)}
                                     disabled={course.status === 'Upcoming'}
                                 >
                                     Attendance
@@ -347,7 +344,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
             {showAttendanceModal && (
                 <ClassAttendanceModal
-                    class={showAttendanceModal}
+                    attendances={showAttendanceModal}
                     isOpen={true}
                     onExit={() => setShowAttendanceModal(null)}
                     onError={(message) => setErrorMessages(message)}
