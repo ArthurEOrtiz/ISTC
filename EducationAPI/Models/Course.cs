@@ -28,6 +28,11 @@ namespace EducationAPI.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int CourseId { get; set; }
 
+		[MaxLength(10, ErrorMessage = "Status must be less equal to or less than 10 characters")]
+		[MinLength(8, ErrorMessage = "Status must greater than or equal to 8 characters")]
+    [EnumDataType(typeof(CourseStatus), ErrorMessage = "Invalid status")]
+    public string Status { get; set; } = CourseStatus.Upcoming.ToString();
+
 		[Required]
 		[MaxLength(50)]
 		public string Title { get; set; } = null!;
