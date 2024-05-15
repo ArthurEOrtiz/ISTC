@@ -106,8 +106,6 @@ const AddCourse: React.FC = () => {
             courseId: 0,
             scheduleStart: scheduleStart,
             scheduleEnd: scheduleEnd,
-            // scheduleStart: scheduleStart.toISOString(),
-            // scheduleEnd: scheduleEnd.toISOString(),
             attendances: [],
         };
     
@@ -121,7 +119,7 @@ const AddCourse: React.FC = () => {
     };
 
     // NewClass
-    const handleNewClassOnDelete = (index: number) => {
+    const handleClassOnDelete = (index: number) => {
         if (course) {
             const newClasses = [...course.classes];
             newClasses.splice(index, 1); // Remove the class at the specified index
@@ -220,7 +218,15 @@ const AddCourse: React.FC = () => {
                                 <h2 className="text-xl font-bold mb-2">Class {index + 1}</h2>
                                 <NewClass
                                     cls={cls}
-                                    onDelete={() => handleNewClassOnDelete(index)}
+                                    onChange={(newCls) => {
+                                        const newClasses = [...course.classes];
+                                        newClasses[index] = newCls;
+                                        setCourse({
+                                            ...course,
+                                            classes: newClasses
+                                        });
+                                    }}
+                                    onDelete={() => handleClassOnDelete(index)}
                                 />
                             </div>
                             ))

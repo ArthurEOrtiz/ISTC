@@ -1,5 +1,5 @@
 'use client';
-import { Attendance, Class, Course, Topic, User } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, Course, Topic } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import { useEffect, useState } from "react";
 import SavingModal from "../../shared/modals/SavingModal";
@@ -14,6 +14,8 @@ import ClassAttendanceModal from "../Attendance/ClassAttendanceModal";
 import CourseInfoModal from "./CourseInfoModal";
 import SelectTopicModal from "../Topics/SelectTopicModal";
 import EnrollmentModal from "../Enrollment/EnrollmentModal";
+import { deepEqual } from "assert";
+import { deepEquals } from "@/Utilities/deepEquality";
 
 interface EditCourseInfoProps {
     course: Course;
@@ -79,9 +81,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
     // This will check if the course has been updated and set the unsaved changes flag.
     useEffect(() => {
-        const incomingCourseString = JSON.stringify(incomingCourse);
-        const courseString = JSON.stringify(course);
-        if (incomingCourseString !== courseString) {
+        console.log("Checking for unsaved changes");
+        if (!deepEquals(course, incomingCourse)) {
             setUnsavedChanges(true);
         } else {
             setUnsavedChanges(false);
@@ -92,8 +93,10 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
     // Event Handlers
     const handleOnClassDelete = (index: number): void => {
+        console.log("Deleting Class", index);
         const newClasses = [...course.classes];
         newClasses.splice(index, 1);
+        console.log("New Classes", newClasses);
         setCourse(prevCourse => {
             return {
                 ...prevCourse,
@@ -173,8 +176,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
     const addNewClassPlusOneDay = (attendances : Attendance[]): void => {
         const lastClass = course.classes[course.classes.length - 1];
-
-       
 
         const addOneDay = (date: any): Date => {
             let output: Date;   
@@ -273,12 +274,19 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                             </div>
                             <NewClass
                                 cls={cls}
+                                onChange={(newClass) => {
+                                    const newClasses = [...course.classes];
+                                    newClasses[index] = newClass;
+                                    setCourse({...course, classes: newClasses});
+                                }}
+                                disabled={course.status === 'Archived'}
                                 onDelete={() => handleOnClassDelete(index)}
                             />
                             <div className="space-x-2">
                                 <button
                                     className="btn btn-primary btn-sm text-white"
                                     onClick={() => setShowAttendanceModal(cls)}
+                                    disabled={course.status === 'Upcoming'}
                                 >
                                     Attendance
                                 </button>
@@ -301,9 +309,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                     </button>
                 </div>
             </div>
-
-   
-
 
             {showConfirmationModal && (
                 <ConfirmationModal

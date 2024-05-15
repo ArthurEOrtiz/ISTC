@@ -153,6 +153,9 @@ namespace EducationAPI.Controllers
 					return NotFound("Course not found.");
 				}
 
+				UpdateCourseStatus(course);
+				await _educationProgramContext.SaveChangesAsync();
+				_logger.LogInformation("GetCourseById({Id}), called", id);
 				return Ok(course);
 			}
 			catch (Exception ex)
@@ -1041,7 +1044,7 @@ namespace EducationAPI.Controllers
 		{
 			var today = DateTime.Today;
 
-			if (course.Classes.Any(c => c.ScheduleStart <= today && c.ScheduleEnd >= today))
+      if (course.Classes.Any(c => c.ScheduleStart <= today) && course.Classes.Any(c => c.ScheduleEnd >= today))
 			{
 				course.Status = CourseStatus.InProgress.ToString();
 			}
