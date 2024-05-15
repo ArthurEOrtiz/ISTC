@@ -44,7 +44,7 @@ namespace EducationAPI.Migrations
 
                     b.HasIndex("TopicsTopicId");
 
-                    b.ToTable("CourseTopic", (string)null);
+                    b.ToTable("CourseTopic");
 
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                             {
@@ -264,6 +264,11 @@ namespace EducationAPI.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Title")
                         .IsRequired()
