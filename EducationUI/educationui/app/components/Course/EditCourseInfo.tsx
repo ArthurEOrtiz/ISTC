@@ -87,22 +87,15 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
         
 
     // Event Handlers
-    const handleOnClassCardDelete = (cls: Class): void => {
-        if (cls.classId !== 0) {
-            setCourse(prevCourse => {
-                return {
-                    ...prevCourse,
-                    classes: prevCourse.classes.filter(classes => classes.classId !== cls.classId)
-                }
-            });
-        } else {
-            setCourse(prevCourse => {
-                return {
-                    ...prevCourse,
-                    classes: prevCourse.classes.filter(classes => classes.scheduleStart !== cls.scheduleStart)
-                }
-            });
-        }
+    const handleOnClassDelete = (index: number): void => {
+        const newClasses = [...course.classes];
+        newClasses.splice(index, 1);
+        setCourse(prevCourse => {
+            return {
+                ...prevCourse,
+                classes: newClasses
+            }
+        });
     }
 
     const handleOnClassAdd = (): void => {
@@ -119,41 +112,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
         }
     }
 
-    const handleClassScheduleStartChange = (date: Date, classId: number): void => {
-        const updatedClasses = course.classes.map(classSchedule => {
-            if (classSchedule.classId === classId) {
-                return {
-                    ...classSchedule,
-                    scheduleStart: date
-                }
-            }
-            return classSchedule;
-        });
-        setCourse(prevCourse => {
-            return {
-                ...prevCourse,
-                classes: updatedClasses
-            }
-        });
-    }
-
-    const handleClassScheduleEndChange = (date: Date, classId: number): void => {
-        const updatedClasses = course.classes.map(classSchedule => {
-            if (classSchedule.classId === classId) {
-                return {
-                    ...classSchedule,
-                    scheduleEnd: date
-                }
-            }
-            return classSchedule;
-        });
-        setCourse(prevCourse => {
-            return {
-                ...prevCourse,
-                classes: updatedClasses
-            }
-        });
-    }
 
 
     const handleSaveCourse = async () => {
@@ -305,9 +263,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                             <NewClass
                                 key={cls.classId}
                                 cls={cls}
-                                onDelete={(e) => handleOnClassCardDelete(e)}
-                                onScheduleStartChange={(date) => handleClassScheduleStartChange(date, cls.classId)}
-                                onScheduleEndChange={(date) => handleClassScheduleEndChange(date, cls.classId)}
+                                onDelete={() => handleOnClassDelete(index)}
                             />
                             <div className="space-x-2">
                                 <button

@@ -42,6 +42,13 @@ namespace EducationAPI.Controllers
 					.Include(c => c.WaitLists)
 					.ToListAsync();
 
+				foreach (var course in courses)
+				{
+					UpdateCourseStatus(course);
+				}
+
+				await _educationProgramContext.SaveChangesAsync();
+
 				_logger.LogInformation("GetAllCourses(), called.");
 				return courses;
 			}
@@ -505,6 +512,8 @@ namespace EducationAPI.Controllers
 
 				}
 
+				UpdateCourseStatus(updatedCourse);
+
 				// Update scalar properties
 				_educationProgramContext.Entry(existingCourse).CurrentValues.SetValues(updatedCourse);
 
@@ -521,8 +530,9 @@ namespace EducationAPI.Controllers
 				// and add back in the the existing course
 				existingCourse.Topics = existingTopics;
 
-        // Update Classes.
+				// Update Classes.
 				// for each class in the updated course . . . 
+				List<Class> classesToAdd = [];
         foreach (var updatedClass in updatedCourse.Classes)
 				{
 					// see if the class exists in the existing course
@@ -537,17 +547,29 @@ namespace EducationAPI.Controllers
 					else
 					{
 						// if it doesn't, add the class.
-						existingCourse.Classes.Add(updatedClass);
+						classesToAdd.Add(updatedClass);
 					}
 				}
 
+				foreach (var classToAdd in classesToAdd)
+				{
+					existingCourse.Classes.Add(classToAdd);
+				}
+
 				// Remove any classes that aren't in the updated course
+				List<Class> classesToRemove = [];
+
 				foreach (var existingClass in existingCourse.Classes)
 				{
 					if (!updatedCourse.Classes.Any(c => c.ClassId == existingClass.ClassId))
 					{
-						existingCourse.Classes.Remove(existingClass);
+						classesToRemove.Add(existingClass);
 					}
+				}
+
+				foreach (var classToRemove in classesToRemove)
+				{
+					existingCourse.Classes.Remove(classToRemove);
 				}
 
 				// Update PDF.
@@ -968,18 +990,20 @@ namespace EducationAPI.Controllers
 
 
 		[HttpDelete("DeleteCourseById/{id}")]
+		[ProducesResponseType((int)HttpStatusCode.NoContent)]
 		public async Task<ActionResult> DeleteCourseById(int id)
 		{
 			try
 			{
 				var existingCourse = await _educationProgramContext.Courses
 						.Include(c => c.Location)
+						.Include(c => c.PDF)
 						.FirstOrDefaultAsync(c => c.CourseId == id);
 
 				if (existingCourse == null)
 				{
 					_logger.LogError("DeleteCourseById({Id}), Course not found.", id);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Course not found.");
 				}
 
 				if (existingCourse.Location != null)
@@ -987,16 +1011,47 @@ namespace EducationAPI.Controllers
 					_educationProgramContext.Locations.Remove(existingCourse.Location);
 				}
 
+				if (existingCourse.PDF != null)
+				{
+					_educationProgramContext.PDFs.Remove(existingCourse.PDF);
+				}
+
 				_educationProgramContext.Courses.Remove(existingCourse);
 				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("DeleteCourseById {Id} called.", id);
-				return new StatusCodeResult((int)HttpStatusCode.OK);
+				return NoContent();
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "RemoveCourseById({Id})", id);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+		/// <summary>
+		/// This method assumes that a Course can have multiple Classes, each with its own schedule, and that the
+		/// status of the Course is determined by the status of its classes. If a course has at least one class
+		/// that is currently in progress, the course is considered in progress. If a course has no classes in 
+		/// progress but has at least one class that is scheduled to start in the future, the course is considered
+		/// upcoming. If all classes have already ended, the course is considered archived.
+		/// </summary>
+		/// <param name="course"></param>
+		private static void UpdateCourseStatus(Course course)
+		{
+			var today = DateTime.Today;
+
+			if (course.Classes.Any(c => c.ScheduleStart <= today && c.ScheduleEnd >= today))
+			{
+				course.Status = CourseStatus.InProgress.ToString();
+			}
+			else if (course.Classes.Any(c => c.ScheduleStart > today))
+			{
+				course.Status = CourseStatus.Upcoming.ToString();
+			}
+			else
+			{
+				course.Status = CourseStatus.Archived.ToString();
 			}
 		}
 

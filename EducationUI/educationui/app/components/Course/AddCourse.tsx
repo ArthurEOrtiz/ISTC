@@ -24,6 +24,7 @@ import SelectPDFModal from '../PDF/SelectPDFModal';
 const AddCourse: React.FC = () => {
     const defaultCourse : Course = {
         courseId: 0,
+        status: "Upcoming",
         title: '',
         description: null,
         attendanceCredit: 0,
@@ -131,28 +132,6 @@ const AddCourse: React.FC = () => {
         }
     }
 
-    const handleNewClassOnScheduleStartChange = (index: number, date: Date) => {
-        if (course) {
-            const newClasses = [...course.classes];
-            newClasses[index].scheduleStart = date;
-            setCourse({
-                ...course,
-                classes: newClasses
-            });
-        }
-    }
-
-    const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
-        if (course) {
-            const newClasses = [...course.classes];
-            newClasses[index].scheduleEnd = date;
-            setCourse({
-                ...course,
-                classes: newClasses
-            });
-        }
-    }
-
     // SelectTopicModal
     const handleSelectTopicModalOnClose = () => {
         setShowSelectTopicModal(false);
@@ -242,8 +221,6 @@ const AddCourse: React.FC = () => {
                                 <NewClass
                                     cls={cls}
                                     onDelete={() => handleNewClassOnDelete(index)}
-                                    onScheduleStartChange={(date: Date) => handleNewClassOnScheduleStartChange(index, date)}
-                                    onScheduleEndChange={(date: Date) => handleNewClassOnScheduleEndChange(index, date)}
                                 />
                             </div>
                             ))

@@ -26,6 +26,7 @@ export interface Contact {
 
 export interface Course {
   courseId: number;
+  status: string;
   title: string;
   description: string | null;
   attendanceCredit: number;
