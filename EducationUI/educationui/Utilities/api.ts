@@ -1,4 +1,4 @@
-import { Course, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
+import { Attendance, Course, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
 import axios from 'axios';
 import https from 'https';
 
@@ -14,6 +14,16 @@ const axiosInstance = axios.create({
 });
 
 // Attendance
+export async function UpdateAttendace(attendance: Attendance) {
+    try {
+        const response = await axiosInstance.put('Attendance/UpdateAttendance', attendance);
+        return response;
+    } catch (error: any) {
+        console.error('Error updating attendance:', error);
+        return error.response.data;
+    }
+}
+
 export async function UpdateAttendanceById(attendanceId: Number, attended: Boolean) {
     try {
         const response = await axiosInstance.put(`Attendance/UpdateAttendanceById/${attendanceId}/${attended}`);

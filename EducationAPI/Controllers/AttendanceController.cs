@@ -34,6 +34,7 @@ namespace EducationAPI.Controllers
 				}
 
 				_educationProgramContext.Entry(AttendanceToUpdate).CurrentValues.SetValues(attendance);
+				await _educationProgramContext.SaveChangesAsync();
 				_logger.LogInformation("UpdateAttendance({Attendance}), called", attendance);
 				return Ok();
 			}
