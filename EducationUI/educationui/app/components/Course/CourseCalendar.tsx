@@ -43,17 +43,21 @@ const CourseCalendar: React.FC<CourseCalendarProps> = ({isAdmin, courses}) => {
     // , [currentRange]);
         
     // This function will convert the courses to events that can be displayed on the calendar.
+    // It will take the first class of the course as the start date and the last class of the course as the end date.
+    // Then if the course has a first class and a last class it will add the course to the events array.
     const convertCoursesToEvents = (courses: Course[]) => {
         const events: any[] = [];
         courses.forEach((course) => {
             const firstClass = course.classes[0];
             const lastClass = course.classes[course.classes.length - 1];
-            events.push({
+            if (firstClass && lastClass){
+                events.push({
                 id: course.courseId,
                 title: course.title,
                 start: new Date(firstClass.scheduleStart),
                 end: new Date(lastClass.scheduleEnd),
             });
+            }
         });
         return events;
     }
