@@ -21,7 +21,8 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [confirmationTitle, setConfirmationTitle] = useState<string>();  
     const [confirmationMessage, setConfirmationMessage] = useState<string>();
-    const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false); 
+    const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false);
+    const [showAttendanceModal, setShowAttendanceModal] = useState<boolean>(false); 
     const router = useRouter();
   
     const defaultWaitListToEnroll: WaitList = {
@@ -94,10 +95,6 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
 
         resetConfirmationModal();
     };
-
-    const handleManageAttendanceClick = () => { 
-        console.log('Manage Attendance');
-    }
 
     const handleEnrollmentModelError = (message: string) => {
         setShowEnrollmentModal(false);
@@ -179,7 +176,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                                 </button>
                                 <button 
                                     className="btn btn-primary text-white"
-                                    onClick={handleManageAttendanceClick}
+                                    onClick={()=>setShowAttendanceModal(true)}
                                     >
                                         Manage Attendance
                                 </button>
@@ -228,8 +225,8 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
 
                 <AttendanceModal
                     course={course}
-                    isOpen={false}
-                    onExit={() => console.log('Exit')}
+                    isOpen={showAttendanceModal}
+                    onExit={() => setShowAttendanceModal(false)}
                 />
 
                 {showConfirmationModal && (
