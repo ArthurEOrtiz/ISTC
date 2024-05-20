@@ -316,11 +316,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                     </div>
                 ))}
                 
-                <div className="flex justify-center mt-2">
+                <div className="flex justify-left mt-2">
                     <button 
-                        className="btn btn-primary text-white"
+                        className="btn btn-success text-white"
                         onClick={handleOnClassAdd}>
-                            Add Class
+                            &#x2B; Class
                     </button>
                 </div>
             </div>
