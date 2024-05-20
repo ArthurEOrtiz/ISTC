@@ -8,7 +8,7 @@ namespace EducationAPI.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
-	public class WaitListController
+	public class WaitListController : ControllerBase
 	{
 		private readonly EducationProgramContext _educationProgramContext;
 		private readonly ILogger<UserController> _logger;
@@ -152,13 +152,13 @@ namespace EducationAPI.Controllers
 				if (waitList == null)
 				{
 					_logger.LogError("DeleteWaitListByID({Id}), wait list not found.", id);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Wait list not found.");
 				}
 
 				_educationProgramContext.WaitLists.Remove(waitList);
 				await _educationProgramContext.SaveChangesAsync();
 				_logger.LogInformation("DeleteWaitListById({Id}) called.", id);
-				return new StatusCodeResult((int)HttpStatusCode.NoContent);
+				return NoContent();
 			}
 			catch(Exception ex)
 			{
