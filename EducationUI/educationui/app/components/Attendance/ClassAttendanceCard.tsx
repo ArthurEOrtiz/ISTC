@@ -69,7 +69,7 @@ const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, 
     }
     
     return (
-        <div className="card bg-base-200 shadow-xl w-full">
+        <div className="card bg-base-200 w-full">
             <div className="card-body">
                 <h2 className="card-title">{new Date(cls.scheduleStart).toLocaleDateString()}</h2>
                 {users && (
@@ -84,7 +84,8 @@ const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, 
                                         onChange={(e) => {HandleAttendanceChange(user.student?.studentId as number, e.target.checked)}}
                                         
                                     />
-                                    <span className="label-text">{user.firstName} {user.lastName}</span>
+                                    <p className="label-text">{user.firstName} {user.lastName} | {user.email}</p>
+                                   
                                     
                                 </label>
                             </div>
