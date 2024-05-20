@@ -8,7 +8,7 @@ import ErrorModel from "../../shared/modals/ErrorModal";
 import { useRouter } from "next/navigation";
 import { DeleteCourseById, UpdateCourse } from "@/Utilities/api";
 import moment from "moment";
-import NewClass from "./NewClass";
+import ClassCard from "../Class/ClassCard";
 import SelectPDFModal from "../PDF/SelectPDFModal";
 import ClassAttendanceModal from "../Attendance/ClassAttendanceModal";
 import CourseInfoModal from "./CourseInfoModal";
@@ -287,7 +287,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                             <div className="mb-2">
                                 <p className="text-xl font-bold">Class {index + 1}</p>
                             </div>
-                            <NewClass
+                            <ClassCard
                                 cls={cls}
                                 onChange={(newClass) => {
                                     const newClasses = [...course.classes];
@@ -316,11 +316,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                     </div>
                 ))}
                 
-                <div className="flex justify-center mt-2">
+                <div className="flex justify-left mt-2">
                     <button 
-                        className="btn btn-primary text-white"
+                        className="btn btn-success text-white"
                         onClick={handleOnClassAdd}>
-                            Add Class
+                            &#x2B; Class
                     </button>
                 </div>
             </div>

@@ -2,7 +2,7 @@
 import { Course, Topic } from '@/app/shared/types/sharedTypes';
 import { useEffect, useState } from 'react';
 import CourseForm from './CourseForm';
-import NewClass from './NewClass';
+import ClassCard from '../Class/ClassCard';
 import SelectTopicModal from '../Topics/SelectTopicModal';
 import ConfirmationModal from '../../shared/modals/ConfirmationModal';
 import { useRouter } from 'next/navigation';
@@ -70,7 +70,7 @@ const AddCourse: React.FC = () => {
             behavior: "smooth"
         });
     }
-    , [course?.classes.length]);
+    , [course.classes.length]);
 
     // Event Handlers this component. 
     const handleAddClass = () => {
@@ -174,7 +174,10 @@ const AddCourse: React.FC = () => {
             {course.title === '' ? (
                 <div className='flex justify-center'>
                     <div className='bg-base-100 shadow-md rounded-xl px-8 pt-6 pb-8 mb-4 w-2/3'>
-                        <CourseForm course={course} onSubmit={(course) => setCourse(course)}/>
+                        <CourseForm 
+                            course={course} 
+                            onSubmit={(course) => setCourse(course)}
+                        />
                     </div>
                 </div>
             ) : (
@@ -216,7 +219,7 @@ const AddCourse: React.FC = () => {
                             
                             <div className="bg-base-100 shadow-md rounded-xl p-4 relative mt-2" key={index}> 
                                 <h2 className="text-xl font-bold mb-2">Class {index + 1}</h2>
-                                <NewClass
+                                <ClassCard
                                     cls={cls}
                                     onChange={(newCls) => {
                                         const newClasses = [...course.classes];
