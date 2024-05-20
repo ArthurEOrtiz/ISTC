@@ -7,8 +7,11 @@ import { getCoursesByDateRange } from '@/Utilities/api';
 import { Course } from '@/app/shared/types/sharedTypes';
 import { useRouter } from 'next/navigation';
 
+interface CourseCalendarProps {
+    isAdmin: boolean;
+}
 
-const CourseCalendar: React.FC = () => {
+const CourseCalendar: React.FC<CourseCalendarProps> = ({isAdmin}) => {
     // The router is used to redirect the user to the course detail page when a course is clicked on the calendar.
     const router = useRouter();
 
@@ -67,7 +70,11 @@ const CourseCalendar: React.FC = () => {
     }
 
     const handleSelectEvent = (event: any) => {
-        router.push(`/courses/course/${event.id}`);
+        if (isAdmin) {
+            router.push(`/admin/editcourse/edit/course/${event.id}`)
+        } else {
+            router.push(`/courses/course/${event.id}`);
+        }
     }
 
     return (

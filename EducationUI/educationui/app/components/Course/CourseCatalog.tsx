@@ -103,7 +103,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                 </div>
             </div>
    
-            {isCourseCalendarVisible && <CourseCalendar />}
+            {isCourseCalendarVisible && <CourseCalendar isAdmin={isAdmin}/>}
 
             {isCourseListVisible && user && <CourseList 
                                             courses={courses}
