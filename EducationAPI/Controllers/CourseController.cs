@@ -94,6 +94,7 @@ namespace EducationAPI.Controllers
 					return NotFound("could not find courses.");
 				}
 
+				
 				// FOR EACH course, retrieve the maximum attendance and the record of the first class.
 				foreach (Course course in courses)
 				{
@@ -101,8 +102,9 @@ namespace EducationAPI.Controllers
 					var firstClass = course.Classes.FirstOrDefault();
 					if (firstClass == null)
 					{
-						_logger.LogError("GetAllEnrollableCourse(), could not find class.");
-						return NotFound("A course did not contain a child class");
+						// If a course does not have a class, then you cant enroll to that course, and 
+						// should be not added to the enrollableCourses list
+						continue;
 					}
 					// IF the number of students in attendance is less than the value of max attendance.
 					if (firstClass.Attendances.Count < MaxAttendance)
