@@ -74,7 +74,7 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var today = DateTime.Today;
-				List<Course> enrollableCourses = new();
+				List<Course> enrollableCourses = [];
 
 				// Get all courses, that have an enrollment deadline on or after today
 				var courses = await _educationProgramContext.Courses
@@ -91,7 +91,7 @@ namespace EducationAPI.Controllers
 				if (courses == null)
 				{
 					_logger.LogError("GetAllEnrollableCourse(), could not find courses.");
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("could not find courses.");
 				}
 
 				// FOR EACH course, retrieve the maximum attendance and the record of the first class.
@@ -102,7 +102,7 @@ namespace EducationAPI.Controllers
 					if (firstClass == null)
 					{
 						_logger.LogError("GetAllEnrollableCourse(), could not find class.");
-						return new StatusCodeResult((int)HttpStatusCode.NotFound);
+						return NotFound("A course did not contain a child class");
 					}
 					// IF the number of students in attendance is less than the value of max attendance.
 					if (firstClass.Attendances.Count < MaxAttendance)
@@ -111,6 +111,13 @@ namespace EducationAPI.Controllers
 						enrollableCourses.Add(course);
 					}
 				}
+
+				foreach (Course course in enrollableCourses)
+				{
+					UpdateCourseStatus(course);
+				}
+
+				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("GetAllEnrollableCourse(), called.");
 				return enrollableCourses;
@@ -545,6 +552,16 @@ namespace EducationAPI.Controllers
 					{
 						// if it does update the class
 						_educationProgramContext.Entry(existingClass).CurrentValues.SetValues(updatedClass);
+						// Update Attendance
+						foreach (Attendance attendance in updatedClass.Attendances)
+						{
+							var existingAttendance = existingClass.Attendances
+								.FirstOrDefault(a => a.AttendanceId == attendance.AttendanceId);
+							if (existingAttendance != null)
+							{
+                _educationProgramContext.Entry(existingAttendance).CurrentValues.SetValues(attendance);
+              }
+						}
 					}
 					else
 					{
@@ -1001,6 +1018,7 @@ namespace EducationAPI.Controllers
 				var existingCourse = await _educationProgramContext.Courses
 						.Include(c => c.Location)
 						.Include(c => c.PDF)
+						.Include(c => c.Exams)
 						.FirstOrDefaultAsync(c => c.CourseId == id);
 
 				if (existingCourse == null)
@@ -1017,6 +1035,14 @@ namespace EducationAPI.Controllers
 				if (existingCourse.PDF != null)
 				{
 					_educationProgramContext.PDFs.Remove(existingCourse.PDF);
+				}
+
+				if (existingCourse.Exams != null)
+				{
+					foreach (var exam in existingCourse.Exams)
+					{
+						_educationProgramContext.Exams.Remove(exam);
+					}
 				}
 
 				_educationProgramContext.Courses.Remove(existingCourse);
@@ -1042,20 +1068,25 @@ namespace EducationAPI.Controllers
 		/// <param name="course"></param>
 		private static void UpdateCourseStatus(Course course)
 		{
-			var today = DateTime.Today;
+			if (course.Classes.Count != 0)
+			{
+				var today = DateTime.Today;
 
-      if (course.Classes.Any(c => c.ScheduleStart <= today) && course.Classes.Any(c => c.ScheduleEnd >= today))
-			{
-				course.Status = CourseStatus.InProgress.ToString();
-			}
-			else if (course.Classes.Any(c => c.ScheduleStart > today))
-			{
-				course.Status = CourseStatus.Upcoming.ToString();
-			}
-			else
-			{
-				course.Status = CourseStatus.Archived.ToString();
-			}
+				if (course.Classes.Any(c => c.ScheduleStart.Date <= today) && course.Classes.Any(c => c.ScheduleEnd.Date >= today))
+				{
+					course.Status = CourseStatus.InProgress.ToString();
+				}
+				else if (course.Classes.Any(c => c.ScheduleStart.Date > today))
+				{
+					course.Status = CourseStatus.Upcoming.ToString();
+				}
+				else
+				{
+					course.Status = CourseStatus.Archived.ToString();
+				}
+			} 
+
+
 		}
 
 	}
