@@ -637,7 +637,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
 
             <div className="flex items-center justify-between">
                 <button
-                    className={`btn btn-primary text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : ''}`}
+                    className={`btn btn-success text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : ''}`}
                     type="submit"
                     disabled={!isFormValid}
                 >
