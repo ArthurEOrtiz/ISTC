@@ -187,7 +187,8 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                 return selectedDate > new Date();
             };
             case 'InProgress': {
-                return selectedDate <= new Date();
+                const lastDayOfClass = new Date(course.classes[course.classes.length - 1].scheduleEnd);
+                return selectedDate <= lastDayOfClass 
             };
             case 'Archived': {
                 return selectedDate < new Date();
