@@ -203,7 +203,7 @@ const AddCourse: React.FC = () => {
                                     Select PDF
                             </button>
                             <button 
-                                className='btn bg-green-600 border-none text-white'
+                                className='btn btn-success border-none text-white'
                                 onClick={()=>setShowConfirmationModal(true)}
                                 >
                                     Save Course
@@ -233,18 +233,18 @@ const AddCourse: React.FC = () => {
                         }
                         <div className="mt-2">
                             <button
-                                className="btn bg-green-600 border-none text-white"
+                                className="btn btn-success text-white"
                                 onClick={handleAddClass}
                             >
-                                Add Class
+                                &#x2B; Class
                             </button>
                             
-                            <button
+                            {/* <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
                             >
                                 Console Log Course
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                 </div>
