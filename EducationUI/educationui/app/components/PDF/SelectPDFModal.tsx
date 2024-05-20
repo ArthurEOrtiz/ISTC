@@ -43,7 +43,7 @@ const SelectPDFModal: React.FC<SelectPDFModalProps> = ({ open, onAdd, onClose, o
             <div className="bg-base-100 p-8 rounded-lg z-50 w-1/2">
                 <div className="flex justify-between mb-4">
                     <h2 className="text-xl font-semibold">Select PDF</h2>
-                    <button onClick={onClose} className="text-error font-bold">X</button>
+                    <button onClick={onClose} className="text-3xl text-error font-bold">&times;</button>
                 </div>
                 <div className="space-y-4">
                     <p className="text-lg">Select a PDF file to upload</p>
