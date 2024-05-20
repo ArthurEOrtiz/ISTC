@@ -1,16 +1,17 @@
-import { Attendance, User } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, User } from "@/app/shared/types/sharedTypes";
 import { GetUserByStudentId, UpdateAttendace } from "@/Utilities/api";
 import { useEffect, useState } from "react";
 
 interface ClassAttendanceModalProps {
-    attendances: Attendance[];
+    class: Class;
     isOpen: boolean;
+    onChanges: (Class: Class) => void;
     onExit: () => void;
     onError(message: string): void;
 }
 
-const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({ attendances: incomingAttendances, isOpen, onExit, onError }) => {
-    const [ attendances, setAttendances ] = useState<Attendance[]>(incomingAttendances);
+const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({ class: incomingClass, isOpen, onChanges, onExit, onError }) => {
+    const [ cls, setCls ] = useState<Class>(incomingClass);
     const [ enrolledUsers, setEnrolledUsers ] = useState<User[]>([]);
     const [ isLoading, setIsLoading ] = useState(false);    
 
@@ -19,17 +20,22 @@ const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({ attendances
     }
     , [isOpen]);
 
-    const handleOnSave = () => {
-        attendances.forEach(attendance => {
-            updateAttendance(attendance);
-        });
+    useEffect(() => {
+        onChanges(cls);
     }
+    , [cls]);
 
+    const handleOnSave = () => {
+        // cls.attendances.forEach(attendance => {
+        //     updateAttendance(attendance);
+        // });
+        onExit();
+    }
 
     const getEnrolledUsers = async () => {
         setIsLoading(true);
         const responses = await Promise.all(
-            attendances.map(attendance => GetUserByStudentId(attendance.studentId))
+            cls.attendances.map(attendance => GetUserByStudentId(attendance.studentId))
         );
 
         const successfulResponses = responses.filter(response => response.status === 200);
@@ -45,8 +51,6 @@ const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({ attendances
         const response = await UpdateAttendace(attendance);
         if (response.status !== 200) {
             onError(response);
-        } else {
-            onExit();
         }
     }
 
@@ -87,21 +91,24 @@ const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({ attendances
                                                     className="checkbox"
                                                     type="checkbox" 
                                                     defaultChecked={
-                                                        attendances.find(attendance => attendance.studentId === user.student.studentId)?.attended 
+                                                        cls.attendances.find(attendance => attendance.studentId === user.student.studentId)?.attended 
                                                         ?? false
                                                     }
                                                     onChange={
-                                                        (event) => {
-                                                            const newAttendances = attendances.map(attendance => {
+                                                        (e) => {
+                                                            const newAttendances = cls.attendances.map(attendance => {
                                                                 if (attendance.studentId === user.student.studentId) {
                                                                     return {
                                                                         ...attendance,
-                                                                        attended: event.target.checked
+                                                                        attended: e.target.checked
                                                                     }
                                                                 }
                                                                 return attendance;
                                                             });
-                                                            setAttendances(newAttendances);
+                                                            setCls({
+                                                                ...cls,
+                                                                attendances: newAttendances
+                                                            });
                                                         }
                                                     }/>
                                             </td>

@@ -45,11 +45,14 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     const [course, setCourse] = useState<Course>(incomingCourse);
     const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [confirmationModalTitle, setConfirmationModalTitle] = useState<string>('');
+    const [confirmationModalMessage, setConfirmationModalMessage] = useState<string>('');
+    const [classToDelete, setClassToDelete] = useState<Number | null>(null); 
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [showCourseInfoModal, setShowCourseInfoModal] = useState<boolean>(false);
     const [showPDFModal, setShowPDFModal] = useState<boolean>(false);
     const [showTopicModal, setShowTopicModal] = useState<boolean>(false);
-    const [showAttendanceModal, setShowAttendanceModal] = useState<Attendance[] | null>(null);
+    const [showAttendanceModal, setShowAttendanceModal] = useState<Class | null>(null);
     const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false);
     const [errorMessages, setErrorMessages] = useState<string | null>(null);
     const router = useRouter();
@@ -80,7 +83,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
     // This will check if the course has been updated and set the unsaved changes flag.
     useEffect(() => {
-        console.log("Checking for unsaved changes");
         if (!deepEquals(course, incomingCourse)) {
             setUnsavedChanges(true);
         } else {
@@ -88,18 +90,24 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
         }
     }
     , [course]);
-        
 
     // Event Handlers
+    const handleConfirmationModalOnConfirm = (): void => {
+        if (confirmationModalTitle === 'Delete Class') {
+            handleConfirmDeleteClass();
+        }
+
+        if (confirmationModalTitle === 'Delete Course') {
+            handleConfirmDeleteCourse();
+        }
+        setShowConfirmationModal(false);
+    }
+
     const handleOnClassDelete = (index: number): void => {
-        const newClasses = [...course.classes];
-        newClasses.splice(index, 1);
-        setCourse(prevCourse => {
-            return {
-                ...prevCourse,
-                classes: newClasses
-            }
-        });
+        setConfirmationModalTitle('Delete Class');
+        setConfirmationModalMessage('Are you sure you want to delete this class? This will delete attendance records for this class.');
+        setClassToDelete(index);
+        setShowConfirmationModal(true);
     }
 
     const handleOnClassAdd = (): void => {
@@ -111,12 +119,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
             const lastClassAttendances = lastClass.attendances;
             lastClassAttendances.forEach(attendance => {
                 attendance.attendanceId = 0;
+                attendance.attended = false;
             });
             addNewClassPlusOneDay(lastClassAttendances);
         }
     }
-
-
 
     const handleSaveCourse = async () => {
         console.log("Saving Course", course);
@@ -133,19 +140,30 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     }
 
     const handleDeleteCourse = () => {
+        setConfirmationModalTitle('Delete Course');
+        setConfirmationModalMessage('Are you sure you want to delete this course?');
         setShowConfirmationModal(true);
     }
 
+    const handleConfirmDeleteClass = () => {
+        const newClasses = [...course.classes];
+        newClasses.splice(classToDelete as number, 1);
+        setCourse(prevCourse => {
+            return {
+                ...prevCourse,
+                classes: newClasses
+            }
+        });
+        setClassToDelete(null);
+    };
+
     const handleConfirmDeleteCourse = async () => {
         setIsSaving(true);
-        try {
-            await DeleteCourseById(course.courseId!);
-        }
-        catch (error) {
-            throw error;
-        }
-        finally {
+        const response = await DeleteCourseById(course.courseId as number);
+        if (response.status === 204) {
             router.push('/admin/editcourse/edit');
+        } else {
+            setErrorMessages(response);
         }
     }
 
@@ -282,7 +300,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                             <div className="space-x-2">
                                 <button
                                     className="btn btn-primary btn-sm text-white"
-                                    onClick={() => setShowAttendanceModal(cls.attendances)}
+                                    onClick={() => setShowAttendanceModal(cls)}
                                     disabled={course.status === 'Upcoming'}
                                 >
                                     Attendance
@@ -309,9 +327,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
             {showConfirmationModal && (
                 <ConfirmationModal
-                    title={'Delete Course'}
-                    message={'Are you sure you want to delete this course?'}
-                    onConfirm={handleConfirmDeleteCourse}
+                    title={confirmationModalTitle}
+                    message={confirmationModalMessage}
+                    onConfirm={handleConfirmationModalOnConfirm}
                     onCancel={() => setShowConfirmationModal(false)} />
             )}
 
@@ -344,8 +362,17 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
             {showAttendanceModal && (
                 <ClassAttendanceModal
-                    attendances={showAttendanceModal}
+                    class={showAttendanceModal}
                     isOpen={true}
+                    onChanges={(cls) => {
+                        const newClasses = course.classes.map((c) => {
+                            if (c.classId === cls.classId) {
+                                return cls;
+                            }
+                            return c;
+                        });
+                        setCourse({...course, classes: newClasses});
+                    }}
                     onExit={() => setShowAttendanceModal(null)}
                     onError={(message) => setErrorMessages(message)}
                 />

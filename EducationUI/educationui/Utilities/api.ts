@@ -184,10 +184,10 @@ export async function DropUsers(courseId: Number, users: User[]) {
 export async function DeleteCourseById(courseId: Number) {
     try {
         const response = await axiosInstance.delete(`Course/DeleteCourseById/${courseId}`);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error : any) {
         console.error('Error deleting course:', error);
-        throw error;
+        return error.response.data;
     }
 }
 

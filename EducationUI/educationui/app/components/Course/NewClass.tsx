@@ -47,12 +47,7 @@ const NewClass: React.FC<NewClassProps> = ({cls: incomingClass, disabled = false
     useEffect(() => {
         onChange(cls);
     }
-    , [cls])
-    
-    // Handlers 
-    const handleRemoveClick = () => {
-        onDelete(cls);
-    };
+    , [cls]);
 
     const handleClassDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const date = event.target.value;
@@ -79,7 +74,6 @@ const NewClass: React.FC<NewClassProps> = ({cls: incomingClass, disabled = false
         const localTime = event.target.value
         setStart(localTime);
         const combinedDateTime = new Date( `${classDate}T${localTime}:00`);
-        // cls.scheduleStart = combinedDateTime;
         setCls({
             ...cls,
             scheduleStart: combinedDateTime
@@ -90,7 +84,6 @@ const NewClass: React.FC<NewClassProps> = ({cls: incomingClass, disabled = false
         const time = event.target.value;
         setEnd(time);
         const combinedDateTime = new Date(`${classDate}T${time}:00`);
-        //cls.scheduleEnd = combinedDateTime;
         setCls({
             ...cls,
             scheduleEnd: combinedDateTime
@@ -101,7 +94,7 @@ const NewClass: React.FC<NewClassProps> = ({cls: incomingClass, disabled = false
         <div>
             <button
                 className="absolute top-0 right-0 mr-2 mt-1 text-error px-2 py-1 rounded-full font-bold"
-                onClick={handleRemoveClick}
+                onClick={() => onDelete(cls)}
             >
                 Delete
             </button>
