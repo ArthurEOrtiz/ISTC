@@ -270,12 +270,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                         onClick={handleDeleteCourse}>
                             Delete Course
                     </button>
-                    {/* <button 
+                    <button 
                         onClick={() => console.log(course)}
                         className="btn btn-primary text-white"
                     >
                         Log Course
-                    </button> */}
+                    </button>
                 </div>
             </div>
     
