@@ -35,7 +35,6 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
             setIsLoading(false);
             return;
         }
-        
     }
     , []);
 
@@ -117,6 +116,21 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                 >
                     Log Courses
                 </button> */}
+                {isAdmin && (
+                    <div>
+                        <div className="join p-1">
+                            <button className="join-item btn btn-primary text-white">
+                                Up Coming
+                            </button>
+                            <button className="join-item btn btn-primary text-white">
+                                In Progress
+                            </button>
+                            <button className="join-item btn btn-primary text-white">
+                                Archived
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
    
             {isCourseCalendarVisible && courses &&<CourseCalendar 
