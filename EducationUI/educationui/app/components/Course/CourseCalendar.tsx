@@ -9,9 +9,10 @@ import { useRouter } from 'next/navigation';
 
 interface CourseCalendarProps {
     isAdmin: boolean;
+    courses: Course[];  
 }
 
-const CourseCalendar: React.FC<CourseCalendarProps> = ({isAdmin}) => {
+const CourseCalendar: React.FC<CourseCalendarProps> = ({isAdmin, courses}) => {
     // The router is used to redirect the user to the course detail page when a course is clicked on the calendar.
     const router = useRouter();
 
@@ -26,20 +27,20 @@ const CourseCalendar: React.FC<CourseCalendarProps> = ({isAdmin}) => {
     });
 
     // This is the state that will hold the courses that will be displayed on the calendar.
-    const [courses, setCourses ] = useState<Course []>([]);
+    // const [courses, setCourses ] = useState<Course []>([]);
 
     // This effect will run when the component mounts and when the currentRange changes. It will fetch the courses
     // that are within the current range and set the courses state with the result.
-    useEffect(() => {
-        const fetchData = async () => {
-            const startDate = moment(currentRange.start).format('YYYY-MM-DD');
-            const endDate = moment(currentRange.end).format('YYYY-MM-DD');
-            const data = await getCoursesByDateRange(startDate, endDate);
-            setCourses(data);
-        };
-        fetchData();
-    }
-    , [currentRange]);
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         const startDate = moment(currentRange.start).format('YYYY-MM-DD');
+    //         const endDate = moment(currentRange.end).format('YYYY-MM-DD');
+    //         const data = await getCoursesByDateRange(startDate, endDate);
+    //         setCourses(data);
+    //     };
+    //     fetchData();
+    // }
+    // , [currentRange]);
         
     // This function will convert the courses to events that can be displayed on the calendar.
     const convertCoursesToEvents = (courses: Course[]) => {

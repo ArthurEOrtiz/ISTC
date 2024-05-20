@@ -19,15 +19,25 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
     const [ isCourseListVisible, setIsCourseListVisible ] = useState(isAdmin);
     const [ courses, setCourses ] = useState<Course[]>();
     const [ errorMessages, setErrorMessages ] = useState<string | null>(null);
+    const [ isLoading, setIsLoading ] = useState(false);    
   
     useEffect(() => {
-        if (!isAdmin) {
+        setIsLoading(true);
+        if (!isAdmin ) {
+            console.log('fetching enrollable courses');
             fetchEnrollableCourses();
+            setIsLoading(false);
             return;
         }
-        fetchAllCourses();
+        if (isAdmin) {
+            console.log('fetching all courses');
+            fetchAllCourses();
+            setIsLoading(false);
+            return;
+        }
+        
     }
-    , [isCourseListVisible]);
+    , []);
 
     useEffect(() => {
         fetchUser();
@@ -76,7 +86,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
         }
     }
     
-    if (!courses || !isLoaded || !user) {
+    if (isLoading || !isLoaded || !user) {
         return <Loading />
     }
 
@@ -101,21 +111,30 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                         List
                     </button>
                 </div>
+
+                {/* <button className="btn btn-primary text-white"
+                        onClick={() => console.log("Courses", courses)}
+                >
+                    Log Courses
+                </button> */}
             </div>
    
-            {isCourseCalendarVisible && <CourseCalendar isAdmin={isAdmin}/>}
+            {isCourseCalendarVisible && courses &&<CourseCalendar 
+                                                        isAdmin={isAdmin}
+                                                        courses={courses}
+                                                    />}
 
-            {isCourseListVisible && user && <CourseList 
-                                            courses={courses}
-                                            user={user} 
-                                            isAdmin={isAdmin}
-                                            onError={(m) => setErrorMessages(m)}
-                                            />}
+            {isCourseListVisible && user && courses && <CourseList 
+                                                            courses={courses}
+                                                            user={user} 
+                                                            isAdmin={isAdmin}
+                                                            onError={(m) => setErrorMessages(m)}
+                                                        />}
             
             {errorMessages && <ErrorModel
-                                title='Error'
-                                message={errorMessages}
-                                onClose={() => setErrorMessages(null)}
+                                    title='Error'
+                                    message={errorMessages}
+                                    onClose={() => setErrorMessages(null)}
                                 />}
 
         </div>
