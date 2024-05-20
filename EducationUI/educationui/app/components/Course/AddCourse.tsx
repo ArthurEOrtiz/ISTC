@@ -70,7 +70,7 @@ const AddCourse: React.FC = () => {
             behavior: "smooth"
         });
     }
-    , [course?.classes.length]);
+    , [course.classes.length]);
 
     // Event Handlers this component. 
     const handleAddClass = () => {
@@ -174,7 +174,10 @@ const AddCourse: React.FC = () => {
             {course.title === '' ? (
                 <div className='flex justify-center'>
                     <div className='bg-base-100 shadow-md rounded-xl px-8 pt-6 pb-8 mb-4 w-2/3'>
-                        <CourseForm course={course} onSubmit={(course) => setCourse(course)}/>
+                        <CourseForm 
+                            course={course} 
+                            onSubmit={(course) => setCourse(course)}
+                        />
                     </div>
                 </div>
             ) : (
@@ -239,12 +242,12 @@ const AddCourse: React.FC = () => {
                                 &#x2B; Class
                             </button>
                             
-                            {/* <button
+                            <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
                             >
                                 Console Log Course
-                            </button> */}
+                            </button>
                         </div>
                     </div>
                 </div>
