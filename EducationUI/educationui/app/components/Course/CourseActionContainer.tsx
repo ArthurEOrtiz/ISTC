@@ -180,13 +180,12 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                                     >
                                         Manage Attendance
                                 </button>
-                                <button
+                                {/* <button
                                     className="btn btn-primary text-white"
                                     onClick={() => console.log(course)}
                                     >
                                         Console Log Course
-                                </button>
-
+                                </button> */}
                             </div>
                         </div>
                     )}
