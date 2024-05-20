@@ -42,6 +42,13 @@ namespace EducationAPI.Controllers
 					.Include(c => c.WaitLists)
 					.ToListAsync();
 
+				foreach (var course in courses)
+				{
+					UpdateCourseStatus(course);
+				}
+
+				await _educationProgramContext.SaveChangesAsync();
+
 				_logger.LogInformation("GetAllCourses(), called.");
 				return courses;
 			}
@@ -67,7 +74,7 @@ namespace EducationAPI.Controllers
 			try
 			{
 				var today = DateTime.Today;
-				List<Course> enrollableCourses = new();
+				List<Course> enrollableCourses = [];
 
 				// Get all courses, that have an enrollment deadline on or after today
 				var courses = await _educationProgramContext.Courses
@@ -84,9 +91,10 @@ namespace EducationAPI.Controllers
 				if (courses == null)
 				{
 					_logger.LogError("GetAllEnrollableCourse(), could not find courses.");
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("could not find courses.");
 				}
 
+				
 				// FOR EACH course, retrieve the maximum attendance and the record of the first class.
 				foreach (Course course in courses)
 				{
@@ -94,8 +102,9 @@ namespace EducationAPI.Controllers
 					var firstClass = course.Classes.FirstOrDefault();
 					if (firstClass == null)
 					{
-						_logger.LogError("GetAllEnrollableCourse(), could not find class.");
-						return new StatusCodeResult((int)HttpStatusCode.NotFound);
+						// If a course does not have a class, then you cant enroll to that course, and 
+						// should be not added to the enrollableCourses list
+						continue;
 					}
 					// IF the number of students in attendance is less than the value of max attendance.
 					if (firstClass.Attendances.Count < MaxAttendance)
@@ -104,6 +113,14 @@ namespace EducationAPI.Controllers
 						enrollableCourses.Add(course);
 					}
 				}
+
+				// update course status before return the list of courses. 
+				foreach (Course course in enrollableCourses)
+				{
+					UpdateCourseStatus(course);
+				}
+
+				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("GetAllEnrollableCourse(), called.");
 				return enrollableCourses;
@@ -146,7 +163,9 @@ namespace EducationAPI.Controllers
 					return NotFound("Course not found.");
 				}
 
-				//return course;
+				UpdateCourseStatus(course);
+				await _educationProgramContext.SaveChangesAsync();
+				_logger.LogInformation("GetCourseById({Id}), called", id);
 				return Ok(course);
 			}
 			catch (Exception ex)
@@ -407,7 +426,7 @@ namespace EducationAPI.Controllers
 				if (course == null)
 				{
 					_logger.LogError("GetCourseEnrollment({CourseId}), course not found.", courseId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Course not found.");
 				}
 
 				var students = course.Classes
@@ -419,7 +438,7 @@ namespace EducationAPI.Controllers
 
 				// then find the user to each student using the student id
 				var users = await _educationProgramContext.Users
-					.Where(u => students.Select(s => s.UserId).Contains(u.UserId))
+					.Where(u => students.Select(s => s!.UserId).Contains(u.UserId))
 					.ToListAsync();
 
 				_logger.LogInformation("GetCourseEnrollment({CourseId}), called.", courseId);
@@ -485,48 +504,116 @@ namespace EducationAPI.Controllers
 			}
 		}
 
-		[HttpPut("UpdateCourseById/{id}")]
-		public async Task<ActionResult<Course>> UpdateCourseById(int id, Course updatedCourse)
+		[HttpPut("UpdateCourse")]
+		public async Task<ActionResult<Course>> UpdateCourse(Course updatedCourse)
 		{
 			try
 			{
 				var existingCourse = await _educationProgramContext.Courses
 					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
 					.Include(c => c.Location)
 					.Include(c => c.Topics)
-					.FirstOrDefaultAsync(c => c.CourseId == id);
+					.Include(c => c.Exams)
+					.Include(c => c.PDF)
+					.FirstOrDefaultAsync(c => c.CourseId == updatedCourse.CourseId);
 
 				if (existingCourse == null)
 				{
-					_logger.LogError("UpdateCourseById({Id}, {UpdatedCourse}), Course not found!", id, updatedCourse);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					_logger.LogError("UpdateCourse({UpdatedCourse}), Course not found!", updatedCourse);
+					return NotFound("Course not found.");
 				}
+
+				UpdateCourseStatus(updatedCourse);
 
 				// Update scalar properties
 				_educationProgramContext.Entry(existingCourse).CurrentValues.SetValues(updatedCourse);
 
-				// Update topics. 
+				// Update topics.
+				// By first clearing the topics that are already in the existing course.
 				existingCourse.Topics.Clear();
+				// then get list of topic id's from the in coming course. 
+				var topicIds = updatedCourse.Topics.Select(t => t.TopicId).ToList();
+				// then find all the existing topics from that list.
+				var existingTopics = await _educationProgramContext.Topics
+					.Where(t => topicIds.Contains(t.TopicId))
+					.ToListAsync();	
 
-				foreach (var topic in updatedCourse.Topics)
+				// and add back in the the existing course
+				existingCourse.Topics = existingTopics;
+
+				// Update Classes.
+				// for each class in the updated course . . . 
+				List<Class> classesToAdd = [];
+        foreach (var updatedClass in updatedCourse.Classes)
 				{
-					var existingTopic = await _educationProgramContext.Topics
-						.FirstOrDefaultAsync(t => t.TopicId == topic.TopicId);
+					// see if the class exists in the existing course
+					var existingClass = existingCourse.Classes
+						.FirstOrDefault(c => c.ClassId == updatedClass.ClassId);
 
-					if (existingTopic != null)
+					if (existingClass != null)
 					{
-						existingCourse.Topics.Add(existingTopic);
+						// if it does update the class
+						_educationProgramContext.Entry(existingClass).CurrentValues.SetValues(updatedClass);
+						// Update Attendance
+						foreach (Attendance attendance in updatedClass.Attendances)
+						{
+							var existingAttendance = existingClass.Attendances
+								.FirstOrDefault(a => a.AttendanceId == attendance.AttendanceId);
+							if (existingAttendance != null)
+							{
+                _educationProgramContext.Entry(existingAttendance).CurrentValues.SetValues(attendance);
+              }
+						}
 					}
+					else
+					{
+						
+						// if it doesn't, add the class.
+						classesToAdd.Add(updatedClass);
+					}
+				}
+
+				foreach (var classToAdd in classesToAdd)
+				{
+					existingCourse.Classes.Add(classToAdd);
+				}
+
+				// Remove any classes that aren't in the updated course
+				List<Class> classesToRemove = [];
+
+				foreach (var existingClass in existingCourse.Classes)
+				{
+					if (!updatedCourse.Classes.Any(c => c.ClassId == existingClass.ClassId))
+					{
+						classesToRemove.Add(existingClass);
+					}
+				}
+
+				foreach (var classToRemove in classesToRemove)
+				{
+					existingCourse.Classes.Remove(classToRemove);
+				}
+
+				// Update PDF.
+				// First check if it's even necessary, because PDF can be null. 
+				if (updatedCourse.PDF != null && existingCourse.PDF != null)
+				{
+					_educationProgramContext.Entry(existingCourse.PDF).CurrentValues.SetValues(updatedCourse.PDF);
+				}
+				else
+				{
+					existingCourse.PDF = updatedCourse.PDF;
 				}
 
 				await _educationProgramContext.SaveChangesAsync();
 
-				_logger.LogInformation("UpdateCourseById({Id}, {UpdatedCourse}) called", id, updatedCourse);
+				_logger.LogInformation("UpdateCourse({UpdatedCourse}) called", updatedCourse);
 				return existingCourse;
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "UpdateCourseById({Id}, {UpdatedCourse})", id, updatedCourse);
+				_logger.LogError(ex, "UpdateCourse({UpdatedCourse})", updatedCourse);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}
@@ -560,6 +647,8 @@ namespace EducationAPI.Controllers
 			{
 				var course = await _educationProgramContext.Courses
 					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
+							.ThenInclude(a => a.Student)
 					.Include(c => c.Exams)
 					.Where(c => c.CourseId == courseId)
 					.FirstOrDefaultAsync();
@@ -567,7 +656,21 @@ namespace EducationAPI.Controllers
 				if (course == null)
 				{
 					_logger.LogError("EnrollUser({UserId},{CourseId}), Course not found.", userId, courseId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Course not found");
+				}
+
+				// Check the current enrollment in the course. 
+				var enrolledStudents = course.Classes
+					.SelectMany(c => c.Attendances)
+					.Where(a => a.Student != null)
+					.Select(a => a.Student)
+					.Distinct()
+					.ToList();
+
+				if (enrolledStudents.Count >= course.MaxAttendance)
+				{
+					_logger.LogError("EnrollUser({UserId}, {CourseId}), Course attandance full.", userId, courseId);
+					return BadRequest("Course attandance full.");
 				}
 
 				// Fetch the student
@@ -579,7 +682,7 @@ namespace EducationAPI.Controllers
 				if (user == null)
 				{
 					_logger.LogError("EnrollUser({UserId},{CourseId}), User not found.", userId, courseId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("User not found");
 				}
 
 				var student = user.Student;
@@ -587,7 +690,7 @@ namespace EducationAPI.Controllers
 				if (student == null)
 				{
 					_logger.LogError("EnrollUser({UserId},{CourseId}), student not found!", userId, courseId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Student not found.");
 				}
 
 				// Check if the student is already enroll in the course
@@ -647,6 +750,8 @@ namespace EducationAPI.Controllers
 			{
 				var course = await _educationProgramContext.Courses
 					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
+							.ThenInclude(a => a.Student)
 					.Include(c => c.Exams)
 					.Where(c => c.CourseId == courseId)
 					.FirstOrDefaultAsync();
@@ -657,12 +762,12 @@ namespace EducationAPI.Controllers
 					return new StatusCodeResult((int)HttpStatusCode.NotFound);
 				}
 
-				foreach (var userId in userIds)
+        foreach (var userId in userIds)
 				{
 					// Fetch the student
 					var user = await _educationProgramContext.Users
 							.Include(u => u.Student)
-							.ThenInclude(s => s.Attendances)
+								.ThenInclude(s => s.Attendances)
 							.FirstOrDefaultAsync(u => u.UserId == userId);
 
 					if (user == null)
@@ -683,10 +788,7 @@ namespace EducationAPI.Controllers
 					if (student.Attendances != null && student.Attendances.Any(a => a.Class != null && a.Class.CourseId == courseId))
 					{
 						_logger.LogError("EnrollUsers({UserId},{CourseId}), User is already enrolled in course.", userId, courseId);
-						return new ObjectResult("Student is already enrolled in course")
-						{
-							StatusCode = (int)HttpStatusCode.Conflict
-						};
+					  return BadRequest("User already enrolled in course.");
 					}
 
 					foreach (var @class in course.Classes)
@@ -715,7 +817,21 @@ namespace EducationAPI.Controllers
 					
 				}
 
-				await _educationProgramContext.SaveChangesAsync();
+        // Check the current enrollment in the course. 
+        var enrolledStudents = course.Classes
+          .SelectMany(c => c.Attendances)
+          .Where(a => a.Student != null)
+          .Select(a => a.Student)
+          .Distinct()
+          .ToList();
+
+				if (enrolledStudents.Count > course.MaxAttendance)
+				{
+					_logger.LogError("EnrollerUsers({CourseId}), Course attendance exceeded.", courseId);
+					return BadRequest("Course attendance exceeded.");
+				}
+
+        await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("EnrollUsers({CourseId}), called.", courseId);
 				return new StatusCodeResult((int)HttpStatusCode.Created);
@@ -897,18 +1013,21 @@ namespace EducationAPI.Controllers
 
 
 		[HttpDelete("DeleteCourseById/{id}")]
+		[ProducesResponseType((int)HttpStatusCode.NoContent)]
 		public async Task<ActionResult> DeleteCourseById(int id)
 		{
 			try
 			{
 				var existingCourse = await _educationProgramContext.Courses
 						.Include(c => c.Location)
+						.Include(c => c.PDF)
+						.Include(c => c.Exams)
 						.FirstOrDefaultAsync(c => c.CourseId == id);
 
 				if (existingCourse == null)
 				{
 					_logger.LogError("DeleteCourseById({Id}), Course not found.", id);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Course not found.");
 				}
 
 				if (existingCourse.Location != null)
@@ -916,17 +1035,61 @@ namespace EducationAPI.Controllers
 					_educationProgramContext.Locations.Remove(existingCourse.Location);
 				}
 
+				if (existingCourse.PDF != null)
+				{
+					_educationProgramContext.PDFs.Remove(existingCourse.PDF);
+				}
+
+				if (existingCourse.Exams != null)
+				{
+					foreach (var exam in existingCourse.Exams)
+					{
+						_educationProgramContext.Exams.Remove(exam);
+					}
+				}
+
 				_educationProgramContext.Courses.Remove(existingCourse);
 				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("DeleteCourseById {Id} called.", id);
-				return new StatusCodeResult((int)HttpStatusCode.OK);
+				return NoContent();
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "RemoveCourseById({Id})", id);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
+		}
+
+		/// <summary>
+		/// This method assumes that a Course can have multiple Classes, each with its own schedule, and that the
+		/// status of the Course is determined by the status of its classes. If a course has at least one class
+		/// that is currently in progress, the course is considered in progress. If a course has no classes in 
+		/// progress but has at least one class that is scheduled to start in the future, the course is considered
+		/// upcoming. If all classes have already ended, the course is considered archived.
+		/// </summary>
+		/// <param name="course"></param>
+		private static void UpdateCourseStatus(Course course)
+		{
+			if (course.Classes.Count != 0)
+			{
+				var today = DateTime.Today;
+
+				if (course.Classes.Any(c => c.ScheduleStart.Date <= today) && course.Classes.Any(c => c.ScheduleEnd.Date >= today))
+				{
+					course.Status = CourseStatus.InProgress.ToString();
+				}
+				else if (course.Classes.Any(c => c.ScheduleStart.Date > today))
+				{
+					course.Status = CourseStatus.Upcoming.ToString();
+				}
+				else
+				{
+					course.Status = CourseStatus.Archived.ToString();
+				}
+			} 
+
+
 		}
 
 	}

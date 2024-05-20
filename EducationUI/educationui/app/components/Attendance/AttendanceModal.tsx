@@ -58,8 +58,9 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({ course, isOpen, onExi
             )}
 
             <div className="modal-box">
-                <div className="modal-top">
+                <div className="modal-top flex justify-between">
                     <h1 className="text-2xl font-bold">Attendance</h1>
+                    <button onClick={onExit} className="text-3xl text-error font-bold">&times;</button>
                 </div>
                 <div className="modal-middle space-y-4">
                     {classes === null ? (
@@ -83,14 +84,6 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({ course, isOpen, onExi
                     )}
                 </div>
 
-                <div className="modal-action">
-                    <button
-                        className="btn btn-error text-white"
-                        onClick={onExit}
-                    >
-                        Exit
-                    </button>
-                </div>
             </div>
         </div>
     );

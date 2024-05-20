@@ -1,4 +1,4 @@
-import { Course, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
+import { Attendance, Course, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
 import axios from 'axios';
 import https from 'https';
 
@@ -14,6 +14,16 @@ const axiosInstance = axios.create({
 });
 
 // Attendance
+export async function UpdateAttendace(attendance: Attendance) {
+    try {
+        const response = await axiosInstance.put('Attendance/UpdateAttendance', attendance);
+        return response;
+    } catch (error: any) {
+        console.error('Error updating attendance:', error);
+        return error.response.data;
+    }
+}
+
 export async function UpdateAttendanceById(attendanceId: Number, attended: Boolean) {
     try {
         const response = await axiosInstance.put(`Attendance/UpdateAttendanceById/${attendanceId}/${attended}`);
@@ -115,13 +125,13 @@ export async function postCourse(course: Course) {
     }
 }
 
-export async function UpdateCourseById(courseId: Number, course: Course) {
+export async function UpdateCourse(course: Course) {
     try {
-        const response = await axiosInstance.put(`Course/UpdateCourseById/${courseId}`, course);
-        return response.data;
-    } catch (error) {
+        const response = await axiosInstance.put('Course/UpdateCourse/', course);
+        return response;
+    } catch (error : any) {
         console.error('Error updating course:', error);
-        throw error;
+        return error.response.data;
     }
 }
 
@@ -144,7 +154,7 @@ export async function EnrollUsers(courseId: Number, users: User[]) {
         return response;
     } catch (error: any) {
         console.error('Error enrolling users:', error);
-        return error.message;
+        return error.response.data;
     }
 }
 
@@ -174,10 +184,10 @@ export async function DropUsers(courseId: Number, users: User[]) {
 export async function DeleteCourseById(courseId: Number) {
     try {
         const response = await axiosInstance.delete(`Course/DeleteCourseById/${courseId}`);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error : any) {
         console.error('Error deleting course:', error);
-        throw error;
+        return error.response.data;
     }
 }
 

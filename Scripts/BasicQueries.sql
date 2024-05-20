@@ -30,6 +30,9 @@ FROM Attendances;
 SELECT *
 FROM Locations;
 
+--DELETE FROM Locations
+--WHERE LocationId = 61;
+
 SELECT *
 FROM WaitLists;
 
@@ -55,6 +58,6 @@ SELECT *
 FROM PDFs;
 
 --DELETE FROM PDFs
---wHERE PDFId = 1;
+--WHERE PDFId IN (3,4,5,6,7);
 
 

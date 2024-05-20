@@ -8,7 +8,7 @@ namespace EducationAPI.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
-	public class AttendanceController
+	public class AttendanceController : ControllerBase
 	{
 		private readonly EducationProgramContext _educationProgramContext;
 		private readonly ILogger<AttendanceController> _logger;
@@ -30,12 +30,13 @@ namespace EducationAPI.Controllers
 				if (AttendanceToUpdate == null)
 				{
 					_logger.LogError("UpdateAttendance({Attendance}), attendance not found.", attendance);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Attendance not found.");
 				}
 
 				_educationProgramContext.Entry(AttendanceToUpdate).CurrentValues.SetValues(attendance);
+				await _educationProgramContext.SaveChangesAsync();
 				_logger.LogInformation("UpdateAttendance({Attendance}), called", attendance);
-				return new StatusCodeResult((int)HttpStatusCode.OK);
+				return Ok(AttendanceToUpdate);
 			}
 			catch (Exception ex)
 			{

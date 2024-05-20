@@ -24,6 +24,7 @@ import SelectPDFModal from '../PDF/SelectPDFModal';
 const AddCourse: React.FC = () => {
     const defaultCourse : Course = {
         courseId: 0,
+        status: "Upcoming",
         title: '',
         description: null,
         attendanceCredit: 0,
@@ -105,8 +106,6 @@ const AddCourse: React.FC = () => {
             courseId: 0,
             scheduleStart: scheduleStart,
             scheduleEnd: scheduleEnd,
-            // scheduleStart: scheduleStart.toISOString(),
-            // scheduleEnd: scheduleEnd.toISOString(),
             attendances: [],
         };
     
@@ -120,32 +119,10 @@ const AddCourse: React.FC = () => {
     };
 
     // NewClass
-    const handleNewClassOnDelete = (index: number) => {
+    const handleClassOnDelete = (index: number) => {
         if (course) {
             const newClasses = [...course.classes];
             newClasses.splice(index, 1); // Remove the class at the specified index
-            setCourse({
-                ...course,
-                classes: newClasses
-            });
-        }
-    }
-
-    const handleNewClassOnScheduleStartChange = (index: number, date: Date) => {
-        if (course) {
-            const newClasses = [...course.classes];
-            newClasses[index].scheduleStart = date;
-            setCourse({
-                ...course,
-                classes: newClasses
-            });
-        }
-    }
-
-    const handleNewClassOnScheduleEndChange = (index: number, date: Date) => {
-        if (course) {
-            const newClasses = [...course.classes];
-            newClasses[index].scheduleEnd = date;
             setCourse({
                 ...course,
                 classes: newClasses
@@ -226,7 +203,7 @@ const AddCourse: React.FC = () => {
                                     Select PDF
                             </button>
                             <button 
-                                className='btn bg-green-600 border-none text-white'
+                                className='btn btn-success border-none text-white'
                                 onClick={()=>setShowConfirmationModal(true)}
                                 >
                                     Save Course
@@ -241,27 +218,33 @@ const AddCourse: React.FC = () => {
                                 <h2 className="text-xl font-bold mb-2">Class {index + 1}</h2>
                                 <NewClass
                                     cls={cls}
-                                    onDelete={() => handleNewClassOnDelete(index)}
-                                    onScheduleStartChange={(date: Date) => handleNewClassOnScheduleStartChange(index, date)}
-                                    onScheduleEndChange={(date: Date) => handleNewClassOnScheduleEndChange(index, date)}
+                                    onChange={(newCls) => {
+                                        const newClasses = [...course.classes];
+                                        newClasses[index] = newCls;
+                                        setCourse({
+                                            ...course,
+                                            classes: newClasses
+                                        });
+                                    }}
+                                    onDelete={() => handleClassOnDelete(index)}
                                 />
                             </div>
                             ))
                         }
                         <div className="mt-2">
                             <button
-                                className="btn bg-green-600 border-none text-white"
+                                className="btn btn-success text-white"
                                 onClick={handleAddClass}
                             >
-                                Add Class
+                                &#x2B; Class
                             </button>
                             
-                            <button
+                            {/* <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
                             >
                                 Console Log Course
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                 </div>

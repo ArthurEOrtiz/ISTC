@@ -1,6 +1,6 @@
 import { Course } from "@/app/shared/types/sharedTypes";
-import { DownloadPDF } from "@/Utilities/api";
 import moment from 'moment-timezone';
+import { useEffect, useState } from "react";
 
 interface CourseInfoCardProps {
     course: Course;
@@ -8,8 +8,18 @@ interface CourseInfoCardProps {
 };
 
 const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true }) => {
+    
+    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+    
+    // effects
+    useEffect(() => {
+        if (course.pdfId !== null) {
+            setPdfUrl(downloadPDF());
+        }
+    }, [course.pdfId]);
+    
     // helpers
-    const formatToMountainTime = (utcDate: string): string => {
+    const formatToMountainTime = (utcDate: Date): string => {
         const mountainTime = moment.utc(utcDate).tz('America/Denver').format('dddd, MMMM Do YYYY, h:mm a');
         return mountainTime;
     }
@@ -119,7 +129,7 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                     {course.pdfId !== null ? (
                         <a
                             className="link link-info"
-                            href={downloadPDF()}
+                            href={pdfUrl || "#"}
                             download={course.pdf?.fileName}
                         >
                             {course.pdf?.fileName}

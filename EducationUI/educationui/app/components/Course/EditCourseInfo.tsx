@@ -1,20 +1,26 @@
 'use client';
-import { Class, Course } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, Course, Topic } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
-import ClassInfoCard from "./ClassInfoCard";
 import { useEffect, useState } from "react";
 import SavingModal from "../../shared/modals/SavingModal";
 import ConfirmationModal from "../../shared/modals/ConfirmationModal";
 import ErrorModel from "../../shared/modals/ErrorModal";
 import { useRouter } from "next/navigation";
-import { DeleteCourseById, UpdateCourseById } from "@/Utilities/api";
+import { DeleteCourseById, UpdateCourse } from "@/Utilities/api";
 import moment from "moment";
+import NewClass from "./NewClass";
+import SelectPDFModal from "../PDF/SelectPDFModal";
+import ClassAttendanceModal from "../Attendance/ClassAttendanceModal";
+import CourseInfoModal from "./CourseInfoModal";
+import SelectTopicModal from "../Topics/SelectTopicModal";
+import EnrollmentModal from "../Enrollment/EnrollmentModal";
+import { deepEquals } from "@/Utilities/deepEquality";
 
 interface EditCourseInfoProps {
     course: Course;
 }
 
-const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => { 
+const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse}) => { 
 
     // Initializing Logic 
     const sortClassesByDate = (classes : Class[]): Class[] => {
@@ -25,9 +31,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     const areClassesOrderedByDate = (): boolean => {
-        for (let i = 0; i < courseInfo.classes.length - 1; i++) {
-            const currentClass = courseInfo.classes[i];
-            const nextClass = courseInfo.classes[i + 1];
+        for (let i = 0; i < course.classes.length - 1; i++) {
+            const currentClass = course.classes[i];
+            const nextClass = course.classes[i + 1];
             if (new Date(currentClass.scheduleStart).getTime() > new Date(nextClass.scheduleStart).getTime()) {
                 return false;
             }
@@ -36,11 +42,18 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     }
 
     // Constants
-    const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
-    const [courseInfo, setCourseInfo] = useState<Course>(course);
+    const [course, setCourse] = useState<Course>(incomingCourse);
     const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [confirmationModalTitle, setConfirmationModalTitle] = useState<string>('');
+    const [confirmationModalMessage, setConfirmationModalMessage] = useState<string>('');
+    const [classToDelete, setClassToDelete] = useState<Number | null>(null); 
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+    const [showCourseInfoModal, setShowCourseInfoModal] = useState<boolean>(false);
+    const [showPDFModal, setShowPDFModal] = useState<boolean>(false);
+    const [showTopicModal, setShowTopicModal] = useState<boolean>(false);
+    const [showAttendanceModal, setShowAttendanceModal] = useState<Class | null>(null);
+    const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false);
     const [errorMessages, setErrorMessages] = useState<string | null>(null);
     const router = useRouter();
     
@@ -49,7 +62,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     // when the component is first rendered and when the classes are updated.
     useEffect(() => {   
         if (!areClassesOrderedByDate()) {
-            setCourseInfo(prevCourse => {
+            setCourse(prevCourse => {
                 return {
                     ...prevCourse,
                     classes: sortClassesByDate(prevCourse.classes)
@@ -57,7 +70,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             });
         }
     }
-    , [courseInfo.classes]);
+    , [course.classes]);
 
     // This will scroll to the bottom of the page when a new class is added.
     useEffect(() => {
@@ -66,121 +79,99 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             behavior: 'smooth'
         });
     }
-    , [courseInfo.classes.length]);
+    , [course.classes.length]);
 
     // This will check if the course has been updated and set the unsaved changes flag.
     useEffect(() => {
-        const courseString = JSON.stringify(course);
-        const courseInfoString = JSON.stringify(courseInfo);
-        if (courseString !== courseInfoString) {
+        if (!deepEquals(course, incomingCourse)) {
             setUnsavedChanges(true);
         } else {
             setUnsavedChanges(false);
         }
     }
-    , [courseInfo]);
+    , [course]);
 
     // Event Handlers
-
-    const handleOnCourseInfoCardSave = (updatedCourse: Course | null): void => {
-        if (updatedCourse !== null) {
-            setCourseInfo(updatedCourse);
+    const handleConfirmationModalOnConfirm = (): void => {
+        if (confirmationModalTitle === 'Delete Class') {
+            handleConfirmDeleteClass();
         }
+
+        if (confirmationModalTitle === 'Delete Course') {
+            handleConfirmDeleteCourse();
+        }
+        setShowConfirmationModal(false);
     }
 
-    const handleOnClassInfoCardDelete = (id: number | null): void => {
-        if (id !== null) {
-            setCourseInfo(prevCourse => {
-                return {
-                    ...prevCourse,
-                    classes: prevCourse.classes.filter(classSchedule => classSchedule.classId !== id)
-                }
-            });
-        } else {
-            setCourseInfo(prevCourse => {
-                return {
-                    ...prevCourse,
-                    classes: prevCourse.classes.slice(0, -1)
-                }
-            });
-        }
+    const handleOnClassDelete = (index: number): void => {
+        setConfirmationModalTitle('Delete Class');
+        setConfirmationModalMessage('Are you sure you want to delete this class? This will delete attendance records for this class.');
+        setClassToDelete(index);
+        setShowConfirmationModal(true);
     }
 
     const handleOnClassAdd = (): void => {
-        const hasNullClass = courseInfo.classes.some(classSchedule => classSchedule.classId === 0);
 
-        if (hasNullClass) {
-            setErrorMessages('There is an unsaved new class, please save or remove class before adding a new class.');
-            return;
-        }
-
-        if (courseInfo.classes.length === 0 || courseInfo.classes === null) {
+        if (course.classes.length === 0 || course.classes === null) {
             addNewClass();
-
         } else {
-            addNewClassPlusOneDay();
-        }
-        setEditModeIndex(courseInfo.classes.length);
-    }
-
-    const handleOnClassAdded = (updatedClassSchedule: Class | null): void => {
-       
-        if (updatedClassSchedule !==  null) {
-            const index = courseInfo.classes.findIndex(classSchedule => classSchedule.classId === 0);
-            if (index !== -1) {
-                const newClasses = [...courseInfo.classes];
-                newClasses[index] = updatedClassSchedule;
-                setCourseInfo(prevCourse => {
-                    return {
-                        ...prevCourse,
-                        classes: newClasses
-                    }
-                });
-                setEditModeIndex(null);
-                setUnsavedChanges(false);
-            }
+            const lastClass = course.classes[course.classes.length - 1];
+            const lastClassAttendances = lastClass.attendances;
+            lastClassAttendances.forEach(attendance => {
+                attendance.attendanceId = 0;
+                attendance.attended = false;
+            });
+            addNewClassPlusOneDay(lastClassAttendances);
         }
     }
 
     const handleSaveCourse = async () => {
-        console.log("Saving Course", courseInfo);
+        console.log("Saving Course", course);
         setIsSaving(true);
-        try{
-           await UpdateCourseById(courseInfo.courseId!, courseInfo);
+        const response = await UpdateCourse(course);
+        if (response.status === 200) {
+            setCourse(response.data);
+            window.location.reload();
+            
+        } else {
+            setErrorMessages(response)
         }
-        catch (error) {
-            throw error;
-        }
-        finally {
-            setIsSaving(false);
-            setUnsavedChanges(false);
-        }
-
+        setIsSaving(false);
     }
 
-    const handleDeleteCourse = async () => {
+    const handleDeleteCourse = () => {
+        setConfirmationModalTitle('Delete Course');
+        setConfirmationModalMessage('Are you sure you want to delete this course?');
         setShowConfirmationModal(true);
     }
 
+    const handleConfirmDeleteClass = () => {
+        const newClasses = [...course.classes];
+        newClasses.splice(classToDelete as number, 1);
+        setCourse(prevCourse => {
+            return {
+                ...prevCourse,
+                classes: newClasses
+            }
+        });
+        setClassToDelete(null);
+    };
+
     const handleConfirmDeleteCourse = async () => {
-        console.log("Deleting Course", courseInfo);
         setIsSaving(true);
-        try {
-            await DeleteCourseById(courseInfo.courseId!);
-        }
-        catch (error) {
-            throw error;
-        }
-        finally {
+        const response = await DeleteCourseById(course.courseId as number);
+        if (response.status === 204) {
             router.push('/admin/editcourse/edit');
+        } else {
+            setErrorMessages(response);
         }
     }
 
     // Helper Methods 
     const addNewClass = (): void => {
         
-        const todayAt9AMMountainTime = moment().utc().set({ hour: 15, minute: 0, second: 0 }).format();
-        const todayAt5PMMountainTime = moment().utc().set({ hour: 23, minute: 0, second: 0 }).format();
+        const todayAt9AMMountainTime = moment().tz('America/Denver').set({ hour: 9, minute: 0, second: 0 }).toDate();
+        const todayAt5PMMountainTime = moment().tz('America/Denver').set({ hour: 17, minute: 0, second: 0 }).toDate();
 
         const newClassSchedule: Class = {
             classId: 0,
@@ -190,21 +181,26 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             attendances: []
         }
         console.log(newClassSchedule)
-        setCourseInfo(prevCourse => {
+        setCourse(prevCourse => {
             return {
                 ...prevCourse,
                 classes: [newClassSchedule]
             }
         });
-        setEditModeIndex(0);
     }
 
-    const addNewClassPlusOneDay = (): void => {
-        const lastClass = courseInfo.classes[courseInfo.classes.length - 1];
+    const addNewClassPlusOneDay = (attendances : Attendance[]): void => {
+        const lastClass = course.classes[course.classes.length - 1];
 
-        const addOneDay = (dateString: string): string => {
-            const date = moment(dateString).add(1, 'days').format();
-            return date;
+        const addOneDay = (date: any): Date => {
+            let output: Date;   
+            if (typeof date === 'string') {
+            output = moment(date).utc(true).add(1, 'days').toDate();
+            } else {
+                output = moment(date).add(1, 'days').toDate();
+            }
+
+            return output as Date;
         }
 
         const newClassSchedule: Class = {
@@ -212,14 +208,10 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
             courseId: course.courseId,
             scheduleStart: addOneDay(lastClass.scheduleStart),
             scheduleEnd: addOneDay(lastClass.scheduleEnd), 
-            attendances: []
+            attendances: attendances
         }
 
-        console.log(newClassSchedule);
-        // Disable edit mode for all other classes 
-        setEditModeIndex(null);
-        // Add the new class with edit mode enabled 
-        setCourseInfo(prevCourse => {
+        setCourse(prevCourse => {
             return {
                 ...prevCourse,
                 classes: [...prevCourse.classes, newClassSchedule]
@@ -230,71 +222,114 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
     return (
         <div className="w-full m-4">
          
-                <div className="p-4">
-                    <h1 className="p-s text-3xl text-center font-bold"> Course Id: {courseInfo.courseId}</h1>
-                    {unsavedChanges && (
-                        <div role="alert" className="alert alert-warning mt-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                        <span>Warning: Unsaved Changes detected!</span>
-                      </div>)}
-                </div>
-                
-                <div className="bg-base-100 shawdow-md rounded-xl p-5">
-                    <div className="mb-4 bg-base-300 rounded-xl p-4">
-                        <CourseInfoCard course={courseInfo} />
-                    </div>
-                    <div className="mt-2 space-x-2">
-                        <button 
-                            className="btn btn-error text-white mb-1 mr-1"
-                            onClick={handleDeleteCourse}>
-                                Delete Course
-                        </button>
-                        <button
-                            className="btn btn-primary text-white mb-1"
-                            onClick = {handleSaveCourse}>
-                                Save Course
-                        </button>
-                    </div>
-
-                </div>
-          
+            <div className="p-4">
+                <p className="p-s text-3xl text-center font-bold"> Edit Course </p>
+                {unsavedChanges && (
+                    <div role="alert" className="alert alert-warning mt-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <span>Warning: Unsaved Changes detected!</span>
+                  </div>)}
+            </div>
             
-            <div>
-                <div className="p-4">
-                    <h1 className="p-s text-3xl text-center font-bold">
-                        Classes
-                    </h1>
+            <div className="bg-base-100 shawdow-md rounded-xl p-5 mb-4">
+                <div className="mb-4 bg-base-300 rounded-xl p-4">
+                    <CourseInfoCard course={course} />
                 </div>
-                <div>
-                    <div>
-                        {courseInfo.classes.map((cls, index) => (
-                            <div key={index} className="flex justify-center">
-                                <ClassInfoCard 
-                                    key={cls.classId}
-                                    class={cls}
-                                    onAdd={handleOnClassAdded}
-                                    onDelete={handleOnClassInfoCardDelete}
-                                    editMode={index === editModeIndex}
-                                    onError={(message) => setErrorMessages(message)}
-                                />
+                <div className="mt-2 space-x-2 space-y-2">
+                    <button
+                        className="btn btn-primary text-white"
+                        onClick={() => setShowCourseInfoModal(true)}
+                    >
+                        Edit Course Information
+                    </button>
+                    <button
+                        className="btn btn-primary text-white"
+                        onClick={() => setShowTopicModal(true)}
+                    >
+                        Select Topics 
+                    </button>
+                    <button
+                        className="btn btn-primary text-white"
+                        onClick={() => setShowPDFModal(true)}
+                    >
+                        Select PDF
+                    </button>
+                    <button
+                        className="btn btn-primary text-white"
+                        onClick={() => setShowEnrollmentModal(true)}
+                    >
+                        Manage Enrollment
+                    </button>
+                    <button
+                        className="btn btn-success text-white"
+                        onClick = {handleSaveCourse}>
+                            Save Course
+                    </button>
+                    <button 
+                        className="btn btn-error text-white"
+                        onClick={handleDeleteCourse}>
+                            Delete Course
+                    </button>
+                    <button 
+                        onClick={() => console.log(course)}
+                        className="btn btn-primary text-white"
+                    >
+                        Log Course
+                    </button>
+                </div>
+            </div>
+    
+            
+            <div className="space-y-2">
+                {course.classes.map((cls, index) => (
+                    <div key={index} >
+                        <div className="bg-base-100 shadow-md rounded-xl relative p-4">
+                            <div className="mb-2">
+                                <p className="text-xl font-bold">Class {index + 1}</p>
                             </div>
-                        ))}
+                            <NewClass
+                                cls={cls}
+                                onChange={(newClass) => {
+                                    const newClasses = [...course.classes];
+                                    newClasses[index] = newClass;
+                                    setCourse({...course, classes: newClasses});
+                                }}
+                                disabled={course.status === 'Archived'}
+                                onDelete={() => handleOnClassDelete(index)}
+                            />
+                            <div className="space-x-2">
+                                <button
+                                    className="btn btn-primary btn-sm text-white"
+                                    onClick={() => setShowAttendanceModal(cls)}
+                                    disabled={course.status === 'Upcoming'}
+                                >
+                                    Attendance
+                                </button>
+                                <button
+                                    className="btn btn-primary btn-sm text-white"
+                                    onClick={() => console.log(cls)}
+                                >
+                                    Log Class
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex justify-center">
-                        <button 
-                            className="btn btn-primary text-white"
-                            onClick={handleOnClassAdd}>
-                                Add Class
-                        </button>
-                    </div>
+                ))}
+                
+                <div className="flex justify-center mt-2">
+                    <button 
+                        className="btn btn-primary text-white"
+                        onClick={handleOnClassAdd}>
+                            Add Class
+                    </button>
                 </div>
             </div>
 
             {showConfirmationModal && (
                 <ConfirmationModal
-                    title={'Delete Course'}
-                    message={'Are you sure you want to delete this course?'}
-                    onConfirm={handleConfirmDeleteCourse}
+                    title={confirmationModalTitle}
+                    message={confirmationModalMessage}
+                    onConfirm={handleConfirmationModalOnConfirm}
                     onCancel={() => setShowConfirmationModal(false)} />
             )}
 
@@ -310,6 +345,73 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course}) => {
                     onClose={() => setErrorMessages(null)} 
                     />
             )}
+
+            <SelectPDFModal
+                open={showPDFModal}
+                onClose={() => setShowPDFModal(false)}
+                onAdd={(pdf) => {
+                    setCourse({...course, pdf: pdf, pdfId: pdf.pdfId});
+                    setShowPDFModal(false);
+                }}
+                onRemove={() => {
+                    setCourse({...course, pdf: null, pdfId: null});
+                    setShowPDFModal(false);
+                }}
+                PDF={course.pdf}
+            />
+
+            {showAttendanceModal && (
+                <ClassAttendanceModal
+                    class={showAttendanceModal}
+                    isOpen={true}
+                    onChanges={(cls) => {
+                        const newClasses = course.classes.map((c) => {
+                            if (c.classId === cls.classId) {
+                                return cls;
+                            }
+                            return c;
+                        });
+                        setCourse({...course, classes: newClasses});
+                    }}
+                    onExit={() => setShowAttendanceModal(null)}
+                    onError={(message) => setErrorMessages(message)}
+                />
+            )}
+
+            <CourseInfoModal
+                course={course}
+                isVisable={showCourseInfoModal}
+                onSubmit={(c) => {
+                    setCourse(c)
+                    setShowCourseInfoModal(false)
+                }}
+                onClose={() => setShowCourseInfoModal(false)}
+            />
+       
+            <SelectTopicModal
+                open={showTopicModal}
+                onClose={() => setShowTopicModal(false)}
+                onSelect={(topics : Topic[]) => {
+                    setCourse({...course, topics: topics});
+                    setShowTopicModal(false);
+                }}
+                topics={course.topics}
+            />
+
+            <EnrollmentModal
+                isOpen={showEnrollmentModal}
+                course={incomingCourse}
+                onExit={() => {
+                    setShowEnrollmentModal(false)
+                    window.location.reload()
+                }}
+                onError={(message) => {
+                    setErrorMessages(message)
+                    setShowEnrollmentModal(false)
+                }}
+            />
+            
+
 
         </div>
     );

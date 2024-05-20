@@ -182,7 +182,21 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
 
     const validateEnrollmentDeadline = (value: string): boolean => {
         const selectedDate = new Date(value);
-        return selectedDate > new Date();
+        switch(course.status) {
+            case 'Upcoming': {
+                return selectedDate > new Date();
+            };
+            case 'InProgress': {
+                const lastDayOfClass = new Date(course.classes[course.classes.length - 1].scheduleEnd);
+                return selectedDate <= lastDayOfClass 
+            };
+            case 'Archived': {
+                return selectedDate < new Date();
+            };
+            default: {
+                return true;
+            };
+        }
     }
 
     const validateExamCredit = (credit: number | null, hasExam: boolean): boolean => {
@@ -404,7 +418,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         id="enrollmentDeadline"
                         min={new Date().toISOString().split('T')[0]}
                         type="date"
-                        value={course.enrollmentDeadline.toISOString().split('T')[0]}
+                        value={new Date(course.enrollmentDeadline).toISOString().split('T')[0]}
                         onChange={handleChange}
                         onBlur={handleEnrollmentDeadlineBlur}
                     />
@@ -412,23 +426,6 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         {(!isEnrollmentDeadlineValid && enrollmentDeadlineTouched) ? 'Please enter a valid enrollment deadline.' : 'Required'}
                     </p>
                 </div>
-
-                {/* <div className="mb-4 w-1/2 pl-2">
-                    <label
-                        className="block text-sm font-bold mb-2"
-                        htmlFor="pdf"
-                    >
-                        PDF
-                    </label>
-                    <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-                        id="pdf"
-                        type="text"
-                        placeholder='PDF URL'
-                        onChange={handleChange}
-                    />
-                    <p className="text-xs text-green-600 italic">Optional</p>
-                </div> */}
 
             </div>
 
@@ -544,7 +541,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         id="location.city"
                         type="text"
                         placeholder="Boise"
-                        defaultValue={course?.location?.city || ''}
+                        defaultValue={course?.location?.city || 'Boise'}
                         onChange={handleChange}
                     />
                     <p className="text-xs text-green-600 italic">Optional</p>
@@ -640,7 +637,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
 
             <div className="flex items-center justify-between">
                 <button
-                    className={`btn btn-primary text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : ''}`}
+                    className={`btn btn-success text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : ''}`}
                     type="submit"
                     disabled={!isFormValid}
                 >

@@ -55,10 +55,13 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
             <div className="absolute inset-0 bg-black opacity-50"></div>
 
             <div className="bg-base-100 p-8 rounded-lg z-50">
-                <div className="flex justify-between mb-4">
-                    <h2 className="text-xl font-semibold">Select Topics</h2>
-                    <button onClick={onClose} className="text-error font-bold">X</button>
+                
+                <div className="flex justify-between">
+                    <h1 className="text-2xl font-bold">Select Topics</h1>
+                    <button onClick={onClose} className="text-3xl text-error font-bold">&times;</button>
                 </div>
+
+                
                 
                 {loading ? (
                     <span className="loading loading-spinner loading-xs"></span>

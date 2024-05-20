@@ -25,6 +25,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
     const [ showConfirmationModal, setShowConfirmationModal ] = useState<boolean>(false);
     const [ confirmationTitle, setConfirmationTitle ] = useState<string>('');
     const [ confirmationMessage, setConfirmationMessage ] = useState<string>('');
+
     // effects
     useEffect(() => {
         if (isOpen) {
@@ -193,11 +194,15 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
                 <div>
                     <div className='flex justify-between items-center mb-1'>
                         <p className="text-2xl font-bold">Enrollment Manager</p>
-                        <button onClick={onExit} className="text-error font-bold">X</button>
+                        <button onClick={onExit} className="text-3xl text-error font-bold">&times;</button>
                     </div>
 
-                    <div className='mb-2'>
+                    <div className='flex justify-between mb-2'>
                         <p>{course.title}</p>
+                        
+                        <p className={`${enrolledUsers.length >= course.maxAttendance ? 'text-error' :  '' }`}>
+                            {enrolledUsers.length} of {course.maxAttendance} enrolled.
+                        </p>
                     </div>
                </div>
 
