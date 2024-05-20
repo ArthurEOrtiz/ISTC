@@ -114,6 +114,7 @@ namespace EducationAPI.Controllers
 					}
 				}
 
+				// update course status before return the list of courses. 
 				foreach (Course course in enrollableCourses)
 				{
 					UpdateCourseStatus(course);
