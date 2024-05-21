@@ -148,7 +148,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                     </button>
                 </div> */}
 
-                {isAdmin && (
+                {isAdmin && isCourseListVisible && (
                     <div>
                         <div className="join p-1">
                             <button
