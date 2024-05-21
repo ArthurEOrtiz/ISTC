@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import CourseCalendar from "./CourseCalendar"
 import CourseList from "./CourseList";
-import { Course, User } from "@/app/shared/types/sharedTypes";
+import { Course, CourseStatus, User } from "@/app/shared/types/sharedTypes";
 import { getAllCourses, GetAllEnrollableCourses, GetUserByClerkId } from "@/Utilities/api";
 import ErrorModel from "@/app/shared/modals/ErrorModal";
 import Loading from "@/app/shared/Loading";
@@ -29,15 +29,11 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
         if (!isAdmin ) {
             // console.log('fetching enrollable courses');
             fetchEnrollableCourses();
-            setIsLoading(false);
-            return;
-        }
-        if (isAdmin) {
+        } else {
             // console.log('fetching all courses');
             fetchAllCourses();
-            setIsLoading(false);
-            return;
         }
+        setIsLoading(false);
     }
     , [user]);
 
@@ -103,8 +99,8 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
         }
     }
 
-    const filterCourses = (courses: Course[], statuses: ('Upcoming' | 'InProgress' | 'Archived')[]) => {
-        return courses.filter(course => statuses.includes(course.status as "Upcoming" | "InProgress" | "Archived"));
+    const filterCourses = (courses: Course[], statuses: CourseStatus[]) => {
+        return courses.filter(course => statuses.includes(course.status as CourseStatus));
     }
     
     // render
