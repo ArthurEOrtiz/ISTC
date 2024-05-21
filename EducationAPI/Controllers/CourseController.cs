@@ -352,7 +352,7 @@ namespace EducationAPI.Controllers
 		}
 
 		/// <summary>
-		/// Returns a list of courses within a date range
+		/// Returns a list of courses within a date range, NOT IN USE
 		/// </summary>
 		/// <param name="startDate"><see cref="DateTime"/> for the start of the search range</param>
 		/// <param name="endDate"><see cref="DateTime"/> for the end of the search range</param>
