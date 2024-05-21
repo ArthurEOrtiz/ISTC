@@ -141,7 +141,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
     const handleDeleteCourse = () => {
         setConfirmationModalTitle('Delete Course');
-        setConfirmationModalMessage('Are you sure you want to delete this course?');
+        setConfirmationModalMessage('Are you sure you want to delete this course? Attendance records and exam results will be deleted. This action cannot be undone.');
         setShowConfirmationModal(true);
     }
 
