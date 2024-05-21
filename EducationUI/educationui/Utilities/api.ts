@@ -1,4 +1,4 @@
-import { Attendance, Course, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
+import { Attendance, Course, CourseStatus, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
 import axios from 'axios';
 import https from 'https';
 
@@ -53,6 +53,17 @@ export async function getAllCourses() {
         console.error('Error fetching courses:', error);
         return error.message;
     }
+}
+
+export async function GetAllCoursesByStatus( statuses: CourseStatus[]){
+    try {
+        const response = await axiosInstance.post('Course/GetAllCoursesByStatus', statuses);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching courses:', error);
+        return error.response.data;
+    }
+
 }
 
 export async function GetAllEnrollableCourses() {
