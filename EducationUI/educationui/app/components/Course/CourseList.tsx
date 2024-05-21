@@ -5,20 +5,28 @@ import CourseActionContainer from './CourseActionContainer';
 
 
 interface CourseListProps {
-    courses: Course[];
+    courses: Course[] | null;
     user: User;
     isAdmin: boolean;   
     onError: (message: string) => void;
 }
 
 const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}) => {
-    const [courseList , setCourseList] = useState<Course[]>(courses);
+    const [courseList , setCourseList] = useState<Course[] | null>(courses);
 
     useEffect(() => {
-        if (courses.length > 0) {
+        if (courses) {
+            setCourseList(courses);
+            //setCourseList(courseList.sort(compareDates));
+        }
+
+    }, [courses]);
+
+    useEffect(() => {
+        if (courseList) {
             setCourseList(courseList.sort(compareDates));
         }
-    }, [courseList]);
+    }, [courseList])
 
     const compareDates = (a: Course, b: Course): number => {
         const dateA = new Date(a.enrollmentDeadline);
@@ -28,16 +36,19 @@ const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}
 
     return (
         <div className='space-y-2'>
-            {courseList.map((course: Course, index : number) => (
-                <div key={index} className="bg-base-100 rounded-xl p-4">
-                    <CourseActionContainer 
-                        course={course}
-                        user={user} 
-                        isAdmin={isAdmin}
-                        onError={(m) => onError(m)}
-                    />
-                </div>
-            ))}
+            {courseList != null ? 
+                (courseList.map((course: Course, index : number) => (
+                    <div key={index} className="bg-base-100 rounded-xl p-4">
+                        <CourseActionContainer 
+                            course={course}
+                            user={user} 
+                            isAdmin={isAdmin}
+                            onError={(m) => onError(m)}
+                        />
+                    </div>
+                ))) : (
+                    <p className='text-center text-error'>No courses available!</p>
+                )}
         </div>
     );
 }

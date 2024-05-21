@@ -64,6 +64,14 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                 </div>
                 )}
             </div>
+            <div>
+                <label className="label">
+                    <span className="label-text">Status</span>
+                </label>
+                <div className="badge badge-info p-3">
+                    <p className="font-bold text-white">{course.status}</p>
+                </div>
+            </div>
 
             <p className="text-base">{course.description}</p>
             
