@@ -8,10 +8,31 @@ interface CourseInfoCardProps {
 };
 
 const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true }) => {
-    
-    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+    // state
+    const [ courseStatusColor, setCourseStatusColor ] = useState<'success' | 'warning' | 'error'>();
+    const [ courseStatusText, setCourseStatusText ] = useState<'Upcoming' | 'In Progress' | 'Archived'>();
+    const [ pdfUrl, setPdfUrl ] = useState<string | null>(null);
     
     // effects
+    useEffect(() => {
+        switch (course.status) {
+            case 'Upcoming':
+                setCourseStatusColor('success');
+                setCourseStatusText('Upcoming');
+                break;
+            case 'InProgress':
+                setCourseStatusColor('warning');
+                setCourseStatusText('In Progress');
+                break;
+            case 'Archived':
+                setCourseStatusColor('error');
+                setCourseStatusText('Archived');
+                break;
+            default:
+                break;
+        }
+    }, [course.status]);
+
     useEffect(() => {
         if (course.pdfId !== null) {
             setPdfUrl(downloadPDF());
@@ -42,7 +63,10 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
     return (
         <div className="space-y-2">
             <div className="flex justify-between">
-                <p className="text-2xl font-bold">{course.title}</p>
+                <div className="flex space-x-2">
+                    <p className="text-2xl font-bold">{course.title} </p>
+                    <span className={`text-white badge badge-sm badge-${courseStatusColor}`}>{courseStatusText}</span>
+                </div>
                 <p className="text-base">Course Id: {course.courseId}</p>
             </div>
             
@@ -63,14 +87,6 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                     <p className="font-bold text-white">None</p>
                 </div>
                 )}
-            </div>
-            <div>
-                <label className="label">
-                    <span className="label-text">Status</span>
-                </label>
-                <div className="badge badge-info p-3">
-                    <p className="font-bold text-white">{course.status}</p>
-                </div>
             </div>
 
             <p className="text-base">{course.description}</p>
