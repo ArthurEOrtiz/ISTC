@@ -7,8 +7,12 @@ import { getCoursesByDateRange } from '@/Utilities/api';
 import { Course } from '@/app/shared/types/sharedTypes';
 import { useRouter } from 'next/navigation';
 
+interface CourseCalendarProps {
+    isAdmin: boolean;
+    courses: Course[];  
+}
 
-const CourseCalendar: React.FC = () => {
+const CourseCalendar: React.FC<CourseCalendarProps> = ({isAdmin, courses}) => {
     // The router is used to redirect the user to the course detail page when a course is clicked on the calendar.
     const router = useRouter();
 
@@ -23,33 +27,37 @@ const CourseCalendar: React.FC = () => {
     });
 
     // This is the state that will hold the courses that will be displayed on the calendar.
-    const [courses, setCourses ] = useState<Course []>([]);
+    // const [courses, setCourses ] = useState<Course []>([]);
 
     // This effect will run when the component mounts and when the currentRange changes. It will fetch the courses
     // that are within the current range and set the courses state with the result.
-    useEffect(() => {
-        const fetchData = async () => {
-            const startDate = moment(currentRange.start).format('YYYY-MM-DD');
-            const endDate = moment(currentRange.end).format('YYYY-MM-DD');
-            const data = await getCoursesByDateRange(startDate, endDate);
-            setCourses(data);
-        };
-        fetchData();
-    }
-    , [currentRange]);
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         const startDate = moment(currentRange.start).format('YYYY-MM-DD');
+    //         const endDate = moment(currentRange.end).format('YYYY-MM-DD');
+    //         const data = await getCoursesByDateRange(startDate, endDate);
+    //         setCourses(data);
+    //     };
+    //     fetchData();
+    // }
+    // , [currentRange]);
         
     // This function will convert the courses to events that can be displayed on the calendar.
+    // It will take the first class of the course as the start date and the last class of the course as the end date.
+    // Then if the course has a first class and a last class it will add the course to the events array.
     const convertCoursesToEvents = (courses: Course[]) => {
         const events: any[] = [];
         courses.forEach((course) => {
             const firstClass = course.classes[0];
             const lastClass = course.classes[course.classes.length - 1];
-            events.push({
+            if (firstClass && lastClass){
+                events.push({
                 id: course.courseId,
                 title: course.title,
                 start: new Date(firstClass.scheduleStart),
                 end: new Date(lastClass.scheduleEnd),
             });
+            }
         });
         return events;
     }
@@ -67,7 +75,11 @@ const CourseCalendar: React.FC = () => {
     }
 
     const handleSelectEvent = (event: any) => {
-        router.push(`/courses/course/${event.id}`);
+        if (isAdmin) {
+            router.push(`/admin/editcourse/edit/course/${event.id}`)
+        } else {
+            router.push(`/courses/course/${event.id}`);
+        }
     }
 
     return (

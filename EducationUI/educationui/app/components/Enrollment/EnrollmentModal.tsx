@@ -140,11 +140,17 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
     }
 
     const enrollSelected = () => {
+        // filter out users that are already enrolled
         const usersToEnroll = selectedUsers.filter(selectedUser => {
             return !enrolledUsers.some(enrolledUser => enrolledUser.userId === selectedUser.userId);
         });
 
        enrollUsers(usersToEnroll);
+       // once all the users are enrollered, check the enrollment queue (waitlist)
+       // and delete the users that were enrolled if any
+        usersToEnroll.forEach(async (user) => {
+            removeStudentFromEnrollmentQueue(user);
+        });
     }
 
     const enrollUsers = async (users: User[]) => {

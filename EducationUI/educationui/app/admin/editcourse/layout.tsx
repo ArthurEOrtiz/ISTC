@@ -1,4 +1,4 @@
-import EditCoursesNav from "./EditCourseNav";
+import Link from "next/link";
 
 interface EditCoursesLayoutProps {
     children: React.ReactNode;
@@ -7,7 +7,19 @@ interface EditCoursesLayoutProps {
 const EditCoursesLayout: React.FC<EditCoursesLayoutProps> = ({ children }) => {
     return (
         <div>
-            <EditCoursesNav />
+            <ul className="navbar bg-primary">
+                <li>
+                    <Link href="/admin/editcourse/add" className="btn btn-ghost text-white">
+                        Add Course
+                    </Link>
+                </li>
+                <li>
+                    <Link href="/admin/editcourse/edit" className="btn btn-ghost text-white">
+                        Edit Course
+                    </Link>
+                </li>
+            </ul>
+
             {children}
         </div>
     );

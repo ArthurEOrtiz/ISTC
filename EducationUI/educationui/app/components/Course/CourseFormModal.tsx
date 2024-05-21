@@ -1,14 +1,14 @@
 import { Course } from "@/app/shared/types/sharedTypes";
 import CourseForm from "./CourseForm";
 
-interface CourseInfoModalProps {
+interface CourseFormModalProps {
     course: Course;
     isVisable: boolean;
     onSubmit: (course: Course) => void; 
     onClose: () => void;
 }
 
-const CourseInfoModal: React.FC<CourseInfoModalProps> = ({course, isVisable, onSubmit, onClose}) => {
+const CourseFormModal: React.FC<CourseFormModalProps> = ({course, isVisable, onSubmit, onClose}) => {
     return (
         <div>
             <div className={`fixed inset-0 bg-black bg-opacity-50 z-50 ${isVisable ? 'block' : 'hidden'}`}></div>
@@ -28,4 +28,4 @@ const CourseInfoModal: React.FC<CourseInfoModalProps> = ({course, isVisable, onS
     )
 }
 
-export default CourseInfoModal
+export default CourseFormModal

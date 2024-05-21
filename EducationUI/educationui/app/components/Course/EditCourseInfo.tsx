@@ -11,7 +11,7 @@ import moment from "moment";
 import ClassCard from "../Class/ClassCard";
 import SelectPDFModal from "../PDF/SelectPDFModal";
 import ClassAttendanceModal from "../Attendance/ClassAttendanceModal";
-import CourseInfoModal from "./CourseInfoModal";
+import CourseFormModal from "./CourseFormModal";
 import SelectTopicModal from "../Topics/SelectTopicModal";
 import EnrollmentModal from "../Enrollment/EnrollmentModal";
 import { deepEquals } from "@/Utilities/deepEquality";
@@ -49,7 +49,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     const [confirmationModalMessage, setConfirmationModalMessage] = useState<string>('');
     const [classToDelete, setClassToDelete] = useState<Number | null>(null); 
     const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
-    const [showCourseInfoModal, setShowCourseInfoModal] = useState<boolean>(false);
+    const [showCourseFormModal, setShowCourseFormModal] = useState<boolean>(false);
     const [showPDFModal, setShowPDFModal] = useState<boolean>(false);
     const [showTopicModal, setShowTopicModal] = useState<boolean>(false);
     const [showAttendanceModal, setShowAttendanceModal] = useState<Class | null>(null);
@@ -238,7 +238,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                 <div className="mt-2 space-x-2 space-y-2">
                     <button
                         className="btn btn-primary text-white"
-                        onClick={() => setShowCourseInfoModal(true)}
+                        onClick={() => setShowCourseFormModal(true)}
                     >
                         Edit Course Information
                     </button>
@@ -378,14 +378,14 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                 />
             )}
 
-            <CourseInfoModal
+            <CourseFormModal
                 course={course}
-                isVisable={showCourseInfoModal}
+                isVisable={showCourseFormModal}
                 onSubmit={(c) => {
                     setCourse(c)
-                    setShowCourseInfoModal(false)
+                    setShowCourseFormModal(false)
                 }}
-                onClose={() => setShowCourseInfoModal(false)}
+                onClose={() => setShowCourseFormModal(false)}
             />
        
             <SelectTopicModal

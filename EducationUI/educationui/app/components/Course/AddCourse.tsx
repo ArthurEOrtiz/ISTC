@@ -10,7 +10,7 @@ import SavingModal from '../../shared/modals/SavingModal';
 import { postCourse } from '@/Utilities/api';
 import ErrorModal from '@/app/shared/modals/ErrorModal';
 import CourseInfoCard from './CourseInfoCard';
-import CourseInfoModal from './CourseInfoModal';
+import CourseFormModal from './CourseFormModal';
 import SelectPDFModal from '../PDF/SelectPDFModal';
 
 
@@ -164,7 +164,7 @@ const AddCourse: React.FC = () => {
         setShowConfirmationModal(false);
     }
 
-    const handleCourseInfoModalSubmit = (c: Course): void => {
+    const handleCourseFormModalSubmit = (c: Course): void => {
         setShowCourseForm(false);
         setCourse(c);
     }
@@ -263,10 +263,10 @@ const AddCourse: React.FC = () => {
                     /> 
             )}
 
-            <CourseInfoModal
+            <CourseFormModal
                 course={course}
                 isVisable={showCourseForm}
-                onSubmit={(c) => handleCourseInfoModalSubmit(c)}
+                onSubmit={(c) => handleCourseFormModalSubmit(c)}
                 onClose={()=>setShowCourseForm(false)}
             />
 

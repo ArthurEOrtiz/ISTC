@@ -24,9 +24,11 @@ export interface Contact {
   zip: string | null;
 }
 
+export type CourseStatus = 'Upcoming' | 'InProgress' | 'Archived' | 'Deleted';
+
 export interface Course {
   courseId: number;
-  status: string;
+  status: CourseStatus;
   title: string;
   description: string | null;
   attendanceCredit: number;
