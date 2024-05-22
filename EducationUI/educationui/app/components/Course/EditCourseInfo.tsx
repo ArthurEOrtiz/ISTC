@@ -84,7 +84,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     , [course]);
 
     // This will sort the classes by date if they are not already sorted
-    // when the component is first rendered and when the classes are updated.
+    // when the component is first rendered.
     useEffect(() => {   
         if (!areClassesOrderedByDate()) {
             setCourse(prevCourse => {
