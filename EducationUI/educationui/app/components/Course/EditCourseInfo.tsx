@@ -1,5 +1,5 @@
 'use client';
-import { Attendance, Class, Course, Topic } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, Course, CourseDTO, Topic } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import { useEffect, useState } from "react";
 import SavingModal from "../../shared/modals/SavingModal";
@@ -81,12 +81,14 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
             setUnsavedChanges(false);
         }
     }
-    , [course]);
+    , [course, incomingCourse]);
 
     // This will sort the classes by date if they are not already sorted
     // when the component is first rendered.
-    useEffect(() => {   
+    useEffect(() => { 
+        console.log("Checking if classes are ordered by date...");  
         if (!areClassesOrderedByDate()) {
+            console.log("Classes are not ordered by date. Sorting...");
             setCourse(prevCourse => {
                 return {
                     ...prevCourse,
@@ -95,7 +97,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
             });
         }
     }
-    , []);
+    , [course.classes]);
 
     // This will scroll to the bottom of the page when a new class is added.
     useEffect(() => {
@@ -143,11 +145,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     const handleSaveCourse = async () => {
         console.log("Saving Course", course);
         setIsSaving(true);
+
         const response = await UpdateCourse(course);
         if (response.status === 200) {
             setCourse(response.data);
-            window.location.reload();
-            
+            setUnsavedChanges(false);            
         } else {
             setErrorMessages(response)
         }
@@ -184,22 +186,22 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
     // Helper Methods 
     const addNewClass = (): void => {
-        
+        const tempId : number = -Date.now();
         const todayAt9AMMountainTime = moment().tz('America/Denver').set({ hour: 9, minute: 0, second: 0 }).toDate();
         const todayAt5PMMountainTime = moment().tz('America/Denver').set({ hour: 17, minute: 0, second: 0 }).toDate();
 
-        const newClassSchedule: Class = {
-            classId: 0,
+        const newClass: Class = {
+            classId: tempId,
             courseId: course.courseId,
             scheduleStart: todayAt9AMMountainTime,
             scheduleEnd: todayAt5PMMountainTime,
             attendances: []
         }
-        //console.log(newClassSchedule)
+        //console.log(newClass)
         setCourse(prevCourse => {
             return {
                 ...prevCourse,
-                classes: [newClassSchedule]
+                classes: [newClass]
             }
         });
     }
@@ -218,8 +220,10 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
             return output as Date;
         }
 
+        const tempId : number = -Date.now();
+
         const newClassSchedule: Class = {
-            classId: 0, 
+            classId: tempId, 
             courseId: course.courseId,
             scheduleStart: addOneDay(lastClass.scheduleStart),
             scheduleEnd: addOneDay(lastClass.scheduleEnd), 
@@ -317,11 +321,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                                 onChange={(newClass) => {
                                     const newClasses = [...course.classes];
                                     newClasses[index] = newClass;
-                                    console.log("Modified Class Index", index);
-                                    console.log("Modified Class", newClass);
-                                    console.log("Modified Classes", newClasses);
-                                    console.log("Course Classes", course.classes);
-                                    console.log("Incoming Course Classes", incomingCourse.classes );
+                                    // console.log("Modified Class Index", index);
+                                    // console.log("Modified Class", newClass);
+                                    // console.log("Modified Classes", newClasses);
+                                    // console.log("Course Classes", course.classes);
+                                    // console.log("Incoming Course Classes", incomingCourse.classes);
                                     setCourse({
                                         ...course, 
                                         classes: newClasses});
