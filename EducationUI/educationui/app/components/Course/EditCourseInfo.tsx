@@ -58,29 +58,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     const router = useRouter();
     
     // Effects
-    // This will sort the classes by date if they are not already sorted
-    // when the component is first rendered and when the classes are updated.
-    useEffect(() => {   
-        if (!areClassesOrderedByDate()) {
-            setCourse(prevCourse => {
-                return {
-                    ...prevCourse,
-                    classes: sortClassesByDate(prevCourse.classes)
-                }
-            });
-        }
-    }
-    , [course.classes]);
-
-    // This will scroll to the bottom of the page when a new class is added.
-    useEffect(() => {
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: 'smooth'
-        });
-    }
-    , [course.classes.length]);
-
     // This will check if the course has been updated and set the unsaved changes flag.
     useEffect(() => {
         // But first, we need to sort the classes by date to compare them.
@@ -105,6 +82,29 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
         }
     }
     , [course]);
+
+    // This will sort the classes by date if they are not already sorted
+    // when the component is first rendered and when the classes are updated.
+    useEffect(() => {   
+        if (!areClassesOrderedByDate()) {
+            setCourse(prevCourse => {
+                return {
+                    ...prevCourse,
+                    classes: sortClassesByDate(prevCourse.classes)
+                }
+            });
+        }
+    }
+    , [course.classes]);
+
+    // This will scroll to the bottom of the page when a new class is added.
+    useEffect(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+    , [course.classes.length]);
 
     // Event Handlers
     const handleConfirmationModalOnConfirm = (): void => {
