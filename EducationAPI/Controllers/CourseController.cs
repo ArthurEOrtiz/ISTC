@@ -66,10 +66,11 @@ namespace EducationAPI.Controllers
       {
         foreach (var status in statuses)
         {
-          // check and make sure that all the statuses in the array are a valid course status
-          if (int.TryParse(status, out _) ||!Enum.TryParse<CourseStatus>(status, true, out _))
+          // check and make sure that all the statuses in the array are a valid course status.
+          // "Upcoming", "In Progress", "Archived"
+          if (int.TryParse(status, out _) || !Enum.TryParse<CourseStatus>(status, true, out _))
           {
-            return BadRequest($"Invalid status: {status}");  
+            return BadRequest($"Invalid status: {status}");
           }
         }
 
@@ -127,6 +128,7 @@ namespace EducationAPI.Controllers
           .Include(c => c.Location)
           .Include(c => c.PDF)
           .Include(c => c.WaitLists)
+          .Where(c => c.Status != CourseStatus.Archived.ToString())
           .Where(c => c.EnrollmentDeadline >= today)
           .ToListAsync();
 
@@ -140,7 +142,6 @@ namespace EducationAPI.Controllers
         // FOR EACH course, retrieve the maximum attendance and the record of the first class.
         foreach (Course course in courses)
         {
-          int MaxAttendance = course.MaxAttendance;
           var firstClass = course.Classes.FirstOrDefault();
           if (firstClass == null)
           {
@@ -149,7 +150,7 @@ namespace EducationAPI.Controllers
             continue;
           }
           // IF the number of students in attendance is less than the value of max attendance.
-          if (firstClass.Attendances.Count < MaxAttendance)
+          if (firstClass.Attendances.Count < course.MaxAttendance)
           {
             // THEN add the course to the list of enrollable courses. 
             enrollableCourses.Add(course);
@@ -170,6 +171,89 @@ namespace EducationAPI.Controllers
       catch (Exception ex)
       {
         _logger.LogError(ex, "GetAllEnrollableCourses()");
+        return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+      }
+    }
+
+    /// <summary>
+    /// Gets all courses which have <see cref="Course.Status"/> that is in the list of statuses, 
+    /// and have an enrollment deadline on or after today.
+    /// </summary>
+    /// <param name="statuses">An <see cref="Array"/> of valid <see cref="CourseStatus"/> as <see cref="string"/>  </param>
+    /// <returns></returns>
+    [HttpGet("GetAllEnrollableCoursesByStatus")]
+    public async Task<ActionResult<List<Course>>> GetAllEnrollableCoursesByStatus([FromQuery] string[] statuses)
+    {
+      try
+      {
+        foreach (var status in statuses)
+        {
+          // check and make sure that all the statuses in the array are a valid course status
+          // "Upcoming", "In Progress", "Archived"
+          if (int.TryParse(status, out _) || !Enum.TryParse<CourseStatus>(status, true, out _))
+          {
+            return BadRequest($"Invalid status: {status}");
+          }
+        }
+
+        var today = DateTime.Today;
+        List<Course> enrollableCourses = [];
+
+        // Get all courses . . . 
+        // that have a status that is in the list of statuses.
+        // that have an enrollment deadline on or after today.
+        var courses = await _educationProgramContext.Courses
+          .Include(c => c.Classes)
+            .ThenInclude(c => c.Attendances)
+          .Include(c => c.Topics)
+          .Include(c => c.Exams)
+          .Include(c => c.Location)
+          .Include(c => c.PDF)
+          .Include(c => c.WaitLists)
+          .Where(c => statuses.Contains(c.Status))
+          .Where(c => c.EnrollmentDeadline >= today)
+          .ToListAsync();
+
+        if (courses == null)
+        {
+          _logger.LogError("GetAllEnrollableCourseByStatus(), could not find courses.");
+          return NotFound("Could not find courses.");
+        }
+
+        // Check that the course has at least one class, and that the number of students in attendance is 
+        // less than the value of max attendance.
+        // FOR EACH course, retrieve the maximum attendance and the record of the first class.
+        foreach (Course course in courses)
+        {
+          var firstClass = course.Classes.FirstOrDefault();
+          if (firstClass == null)
+          {
+            // If a course does not have a class, then you cant enroll to that course, and 
+            // should be not added to the enrollableCourses list
+            continue;
+          }
+          // IF the number of students in attendance is less than the value of max attendance.
+          if (firstClass.Attendances.Count < course.MaxAttendance)
+          {
+            // THEN add the course to the list of enrollable courses. 
+            enrollableCourses.Add(course);
+          }
+        }
+
+        // update course status before return the list of courses. 
+        foreach (Course course in enrollableCourses)
+        {
+          UpdateCourseStatus(course);
+        }
+
+        await _educationProgramContext.SaveChangesAsync();
+
+        _logger.LogInformation("GetAllEnrollableCourseByStatus(), called.");
+        return enrollableCourses;
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "GetAllEnrollableCoursesBYStatus()");
         return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
       }
     }
