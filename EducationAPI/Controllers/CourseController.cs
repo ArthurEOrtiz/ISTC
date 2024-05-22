@@ -642,6 +642,7 @@ namespace EducationAPI.Controllers
           .Include(c => c.Topics)
           .Include(c => c.Exams)
           .Include(c => c.PDF)
+          .Include(c => c.WaitLists)
           .FirstOrDefaultAsync(c => c.CourseId == updatedCourse.CourseId);
 
         if (existingCourse == null)
