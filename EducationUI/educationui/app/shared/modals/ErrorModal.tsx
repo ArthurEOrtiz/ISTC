@@ -11,7 +11,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ title, message, onClose }) => {
             <div className="bg-base-200 rounded-xl p-4 z-50">
                 <div className="flex justify-between items-baseline">
                     <h2 className="font-bold text-lg text-error mb-4">{title}</h2>
-                    <button onClick={onClose} className="text-error font-bold">X</button>
+                    <button onClick={onClose} className="text-error text-3xl font-bold">&times;</button>
                 </div>
                 <p className="text-lg mb-4">{message}</p>
                 <button onClick={onClose} className="btn btn-ghost dark:text-white">Close</button>
