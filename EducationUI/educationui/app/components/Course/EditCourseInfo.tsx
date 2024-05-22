@@ -95,7 +95,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
             });
         }
     }
-    , [course.classes]);
+    , []);
 
     // This will scroll to the bottom of the page when a new class is added.
     useEffect(() => {
