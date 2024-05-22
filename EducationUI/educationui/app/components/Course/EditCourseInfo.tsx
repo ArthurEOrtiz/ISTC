@@ -195,7 +195,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
             scheduleEnd: todayAt5PMMountainTime,
             attendances: []
         }
-        console.log(newClassSchedule)
+        //console.log(newClassSchedule)
         setCourse(prevCourse => {
             return {
                 ...prevCourse,
@@ -303,19 +303,25 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
             
             <div className="space-y-2">
                 {course.classes.map((cls, index) => (
-                    <div key={index} >
+                    <div key={cls.classId} >
                         <div className="bg-base-100 shadow-md rounded-xl relative p-4">
-                            <div className="mb-2">
+                            <div className="flex justify-between mb-2 mt-4">
                                 <p className="text-xl font-bold">Class {index + 1}</p>
+                                <div>
+                                    <p className="text-sm">Class ID: {cls.classId}</p>
+                                    <p className="text-sm">Index: {index}</p>
+                                </div>
                             </div>
                             <ClassCard
                                 cls={cls}
                                 onChange={(newClass) => {
                                     const newClasses = [...course.classes];
                                     newClasses[index] = newClass;
-                                    console.log("Modified Class", newClass)
-                                    console.log("Modified Class Index", index)
-                                    console.log("Modified Classes", newClasses)
+                                    console.log("Modified Class Index", index);
+                                    console.log("Modified Class", newClass);
+                                    console.log("Modified Classes", newClasses);
+                                    console.log("Course Classes", course.classes);
+                                    console.log("Incoming Course Classes", incomingCourse.classes );
                                     setCourse({
                                         ...course, 
                                         classes: newClasses});
