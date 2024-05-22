@@ -103,7 +103,7 @@ namespace EducationAPI.Controllers
     }
 
     /// <summary>
-    /// Gets all course who enrollment deadline days are in the future and do not exceed the 
+    /// Gets all courses which have an enrollment deadline in the future and do not exceed the 
     /// maximum attendance count. 
     /// </summary>
     /// <returns>
@@ -177,7 +177,7 @@ namespace EducationAPI.Controllers
 
     /// <summary>
     /// Gets all courses which have <see cref="Course.Status"/> that is in the list of statuses, 
-    /// and have a <see cref="Course.MaxAttendance"/> value on or after today.
+    /// a <see cref="Course.MaxAttendance"/> value on or after today, and <see cref="Course.EnrollmentDeadline"/> value that is equal to today or the future. 
     /// </summary>
     /// <param name="statuses">An <see cref="Array"/> of a <see cref="string"/> that are valid <see cref="CourseStatus"/></param>
     /// <returns></returns>
