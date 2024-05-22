@@ -179,7 +179,7 @@ namespace EducationAPI.Controllers
     /// Gets all courses which have <see cref="Course.Status"/> that is in the list of statuses, 
     /// and have a <see cref="Course.MaxAttendance"/> value on or after today.
     /// </summary>
-    /// <param name="statuses">An <see cref="Array"/> of valid <see cref="CourseStatus"/> as <see cref="string"/>  </param>
+    /// <param name="statuses">An <see cref="Array"/> of a <see cref="string"/> that are valid <see cref="CourseStatus"/></param>
     /// <returns></returns>
     [HttpGet("GetAllEnrollableCoursesByStatus")]
     public async Task<ActionResult<List<Course>>> GetAllEnrollableCoursesByStatus([FromQuery] string[] statuses)
