@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import CourseCalendar from "./CourseCalendar"
 import CourseList from "./CourseList";
 import { Course, CourseStatus, User } from "@/app/shared/types/sharedTypes";
-import { getAllCourses, GetAllEnrollableCourses, GetUserByClerkId } from "@/Utilities/api";
+import { GetCoursesByStatus, GetAllEnrollableCourses, GetUserByClerkId, GetAllEnrollableCoursesByStatus } from "@/Utilities/api";
 import ErrorModel from "@/app/shared/modals/ErrorModal";
 import Loading from "@/app/shared/Loading";
 import { useUser } from "@clerk/clerk-react";
@@ -19,14 +19,13 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
     const [ isCourseCalendarVisible, setIsCourseCalendarVisible ] = useState(!isAdmin);
     const [ isCourseListVisible, setIsCourseListVisible ] = useState(isAdmin);
     const [ courses, setCourses ] = useState<Course[]>();
-    const [ filteredCourses, setFilteredCourses ] = useState<Course[] | null>(null);
     const [ errorMessages, setErrorMessages ] = useState<string | null>(null);
     const [ isLoading, setIsLoading ] = useState(false); 
 
     // effects
     useEffect(() => {
         setIsLoading(true);
-        if (!isAdmin ) {
+        if (!isAdmin) {
             // console.log('fetching enrollable courses');
             fetchEnrollableCourses();
         } else {
@@ -35,24 +34,11 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
         }
         setIsLoading(false);
     }
-    , [user]);
+    , [selectedStatuses]);
 
     useEffect(() => {
         fetchUser();
     }, [clerkUser]);
-
-    useEffect(() => {
-        if(!courses) {
-            return;
-        }
-
-        if (selectedStatuses.length === 0) {
-            setFilteredCourses(courses);
-            return;
-        }
-
-        setFilteredCourses(filterCourses(courses, selectedStatuses));
-    }, [selectedStatuses])
 
     // handlers
     const handleCourseCalendarClick = () => {
@@ -67,22 +53,21 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
 
     // helpers
     const fetchEnrollableCourses = async () => {
-        const response = await GetAllEnrollableCourses();
+        const response = await GetAllEnrollableCoursesByStatus(selectedStatuses);
         if (response.status === 200) {
-            setCourses(response.data);
-            setFilteredCourses(filterCourses(response.data, selectedStatuses));  
+            setCourses(response.data); 
         } else {
             setErrorMessages(response as unknown as string);
         }
     }
 
     const fetchAllCourses = async () => {
-        const response = await getAllCourses();
+        const response = await GetCoursesByStatus(selectedStatuses);
         if (response.status === 200) {
             setCourses(response.data);
-            setFilteredCourses(filterCourses(response.data, selectedStatuses));  
+            
         } else {
-            setErrorMessages(response as unknown as string);
+            setErrorMessages(response);
         }
     }
 
@@ -98,13 +83,8 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
             setErrorMessages(response as unknown as string);
         }
     }
-
-    const filterCourses = (courses: Course[], statuses: CourseStatus[]) => {
-        return courses.filter(course => statuses.includes(course.status as CourseStatus));
-    }
     
     // render
-
     if (isLoading || !isLoaded || !user) {
         return <Loading />
     }
@@ -182,7 +162,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                                                     />}
 
             {isCourseListVisible && user && courses && <CourseList 
-                                                            courses={filteredCourses}
+                                                            courses={courses}
                                                             user={user} 
                                                             isAdmin={isAdmin}
                                                             onError={(m) => setErrorMessages(m)}
