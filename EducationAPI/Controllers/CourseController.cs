@@ -695,12 +695,12 @@ namespace EducationAPI.Controllers
           }
           else
           {
-
             // if it doesn't, add the class.
             classesToAdd.Add(updatedClass);
           }
         }
 
+        // Add the classes that are not in the existing course
         foreach (var classToAdd in classesToAdd)
         {
           existingCourse.Classes.Add(classToAdd);
@@ -709,8 +709,10 @@ namespace EducationAPI.Controllers
         // Remove any classes that aren't in the updated course
         List<Class> classesToRemove = [];
 
+        // for each class in the existing course
         foreach (var existingClass in existingCourse.Classes)
         {
+          // if the class is not in the updated course, add it to the list of classes to remove.
           if (!updatedCourse.Classes.Any(c => c.ClassId == existingClass.ClassId))
           {
             classesToRemove.Add(existingClass);
