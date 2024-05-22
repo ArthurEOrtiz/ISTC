@@ -83,7 +83,22 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
     // This will check if the course has been updated and set the unsaved changes flag.
     useEffect(() => {
-        if (!deepEquals(course, incomingCourse)) {
+        // But first, we need to sort the classes by date to compare them.
+        // This is because the classes are not guaranteed to be in order when they are received from the API.
+        const sortedCourseClasses = sortClassesByDate(course.classes);
+        const sortedIncomingCourseClasses = sortClassesByDate(incomingCourse.classes);
+
+        const sortedCourse = {
+            ...course,
+            classes: sortedCourseClasses
+        }
+
+        const sortedIncomingCourse = {
+            ...incomingCourse,
+            classes: sortedIncomingCourseClasses
+        }
+        
+        if (!deepEquals(sortedCourse, sortedIncomingCourse)) {
             setUnsavedChanges(true);
         } else {
             setUnsavedChanges(false);
