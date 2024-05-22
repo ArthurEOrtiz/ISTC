@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import CourseCalendar from "./CourseCalendar"
 import CourseList from "./CourseList";
 import { Course, CourseStatus, User } from "@/app/shared/types/sharedTypes";
-import { GetCoursesByStatus, GetAllEnrollableCourses, GetUserByClerkId, GetAllEnrollableCoursesByStatus } from "@/Utilities/api";
+import { GetCoursesByStatus, GetUserByClerkId, GetAllEnrollableCoursesByStatus } from "@/Utilities/api";
 import ErrorModel from "@/app/shared/modals/ErrorModal";
 import Loading from "@/app/shared/Loading";
 import { useUser } from "@clerk/clerk-react";
@@ -124,7 +124,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                     </button>
                 </div> */}
 
-                {isAdmin && isCourseListVisible && (
+                {isCourseListVisible && (
                     <div>
                         <div className="join p-1">
                             <button
@@ -143,14 +143,16 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                             >
                                 In Progress
                             </button>
-                            <button
-                                className={`join-item btn ${selectedStatuses.includes('Archived') ? 'btn-primary text-white': ''}`}
-                                onClick={() => setSelectedStatuses(selectedStatuses.includes('Archived') 
-                                    ? selectedStatuses.filter(status => status !== 'Archived') 
-                                    : [...selectedStatuses, 'Archived'])}
-                            >
-                                Archived
-                            </button>
+                            {isAdmin && (
+                                <button
+                                    className={`join-item btn ${selectedStatuses.includes('Archived') ? 'btn-primary text-white': ''}`}
+                                    onClick={() => setSelectedStatuses(selectedStatuses.includes('Archived') 
+                                        ? selectedStatuses.filter(status => status !== 'Archived') 
+                                        : [...selectedStatuses, 'Archived'])}
+                                >
+                                    Archived
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
