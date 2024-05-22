@@ -1,4 +1,5 @@
 ﻿using EducationAPI.DataAccess;
+using EducationAPI.DTO;
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -635,6 +636,12 @@ namespace EducationAPI.Controllers
     {
       try
       {
+        // First lets pull the Course out of the DTO.
+        //var updatedCourse = updatedCourseDTO.Course;
+        // Update the status of the course
+        UpdateCourseStatus(updatedCourse);
+
+        // Query the database for the course to update. 
         var existingCourse = await _educationProgramContext.Courses
           .Include(c => c.Classes)
             .ThenInclude(c => c.Attendances)
@@ -645,13 +652,12 @@ namespace EducationAPI.Controllers
           .Include(c => c.WaitLists)
           .FirstOrDefaultAsync(c => c.CourseId == updatedCourse.CourseId);
 
+        // if there is not existing course that return a 404
         if (existingCourse == null)
         {
           _logger.LogError("UpdateCourse({UpdatedCourse}), Course not found!", updatedCourse);
           return NotFound("Course not found.");
         }
-
-        UpdateCourseStatus(updatedCourse);
 
         // Update scalar properties
         _educationProgramContext.Entry(existingCourse).CurrentValues.SetValues(updatedCourse);
@@ -674,7 +680,17 @@ namespace EducationAPI.Controllers
         List<Class> classesToAdd = [];
         foreach (var updatedClass in updatedCourse.Classes)
         {
-          // see if the class exists in the existing course
+         
+          // if the classId of the updated class is negative, then it is a new class
+          // so you should change the classId to zero
+          if (updatedClass.ClassId > 0)
+          {
+            updatedClass.ClassId = 0;
+            classesToAdd.Add(updatedClass);
+            continue;
+          }
+
+          // If its not a new class see if the class exists in the existing course
           var existingClass = existingCourse.Classes
             .FirstOrDefault(c => c.ClassId == updatedClass.ClassId);
 
@@ -692,11 +708,6 @@ namespace EducationAPI.Controllers
                 _educationProgramContext.Entry(existingAttendance).CurrentValues.SetValues(attendance);
               }
             }
-          }
-          else
-          {
-            // if it doesn't, add the class.
-            classesToAdd.Add(updatedClass);
           }
         }
 
@@ -738,7 +749,7 @@ namespace EducationAPI.Controllers
         await _educationProgramContext.SaveChangesAsync();
 
         _logger.LogInformation("UpdateCourse({UpdatedCourse}) called", updatedCourse);
-        return existingCourse;
+        return Ok(existingCourse);
       }
       catch (Exception ex)
       {
