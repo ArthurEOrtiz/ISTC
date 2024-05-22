@@ -276,6 +276,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                     >
                         Log Course
                     </button>
+                    <button
+                        className="btn btn-primary text-white"
+                        onClick={() => console.log(incomingCourse)}
+                    >
+                        Log Incoming Course
+                    </button>
                 </div>
             </div>
     
@@ -292,7 +298,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                                 onChange={(newClass) => {
                                     const newClasses = [...course.classes];
                                     newClasses[index] = newClass;
-                                    setCourse({...course, classes: newClasses});
+                                    console.log("Modified Class", newClass)
+                                    console.log("Modified Class Index", index)
+                                    console.log("Modified Classes", newClasses)
+                                    setCourse({
+                                        ...course, 
+                                        classes: newClasses});
                                 }}
                                 disabled={course.status === 'Archived'}
                                 onDelete={() => handleOnClassDelete(index)}
