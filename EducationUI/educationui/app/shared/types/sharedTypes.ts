@@ -24,7 +24,7 @@ export interface Contact {
   zip: string | null;
 }
 
-export type CourseStatus = 'Upcoming' | 'InProgress' | 'Archived' | 'Deleted';
+export type CourseStatus = 'Upcoming' | 'InProgress' | 'Archived';
 
 export interface Course {
   courseId: number;

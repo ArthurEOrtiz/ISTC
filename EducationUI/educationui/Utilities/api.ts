@@ -1,16 +1,18 @@
-import { Attendance, Course, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
+import { Attendance, Course, CourseStatus, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
 import axios from 'axios';
 import https from 'https';
+import qs from 'qs';
 
 
-const baseUrl = 'https://localhost:7144/';
+
 
 const axiosInstance = axios.create({
-    baseURL: baseUrl,
+    baseURL: 'https://localhost:7144/',
     httpsAgent: new https.Agent({ rejectUnauthorized: false }), // This line is for handling self-signed certificates, remove if not needed
     headers: {
         'Accept': 'application/json',
     },
+    paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
 });
 
 // Attendance
@@ -55,6 +57,18 @@ export async function getAllCourses() {
     }
 }
 
+export async function GetCoursesByStatus( statuses: CourseStatus[]){
+    console.log('statuses', statuses);
+    try {
+        const response = await axiosInstance.get('Course/GetCoursesByStatus', { params: { statuses } });
+        console.log('response', response);  
+        return response;
+    } catch (error : any) {
+        console.error('Error fetching courses:', error);
+        return error.response.data;
+    }
+}
+
 export async function GetAllEnrollableCourses() {
     try {
         const response = await axiosInstance.get('Course/GetAllEnrollableCourses');
@@ -62,6 +76,16 @@ export async function GetAllEnrollableCourses() {
     } catch (error : any) {
         console.error('Error fetching courses:', error);
         throw error.message;
+    }
+}
+
+export async function GetAllEnrollableCoursesByStatus(statuses: CourseStatus[]) {
+    try {
+        const response = await axiosInstance.get('Course/GetAllEnrollableCoursesByStatus', { params: { statuses } });
+        return response;
+    } catch (error : any) {
+        console.error('Error fetching courses:', error);
+        throw error.response.data;
     }
 }
 

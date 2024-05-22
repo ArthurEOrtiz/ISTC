@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import CourseCalendar from "./CourseCalendar"
 import CourseList from "./CourseList";
-import { Course, User } from "@/app/shared/types/sharedTypes";
-import { getAllCourses, GetAllEnrollableCourses, GetUserByClerkId } from "@/Utilities/api";
+import { Course, CourseStatus, User } from "@/app/shared/types/sharedTypes";
+import { GetCoursesByStatus, GetUserByClerkId, GetAllEnrollableCoursesByStatus } from "@/Utilities/api";
 import ErrorModel from "@/app/shared/modals/ErrorModal";
 import Loading from "@/app/shared/Loading";
 import { useUser } from "@clerk/clerk-react";
@@ -15,48 +15,30 @@ interface CourseCatalogProps {
 const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
     const { user: clerkUser, isLoaded } = useUser();
     const [ user, setUser ] = useState<User>();
-    const [ selectedStatuses, setSelectedStatuses ] = useState<('Upcoming' | 'InProgress'| 'Archived')[]>(['Upcoming', 'InProgress']);   
+    const [ selectedStatuses, setSelectedStatuses ] = useState<CourseStatus []>(['Upcoming', 'InProgress']);   
     const [ isCourseCalendarVisible, setIsCourseCalendarVisible ] = useState(!isAdmin);
     const [ isCourseListVisible, setIsCourseListVisible ] = useState(isAdmin);
     const [ courses, setCourses ] = useState<Course[]>();
-    const [ filteredCourses, setFilteredCourses ] = useState<Course[] | null>(null);
     const [ errorMessages, setErrorMessages ] = useState<string | null>(null);
     const [ isLoading, setIsLoading ] = useState(false); 
 
     // effects
     useEffect(() => {
         setIsLoading(true);
-        if (!isAdmin ) {
+        if (!isAdmin) {
             // console.log('fetching enrollable courses');
             fetchEnrollableCourses();
-            setIsLoading(false);
-            return;
-        }
-        if (isAdmin) {
+        } else {
             // console.log('fetching all courses');
             fetchAllCourses();
-            setIsLoading(false);
-            return;
         }
+        setIsLoading(false);
     }
-    , [user]);
+    , [selectedStatuses]);
 
     useEffect(() => {
         fetchUser();
     }, [clerkUser]);
-
-    useEffect(() => {
-        if(!courses) {
-            return;
-        }
-
-        if (selectedStatuses.length === 0) {
-            setFilteredCourses(courses);
-            return;
-        }
-
-        setFilteredCourses(filterCourses(courses, selectedStatuses));
-    }, [selectedStatuses])
 
     // handlers
     const handleCourseCalendarClick = () => {
@@ -71,22 +53,21 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
 
     // helpers
     const fetchEnrollableCourses = async () => {
-        const response = await GetAllEnrollableCourses();
+        const response = await GetAllEnrollableCoursesByStatus(selectedStatuses);
         if (response.status === 200) {
-            setCourses(response.data);
-            setFilteredCourses(filterCourses(response.data, selectedStatuses));  
+            setCourses(response.data); 
         } else {
             setErrorMessages(response as unknown as string);
         }
     }
 
     const fetchAllCourses = async () => {
-        const response = await getAllCourses();
+        const response = await GetCoursesByStatus(selectedStatuses);
         if (response.status === 200) {
             setCourses(response.data);
-            setFilteredCourses(filterCourses(response.data, selectedStatuses));  
+            
         } else {
-            setErrorMessages(response as unknown as string);
+            setErrorMessages(response);
         }
     }
 
@@ -102,13 +83,8 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
             setErrorMessages(response as unknown as string);
         }
     }
-
-    const filterCourses = (courses: Course[], statuses: ('Upcoming' | 'InProgress' | 'Archived')[]) => {
-        return courses.filter(course => statuses.includes(course.status as "Upcoming" | "InProgress" | "Archived"));
-    }
     
     // render
-
     if (isLoading || !isLoaded || !user) {
         return <Loading />
     }
@@ -148,7 +124,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                     </button>
                 </div> */}
 
-                {isAdmin && isCourseListVisible && (
+                {isCourseListVisible && (
                     <div>
                         <div className="join p-1">
                             <button
@@ -167,14 +143,16 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                             >
                                 In Progress
                             </button>
-                            <button
-                                className={`join-item btn ${selectedStatuses.includes('Archived') ? 'btn-primary text-white': ''}`}
-                                onClick={() => setSelectedStatuses(selectedStatuses.includes('Archived') 
-                                    ? selectedStatuses.filter(status => status !== 'Archived') 
-                                    : [...selectedStatuses, 'Archived'])}
-                            >
-                                Archived
-                            </button>
+                            {isAdmin && (
+                                <button
+                                    className={`join-item btn ${selectedStatuses.includes('Archived') ? 'btn-primary text-white': ''}`}
+                                    onClick={() => setSelectedStatuses(selectedStatuses.includes('Archived') 
+                                        ? selectedStatuses.filter(status => status !== 'Archived') 
+                                        : [...selectedStatuses, 'Archived'])}
+                                >
+                                    Archived
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
@@ -186,7 +164,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                                                     />}
 
             {isCourseListVisible && user && courses && <CourseList 
-                                                            courses={filteredCourses}
+                                                            courses={courses}
                                                             user={user} 
                                                             isAdmin={isAdmin}
                                                             onError={(m) => setErrorMessages(m)}
