@@ -177,7 +177,7 @@ namespace EducationAPI.Controllers
 
     /// <summary>
     /// Gets all courses which have <see cref="Course.Status"/> that is in the list of statuses, 
-    /// and have an enrollment deadline on or after today.
+    /// and have a <see cref="Course.MaxAttendance"/> value on or after today.
     /// </summary>
     /// <param name="statuses">An <see cref="Array"/> of valid <see cref="CourseStatus"/> as <see cref="string"/>  </param>
     /// <returns></returns>
