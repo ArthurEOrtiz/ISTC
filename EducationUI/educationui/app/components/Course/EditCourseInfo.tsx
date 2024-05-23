@@ -189,7 +189,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
     // Helper Methods 
     const addNewClass = (): void => {
-        const tempId : number = -Date.now();
+        // Generate a unique negative ID for the class
+        // the api will then reconize this as a new class to be added.
+        const tempId : number = -(Date.now() % 2147483647); // 2147483647 is the max value for a 32-bit signed integer
         const todayAt9AMMountainTime = moment().tz('America/Denver').set({ hour: 9, minute: 0, second: 0 }).toDate();
         const todayAt5PMMountainTime = moment().tz('America/Denver').set({ hour: 17, minute: 0, second: 0 }).toDate();
 
@@ -223,7 +225,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
             return output as Date;
         }
 
-        const tempId : number = -Date.now();
+        // Generate a unique negative ID for the class
+        // the api will then reconize this as a new class to be added.
+        const tempId : number = -(Date.now() % 2147483647); // 2147483647 is the max value for a 32-bit signed integer
 
         const newClassSchedule: Class = {
             classId: tempId, 
