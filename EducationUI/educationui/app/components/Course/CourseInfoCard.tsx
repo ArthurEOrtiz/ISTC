@@ -154,7 +154,7 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                 </div>
                 <div className="w-full">
                     <p className="text-1xl font-bold">PDF</p>
-                    {course.pdfId !== null ? (
+                    {course.pdf ? (
                         <a
                             className="link link-info"
                             href={pdfUrl || "#"}
