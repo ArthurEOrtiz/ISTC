@@ -58,10 +58,8 @@ export async function getAllCourses() {
 }
 
 export async function GetCoursesByStatus( statuses: CourseStatus[]){
-    console.log('statuses', statuses);
     try {
         const response = await axiosInstance.get('Course/GetCoursesByStatus', { params: { statuses } });
-        console.log('response', response);  
         return response;
     } catch (error : any) {
         console.error('Error fetching courses:', error);
@@ -387,9 +385,9 @@ export async function checkUserExistsByClerkId(clerkId: String) {
     try {
         const response = await axiosInstance.get(`User/CheckUserExistsByClerkId/${clerkId}`);
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching user:', error);
-        throw error;
+        return error.message;
     }
 }
 

@@ -1,5 +1,5 @@
 'use client';
-import { Attendance, Class, Course, CourseDTO, Topic } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, Course, Topic } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import { useEffect, useState } from "react";
 import SavingModal from "../../shared/modals/SavingModal";
@@ -76,12 +76,14 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
         }
         
         if (!deepEquals(sortedCourse, sortedIncomingCourse)) {
+            console.log("Unsaved Changes Detected");
             setUnsavedChanges(true);
         } else {
+            console.log("No Unsaved Changes Detected");
             setUnsavedChanges(false);
         }
     }
-    , [course, incomingCourse]);
+    , [course, course.classes]);
 
     // This will sort the classes by date if they are not already sorted
     // when the component is first rendered.
@@ -149,7 +151,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
         const response = await UpdateCourse(course);
         if (response.status === 200) {
             setCourse(response.data);
-            setUnsavedChanges(false);            
+            console.log("Course Saved", response.data);
+            //setUnsavedChanges(false);            
         } else {
             setErrorMessages(response)
         }
