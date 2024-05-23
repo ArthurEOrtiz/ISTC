@@ -6,7 +6,7 @@ import SavingModal from "../../shared/modals/SavingModal";
 import ConfirmationModal from "../../shared/modals/ConfirmationModal";
 import ErrorModel from "../../shared/modals/ErrorModal";
 import { useRouter } from "next/navigation";
-import { DeleteCourseById, UpdateCourse } from "@/Utilities/api";
+import { DeleteCourseById, getCourseById, UpdateCourse } from "@/Utilities/api";
 import moment from "moment";
 import ClassCard from "../Class/ClassCard";
 import SelectPDFModal from "../PDF/SelectPDFModal";
@@ -17,13 +17,15 @@ import EnrollmentModal from "../Enrollment/EnrollmentModal";
 import { deepEquals } from "@/Utilities/deepEquality";
 
 interface EditCourseInfoProps {
-    course: Course;
+    courseId: number;
 }
 
-const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse}) => { 
+const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => { 
 
     // Initializing Logic 
     const sortClassesByDate = (classes : Class[]): Class[] => {
+        if (!courseHasClasses()) return [];
+
         const sortedClasses = [...classes].sort((a, b) => {
             return new Date(a.scheduleStart).getTime() - new Date(b.scheduleStart).getTime();
         });
@@ -31,6 +33,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     }
 
     const areClassesOrderedByDate = (): boolean => {
+        if (!courseHasClasses()) return false;
         for (let i = 0; i < course.classes.length - 1; i++) {
             const currentClass = course.classes[i];
             const nextClass = course.classes[i + 1];
@@ -42,7 +45,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     }
 
     // Constants
-    const [course, setCourse] = useState<Course>(incomingCourse);
+    const courseId = crsId;
+    const [initialCourse, setInitialCourse] = useState<Course>({} as Course);
+    const [course, setCourse] = useState<Course>({} as Course);
     const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [confirmationModalTitle, setConfirmationModalTitle] = useState<string>('');
@@ -58,24 +63,34 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     const router = useRouter();
     
     // Effects
+    // Initialize the course data when the component is first rendered.
+    useEffect(() => {
+        initializeCourseData();
+    }, []);
+
     // This will check if the course has been updated and set the unsaved changes flag.
     useEffect(() => {
-        // But first, we need to sort the classes by date to compare them.
+        // First check if there are any classes to check.
+        if (courseHasClasses()) {
+            return;
+        }
+
+        // Then sort the classes by date to compare them.
         // This is because the classes are not guaranteed to be in order when they are received from the API.
         const sortedCourseClasses = sortClassesByDate(course.classes);
-        const sortedIncomingCourseClasses = sortClassesByDate(incomingCourse.classes);
+        const sortedInitialCourseClasses = sortClassesByDate(initialCourse.classes);
 
         const sortedCourse = {
             ...course,
             classes: sortedCourseClasses
         }
 
-        const sortedIncomingCourse = {
-            ...incomingCourse,
-            classes: sortedIncomingCourseClasses
+        const sortedInitialCourse = {
+            ...initialCourse,
+            classes: sortedInitialCourseClasses
         }
         
-        if (!deepEquals(sortedCourse, sortedIncomingCourse)) {
+        if (!deepEquals(sortedCourse, sortedInitialCourse)) {
             console.log("Unsaved Changes Detected");
             setUnsavedChanges(true);
         } else {
@@ -86,8 +101,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     , [course, course.classes]);
 
     // This will sort the classes by date if they are not already sorted
-    // when the component is first rendered.
     useEffect(() => { 
+
+        if (courseHasClasses()){
+            return;
+        }
+
         console.log("Checking if classes are ordered by date...");  
         if (!areClassesOrderedByDate()) {
             console.log("Classes are not ordered by date. Sorting...");
@@ -108,7 +127,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
             behavior: 'smooth'
         });
     }
-    , [course.classes.length]);
+    , [course.classes?.length]);
 
     // Event Handlers
     const handleConfirmationModalOnConfirm = (): void => {
@@ -188,6 +207,23 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
     }
 
     // Helper Methods 
+
+    const initializeCourseData = async () => {
+        const courseData = await GetCourseData(courseId);
+        setCourse(courseData);
+        setInitialCourse(courseData);
+    }
+
+    const GetCourseData = async (courseId: number): Promise<Course> => {
+        const response = await getCourseById(courseId);
+       if (response.status === 200) {
+            return response.data;
+        } else {
+            setErrorMessages(response);
+            return {} as Course;
+        }
+    }
+    
     const addNewClass = (): void => {
         // Generate a unique negative ID for the class
         // the api will then reconize this as a new class to be added.
@@ -243,6 +279,22 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                 classes: [...prevCourse.classes, newClassSchedule]
             }
         });
+    }
+
+    const courseHasClasses = (): boolean => {
+        if (course.classes === undefined) {
+            return false;
+        }
+        
+        if (course.classes === null) {
+            return false;
+        }
+
+        if (course.classes.length === 0) {
+            return false;
+        }
+
+        return true
     }
 
     return (
@@ -304,16 +356,16 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                     </button>
                     <button
                         className="btn btn-primary text-white"
-                        onClick={() => console.log(incomingCourse)}
+                        onClick={() => console.log(initialCourse)}
                     >
-                        Log Incoming Course
+                        Log Initial Course
                     </button>
                 </div>
             </div>
     
             
             <div className="space-y-2">
-                {course.classes.map((cls, index) => (
+                {course.classes?.map((cls, index) => (
                     <div key={cls.classId} >
                         <div className="bg-base-100 shadow-md rounded-xl relative p-4">
                             <div className="flex justify-between mb-2 mt-4">
@@ -332,7 +384,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
                                     // console.log("Modified Class", newClass);
                                     // console.log("Modified Classes", newClasses);
                                     // console.log("Course Classes", course.classes);
-                                    // console.log("Incoming Course Classes", incomingCourse.classes);
+                                    // console.log("Incoming Course Classes", intialCourse.classes);
                                     setCourse({
                                         ...course, 
                                         classes: newClasses});
@@ -443,7 +495,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({course: incomingCourse})
 
             <EnrollmentModal
                 isOpen={showEnrollmentModal}
-                course={incomingCourse}
+                course={initialCourse}
                 onExit={() => {
                     setShowEnrollmentModal(false)
                     window.location.reload()
