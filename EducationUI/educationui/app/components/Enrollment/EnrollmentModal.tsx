@@ -1,6 +1,7 @@
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
 import { Course, User } from "@/app/shared/types/sharedTypes";
 import { DeleteWaitListByUserIdCourseId, DropUser, EnrollUser, EnrollUsers, getAllUsers, GetCourseEnrollment, GetDropQueue, GetEnrollmentQueue, SearchUsers } from "@/Utilities/api";
+import { on } from "events";
 import { useEffect, useState } from "react";
 
 interface EnrollmentModalProps {
@@ -8,9 +9,10 @@ interface EnrollmentModalProps {
     isOpen: boolean;
     onExit: () => void;
     onError: (message: string) => void;
+    onEnroll? : () => void;
 }
 
-const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExit, onError }) => {
+const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExit, onError, onEnroll }) => {
     const [ users, setUsers] = useState<User[]>();
     const [ enrollmentQueue, setEnrollmentQueue ] = useState<User[]>();
     const [ dropQueue, setDropQueue ] = useState<User[]>();
@@ -149,14 +151,20 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
        // once all the users are enrollered, check the enrollment queue (waitlist)
        // and delete the users that were enrolled if any
         usersToEnroll.forEach(async (user) => {
-            removeStudentFromEnrollmentQueue(user);
+            const isUserWaitListed = enrollmentQueue?.some(enrollmentUser => enrollmentUser.userId === user.userId);
+            if (isUserWaitListed) {
+                removeStudentFromEnrollmentQueue(user);
+            }
         });
+
+             
     }
 
     const enrollUsers = async (users: User[]) => {
         const response = await EnrollUsers(course.courseId, users);
         if (response.status === 201) {
             await getEnrolledUsers();
+            onEnroll && onEnroll();  
         } else {
             onError(response as unknown as string);
         }
@@ -166,6 +174,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
         const response = await EnrollUser(user.userId, course.courseId);
         if (response.status === 201) {
             await getEnrolledUsers();
+            onEnroll && onEnroll();
         } else {
             onError(response as unknown as string);
         }
