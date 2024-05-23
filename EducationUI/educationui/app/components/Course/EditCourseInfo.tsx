@@ -15,6 +15,7 @@ import CourseFormModal from "./CourseFormModal";
 import SelectTopicModal from "../Topics/SelectTopicModal";
 import EnrollmentModal from "../Enrollment/EnrollmentModal";
 import { deepEquals } from "@/Utilities/deepEquality";
+import Loading from "@/app/shared/Loading";
 
 interface EditCourseInfoProps {
     courseId: number;
@@ -49,6 +50,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     const [initialCourse, setInitialCourse] = useState<Course>({} as Course);
     const [course, setCourse] = useState<Course>({} as Course);
     const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [confirmationModalTitle, setConfirmationModalTitle] = useState<string>('');
     const [confirmationModalMessage, setConfirmationModalMessage] = useState<string>('');
@@ -98,12 +100,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
             setUnsavedChanges(false);
         }
     }
-    , [course, course.classes]);
+    , [course]);
 
     // This will sort the classes by date if they are not already sorted
     useEffect(() => { 
-
-        if (courseHasClasses()){
+        if (!courseHasClasses()){
             return;
         }
 
@@ -150,7 +151,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
 
     const handleOnClassAdd = (): void => {
 
-        if (course.classes.length === 0 || course.classes === null) {
+        if (!courseHasClasses()) {
             addNewClass();
         } else {
             const lastClass = course.classes[course.classes.length - 1];
@@ -169,9 +170,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
 
         const response = await UpdateCourse(course);
         if (response.status === 200) {
-            setCourse(response.data);
             console.log("Course Saved", response.data);
-            //setUnsavedChanges(false);            
+            setCourse(response.data);
+            setInitialCourse(response.data);           
         } else {
             setErrorMessages(response)
         }
@@ -209,14 +210,19 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     // Helper Methods 
 
     const initializeCourseData = async () => {
-        const courseData = await GetCourseData(courseId);
+        console.log("Initializing Course Data")
+        setIsLoading(true);
+        const courseData = await getCourseData(courseId);
+        console.log("Course Data", courseData)
         setCourse(courseData);
         setInitialCourse(courseData);
+        setIsLoading(false);
     }
 
-    const GetCourseData = async (courseId: number): Promise<Course> => {
+    const getCourseData = async (courseId: number): Promise<Course> => {
+       
         const response = await getCourseById(courseId);
-       if (response.status === 200) {
+        if (response.status === 200) {
             return response.data;
         } else {
             setErrorMessages(response);
@@ -297,6 +303,27 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
         return true
     }
 
+    // Render
+    // if the course is loading, display the loading spinner
+    if (isLoading) {
+        return <Loading />
+    }
+    // if the course is not loading and there is no course data, display an error message
+    if (!isLoading && Object.keys(course).length === 0){
+
+        return (
+            <div className="mt-4 bg-error-content p-8 m-4 rounded-xl space-y-4 w-full">
+                <p className="text-error text-2xl">No information is avaiable for this course. </p>
+                <button 
+                    className="btn btn-primary btn-sm text-white"
+                    onClick={() => router.push('/admin/editcourse/edit')}
+                >
+                    Return to Course List
+                </button>
+            </div>
+        );
+    }
+    // if the course is not loading and there is course data, display the course information
     return (
         <div className="w-full m-4">
          
