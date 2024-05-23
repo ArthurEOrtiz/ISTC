@@ -1,7 +1,6 @@
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
 import { Course, User } from "@/app/shared/types/sharedTypes";
 import { DeleteWaitListByUserIdCourseId, DropUser, EnrollUser, EnrollUsers, getAllUsers, GetCourseEnrollment, GetDropQueue, GetEnrollmentQueue, SearchUsers } from "@/Utilities/api";
-import { on } from "events";
 import { useEffect, useState } from "react";
 
 interface EnrollmentModalProps {
@@ -156,8 +155,6 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
                 removeStudentFromEnrollmentQueue(user);
             }
         });
-
-             
     }
 
     const enrollUsers = async (users: User[]) => {
@@ -185,6 +182,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
         const response = await DropUser(userToDrop!.userId, course.courseId);
         if (response.status === 204) {
             await getEnrolledUsers();
+            onEnroll && onEnroll();
         } else {
             onError(response as unknown as string);
         }
@@ -195,6 +193,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
         const response = await DeleteWaitListByUserIdCourseId(user.userId, course.courseId);
         if (response.status === 204) {
             await getEnrollmentQueue();
+            onEnroll && onEnroll();
         } else {
             onError(response as unknown as string);
         }
