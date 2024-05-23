@@ -1,12 +1,12 @@
 'use client';
-import { Attendance, Class, Course, Topic } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, Course, Exam, Topic } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import { useEffect, useState } from "react";
 import SavingModal from "../../shared/modals/SavingModal";
 import ConfirmationModal from "../../shared/modals/ConfirmationModal";
 import ErrorModel from "../../shared/modals/ErrorModal";
 import { useRouter } from "next/navigation";
-import { DeleteCourseById, getCourseById, UpdateCourse } from "@/Utilities/api";
+import { DeleteCourseById, getCourseById, GetExamsByCourseId, UpdateCourse } from "@/Utilities/api";
 import moment from "moment";
 import ClassCard from "../Class/ClassCard";
 import SelectPDFModal from "../PDF/SelectPDFModal";
@@ -108,7 +108,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
         if (!courseHasClasses()){
             return;
         }
-
         // console.log("Checking if classes are ordered by date...");  
         if (!areClassesOrderedByDate()) {
             // console.log("Classes are not ordered by date. Sorting...");
@@ -151,7 +150,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     }
 
     const handleOnClassAdd = (): void => {
-
         if (!courseHasClasses()) {
             addNewClass();
         } else {
@@ -228,6 +226,32 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
             return {} as Course;
         }
     }
+
+    const setCourseExams = async () => {
+        const exams = await getCourseExams(course.courseId as number);
+        setCourse(prevCourse => {
+            return {
+                ...prevCourse,
+                exams: exams
+            }
+        });
+        setInitialCourse(prevCourse => {
+            return {
+                ...prevCourse,
+                exams: exams
+            }
+        });
+    }
+
+    const getCourseExams = async (courseId: number): Promise<Exam[]> => {
+        const response = await GetExamsByCourseId(courseId);
+        if (response.status === 200) {
+            return response.data;
+        } else {
+            setErrorMessages(response);
+            return [] as Exam[];
+        }
+    }
     
     const addNewClass = (): void => {
         // Generate a unique negative ID for the class
@@ -243,7 +267,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
             scheduleEnd: todayAt5PMMountainTime,
             attendances: []
         }
-        //console.log(newClass)
+        
         setCourse(prevCourse => {
             return {
                 ...prevCourse,
@@ -365,7 +389,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                 </li>
                 <li>
                     <button
-                        className="text-nowrap text-success"
+                        className="text-nowrap text-success font-bold"
                         onClick={handleSaveCourse}
                     >
                         Save
@@ -373,10 +397,18 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                 </li>
                 <li>
                     <button
-                        className="text-nowrap text-error"
+                        className="text-nowrap text-error font-bold"
                         onClick={handleDeleteCourse}
                     >
                         Delete
+                    </button>
+                </li>
+                <li>
+                    <button
+                        className="text-nowrap text-warning font-bold"
+                        onClick={() => console.log(course)}
+                    >
+                        Log Course
                     </button>
                 </li>
             </>
@@ -576,6 +608,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                 course={initialCourse}
                 onExit={() => {
                     setShowEnrollmentModal(false)
+                    setCourseExams()
                 }}
                 onError={(message) => {
                     setErrorMessages(message)
