@@ -374,7 +374,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                         onClick={handleDeleteCourse}>
                             Delete Course
                     </button>
-                    <button 
+                    {/* <button 
                         onClick={() => console.log(course)}
                         className="btn btn-primary text-white"
                     >
@@ -385,7 +385,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                         onClick={() => console.log(initialCourse)}
                     >
                         Log Initial Course
-                    </button>
+                    </button> */}
                 </div>
             </div>
     
@@ -396,10 +396,10 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                         <div className="bg-base-100 shadow-md rounded-xl relative p-4">
                             <div className="flex justify-between mb-2 mt-4">
                                 <p className="text-xl font-bold">Class {index + 1}</p>
-                                <div>
+                                {/* <div>
                                     <p className="text-sm">Class ID: {cls.classId}</p>
                                     <p className="text-sm">Index: {index}</p>
-                                </div>
+                                </div> */}
                             </div>
                             <ClassCard
                                 cls={cls}
@@ -426,12 +426,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                                 >
                                     Attendance
                                 </button>
-                                <button
+                                {/* <button
                                     className="btn btn-primary btn-sm text-white"
                                     onClick={() => console.log(cls)}
                                 >
                                     Log Class
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                     </div>
