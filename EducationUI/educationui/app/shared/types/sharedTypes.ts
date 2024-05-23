@@ -56,8 +56,8 @@ export interface CourseDTO {
 export interface Exam {
   examId: number;
   courseId: number;
-  userId: number;
-  HasPassed: boolean;
+  studentId: number;
+  hasPassed: boolean;
 }
 
 export interface Location {
