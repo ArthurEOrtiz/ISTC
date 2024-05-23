@@ -163,19 +163,19 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                         <div>
                             <div className="flex space-x-2">
                                 <button 
-                                    className="btn btn-primary text-white"
+                                    className="btn btn-primary btn-sm text-white"
                                     onClick={() => router.push(`/admin/editcourse/edit/course/${course.courseId}`)}
                                     >
                                         Edit Course
                                 </button>
                                 <button
-                                    className="btn btn-primary text-white"
+                                    className="btn btn-primary btn-sm text-white"
                                     onClick={()=>setShowEnrollmentModal(true)}
                                     >
                                         Manage Enrollment
                                 </button>
                                 <button 
-                                    className="btn btn-primary text-white"
+                                    className="btn btn-primary btn-sm text-white"
                                     onClick={()=>setShowAttendanceModal(true)}
                                     >
                                         Manage Attendance
@@ -186,6 +186,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                                     >
                                         Console Log Course
                                 </button> */}
+                                
                             </div>
                         </div>
                     )}
@@ -195,17 +196,22 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                             <div className="flex space-x-2">
 
                                 <button 
-                                    className={`btn ${(isEnrolled || isWaitListed) ? 'btn-error' : 'btn-primary'} text-white`}
+                                    className={`btn ${(isEnrolled || isWaitListed) ? 'btn-error' : 'btn-primary'} btn-sm text-white`}
                                     onClick={handleEnrollmentClick}>
                                         {isEnrolled || isWaitListed ? 'Drop Course' : 'Apply to Enroll'}
                                 </button>
 
                                 <button 
-                                    className="btn btn-primary text-white"
+                                    className="btn btn-primary text-white btn-sm"
                                     >
                                         View Course
                                 </button>
-
+                                {/* <button
+                                    className="btn btn-primary text-white"
+                                    onClick={() => console.log(course)}
+                                    >
+                                        Console Log Course
+                                </button> */}
                                 
                             </div>
                         </div>

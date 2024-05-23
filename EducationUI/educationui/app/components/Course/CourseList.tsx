@@ -17,7 +17,6 @@ const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}
     useEffect(() => {
         if (courses) {
             setCourseList(courses);
-            //setCourseList(courseList.sort(compareDates));
         }
 
     }, [courses]);
