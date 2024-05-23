@@ -98,7 +98,8 @@ const NewClass: React.FC<NewClassProps> = ({cls: incomingClass, disabled = false
             >
                 Delete
             </button>
-            <p className="text-sm text-right">Class Id: {cls.classId}</p>
+
+            {/* <p className="text-sm text-right">Class Id: {cls.classId}</p> */}
 
             <div className="flex flex-wrap -mx-3 mb-6">
                 <div className="w-full px-3 mb-6 md:w-1/3 md:mb-0">
