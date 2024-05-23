@@ -37,16 +37,18 @@ const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}
     return (
         <div className='space-y-2'>
             {courseList != null ? 
-                (courseList.map((course: Course, index : number) => (
-                    <div key={index} className="bg-base-100 rounded-xl p-4">
-                        <CourseActionContainer 
-                            course={course}
-                            user={user} 
-                            isAdmin={isAdmin}
-                            onError={(m) => onError(m)}
-                        />
-                    </div>
-                ))) : (
+                (
+                    courseList.map((course: Course, index : number) => (
+                        <div key={index} className="bg-base-100 rounded-xl p-4">
+                            <CourseActionContainer 
+                                course={course}
+                                user={user} 
+                                isAdmin={isAdmin}
+                                onError={(m) => onError(m)}
+                            />
+                        </div>
+                    ))
+                ) : (
                     <p className='text-center text-error'>No courses available!</p>
                 )}
         </div>
