@@ -60,15 +60,26 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
         return "#";
     };
 
+    // render
+    // if course is empty, return a message
+    if (Object.keys(course).length === 0) {
+        return <p className="text-error">No information avaiable for this course. </p>;
+    }
+    // else, return the course information.
     return (
         <div className="space-y-2">
-            <div className="flex justify-between">
-                <div className="flex space-x-2">
-                    <p className="text-2xl font-bold">{course.title} </p>
-                    <span className={`text-white badge badge-sm badge-${courseStatusColor}`}>{courseStatusText}</span>
+            {course.title ?(
+                <div className="flex justify-between">
+                    <div className="flex space-x-2">
+                        <p className="text-2xl font-bold">{course.title} </p>
+                        <span className={`text-white badge badge-sm badge-${courseStatusColor}`}>{courseStatusText}</span>
+                    </div>
+                    <p className="text-base">Course Id: {course.courseId}</p>
                 </div>
-                <p className="text-base">Course Id: {course.courseId}</p>
-            </div>
+            ) : (
+                <p className="text-warning">This course is empty!</p>
+            )}
+
             
             <div className="flex space-x-2">
                 <p className="text-1xl font-bold">Topics</p>
@@ -140,17 +151,21 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
             <div className="flex justify-between">
                 <div className="w-full">
                     <p className="text-1xl font-bold">Enrollment Deadline</p>
-                    <p>{new Date(course.enrollmentDeadline)
-                        .toLocaleDateString(
-                            'en-US', 
-                            {
-                                weekday: 'long', 
-                                year: 'numeric', 
-                                month: 'long', 
-                                day: 'numeric'
-                            }
-                        )}
-                    </p>
+                    {course.enrollmentDeadline ? (
+                        <p>{new Date(course.enrollmentDeadline)
+                            .toLocaleDateString(
+                                'en-US', 
+                                {
+                                    weekday: 'long', 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric'
+                                }
+                            )}
+                        </p>
+                    ) : (
+                        <p className="text-error">None</p>
+                    )}
                 </div>
                 <div className="w-full">
                     <p className="text-1xl font-bold">PDF</p>
@@ -207,7 +222,11 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                         <div className="flex w-full">
                             <div className="flex space-x-2">
                                 <p className="text-1xl font-bold">Attendance Credit :</p>
-                                <p className="text-base">{course.attendanceCredit}</p>
+                                {course.attendanceCredit ? (
+                                    <p className="text-base">{course.attendanceCredit}</p>
+                                ) : (
+                                    <p className="text-error">Undefined</p>
+                                )}
                             </div>
                         </div>
 
@@ -215,7 +234,11 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                         <div className="flex w-full">
                             <div className="flex space-x-2">
                                 <p className="text-1xl font-bold">Max Attendance :</p>
-                                <p className="text-base">{course.maxAttendance}</p>
+                                {course.maxAttendance ? (
+                                    <p className="text-base">{course.maxAttendance}</p>
+                                ) : (
+                                    <p className="text-error">Undefined</p>
+                                )}
                             </div>
                         </div>
                     
