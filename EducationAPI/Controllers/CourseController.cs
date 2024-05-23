@@ -897,7 +897,7 @@ namespace EducationAPI.Controllers
         if (course == null)
         {
           _logger.LogError("EnrollUsers({CourseId}), Course not found.", courseId);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          return NotFound("Course not found");
         }
 
         foreach (var userId in userIds)
