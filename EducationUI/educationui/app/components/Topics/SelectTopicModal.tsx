@@ -96,7 +96,7 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
                             <p className="text-sm font-semibold">Selected Topics</p>
                             <hr className='mb-2'></hr>
                             <ul className="mb-4">
-                                {selectedTopics.length > 0 ? (
+                                {selectedTopics && selectedTopics.length > 0 ? (
                                     selectedTopics.map((selectedTopic) => (
                                         <li key={selectedTopic.topicId} className="mb-2">
                                             <button

@@ -1,4 +1,5 @@
 ﻿using EducationAPI.DataAccess;
+using EducationAPI.DTO;
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -103,7 +104,7 @@ namespace EducationAPI.Controllers
     }
 
     /// <summary>
-    /// Gets all course who enrollment deadline days are in the future and do not exceed the 
+    /// Gets all courses which have an enrollment deadline in the future and do not exceed the 
     /// maximum attendance count. 
     /// </summary>
     /// <returns>
@@ -177,9 +178,9 @@ namespace EducationAPI.Controllers
 
     /// <summary>
     /// Gets all courses which have <see cref="Course.Status"/> that is in the list of statuses, 
-    /// and have an enrollment deadline on or after today.
+    /// a <see cref="Course.MaxAttendance"/> value on or after today, and <see cref="Course.EnrollmentDeadline"/> value that is equal to today or the future. 
     /// </summary>
-    /// <param name="statuses">An <see cref="Array"/> of valid <see cref="CourseStatus"/> as <see cref="string"/>  </param>
+    /// <param name="statuses">An <see cref="Array"/> of a <see cref="string"/> that are valid <see cref="CourseStatus"/></param>
     /// <returns></returns>
     [HttpGet("GetAllEnrollableCoursesByStatus")]
     public async Task<ActionResult<List<Course>>> GetAllEnrollableCoursesByStatus([FromQuery] string[] statuses)
@@ -635,6 +636,10 @@ namespace EducationAPI.Controllers
     {
       try
       {
+        // Update the status of the incoming course
+        UpdateCourseStatus(updatedCourse);
+
+        // Query the database for the course to update. 
         var existingCourse = await _educationProgramContext.Courses
           .Include(c => c.Classes)
             .ThenInclude(c => c.Attendances)
@@ -642,15 +647,15 @@ namespace EducationAPI.Controllers
           .Include(c => c.Topics)
           .Include(c => c.Exams)
           .Include(c => c.PDF)
+          .Include(c => c.WaitLists)
           .FirstOrDefaultAsync(c => c.CourseId == updatedCourse.CourseId);
 
+        // if there is not existing course that return a 404
         if (existingCourse == null)
         {
           _logger.LogError("UpdateCourse({UpdatedCourse}), Course not found!", updatedCourse);
           return NotFound("Course not found.");
         }
-
-        UpdateCourseStatus(updatedCourse);
 
         // Update scalar properties
         _educationProgramContext.Entry(existingCourse).CurrentValues.SetValues(updatedCourse);
@@ -673,7 +678,17 @@ namespace EducationAPI.Controllers
         List<Class> classesToAdd = [];
         foreach (var updatedClass in updatedCourse.Classes)
         {
-          // see if the class exists in the existing course
+         
+          // if the classId of the updated class is negative, then it is a new class
+          // so you should change the classId to zero
+          if (updatedClass.ClassId < 0)
+          {
+            updatedClass.ClassId = 0;
+            classesToAdd.Add(updatedClass);
+            continue;
+          }
+
+          // If its not a new class see if the class exists in the existing course
           var existingClass = existingCourse.Classes
             .FirstOrDefault(c => c.ClassId == updatedClass.ClassId);
 
@@ -692,14 +707,9 @@ namespace EducationAPI.Controllers
               }
             }
           }
-          else
-          {
-
-            // if it doesn't, add the class.
-            classesToAdd.Add(updatedClass);
-          }
         }
 
+        // Add the classes that are not in the existing course
         foreach (var classToAdd in classesToAdd)
         {
           existingCourse.Classes.Add(classToAdd);
@@ -708,8 +718,10 @@ namespace EducationAPI.Controllers
         // Remove any classes that aren't in the updated course
         List<Class> classesToRemove = [];
 
+        // for each class in the existing course
         foreach (var existingClass in existingCourse.Classes)
         {
+          // if the class is not in the updated course, add it to the list of classes to remove.
           if (!updatedCourse.Classes.Any(c => c.ClassId == existingClass.ClassId))
           {
             classesToRemove.Add(existingClass);
@@ -735,7 +747,7 @@ namespace EducationAPI.Controllers
         await _educationProgramContext.SaveChangesAsync();
 
         _logger.LogInformation("UpdateCourse({UpdatedCourse}) called", updatedCourse);
-        return existingCourse;
+        return Ok(existingCourse);
       }
       catch (Exception ex)
       {

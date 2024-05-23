@@ -48,6 +48,11 @@ export interface Course {
   waitLists: WaitList[];
 }
 
+export interface CourseDTO {
+  course: Course;
+  newClassIds: number[];
+}
+
 export interface Exam {
   examId: number;
   courseId: number;
