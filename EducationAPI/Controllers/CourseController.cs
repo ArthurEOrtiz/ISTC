@@ -681,7 +681,7 @@ namespace EducationAPI.Controllers
          
           // if the classId of the updated class is negative, then it is a new class
           // so you should change the classId to zero
-          if (updatedClass.ClassId > 0)
+          if (updatedClass.ClassId < 0)
           {
             updatedClass.ClassId = 0;
             classesToAdd.Add(updatedClass);
