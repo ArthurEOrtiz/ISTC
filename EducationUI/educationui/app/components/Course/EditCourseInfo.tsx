@@ -94,10 +94,10 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
         }
         
         if (!deepEquals(sortedCourse, sortedInitialCourse)) {
-            console.log("Unsaved Changes Detected");
+            // console.log("Unsaved Changes Detected");
             setUnsavedChanges(true);
         } else {
-            console.log("No Unsaved Changes Detected");
+            // console.log("No Unsaved Changes Detected");
             setUnsavedChanges(false);
         }
     }
@@ -109,9 +109,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
             return;
         }
 
-        console.log("Checking if classes are ordered by date...");  
+        // console.log("Checking if classes are ordered by date...");  
         if (!areClassesOrderedByDate()) {
-            console.log("Classes are not ordered by date. Sorting...");
+            // console.log("Classes are not ordered by date. Sorting...");
             setCourse(prevCourse => {
                 return {
                     ...prevCourse,
@@ -210,17 +210,16 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
 
     // Helper Methods 
     const initializeCourseData = async () => {
-        console.log("Initializing Course Data")
+        // console.log("Initializing Course Data")
         setIsLoading(true);
         const courseData = await getCourseData(courseId);
-        console.log("Course Data", courseData)
+        // console.log("Course Data", courseData)
         setCourse(courseData);
         setInitialCourse(courseData);
         setIsLoading(false);
     }
 
     const getCourseData = async (courseId: number): Promise<Course> => {
-       
         const response = await getCourseById(courseId);
         if (response.status === 200) {
             return response.data;
@@ -304,6 +303,8 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     }
 
     // Render
+    
+    // This function will render the navigation list for the course edit page.
     const renderNavList = () => {
         return (
             <>
@@ -416,11 +417,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
             </div>
             
             <div className="bg-base-100 shawdow-md rounded-xl p-5 mb-4">
-                <div className="mb-4 bg-base-300 rounded-xl p-4">
+                <div className="mb-2 bg-base-300 rounded-xl p-4">
                     <CourseInfoCard course={course} />
                 </div>
 
-                <div className="navbar bg-base-100">
+                <div className="navbar">
                     <div className="navbar-start">
                         <div className="dropdown">
                             <div tabIndex={0} role="button" className="btn btn-circle btn-outline btn-primary text-white lg:hidden">
@@ -440,7 +441,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                     </div>
                 </div>
             </div>
-    
             
             <div className="space-y-2">
                 {course.classes?.map((cls, index) => (
