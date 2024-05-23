@@ -3,9 +3,9 @@ export function deepEquals(a : any, b: any) : boolean {
         return true;
     }
 
-    if (a instanceof Date && b instanceof Date) {
-        return a.getTime() === b.getTime();
-    }
+    // if (a instanceof Date && b instanceof Date) {
+    //     return a.getTime() === b.getTime();
+    // }
 
     if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) {
         return false;
@@ -23,8 +23,9 @@ export function deepEquals(a : any, b: any) : boolean {
         }
 
         if (key === 'scheduleStart' || key === 'scheduleEnd') {
-            const dateA = new Date(a[key]);
-            const dateB = new Date(b[key]);
+            console.log("Comparing dates", a[key], b[key]);
+            const dateA = new Date(typeof a[key] === 'string' && !a[key].endsWith('Z') ? a[key] + 'Z' : a[key]);
+            const dateB = new Date(typeof b[key] === 'string' && !b[key].endsWith('Z') ? b[key] + 'Z' : b[key]);
 
             if (isNaN(dateA.getTime()) || isNaN(dateB.getTime()) || dateA.getTime() !== dateB.getTime()) {
                 return false;
