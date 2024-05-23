@@ -524,16 +524,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                 course={initialCourse}
                 onExit={() => {
                     setShowEnrollmentModal(false)
-                    window.location.reload()
                 }}
                 onError={(message) => {
                     setErrorMessages(message)
                     setShowEnrollmentModal(false)
                 }}
             />
-            
-
-
         </div>
     );
 }
