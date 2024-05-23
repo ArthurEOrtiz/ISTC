@@ -16,6 +16,7 @@ import SelectTopicModal from "../Topics/SelectTopicModal";
 import EnrollmentModal from "../Enrollment/EnrollmentModal";
 import { deepEquals } from "@/Utilities/deepEquality";
 import Loading from "@/app/shared/Loading";
+import ExamModal from "../Exam/ExamModal";
 
 interface EditCourseInfoProps {
     courseId: number;
@@ -61,6 +62,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     const [showTopicModal, setShowTopicModal] = useState<boolean>(false);
     const [showAttendanceModal, setShowAttendanceModal] = useState<Class | null>(null);
     const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false);
+    const [showExamModal, setShowExamModal] = useState<boolean>(false); 
     const [errorMessages, setErrorMessages] = useState<string | null>(null);
     const router = useRouter();
     
@@ -378,7 +380,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                             <li>
                                 <button
                                     className="text-nowrap"
-                                    onClick={() => console.log(course.exams)}
+                                    onClick={() => setShowExamModal(true)}
                                 >
                                     Exams
                                 </button>
@@ -611,6 +613,16 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                     setShowEnrollmentModal(false)
                 }}
                 onEnroll={setCourseExams}
+            />
+
+            <ExamModal
+                exams={course.exams}
+                isOpen={showExamModal}
+                onExit={(exams) => {
+                    setShowExamModal(false)
+                    exams && setCourse({...course, exams: exams})
+                }}
+                onError={(message) => setErrorMessages(message)}
             />
         </div>
     );
