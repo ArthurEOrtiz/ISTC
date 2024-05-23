@@ -16,7 +16,6 @@ import SelectTopicModal from "../Topics/SelectTopicModal";
 import EnrollmentModal from "../Enrollment/EnrollmentModal";
 import { deepEquals } from "@/Utilities/deepEquality";
 import Loading from "@/app/shared/Loading";
-import { render } from "react-dom";
 
 interface EditCourseInfoProps {
     courseId: number;
