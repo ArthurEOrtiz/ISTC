@@ -369,7 +369,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="hasExam"
                         onChange = {handleChange}
-                        defaultValue = {course.hasExam.toString()}
+                        defaultValue = {course.hasExam?.toString()}
                     >
                         <option value="true">Yes</option>
                         <option value="false">No</option>
@@ -418,7 +418,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         id="enrollmentDeadline"
                         min={new Date().toISOString().split('T')[0]}
                         type="date"
-                        value={new Date(course.enrollmentDeadline).toISOString().split('T')[0]}
+                        value={course.enrollmentDeadline ? new Date(course.enrollmentDeadline).toISOString().split('T')[0] : ''}
                         onChange={handleChange}
                         onBlur={handleEnrollmentDeadlineBlur}
                     />
