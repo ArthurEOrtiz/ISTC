@@ -73,7 +73,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     // This will check if the course has been updated and set the unsaved changes flag.
     useEffect(() => {
         // First check if there are any classes to check.
-        if (courseHasClasses()) {
+        if (!courseHasClasses()) {
             return;
         }
 
@@ -100,7 +100,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
             setUnsavedChanges(false);
         }
     }
-    , [course]);
+    , [course, course.classes]);
 
     // This will sort the classes by date if they are not already sorted
     useEffect(() => { 
@@ -208,7 +208,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     }
 
     // Helper Methods 
-
     const initializeCourseData = async () => {
         console.log("Initializing Course Data")
         setIsLoading(true);
