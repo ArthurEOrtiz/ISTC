@@ -258,8 +258,18 @@ export async function DeleteClassById(classId: Number) {
     }
 }
 
-// Topics
+// Exams
+export async function GetExamsByCourseId(courseId: Number) {
+    try {
+        const response = await axiosInstance.get(`Exam/GetExamsByCourseId/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching exams:', error);
+        return error.message;
+    }
+}
 
+// Topics
 export async function postTopic(topic: Topic) {
     try {
         const response = await axiosInstance.post('Topic/PostTopic', topic);
