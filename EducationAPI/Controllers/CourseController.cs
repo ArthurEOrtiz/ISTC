@@ -636,9 +636,7 @@ namespace EducationAPI.Controllers
     {
       try
       {
-        // First lets pull the Course out of the DTO.
-        //var updatedCourse = updatedCourseDTO.Course;
-        // Update the status of the course
+        // Update the status of the incoming course
         UpdateCourseStatus(updatedCourse);
 
         // Query the database for the course to update. 
