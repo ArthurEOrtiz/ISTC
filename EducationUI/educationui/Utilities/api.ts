@@ -90,10 +90,10 @@ export async function GetAllEnrollableCoursesByStatus(statuses: CourseStatus[]) 
 export async function getCourseById(courseId: number) {
     try {
         const response = await axiosInstance.get(`Course/GetCourseById?id=${courseId}`);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error fetching course:', error);
-        throw error;
+        return error.message;
     }
 }
 
