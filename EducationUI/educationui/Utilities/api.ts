@@ -341,6 +341,16 @@ export async function GetUserById(userId: Number) {
     }
 }
 
+export async function GetUserByStudentId(studentId: Number) {
+    try {
+        const response = await axiosInstance.get(`User/GetUserByStudentId/${studentId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching user:', error);
+        return error.message;
+    }
+}
+
 export async function GetUserByEmail(email: string) {
     try {
         const response = await axiosInstance.get(`User/GetUserByEmail/${email}`);
@@ -431,15 +441,7 @@ export async function IsUserEnrolledInCourse(clerkId: String, courseId: Number) 
     }
 }
 
-export async function GetUserByStudentId(studentId: Number) {
-    try {
-        const response = await axiosInstance.get(`User/GetUserByStudentId/${studentId}`);
-        return response;
-    } catch (error: any) {
-        console.error('Error fetching user:', error);
-        return error.message;
-    }
-}
+
 
 export async function DeleteUserById(userId: Number) {
     try {
