@@ -192,6 +192,12 @@ const AddCourse: React.FC = () => {
                             course={course} 
                             onSubmit={(course) => setCourse(course)}
                         />
+                        <button 
+                            className='btn btn-primary text-white'
+                            onClick={()=>console.log(course)}
+                            >
+                                Log Course
+                        </button>
                     </div>
                 </div>
             ) : (
@@ -224,6 +230,12 @@ const AddCourse: React.FC = () => {
                                 onClick={()=>setShowConfirmationModal(true)}
                                 >
                                     Save Course
+                            </button>
+                            <button
+                                className="btn btn-primary text-white"
+                                onClick={() => console.log(course)}
+                            >
+                                Log Course
                             </button>
                         </div>
                     </div>
