@@ -1,5 +1,5 @@
 import { Exam, User } from "@/app/shared/types/sharedTypes";
-import { GetCourseEnrollment} from "@/Utilities/api";
+import { GetCourseEnrollment, UpdateExam} from "@/Utilities/api";
 import { useEffect, useState } from "react";
 
 interface ExamModalProps {
@@ -47,6 +47,22 @@ const ExamModal: React.FC<ExamModalProps> = ({exams, courseId, isOpen, onExit, o
         }
     }
 
+    const saveExams = async (exams: Exam[]) => {
+        setIsLoading(true);
+        exams.forEach(async (exam) => {
+            await saveExam(exam);
+        });
+        onExit(exams);
+    }
+
+    const saveExam = async (exam: Exam) => {
+        const response = await UpdateExam(exam);
+        if (response.status !== 200) {
+            onError(response.data);
+        }
+    }
+    
+
     // Render
     return (
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${isOpen ? 'block' : 'hidden'}`}>
@@ -56,7 +72,7 @@ const ExamModal: React.FC<ExamModalProps> = ({exams, courseId, isOpen, onExit, o
             <div className="bg-base-100 p-4 rounded-xl z-10 min-w-96">
                 <div>
                     {/* Header */}
-                    <div className="flex justify-between">
+                    <div className="flex justify-between mb-4">
                         <h1 className="text-2xl font-bold">Exams</h1>
                         <button onClick={() => onExit(null)} className="text-3xl text-error font-bold">&times;</button>
                     </div>
@@ -69,10 +85,11 @@ const ExamModal: React.FC<ExamModalProps> = ({exams, courseId, isOpen, onExit, o
                                     (   
                                         <table className="table w-full border-separate border-spacing-2">
                                             <thead>
-                                                <tr>
+                                                <tr className="">
+                                                    <th>Exam Id</th>
                                                     <th>Student</th>
                                                     <th>Email</th>
-                                                    <th>Has Passed</th>
+                                                    <th>Has Passed?</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -80,6 +97,7 @@ const ExamModal: React.FC<ExamModalProps> = ({exams, courseId, isOpen, onExit, o
                                                     const user = users.find((u) => u.student.studentId === exam.studentId);
                                                     return (
                                                         <tr key={index}>
+                                                            <td>{exam.examId}</td>
                                                             <td>{user ? `${user.firstName} ${user.lastName}` : 'User not found'}</td>
                                                             <td>{user ? user.email : 'User not found'}</td>
                                                             <td>
@@ -110,8 +128,10 @@ const ExamModal: React.FC<ExamModalProps> = ({exams, courseId, isOpen, onExit, o
                     {/* Footer */}
                     <div className="flex justify-start mt-4">
                         <button 
-                            onClick={() => onExit(examList)} 
-                            className="btn btn-success text-white">
+                            onClick={() => saveExams(examList!)} 
+                            className="btn btn-success text-white"
+                            disabled={isLoading && examList != null}
+                        >
                                 Save
                         </button>
                     </div>
