@@ -617,6 +617,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
 
             <ExamModal
                 exams={course.exams}
+                courseId={course.courseId}
                 isOpen={showExamModal}
                 onExit={(exams) => {
                     setShowExamModal(false)
