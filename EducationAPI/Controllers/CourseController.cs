@@ -569,7 +569,7 @@ namespace EducationAPI.Controllers
           .ToListAsync();
 
         _logger.LogInformation("GetCourseEnrollment({CourseId}), called.", courseId);
-        return users;
+        return Ok(users);
 
       }
       catch (Exception ex)
@@ -578,7 +578,6 @@ namespace EducationAPI.Controllers
         return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
       }
     }
-
 
     /// <summary>
     /// Gives the end user the ability to add a Course record to the database.
