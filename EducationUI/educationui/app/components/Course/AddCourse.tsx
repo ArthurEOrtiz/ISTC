@@ -13,13 +13,10 @@ import CourseInfoCard from './CourseInfoCard';
 import CourseFormModal from './CourseFormModal';
 import SelectPDFModal from '../PDF/SelectPDFModal';
 
-
-
-/**
+/*
  * Component for adding a new course. 
  * This component is under the CourseComponents folder, and is the central component for 
- * creating a new course. It Contains the NewCourseForm, CourseInfoCard, NewClass, and Select
- * TopicModal components.
+ * creating a new course. 
  */
 const AddCourse: React.FC = () => {
     const defaultCourse : Course = {
