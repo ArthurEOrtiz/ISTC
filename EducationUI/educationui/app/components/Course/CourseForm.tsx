@@ -416,7 +416,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                     <input
                         className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!isEnrollmentDeadlineValid && enrollmentDeadlineTouched ? 'border-error' : ''}`}
                         id="enrollmentDeadline"
-                        min={new Date().toISOString().split('T')[0]}
+                        // min={new Date().toISOString().split('T')[0]}
                         type="date"
                         value={course.enrollmentDeadline ? new Date(course.enrollmentDeadline).toISOString().split('T')[0] : ''}
                         onChange={handleChange}
