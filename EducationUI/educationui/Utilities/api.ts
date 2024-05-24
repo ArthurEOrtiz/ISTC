@@ -1,4 +1,4 @@
-import { Attendance, Course, CourseStatus, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
+import { Attendance, Course, CourseStatus, Exam, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
 import axios from 'axios';
 import https from 'https';
 import qs from 'qs';
@@ -265,6 +265,16 @@ export async function GetExamsByCourseId(courseId: Number) {
         return response;
     } catch (error: any) {
         console.error('Error fetching exams:', error);
+        return error.message;
+    }
+}
+
+export async function UpdateExam(exam: Exam) {
+    try {
+        const response = await axiosInstance.put('Exam/UpdateExam', exam);
+        return response;
+    } catch (error: any) {
+        console.error('Error updating exam:', error);
         return error.message;
     }
 }
