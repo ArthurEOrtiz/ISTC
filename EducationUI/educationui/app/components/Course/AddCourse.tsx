@@ -12,6 +12,7 @@ import ErrorModal from '@/app/shared/modals/ErrorModal';
 import CourseInfoCard from './CourseInfoCard';
 import CourseFormModal from './CourseFormModal';
 import SelectPDFModal from '../PDF/SelectPDFModal';
+import { areClassesOrderedByDate, courseHasClasses, sortClassesByDate } from '@/Utilities/class';
 
 /*
  * Component for adding a new course. 
@@ -71,6 +72,18 @@ const AddCourse: React.FC = () => {
     }
     , [course.classes.length]);
 
+    useEffect(() => {
+        if (courseHasClasses(course.classes) && !areClassesOrderedByDate(course.classes)) {
+            setCourse({
+                ...course,
+                classes: sortClassesByDate(course.classes)
+            });
+        }
+    }
+    , [course.classes]);
+
+            
+
     // Event Handlers 
     const handleAddClass = () => {
         const today = new Date();
@@ -98,10 +111,12 @@ const AddCourse: React.FC = () => {
             // Set the end time to 5 PM of today
             scheduleEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 17, 0);
         }
+
+        const tempId : number = -course.classes.length;
     
         // Create the new class object
         const newClass = {
-            classId: 0,
+            classId: tempId,
             courseId: 0,
             scheduleStart: scheduleStart,
             scheduleEnd: scheduleEnd,
@@ -215,8 +230,7 @@ const AddCourse: React.FC = () => {
 
                     <div>
                         {course.classes.map((cls, index) => (
-                            
-                            <div className="bg-base-100 shadow-md rounded-xl p-4 relative mt-2" key={index}> 
+                            <div className="bg-base-100 shadow-md rounded-xl p-4 relative mt-2" key={cls.classId}> 
                                 <h2 className="text-xl font-bold mb-2">Class {index + 1}</h2>
                                 <ClassCard
                                     cls={cls}
