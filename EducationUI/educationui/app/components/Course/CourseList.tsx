@@ -12,7 +12,7 @@ interface CourseListProps {
 }
 
 const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}) => {
-    const [courseList , setCourseList] = useState<Course[] | null>(courses);
+    const [courseList , setCourseList] = useState<Course[] | null>(null);
 
     useEffect(() => {
         if (courses) {
