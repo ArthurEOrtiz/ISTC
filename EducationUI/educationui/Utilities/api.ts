@@ -1,4 +1,4 @@
-import { Attendance, Course, CourseStatus, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
+import { Attendance, Course, CourseStatus, Exam, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
 import axios from 'axios';
 import https from 'https';
 import qs from 'qs';
@@ -258,8 +258,28 @@ export async function DeleteClassById(classId: Number) {
     }
 }
 
-// Topics
+// Exams
+export async function GetExamsByCourseId(courseId: Number) {
+    try {
+        const response = await axiosInstance.get(`Exam/GetExamsByCourseId/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching exams:', error);
+        return error.message;
+    }
+}
 
+export async function UpdateExam(exam: Exam) {
+    try {
+        const response = await axiosInstance.put('Exam/UpdateExam', exam);
+        return response;
+    } catch (error: any) {
+        console.error('Error updating exam:', error);
+        return error.message;
+    }
+}
+
+// Topics
 export async function postTopic(topic: Topic) {
     try {
         const response = await axiosInstance.post('Topic/PostTopic', topic);
@@ -328,6 +348,16 @@ export async function GetUserById(userId: Number) {
     } catch (error) {
         console.error('Error fetching user:', error);
         throw error;
+    }
+}
+
+export async function GetUserByStudentId(studentId: Number) {
+    try {
+        const response = await axiosInstance.get(`User/GetUserByStudentId/${studentId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching user:', error);
+        return error.message;
     }
 }
 
@@ -421,15 +451,7 @@ export async function IsUserEnrolledInCourse(clerkId: String, courseId: Number) 
     }
 }
 
-export async function GetUserByStudentId(studentId: Number) {
-    try {
-        const response = await axiosInstance.get(`User/GetUserByStudentId/${studentId}`);
-        return response;
-    } catch (error: any) {
-        console.error('Error fetching user:', error);
-        return error.message;
-    }
-}
+
 
 export async function DeleteUserById(userId: Number) {
     try {

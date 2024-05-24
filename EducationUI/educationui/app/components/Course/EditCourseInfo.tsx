@@ -1,12 +1,12 @@
 'use client';
-import { Attendance, Class, Course, Topic } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, Course, Exam, Topic } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import { useEffect, useState } from "react";
 import SavingModal from "../../shared/modals/SavingModal";
 import ConfirmationModal from "../../shared/modals/ConfirmationModal";
 import ErrorModel from "../../shared/modals/ErrorModal";
 import { useRouter } from "next/navigation";
-import { DeleteCourseById, getCourseById, UpdateCourse } from "@/Utilities/api";
+import { DeleteCourseById, getCourseById, GetExamsByCourseId, UpdateCourse } from "@/Utilities/api";
 import moment from "moment";
 import ClassCard from "../Class/ClassCard";
 import SelectPDFModal from "../PDF/SelectPDFModal";
@@ -16,6 +16,7 @@ import SelectTopicModal from "../Topics/SelectTopicModal";
 import EnrollmentModal from "../Enrollment/EnrollmentModal";
 import { deepEquals } from "@/Utilities/deepEquality";
 import Loading from "@/app/shared/Loading";
+import ExamModal from "../Exam/ExamModal";
 
 interface EditCourseInfoProps {
     courseId: number;
@@ -61,6 +62,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     const [showTopicModal, setShowTopicModal] = useState<boolean>(false);
     const [showAttendanceModal, setShowAttendanceModal] = useState<Class | null>(null);
     const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false);
+    const [showExamModal, setShowExamModal] = useState<boolean>(false); 
     const [errorMessages, setErrorMessages] = useState<string | null>(null);
     const router = useRouter();
     
@@ -73,14 +75,15 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     // This will check if the course has been updated and set the unsaved changes flag.
     useEffect(() => {
         // First check if there are any classes to check.
-        if (!courseHasClasses()) {
-            return;
-        }
+        // I need to remove this check because the classes are always present.
+        // if (!courseHasClasses()) {
+        //     return;
+        // }
 
         // Then sort the classes by date to compare them.
         // This is because the classes are not guaranteed to be in order when they are received from the API.
-        const sortedCourseClasses = sortClassesByDate(course.classes);
-        const sortedInitialCourseClasses = sortClassesByDate(initialCourse.classes);
+        const sortedCourseClasses = courseHasClasses() ? sortClassesByDate(course.classes) : [];
+        const sortedInitialCourseClasses = courseHasClasses() ? sortClassesByDate(initialCourse.classes) : [];
 
         const sortedCourse = {
             ...course,
@@ -93,24 +96,23 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
         }
         
         if (!deepEquals(sortedCourse, sortedInitialCourse)) {
-            console.log("Unsaved Changes Detected");
+            // console.log("Unsaved Changes Detected");
             setUnsavedChanges(true);
         } else {
-            console.log("No Unsaved Changes Detected");
+            // console.log("No Unsaved Changes Detected");
             setUnsavedChanges(false);
         }
     }
-    , [course, course.classes]);
+    , [course, course.classes, course.exams]);
 
     // This will sort the classes by date if they are not already sorted
     useEffect(() => { 
         if (!courseHasClasses()){
             return;
         }
-
-        console.log("Checking if classes are ordered by date...");  
+        // console.log("Checking if classes are ordered by date...");  
         if (!areClassesOrderedByDate()) {
-            console.log("Classes are not ordered by date. Sorting...");
+            // console.log("Classes are not ordered by date. Sorting...");
             setCourse(prevCourse => {
                 return {
                     ...prevCourse,
@@ -150,7 +152,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     }
 
     const handleOnClassAdd = (): void => {
-
         if (!courseHasClasses()) {
             addNewClass();
         } else {
@@ -209,23 +210,48 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
 
     // Helper Methods 
     const initializeCourseData = async () => {
-        console.log("Initializing Course Data")
+        // console.log("Initializing Course Data")
         setIsLoading(true);
         const courseData = await getCourseData(courseId);
-        console.log("Course Data", courseData)
+        // console.log("Course Data", courseData)
         setCourse(courseData);
         setInitialCourse(courseData);
         setIsLoading(false);
     }
 
     const getCourseData = async (courseId: number): Promise<Course> => {
-       
         const response = await getCourseById(courseId);
         if (response.status === 200) {
             return response.data;
         } else {
             setErrorMessages(response);
             return {} as Course;
+        }
+    }
+
+    const setCourseExams = async () => {
+        const exams = await getCourseExams(course.courseId as number);
+        setCourse(prevCourse => {
+            return {
+                ...prevCourse,
+                exams: exams
+            }
+        });
+        setInitialCourse(prevCourse => {
+            return {
+                ...prevCourse,
+                exams: exams
+            }
+        });
+    }
+
+    const getCourseExams = async (courseId: number): Promise<Exam[]> => {
+        const response = await GetExamsByCourseId(courseId);
+        if (response.status === 200) {
+            return response.data;
+        } else {
+            setErrorMessages(response);
+            return [] as Exam[];
         }
     }
     
@@ -243,7 +269,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
             scheduleEnd: todayAt5PMMountainTime,
             attendances: []
         }
-        //console.log(newClass)
+        
         setCourse(prevCourse => {
             return {
                 ...prevCourse,
@@ -303,6 +329,94 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     }
 
     // Render
+    
+    // This function will render the navigation list for the course edit page.
+    const renderNavList = () => {
+        return (
+            <>
+                <li>
+                    <details>
+                        <summary>Edit</summary>
+                        <ul className="p-2 z-10 bg-base-300 rounded-xl">
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    onClick={() => setShowCourseFormModal(true)}
+                                >
+                                    Information
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    onClick={() => setShowTopicModal(true)}
+                                >
+                                    Topics 
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    onClick={() => setShowPDFModal(true)}
+                                >
+                                    PDF
+                                </button>
+                            </li>
+                        </ul>
+                    </details>
+                            
+                </li>
+                <li>
+                    <details>
+                        <summary>Manage</summary>
+                        <ul className="p-2 z-10 bg-base-300 rounded-xl">
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    onClick={() => setShowEnrollmentModal(true)}
+                                >
+                                    Enrollment
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    onClick={() => setShowExamModal(true)}
+                                >
+                                    Exams
+                                </button>
+                            </li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <button
+                        className="text-nowrap text-success font-bold"
+                        onClick={handleSaveCourse}
+                    >
+                        Save
+                    </button>
+                </li>
+                <li>
+                    <button
+                        className="text-nowrap text-error font-bold"
+                        onClick={handleDeleteCourse}
+                    >
+                        Delete
+                    </button>
+                </li>
+                <li>
+                    <button
+                        className="text-nowrap text-warning font-bold"
+                        onClick={() => console.log(course)}
+                    >
+                        Log Course
+                    </button>
+                </li>
+            </>
+        );
+    }  
+
     // if the course is loading, display the loading spinner
     if (isLoading) {
         return <Loading />
@@ -330,65 +444,37 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                 <p className="p-s text-3xl text-center font-bold"> Edit Course </p>
                 {unsavedChanges && (
                     <div role="alert" className="alert alert-warning mt-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                    <span>Warning: Unsaved Changes detected!</span>
-                  </div>)}
+                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <span>Warning: Unsaved Changes detected!</span>
+                  </div>
+                )}
             </div>
             
             <div className="bg-base-100 shawdow-md rounded-xl p-5 mb-4">
-                <div className="mb-4 bg-base-300 rounded-xl p-4">
+                <div className="mb-2 bg-base-300 rounded-xl p-4">
                     <CourseInfoCard course={course} />
                 </div>
-                <div className="mt-2 space-x-2 space-y-2">
-                    <button
-                        className="btn btn-primary text-white"
-                        onClick={() => setShowCourseFormModal(true)}
-                    >
-                        Edit Course Information
-                    </button>
-                    <button
-                        className="btn btn-primary text-white"
-                        onClick={() => setShowTopicModal(true)}
-                    >
-                        Select Topics 
-                    </button>
-                    <button
-                        className="btn btn-primary text-white"
-                        onClick={() => setShowPDFModal(true)}
-                    >
-                        Select PDF
-                    </button>
-                    <button
-                        className="btn btn-primary text-white"
-                        onClick={() => setShowEnrollmentModal(true)}
-                    >
-                        Manage Enrollment
-                    </button>
-                    <button
-                        className="btn btn-success text-white"
-                        onClick = {handleSaveCourse}>
-                            Save Course
-                    </button>
-                    <button 
-                        className="btn btn-error text-white"
-                        onClick={handleDeleteCourse}>
-                            Delete Course
-                    </button>
-                    {/* <button 
-                        onClick={() => console.log(course)}
-                        className="btn btn-primary text-white"
-                    >
-                        Log Course
-                    </button>
-                    <button
-                        className="btn btn-primary text-white"
-                        onClick={() => console.log(initialCourse)}
-                    >
-                        Log Initial Course
-                    </button> */}
+
+                <div className="navbar">
+                    <div className="navbar-start">
+                        <div className="dropdown">
+                            <div tabIndex={0} role="button" className="btn btn-circle btn-outline btn-primary text-white lg:hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+                            </div>
+                            <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                                {renderNavList()}
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="navbar-center hidden bg-base-300 rounded-xl lg:flex justify-start ">
+                        <ul className="menu menu-horizontal space-x-16">
+                            {renderNavList()}
+                        </ul>
+                    </div>
+                    <div className="navbar-end">
+                    </div>
                 </div>
             </div>
-    
             
             <div className="space-y-2">
                 {course.classes?.map((cls, index) => (
@@ -522,13 +608,23 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
             <EnrollmentModal
                 isOpen={showEnrollmentModal}
                 course={initialCourse}
-                onExit={() => {
-                    setShowEnrollmentModal(false)
-                }}
+                onExit={() => {setShowEnrollmentModal(false)}}
                 onError={(message) => {
                     setErrorMessages(message)
                     setShowEnrollmentModal(false)
                 }}
+                onEnroll={setCourseExams}
+            />
+
+            <ExamModal
+                exams={course.exams}
+                courseId={course.courseId}
+                isOpen={showExamModal}
+                onExit={(exams) => {
+                    setShowExamModal(false)
+                    exams && setCourse({...course, exams: exams})
+                }}
+                onError={(message) => setErrorMessages(message)}
             />
         </div>
     );

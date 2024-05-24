@@ -8,9 +8,10 @@ interface EnrollmentModalProps {
     isOpen: boolean;
     onExit: () => void;
     onError: (message: string) => void;
+    onEnroll? : () => void;
 }
 
-const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExit, onError }) => {
+const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExit, onError, onEnroll }) => {
     const [ users, setUsers] = useState<User[]>();
     const [ enrollmentQueue, setEnrollmentQueue ] = useState<User[]>();
     const [ dropQueue, setDropQueue ] = useState<User[]>();
@@ -149,7 +150,10 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
        // once all the users are enrollered, check the enrollment queue (waitlist)
        // and delete the users that were enrolled if any
         usersToEnroll.forEach(async (user) => {
-            removeStudentFromEnrollmentQueue(user);
+            const isUserWaitListed = enrollmentQueue?.some(enrollmentUser => enrollmentUser.userId === user.userId);
+            if (isUserWaitListed) {
+                removeStudentFromEnrollmentQueue(user);
+            }
         });
     }
 
@@ -157,6 +161,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
         const response = await EnrollUsers(course.courseId, users);
         if (response.status === 201) {
             await getEnrolledUsers();
+            onEnroll && onEnroll();  
         } else {
             onError(response as unknown as string);
         }
@@ -166,6 +171,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
         const response = await EnrollUser(user.userId, course.courseId);
         if (response.status === 201) {
             await getEnrolledUsers();
+            onEnroll && onEnroll();
         } else {
             onError(response as unknown as string);
         }
@@ -176,6 +182,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
         const response = await DropUser(userToDrop!.userId, course.courseId);
         if (response.status === 204) {
             await getEnrolledUsers();
+            onEnroll && onEnroll();
         } else {
             onError(response as unknown as string);
         }
@@ -186,6 +193,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
         const response = await DeleteWaitListByUserIdCourseId(user.userId, course.courseId);
         if (response.status === 204) {
             await getEnrollmentQueue();
+            onEnroll && onEnroll();
         } else {
             onError(response as unknown as string);
         }
