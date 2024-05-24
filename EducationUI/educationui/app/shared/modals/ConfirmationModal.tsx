@@ -17,7 +17,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ title, message, o
                 <div className="flex justify-between">
                     {onCancel && (
                         <>
-                        <button onClick={onConfirm} className="btn btn-success text-white ">Yes</button>
+                        <button onClick={onConfirm} className="btn btn-success text-white">Yes</button>
                         <button onClick={onCancel} className="btn btn-error text-white">No</button>
                         </>
                     )}
