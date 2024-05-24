@@ -19,6 +19,7 @@ import SelectPDFModal from '../PDF/SelectPDFModal';
  * creating a new course. 
  */
 const AddCourse: React.FC = () => {
+
     const defaultCourse : Course = {
         courseId: 0,
         status: "Upcoming",
@@ -50,7 +51,7 @@ const AddCourse: React.FC = () => {
         exams: [],
         waitLists: [],
     };
-
+    // State variables for the component
     const [course, setCourse] = useState<Course>(defaultCourse);
     const [showCourseForm, setShowCourseForm] = useState<boolean>(false);
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
@@ -61,6 +62,7 @@ const AddCourse: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState<string>('');
     const router = useRouter();
     
+    // Effects
     useEffect(() => {
         window.scrollTo({
             top: document.body.scrollHeight,
@@ -69,7 +71,7 @@ const AddCourse: React.FC = () => {
     }
     , [course.classes.length]);
 
-    // Event Handlers this component. 
+    // Event Handlers 
     const handleAddClass = () => {
         const today = new Date();
     
@@ -238,13 +240,12 @@ const AddCourse: React.FC = () => {
                             >
                                 &#x2B; Class
                             </button>
-                            
-                            <button
+                            {/* <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
                             >
                                 Log Course
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                 </div>
