@@ -911,7 +911,7 @@ namespace EducationAPI.Controllers
           if (user == null)
           {
             _logger.LogError("EnrollUsers({UserId},{CourseId}), User not found.", userId, courseId);
-            return new StatusCodeResult((int)HttpStatusCode.NotFound);
+            return NotFound("User not found.");
           }
 
           var student = user.Student;
@@ -919,7 +919,7 @@ namespace EducationAPI.Controllers
           if (student == null)
           {
             _logger.LogError("EnrollUsers({UserId},{CourseId}), student not found.", userId, courseId);
-            return new StatusCodeResult((int)HttpStatusCode.NotFound);
+            return NotFound("Student not found, User might not be a student.");
           }
 
           // Check if the student is already enroll in the course
