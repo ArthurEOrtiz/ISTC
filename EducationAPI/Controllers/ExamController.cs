@@ -35,5 +35,23 @@ namespace EducationAPI.Controllers
         return StatusCode(500);
       }
     }
+
+    [HttpPut("UpdateExam")]
+    public async Task<ActionResult<Exam>> UpdateExam(Exam exam)
+    {
+      try
+      {
+        _educationProgramContext.Entry(exam).State = EntityState.Modified;
+        await _educationProgramContext.SaveChangesAsync();
+        
+        _logger.LogInformation("UpdateExam({exam}) called.", exam);
+        return Ok(exam);
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "UpdateExam({exam})", exam);
+        return StatusCode(500);
+      }
+    }
   }
 }
