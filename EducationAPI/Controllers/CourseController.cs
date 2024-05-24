@@ -677,7 +677,7 @@ namespace EducationAPI.Controllers
         List<Class> classesToAdd = [];
         foreach (var updatedClass in updatedCourse.Classes)
         {
-         
+
           // if the classId of the updated class is negative, then it is a new class
           // so you should change the classId to zero
           if (updatedClass.ClassId < 0)
@@ -731,6 +731,9 @@ namespace EducationAPI.Controllers
         {
           existingCourse.Classes.Remove(classToRemove);
         }
+
+        // Update Location
+        _educationProgramContext.Entry(existingCourse.Location).CurrentValues.SetValues(updatedCourse.Location);
 
         // Update PDF.
         // First check if it's even necessary, because PDF can be null. 
