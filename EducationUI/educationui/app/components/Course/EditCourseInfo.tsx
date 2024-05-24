@@ -84,11 +84,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
 
     // This will sort the classes by date if they are not already sorted
     useEffect(() => { 
-        if (!courseHasClasses(course.classes)){
-            return;
-        }
+        // if (!courseHasClasses(course.classes)){
+        //     return;
+        // }
         // console.log("Checking if classes are ordered by date...");  
-        if (!areClassesOrderedByDate(course.classes)) {
+        if (courseHasClasses(course.classes) && !areClassesOrderedByDate(course.classes)) {
             // console.log("Classes are not ordered by date. Sorting...");
             setCourse(prevCourse => {
                 return {
