@@ -1,6 +1,5 @@
 import { Exam, User } from "@/app/shared/types/sharedTypes";
-import { GetCourseEnrollment, GetUserByStudentId } from "@/Utilities/api";
-import { get } from "http";
+import { GetCourseEnrollment} from "@/Utilities/api";
 import { useEffect, useState } from "react";
 
 interface ExamModalProps {
@@ -64,22 +63,42 @@ const ExamModal: React.FC<ExamModalProps> = ({exams, courseId, isOpen, onExit, o
                     {/* Main Content */}
                     <div>
                         {/* Exams */}
-                        <div className="space-y-2">
+                        <div className="bg-base-300 p-4 rounded-xl">
                             {!isLoading ? (
                                 examList != null && users ? 
-                                    (
-                                        examList.map((exam: Exam, index: number) => {
-                                            const user = users.find((u) => u.student.studentId === exam.studentId);
-                                            return (
-                                                <div key={index} className="bg-base-200 rounded-xl p-4">
-                                                    <p>Exam ID : {exam.examId}</p>
-                                                    <p>{`${user?.firstName} ${user?.lastName}`}</p>
-                                                    <p>{`${user?.email}`}</p>
-                                                    <p>Has Passed? {`${exam.hasPassed ? 'Passed' : 'Failed'}`}</p>
-                                                    
-                                                </div>
-                                            );
-                                        })
+                                    (   
+                                        <table className="table w-full border-separate border-spacing-2">
+                                            <thead>
+                                                <tr>
+                                                    <th>Student</th>
+                                                    <th>Email</th>
+                                                    <th>Has Passed</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {examList.map((exam: Exam, index: number) => {
+                                                    const user = users.find((u) => u.student.studentId === exam.studentId);
+                                                    return (
+                                                        <tr key={index}>
+                                                            <td>{user ? `${user.firstName} ${user.lastName}` : 'User not found'}</td>
+                                                            <td>{user ? user.email : 'User not found'}</td>
+                                                            <td>
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="checkbox checkbox-success"
+                                                                    defaultChecked={exam.hasPassed}
+                                                                    onChange={(e) => {
+                                                                        const newExamList = [...examList];
+                                                                        newExamList[index].hasPassed = e.target.checked;
+                                                                        setExamList(newExamList);
+                                                                    }}
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                })}
+                                            </tbody>
+                                        </table>
                                     ) : (
                                         <p className="text-center text-error">No exams available!</p>
                                     )
@@ -87,6 +106,14 @@ const ExamModal: React.FC<ExamModalProps> = ({exams, courseId, isOpen, onExit, o
                                 <span className="loading loading-spinner loading-lg"></span>
                             )}
                         </div>
+                    </div>
+                    {/* Footer */}
+                    <div className="flex justify-start mt-4">
+                        <button 
+                            onClick={() => onExit(examList)} 
+                            className="btn btn-success text-white">
+                                Save
+                        </button>
                     </div>
                 </div>
             </div>
