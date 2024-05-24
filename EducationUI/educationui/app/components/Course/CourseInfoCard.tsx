@@ -72,7 +72,9 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                 <div className="flex justify-between">
                     <div className="flex space-x-2">
                         <p className="text-2xl font-bold">{course.title} </p>
-                        <span className={`text-white badge badge-sm badge-${courseStatusColor}`}>{courseStatusText}</span>
+                        <div className={`badge badge-sm badge-${courseStatusColor ? courseStatusColor : 'error'}`}>
+                            <p className="text-white">{courseStatusText? courseStatusText : 'unknown'}</p>
+                        </div>
                     </div>
                     <p className="text-base">Course Id: {course.courseId}</p>
                 </div>
