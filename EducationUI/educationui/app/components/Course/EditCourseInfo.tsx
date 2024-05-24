@@ -74,14 +74,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
 
     // This will check if the course has been updated and set the unsaved changes flag.
     useEffect(() => {
-        // First check if there are any classes to check.
-        // I need to remove this check because the classes are always present.
-        // if (!courseHasClasses()) {
-        //     return;
-        // }
-
-        // Then sort the classes by date to compare them.
+        // Check if there are classes to this course, if it does then sort the classes by date.
         // This is because the classes are not guaranteed to be in order when they are received from the API.
+        // This will allow us to compare the classes in a consistent order.
         const sortedCourseClasses = courseHasClasses() ? sortClassesByDate(course.classes) : [];
         const sortedInitialCourseClasses = courseHasClasses() ? sortClassesByDate(initialCourse.classes) : [];
 
@@ -405,14 +400,14 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                         Delete
                     </button>
                 </li>
-                <li>
+                {/* <li>
                     <button
                         className="text-nowrap text-warning font-bold"
                         onClick={() => console.log(course)}
                     >
                         Log Course
                     </button>
-                </li>
+                </li> */}
             </>
         );
     }  
