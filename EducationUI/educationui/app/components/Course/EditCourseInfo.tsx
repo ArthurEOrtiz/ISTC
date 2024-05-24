@@ -400,14 +400,14 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                         Delete
                     </button>
                 </li>
-                {/* <li>
+                <li>
                     <button
                         className="text-nowrap text-warning font-bold"
                         onClick={() => console.log(course)}
                     >
                         Log Course
                     </button>
-                </li> */}
+                </li>
             </>
         );
     }  
@@ -521,7 +521,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                 <div className="flex justify-left mt-2">
                     <button 
                         className="btn btn-success text-white"
-                        onClick={handleOnClassAdd}>
+                        onClick={handleOnClassAdd}
+                        disabled={course.status === 'Archived'}
+                        >
                             &#x2B; Class
                     </button>
                 </div>
