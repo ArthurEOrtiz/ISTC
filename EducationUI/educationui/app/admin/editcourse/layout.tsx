@@ -15,7 +15,7 @@ const EditCoursesLayout: React.FC<EditCoursesLayoutProps> = ({ children }) => {
                 </li>
                 <li>
                     <Link href="/admin/editcourse/edit" className="btn btn-ghost text-white">
-                        Edit Course
+                        Course List
                     </Link>
                 </li>
             </ul>
