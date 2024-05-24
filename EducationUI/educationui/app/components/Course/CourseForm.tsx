@@ -2,6 +2,7 @@
 import { Course } from "@/app/shared/types/sharedTypes";
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 import CharacterCounter from "../../shared/CharacterCounter";
+import { courseHasClasses } from "@/Utilities/class";
 
 interface CourseFormProps {
     onSubmit: (course : Course) => void;
@@ -74,10 +75,28 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                 }));
                 break;
             }
-            case id === 'enrollmentDeadline': {
+            case id === 'attendanceCredit': {
+                const attendanceCredit = parseInt(value) ? parseInt(value) : 0;
                 setCourse((prevCourse) => ({
                     ...prevCourse,
-                    enrollmentDeadline: new Date(value),
+                    attendanceCredit,
+                }));
+                break;
+            }
+            case id === 'maxAttendance': {
+                const maxAttendance = parseInt(value) ? parseInt(value) : 0;
+                setCourse((prevCourse) => ({
+                    ...prevCourse,
+                    maxAttendance,
+                }));
+                break;
+            }
+            case id === 'enrollmentDeadline': {
+                const enrollmentDeadline = new Date(value);
+                enrollmentDeadline.setHours(0, 0, 0, 0);
+                setCourse((prevCourse) => ({
+                    ...prevCourse,
+                    enrollmentDeadline,
                 }));
                 break;
             }
@@ -187,6 +206,11 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                 return selectedDate > new Date();
             };
             case 'InProgress': {
+                // If a course is In Progress, then it should have classes.
+                // But lets put ths in here just in case.
+                if (!courseHasClasses(course.classes)) {
+                    return false;
+                }
                 const lastDayOfClass = new Date(course.classes[course.classes.length - 1].scheduleEnd);
                 return selectedDate <= lastDayOfClass 
             };
@@ -416,9 +440,8 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                     <input
                         className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!isEnrollmentDeadlineValid && enrollmentDeadlineTouched ? 'border-error' : ''}`}
                         id="enrollmentDeadline"
-                        // min={new Date().toISOString().split('T')[0]}
                         type="date"
-                        value={course.enrollmentDeadline ? new Date(course.enrollmentDeadline).toISOString().split('T')[0] : ''}
+                        defaultValue={new Date(course.enrollmentDeadline).toISOString().split('T')[0]}
                         onChange={handleChange}
                         onBlur={handleEnrollmentDeadlineBlur}
                     />
@@ -637,7 +660,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
 
             <div className="flex items-center justify-between">
                 <button
-                    className={`btn btn-success text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : ''}`}
+                    className={`btn btn-success text-white py-2 px-4 focus:outline-none focus:shadow-outline ${!isFormValid ? ' opacity-50 cursor-not-allowed' : ''}`}
                     type="submit"
                     disabled={!isFormValid}
                 >
