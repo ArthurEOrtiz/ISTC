@@ -3,6 +3,7 @@ using EducationAPI.DTO;
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 using System.Net;
 
 namespace EducationAPI.Controllers
@@ -594,6 +595,9 @@ namespace EducationAPI.Controllers
     {
       try
       {
+        // First take all the new classes which will have negative numbers as id's and turn them into 0's
+        course.Classes.ToList().ForEach(cls => cls.ClassId = 0);
+        
         // Create a copy of the topics collection
         var topicsCopy = course.Topics.ToList();
 
