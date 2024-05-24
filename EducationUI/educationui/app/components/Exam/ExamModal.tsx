@@ -1,48 +1,54 @@
 import { Exam, User } from "@/app/shared/types/sharedTypes";
-import { GetUserByStudentId } from "@/Utilities/api";
+import { GetCourseEnrollment, GetUserByStudentId } from "@/Utilities/api";
+import { get } from "http";
 import { useEffect, useState } from "react";
 
 interface ExamModalProps {
     exams: Exam[] | null;
+    courseId: number;
     isOpen: boolean;
     onExit: (exams: Exam[] | null) => void;
     onError: (message: string) => void;
 }
 
-const ExamModal: React.FC<ExamModalProps> = ({exams, isOpen, onExit, onError}) => {
+const ExamModal: React.FC<ExamModalProps> = ({exams, courseId, isOpen, onExit, onError}) => {
+    // State
     const [examList, setExamList] = useState<Exam[] | null>(exams);
     const [users, setUsers] = useState<User[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    // Effects
     useEffect(() => {
         if (exams && isOpen) {
-            console.log('Setting exam list');
+            // console.log('Setting exam list');
             setExamList(exams);
-            console.log('Getting all users');
+            // console.log('Getting all users');
             getAllUsers();
         }
     }, [isOpen]);
 
+    // Helper Functions
     const getAllUsers = async () => {
-        console.log('Getting all users');
+        // console.log('Getting all users');
         if (examList) {
-            console.log('Exam list is not null');
+            // console.log('Exam list is not null');
             setIsLoading(true);
-            await Promise.all(examList.map(async (exam: Exam) => { await getUsers(exam.studentId) }));
+            getUsers();
             setIsLoading(false);
-            console.log('Finished getting all users')
+            // console.log('Finished getting all users')
         }
     }
 
-    const getUsers = async (studentId : number) => {
-        const response = await GetUserByStudentId(studentId);
-        if (response.status === 200){
-            setUsers([...(users || []), response.data]);
+    const getUsers = async () => {
+        const response = await GetCourseEnrollment(courseId);
+        if (response.status === 200) {
+            setUsers(response.data);
         } else {
             onError(response)
         }
     }
 
+    // Render
     return (
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${isOpen ? 'block' : 'hidden'}`}>
             {/* Background Overlay */}
@@ -60,15 +66,20 @@ const ExamModal: React.FC<ExamModalProps> = ({exams, isOpen, onExit, onError}) =
                         {/* Exams */}
                         <div className="space-y-2">
                             {!isLoading ? (
-                                examList != null ? 
+                                examList != null && users ? 
                                     (
-                                        examList.map((exam: Exam, index: number) => (
-                                            <div key={index} className="bg-base-200 rounded-xl p-4">
-                                                <p>Exam ID    {exam.examId}</p>
-                                                <p>Student ID {exam.studentId}</p>
-                                                <p>Has Passed {`${exam.hasPassed ? 'Passed' : 'Failed'}`}</p>
-                                            </div>
-                                        ))
+                                        examList.map((exam: Exam, index: number) => {
+                                            const user = users.find((u) => u.student.studentId === exam.studentId);
+                                            return (
+                                                <div key={index} className="bg-base-200 rounded-xl p-4">
+                                                    <p>Exam ID : {exam.examId}</p>
+                                                    <p>{`${user?.firstName} ${user?.lastName}`}</p>
+                                                    <p>{`${user?.email}`}</p>
+                                                    <p>Has Passed? {`${exam.hasPassed ? 'Passed' : 'Failed'}`}</p>
+                                                    
+                                                </div>
+                                            );
+                                        })
                                     ) : (
                                         <p className="text-center text-error">No exams available!</p>
                                     )
