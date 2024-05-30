@@ -192,12 +192,6 @@ const AddCourse: React.FC = () => {
                             course={course} 
                             onSubmit={(course) => setCourse(course)}
                         />
-                        <button 
-                            className='btn btn-primary text-white'
-                            onClick={()=>console.log(course)}
-                            >
-                                Log Course
-                        </button>
                     </div>
                 </div>
             ) : (
@@ -231,12 +225,12 @@ const AddCourse: React.FC = () => {
                                 >
                                     Save Course
                             </button>
-                            <button
+                            {/* <button
                                 className="btn btn-primary text-white"
                                 onClick={() => console.log(course)}
                             >
                                 Log Course
-                            </button>
+                            </button> */}
                         </div>
                     </div>
 
