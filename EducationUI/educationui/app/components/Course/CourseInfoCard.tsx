@@ -9,7 +9,7 @@ interface CourseInfoCardProps {
 
 const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true }) => {
     // state
-    const [ courseStatusColor, setCourseStatusColor ] = useState<'success' | 'warning' | 'error'>();
+    const [ courseStatusColor, setCourseStatusColor ] = useState<'badge-success' | 'badge-warning' | 'badge-error'>();
     const [ courseStatusText, setCourseStatusText ] = useState<'Upcoming' | 'In Progress' | 'Archived'>();
     const [ pdfUrl, setPdfUrl ] = useState<string | null>(null);
     
@@ -17,15 +17,15 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
     useEffect(() => {
         switch (course.status) {
             case 'Upcoming':
-                setCourseStatusColor('success');
+                setCourseStatusColor('badge-success');
                 setCourseStatusText('Upcoming');
                 break;
             case 'InProgress':
-                setCourseStatusColor('warning');
+                setCourseStatusColor('badge-warning');
                 setCourseStatusText('In Progress');
                 break;
             case 'Archived':
-                setCourseStatusColor('error');
+                setCourseStatusColor('badge-error');
                 setCourseStatusText('Archived');
                 break;
             default:
@@ -70,9 +70,9 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
         <div className="space-y-2">
             {course.title ?(
                 <div className="flex justify-between">
-                    <div className="flex space-x-2">
+                    <div className="flex items-center space-x-2">
                         <p className="text-2xl font-bold">{course.title} </p>
-                        <div className={`badge badge-sm badge-${courseStatusColor ? courseStatusColor : 'error'}`}>
+                        <div className={`badge badge-sm ${courseStatusColor ? courseStatusColor : 'badge-error'}`}>
                             <p className="text-white">{courseStatusText? courseStatusText : 'unknown'}</p>
                         </div>
                     </div>
