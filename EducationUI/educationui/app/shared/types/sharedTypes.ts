@@ -31,10 +31,10 @@ export interface Course {
   status: CourseStatus;
   title: string;
   description: string | null;
-  attendanceCredit: number;
+  attendanceCredit: number | string;
   hasExam: boolean;
-  examCredit: number | null;
-  maxAttendance: number;
+  examCredit: number | string | null;
+  maxAttendance: number | string;
   enrollmentDeadline: Date;
   instructorName: string | null;
   instructorEmail: string | null;
