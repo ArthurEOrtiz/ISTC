@@ -59,7 +59,9 @@ export async function getAllCourses() {
 
 export async function GetCoursesByStatus( statuses: CourseStatus[]){
     try {
-        const response = await axiosInstance.get('Course/GetCoursesByStatus', { params: { statuses } });
+        const response = await axiosInstance.get('Course/GetCoursesByStatus', { 
+            params: { statuses } 
+        });
         return response;
     } catch (error : any) {
         console.error('Error fetching courses:', error);
@@ -79,11 +81,25 @@ export async function GetAllEnrollableCourses() {
 
 export async function GetAllEnrollableCoursesByStatus(statuses: CourseStatus[]) {
     try {
-        const response = await axiosInstance.get('Course/GetAllEnrollableCoursesByStatus', { params: { statuses } });
+        const response = await axiosInstance.get('Course/GetAllEnrollableCoursesByStatus', { 
+            params: { statuses } 
+        });
         return response;
     } catch (error : any) {
         console.error('Error fetching courses:', error);
         throw error.response.data;
+    }
+}
+
+export async function SearchCourses(searchString: string, statuses: CourseStatus[]) {
+    try {
+        const response = await axiosInstance.get(`Course/SearchCourses/${searchString}`, {
+             params: { statuses },
+        });
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching courses:', error);
+        return error.message;
     }
 }
 
