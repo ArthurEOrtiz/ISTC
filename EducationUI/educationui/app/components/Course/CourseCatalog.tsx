@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import CourseCalendar from "./CourseCalendar"
 import CourseList from "./CourseList";
 import { Course, CourseStatus, User } from "@/app/shared/types/sharedTypes";
-import { GetCoursesByStatus, GetUserByClerkId, GetAllEnrollableCoursesByStatus } from "@/Utilities/api";
+import { GetCoursesByStatus, GetUserByClerkId, GetAllEnrollableCoursesByStatus, SearchCourses } from "@/Utilities/api";
 import ErrorModel from "@/app/shared/modals/ErrorModal";
 import Loading from "@/app/shared/Loading";
 import { useUser } from "@clerk/clerk-react";
@@ -15,7 +15,8 @@ interface CourseCatalogProps {
 const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
     const { user: clerkUser, isLoaded } = useUser();
     const [ user, setUser ] = useState<User>();
-    const [ selectedStatuses, setSelectedStatuses ] = useState<CourseStatus []>(['Upcoming', 'InProgress']);   
+    const [ selectedStatuses, setSelectedStatuses ] = useState<CourseStatus []>(['Upcoming', 'InProgress']);
+    const [ searchString, setSearchString ] = useState<string>(''); 
     const [ isCourseCalendarVisible, setIsCourseCalendarVisible ] = useState(!isAdmin);
     const [ isCourseListVisible, setIsCourseListVisible ] = useState(isAdmin);
     const [ courses, setCourses ] = useState<Course[]>();
@@ -25,13 +26,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
     // effects
     useEffect(() => {
         setIsLoading(true);
-        if (!isAdmin) {
-            // console.log('fetching enrollable courses');
-            fetchEnrollableCourses();
-        } else {
-            // console.log('fetching all courses');
-            fetchAllCourses();
-        }
+        loadCourses();
         setIsLoading(false);
     }
     , [selectedStatuses]);
@@ -39,6 +34,11 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
     useEffect(() => {
         fetchUser();
     }, [clerkUser]);
+
+    useEffect(() => {
+        searchCourses();
+    }
+    , [searchString]);
 
     // handlers
     const handleCourseCalendarClick = () => {
@@ -65,7 +65,6 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
         const response = await GetCoursesByStatus(selectedStatuses);
         if (response.status === 200) {
             setCourses(response.data);
-            
         } else {
             setErrorMessages(response);
         }
@@ -83,6 +82,32 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
             setErrorMessages(response as unknown as string);
         }
     }
+
+    const loadCourses = async () => {
+        if (!isAdmin) {
+            await fetchEnrollableCourses();
+        } else {
+             await fetchAllCourses();
+        }
+        
+    }
+
+    const searchCourses = async () => {
+        if (searchString === '') {
+            await loadCourses();
+            return;
+        }
+
+        console.log("Search String", searchString);
+        console.log("Selected Statuses", selectedStatuses);
+        const response = await SearchCourses(searchString, selectedStatuses);
+        if (response.status === 200) {
+            setCourses(response.data);
+        } else {
+            setErrorMessages(response as unknown as string);
+        }
+    }
+
     
     // render
     if (isLoading || !isLoaded || !user) {
@@ -125,7 +150,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                 </div> */}
 
                 {isCourseListVisible && (
-                    <div>
+                    <div className="flex justify-between">
                         <div className="join p-1">
                             <button
                                 className={`join-item btn ${selectedStatuses.includes('Upcoming') ? 'btn-primary text-white': ''}`}
@@ -154,11 +179,23 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                                 </button>
                             )}
                         </div>
+                        <div>
+                            <label className="input input-bordered flex items-center gap-2">
+                                <input 
+                                    type="text" 
+                                    className="grow" 
+                                    placeholder="Search"
+                                    value={searchString}
+                                    onChange={(e) => setSearchString(e.target.value)} 
+                                />
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 opacity-70"><path fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd" /></svg>
+                            </label>
+                        </div>
                     </div>
                 )}
             </div>
    
-            {isCourseCalendarVisible && courses &&<CourseCalendar 
+            {isCourseCalendarVisible && courses && <CourseCalendar 
                                                         isAdmin={isAdmin}
                                                         courses={courses}
                                                     />}
