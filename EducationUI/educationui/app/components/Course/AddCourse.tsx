@@ -26,10 +26,10 @@ const AddCourse: React.FC = () => {
         status: "Upcoming",
         title: '',
         description: null,
-        attendanceCredit: 0,
+        attendanceCredit: '',
         examCredit: null,
         hasExam: false,
-        maxAttendance: 0,
+        maxAttendance: '',
         enrollmentDeadline: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1), // today plus on day, no time.
         instructorName: null,
         instructorEmail: null,
