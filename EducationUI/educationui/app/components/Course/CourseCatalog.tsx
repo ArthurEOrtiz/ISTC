@@ -25,9 +25,9 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
 
     // effects
     useEffect(() => {
-        setIsLoading(true);
+        
         loadCourses();
-        setIsLoading(false);
+        
     }
     , [selectedStatuses]);
 
@@ -84,12 +84,13 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
     }
 
     const loadCourses = async () => {
+        setIsLoading(true);
         if (!isAdmin) {
             await fetchEnrollableCourses();
         } else {
              await fetchAllCourses();
         }
-        
+        setIsLoading(false);
     }
 
     const searchCourses = async () => {
@@ -110,7 +111,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
 
     
     // render
-    if (isLoading || !isLoaded || !user) {
+    if ( !isLoaded || !user) {
         return <Loading />
     }
 
@@ -200,12 +201,17 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                                                         courses={courses}
                                                     />}
 
-            {isCourseListVisible && user && courses && <CourseList 
+            {(isCourseListVisible && user && courses && !isLoading ) ? <CourseList 
                                                             courses={courses}
                                                             user={user} 
                                                             isAdmin={isAdmin}
                                                             onError={(m) => setErrorMessages(m)}
-                                                        />}
+                                                            />
+                                                            : (
+                                                                <div className="flex justify-center">
+                                                                    <span className="loading loading-spinner loading-lg"></span>
+                                                                </div>
+                                                            )}
             
             {errorMessages && <ErrorModel
                                     title='Error'
