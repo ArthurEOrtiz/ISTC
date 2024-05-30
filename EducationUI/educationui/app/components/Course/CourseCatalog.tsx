@@ -133,7 +133,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                                     ? selectedStatuses.filter(status => status !== 'Upcoming') 
                                     : [...selectedStatuses, 'Upcoming'])}
                             >
-                                Up Coming
+                                Upcoming
                             </button>
                             <button
                                 className={`join-item btn ${selectedStatuses.includes('InProgress') ? 'btn-primary text-white': ''}`}
