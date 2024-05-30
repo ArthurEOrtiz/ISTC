@@ -580,6 +580,70 @@ namespace EducationAPI.Controllers
       }
     }
 
+    [HttpGet("SearchCourses/{searchString}")]
+    public async Task<ActionResult<List<Course>>> SearchCourses(string searchString, [FromQuery] string[] statuses)
+    {
+      if (string.IsNullOrEmpty(searchString))
+      {
+        return BadRequest("Search string cannot be empty.");
+      }
+
+      foreach (var stat in statuses)
+      {
+        if (!Enum.TryParse<CourseStatus>(stat, true, out _))
+        {
+          return BadRequest($"Invalid status: {stat}");
+        }
+      }
+
+      try
+      {
+        var courses = await _educationProgramContext.Courses
+          .Include(c => c.Classes)
+            .ThenInclude(c => c.Attendances)
+          .Include(c => c.Topics)
+          .Include(c => c.Exams)
+          .Include(c => c.Location)
+          .Include(c => c.PDF)
+          .Include(c => c.WaitLists)
+          .Where(c => statuses.Contains(c.Status))
+          .Where(c => 
+            c.Title.Contains(searchString) || 
+            (c.Description != null && c.Description.Contains(searchString)) ||
+            (c.InstructorName != null && c.InstructorName.Contains(searchString)) ||
+            (c.InstructorEmail != null && c.InstructorEmail.Contains(searchString)) ||
+            (c.Location.Description != null && c.Location.Description.Contains(searchString)) ||
+            (c.Location.Room != null && c.Location.Room.Contains(searchString)) ||
+            (c.Location.RemoteLink != null && c.Location.RemoteLink.Contains(searchString)) ||
+            (c.Location.AddressLine1 != null && c.Location.AddressLine1.Contains(searchString)) ||
+            (c.Location.AddressLine2 != null && c.Location.AddressLine2.Contains(searchString)) ||
+            (c.Location.City != null && c.Location.City.Contains(searchString)) ||
+            (c.Location.State != null && c.Location.State.Contains(searchString)) ||
+            (c.Location.PostalCode != null && c.Location.PostalCode.Contains(searchString)) ||
+            c.Topics.Any(
+              t => t.Title.Contains(searchString) || 
+              (t.Description != null && t.Description.Contains(searchString))
+              )
+            )
+          .ToListAsync();
+
+        foreach (var course in courses)
+        {
+          UpdateCourseStatus(course);
+        }
+
+        await _educationProgramContext.SaveChangesAsync();
+
+        _logger.LogInformation("SearchCourses({SearchString}), called.", searchString);
+        return Ok(courses);
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "Error in SearchCourses({SearchString}): {Message}", searchString, ex.Message);
+        return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+      }
+    }
+
     /// <summary>
     /// Gives the end user the ability to add a Course record to the database.
     /// </summary>
