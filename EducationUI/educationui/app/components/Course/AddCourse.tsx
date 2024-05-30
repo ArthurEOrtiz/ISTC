@@ -280,38 +280,6 @@ const AddCourse: React.FC = () => {
                             <div className="navbar-end">
                             </div>
                         </div>
-                        {/* <div className='mt-2 space-x-2'>
-                            <button 
-                                className='btn btn-primary text-white'
-                                onClick={()=>setShowCourseForm(true)}
-                                >
-                                    Edit Course Information
-                            </button>
-                            <button 
-                                className='btn btn-primary text-white'
-                                onClick={()=>setShowSelectTopicModal(true)}
-                                >
-                                    Select Topics
-                            </button>
-                            <button
-                                className='btn btn-primary text-white'
-                                onClick={() => setShowPDFModal(true)}
-                                >
-                                    Select PDF
-                            </button>
-                            <button 
-                                className='btn btn-success border-none text-white'
-                                onClick={()=>setShowConfirmationModal(true)}
-                                >
-                                    Save Course
-                            </button>
-                            <button
-                                className="btn btn-primary text-white"
-                                onClick={() => console.log(course)}
-                            >
-                                Log Course
-                            </button>
-                        </div> */}
                     </div>
 
                     <div>
