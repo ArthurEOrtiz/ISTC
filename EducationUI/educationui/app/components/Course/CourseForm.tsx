@@ -11,10 +11,10 @@ interface CourseFormProps {
 
 const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }) => {
     
-    const [course, setCourse] = useState<Course>(inboundCourse);
+    const [course, setCourse] = useState<Course>({} as Course);
 
     const [titleTouched, setTitleTouched] = useState<boolean>(false);
-    const [istitleValid, setIsTitleValid] = useState<boolean>();
+    const [isTitleValid, setIsTitleValid] = useState<boolean>();
 
     const [emailTouched, setEmailTouched] = useState<boolean>(false);  
     const [isEmailValid, setIsEmailValid] = useState<boolean>(true);
@@ -31,7 +31,8 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
     const [enrollmentDeadlineTouched, setEnrollmentDeadlineTouched] = useState<boolean>(true);
     const [isEnrollmentDeadlineValid, setIsEnrollmentDeadlineValid] = useState<boolean>(true);
 
-    const isFormValid = istitleValid && isEmailValid && isAttendanceCreditValid && isExamCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid;
+    const enrollmentDeadline = course.enrollmentDeadline ? new Date(course.enrollmentDeadline).toISOString().split('T')[0] : '';
+    const isFormValid = isTitleValid && isEmailValid && isAttendanceCreditValid && isExamCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid;
 
     // effects
     useEffect(() => {
@@ -43,17 +44,18 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
     }, [course.examCredit, course.hasExam]);
 
     useEffect(() => {
-        if (course.title !== '') {
-            setIsTitleValid(true);
+        if (course.title === '') {
+            setIsTitleValid(false);
         }
 
-        if (course.attendanceCredit > 0) {
+        if (parseInt(course.attendanceCredit as string) > 0) {
             setIsAttendanceCreditValid(true);
         }
 
-        if (course.maxAttendance > 0) {
+        if (parseInt(course.maxAttendance as string) > 0) {
             setIsMaxAttendanceValid(true);
         }
+
     }, [course])
 
     // Handlers
@@ -76,7 +78,17 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                 break;
             }
             case id === 'attendanceCredit': {
-                const attendanceCredit = parseInt(value) ? parseInt(value) : 0;
+                let attendanceCredit = course.attendanceCredit;
+
+                if (value !== '') {
+                    const parsedValue = parseInt(value);
+                    if (!isNaN(parsedValue) && parsedValue >= 1 && parsedValue <= 100) {
+                        attendanceCredit = parsedValue;
+                    }
+                } else {
+                    attendanceCredit = '';
+                }
+
                 setCourse((prevCourse) => ({
                     ...prevCourse,
                     attendanceCredit,
@@ -84,10 +96,38 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                 break;
             }
             case id === 'maxAttendance': {
-                const maxAttendance = parseInt(value) ? parseInt(value) : 0;
+                let maxAttendance = course.maxAttendance;
+
+                if (value !== '') {
+                    const parsedValue = parseInt(value);
+                    if (!isNaN(parsedValue) && parsedValue >= 1 && parsedValue <= 999) {
+                        maxAttendance = parsedValue;
+                    }
+                } else {
+                    maxAttendance = '';
+                }
+            
                 setCourse((prevCourse) => ({
                     ...prevCourse,
                     maxAttendance,
+                }));
+                break;
+            }
+            case id === 'examCredit': {
+                let examCredit = course.examCredit;
+
+                if (value !== '') {
+                    const parsedValue = parseInt(value);
+                    if (!isNaN(parsedValue) && parsedValue >= 1 && parsedValue <= 100) {
+                        examCredit = parsedValue;
+                    }
+                } else {
+                    examCredit = null;
+                }
+
+                setCourse((prevCourse) => ({
+                    ...prevCourse,
+                    examCredit,
                 }));
                 break;
             }
@@ -99,8 +139,8 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                 }));
                 break;
             }
-            case id.startsWith('hasExam'): {
-                if (value === 'true') {
+            case id === 'hasExam': {
+                if (value === 'yes') {
                     setCourse((prevCourse) => ({
                         ...prevCourse,
                         hasExam: true,
@@ -110,6 +150,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         ...prevCourse,
                         hasExam: false,
                         examCredit: null,
+                        exams: [],
                     }));
                 }
                 break;
@@ -147,7 +188,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
     
     const handleCourseTitleBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setTitleTouched(true);
-        setIsTitleValid(!!event.target.value);
+        setIsTitleValid(event.target.value !== '');
     }
 
     const handleEmailBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
@@ -222,12 +263,16 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
         }
     }
 
-    const validateExamCredit = (credit: number | null, hasExam: boolean): boolean => {
+    const validateExamCredit = (credit: number | string | null, hasExam: boolean): boolean => {
         if (!hasExam) {
             return true;
         }
 
         if (credit === null) {
+            return false;
+        }
+
+        if (typeof credit === 'string') {
             return false;
         }
 
@@ -246,11 +291,11 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                 </label>
                 
                 <input
-                    className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!istitleValid && titleTouched? 'border-error' : ''}`}
+                    className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!isTitleValid && titleTouched? 'border-error' : ''}`}
                     id="title"
                     type="text"
                     placeholder="Title"
-                    defaultValue={course.title}
+                    value={course.title}
                     required
                     maxLength={50}
                     onChange = {handleChange}
@@ -258,7 +303,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                 />
                 
                 <p className="text-error text-xs italic">
-                    {(!istitleValid && titleTouched) ? 'Please enter a Title.' : 'Required'}
+                    {(!isTitleValid && titleTouched) ? 'Please enter a Title.' : 'Required'}
                 </p>
             </div>
 
@@ -273,7 +318,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                     className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                     id="description"
                     placeholder="Optional"
-                    defaultValue={course.description ?? ''}
+                    value={course.description ?? ''}
                     maxLength={500}
                     onChange = {handleChange}
                     rows={5}
@@ -298,7 +343,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         id="instructorName"
                         type="text"
                         placeholder="John Doe"
-                        defaultValue={course?.instructorName || ''}
+                        value={course?.instructorName || ''}
                         maxLength={50}
                         onChange = {handleChange}
                     />
@@ -317,7 +362,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         id="instructorEmail"
                         type="email"
                         placeholder="valid@Email.com"
-                        defaultValue={course?.instructorEmail || ''}
+                        value={course?.instructorEmail || ''}
                         onChange = {handleChange}
                         onBlur={handleEmailBlur}
                     />
@@ -340,11 +385,9 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                     <input
                         className={`shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline ${!isAttendanceCreditValid && attendanceCreditTouched ? 'border-error' : ''}`}
                         id="attendanceCredit"
-                        type="number"
-                        min={1}
-                        max={100}
+                        type="text"
                         placeholder="1-100"
-                        defaultValue={course.attendanceCredit}
+                        value={course.attendanceCredit}
                         onChange = {handleChange}
                         onBlur={handleAttendanceCreditBlur}
                     />
@@ -364,12 +407,11 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                     <input
                         className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!isMaxAttendanceValid && maxAttendanceTouched ? 'border-error' : ''}`}
                         id="maxAttendance"
-                        type="number"
-                        min={1}
-                        max={999}
+                        type="text"
+                        
                         placeholder="1-999"
-                        defaultValue={course.maxAttendance}
-                        onChange = {handleChange}
+                        value={course.maxAttendance}
+                        onChange={handleChange}
                         onBlur={handleMaxAttendanceBlur}
                     />
                     <p className="text-error text-xs italic">
@@ -392,11 +434,12 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="hasExam"
                         onChange = {handleChange}
-                        defaultValue = {course.hasExam?.toString()}
+                        value = {course.hasExam ? 'yes' : 'no'}
                     >
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
+                        <option value="yes" >Yes</option>
+                        <option value="no">No</option>
                     </select>
+
                 </div>
 
                 {course.hasExam && (
@@ -410,11 +453,9 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         <input
                             className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!isExamCreditValid && examCreditTouched ? 'border-error' : ''}`}
                             id="examCredit"
-                            type="number"
-                            min={1}
-                            max={100}
+                            type="text"
                             placeholder="1-100"
-                            defaultValue={course?.examCredit || 1}
+                            value={course?.examCredit || ''}
                             onChange = {handleChange}
                             onBlur={handleExamCreditBlur}
                         />
@@ -440,7 +481,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!isEnrollmentDeadlineValid && enrollmentDeadlineTouched ? 'border-error' : ''}`}
                         id="enrollmentDeadline"
                         type="date"
-                        defaultValue={new Date(course.enrollmentDeadline).toISOString().split('T')[0]}
+                        value={enrollmentDeadline}
                         onChange={handleChange}
                         onBlur={handleEnrollmentDeadlineBlur}
                     />
@@ -463,7 +504,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                     id="location.description"
                     type="text"
                     placeholder="Chinden Campus"
-                    defaultValue={course?.location?.description || ''}
+                    value={course?.location?.description || ''}
                     maxLength={50}
                     onChange={handleChange}
                 />
@@ -484,7 +525,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         id="location.room"
                         type="text"
                         placeholder="123B"
-                        defaultValue={course?.location?.room || ''}
+                        value={course?.location?.room || ''}
                         maxLength={50}
                         onChange={handleChange}
                     />
@@ -503,7 +544,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         id="location.remoteLink"
                         type="url"
                         placeholder="https://zoom.us/j/1234567890?pwd=abc123"
-                        defaultValue={course?.location?.remoteLink || ''}
+                        value={course?.location?.remoteLink || ''}
                         onChange={handleChange}
                     />
                     <p className="text-xs text-green-600 italic">Optional</p>
@@ -523,7 +564,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                     id="location.addressLine1"
                     type="text"
                     placeholder="123 Main St"
-                    defaultValue={course?.location?.addressLine1 || ''}
+                    value={course?.location?.addressLine1 || ''}
                     maxLength={50}
                     onChange={handleChange}
                 />
@@ -542,7 +583,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                     id="location.addressLine2"
                     type="text"
                     placeholder="Apt 3A"
-                    defaultValue={course?.location?.addressLine2 || ''}
+                    value={course?.location?.addressLine2 || ''}
                     maxLength={50}
                     onChange={handleChange}
                 />
@@ -563,7 +604,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         id="location.city"
                         type="text"
                         placeholder="Boise"
-                        defaultValue={course?.location?.city || 'Boise'}
+                        value={course?.location?.city || 'Boise'}
                         onChange={handleChange}
                     />
                     <p className="text-xs text-green-600 italic">Optional</p>
@@ -580,7 +621,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="location.state"
                         onChange={handleChange}
-                        defaultValue={course?.location?.state || 'ID'}
+                        value={course?.location?.state || 'ID'}
                     >
                         <option value="AL">Alabama</option>
                         <option value="AK">Alaska</option>
@@ -648,7 +689,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         id="location.postalCode"
                         type="text"
                         placeholder="83714"
-                        defaultValue={course?.location?.postalCode || ''}
+                        value={course?.location?.postalCode || ''}
                         onKeyDown = {preventCharInput}
                         onChange = {handleChange}
                     />
