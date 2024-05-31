@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import CourseCalendar from "./CourseCalendar"
 import CourseList from "./CourseList";
 import { Course, CourseStatus, User } from "@/app/shared/types/sharedTypes";
-import { GetCoursesByStatus, GetUserByClerkId, GetAllEnrollableCoursesByStatus, SearchCourses } from "@/Utilities/api";
+import { GetCoursesByStatus, GetUserByClerkId, GetAllEnrollableCoursesByStatus, SearchAllCourses } from "@/Utilities/api";
 import ErrorModel from "@/app/shared/modals/ErrorModal";
 import Loading from "@/app/shared/Loading";
 import { useUser } from "@clerk/clerk-react";
@@ -99,9 +99,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
             return;
         }
 
-        console.log("Search String", searchString);
-        console.log("Selected Statuses", selectedStatuses);
-        const response = await SearchCourses(searchString, selectedStatuses);
+        const response = await SearchAllCourses(searchString, selectedStatuses);
         if (response.status === 200) {
             setCourses(response.data);
         } else {

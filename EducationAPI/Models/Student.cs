@@ -5,11 +5,6 @@ namespace EducationAPI.Models
 {
 	public class Student
 	{
-		public Student()
-		{
-			Attendances = new HashSet<Attendance>();
-		}
-
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int StudentId { get; set; }
@@ -23,8 +18,8 @@ namespace EducationAPI.Models
 
 		public bool MappingCertified { get; set; } = false;
 
-		public virtual ICollection<Attendance> Attendances { get; set; }
+		public virtual ICollection<Attendance> Attendances { get; set; } = [];
 		
-		public virtual ICollection<Exam> Exams { get; set; } = new HashSet<Exam>();
+		public virtual ICollection<Exam> Exams { get; set; } = [];
 	}
 }

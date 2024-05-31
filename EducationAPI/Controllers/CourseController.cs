@@ -578,7 +578,7 @@ namespace EducationAPI.Controllers
       }
     }
 
-    [HttpGet("SearchCourses/{searchString}")]
+    [HttpGet("SearchAllCourses/{searchString}")]
     public async Task<ActionResult<List<Course>>> SearchAllCourses(string searchString, [FromQuery] string[] statuses)
     {
        try

@@ -91,9 +91,9 @@ export async function GetAllEnrollableCoursesByStatus(statuses: CourseStatus[]) 
     }
 }
 
-export async function SearchCourses(searchString: string, statuses: CourseStatus[]) {
+export async function SearchAllCourses(searchString: string, statuses: CourseStatus[]) {
     try {
-        const response = await axiosInstance.get(`Course/SearchCourses/${searchString}`, {
+        const response = await axiosInstance.get(`Course/SearchAllCourses/${searchString}`, {
              params: { statuses },
         });
         return response;
