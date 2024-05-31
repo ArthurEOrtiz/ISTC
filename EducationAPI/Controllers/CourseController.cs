@@ -1,9 +1,7 @@
 ﻿using EducationAPI.DataAccess;
-using EducationAPI.DTO;
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Configuration;
 using System.Net;
 
 namespace EducationAPI.Controllers
@@ -192,7 +190,7 @@ namespace EducationAPI.Controllers
         {
           // check and make sure that all the statuses in the array are a valid course status
           // "Upcoming", "In Progress", "Archived"
-          if (int.TryParse(status, out _) || !Enum.TryParse<CourseStatus>(status, true, out _))
+          if (!Enum.TryParse<CourseStatus>(status, true, out _))
           {
             return BadRequest($"Invalid status: {status}");
           }
@@ -581,51 +579,62 @@ namespace EducationAPI.Controllers
     }
 
     [HttpGet("SearchCourses/{searchString}")]
-    public async Task<ActionResult<List<Course>>> SearchCourses(string searchString, [FromQuery] string[] statuses)
+    public async Task<ActionResult<List<Course>>> SearchAllCourses(string searchString, [FromQuery] string[] statuses)
     {
-      if (string.IsNullOrEmpty(searchString))
+       try
       {
-        return BadRequest("Search string cannot be empty.");
-      }
-
-      foreach (var stat in statuses)
-      {
-        if (!Enum.TryParse<CourseStatus>(stat, true, out _))
+        if (string.IsNullOrEmpty(searchString))
         {
-          return BadRequest($"Invalid status: {stat}");
+          return BadRequest("Search string cannot be empty.");
         }
-      }
 
-      try
-      {
-        var courses = await _educationProgramContext.Courses
-          .Include(c => c.Classes)
-            .ThenInclude(c => c.Attendances)
-          .Include(c => c.Topics)
-          .Include(c => c.Exams)
-          .Include(c => c.Location)
-          .Include(c => c.PDF)
-          .Include(c => c.WaitLists)
-          .Where(c => statuses.Contains(c.Status))
-          .Where(c => 
-            c.Title.Contains(searchString) || 
-            (c.Description != null && c.Description.Contains(searchString)) ||
-            (c.InstructorName != null && c.InstructorName.Contains(searchString)) ||
-            (c.InstructorEmail != null && c.InstructorEmail.Contains(searchString)) ||
-            (c.Location.Description != null && c.Location.Description.Contains(searchString)) ||
-            (c.Location.Room != null && c.Location.Room.Contains(searchString)) ||
-            (c.Location.RemoteLink != null && c.Location.RemoteLink.Contains(searchString)) ||
-            (c.Location.AddressLine1 != null && c.Location.AddressLine1.Contains(searchString)) ||
-            (c.Location.AddressLine2 != null && c.Location.AddressLine2.Contains(searchString)) ||
-            (c.Location.City != null && c.Location.City.Contains(searchString)) ||
-            (c.Location.State != null && c.Location.State.Contains(searchString)) ||
-            (c.Location.PostalCode != null && c.Location.PostalCode.Contains(searchString)) ||
-            c.Topics.Any(
-              t => t.Title.Contains(searchString) || 
-              (t.Description != null && t.Description.Contains(searchString))
-              )
-            )
-          .ToListAsync();
+        foreach (var status in statuses)
+        {
+          // check and make sure that all the statuses in the array are a valid course status
+          // "Upcoming", "In Progress", "Archived"
+          if (!Enum.TryParse<CourseStatus>(status, true, out _))
+          {
+            return BadRequest($"Invalid status: {status}");
+          }
+        }
+
+        var searchWords = searchString.Split(' ');
+
+        var courses = new List<Course>();
+
+        foreach (var word in searchWords)
+        {
+          var coursesForWord = await _educationProgramContext.Courses
+              .Include(c => c.Classes)
+                  .ThenInclude(c => c.Attendances)
+              .Include(c => c.Topics)
+              .Include(c => c.Exams)
+              .Include(c => c.Location)
+              .Include(c => c.PDF)
+              .Include(c => c.WaitLists)
+              .Where(c => statuses.Contains(c.Status))
+              .Where(c =>
+                  c.Title.Contains(word) ||
+                  (c.Description != null && c.Description.Contains(word)) ||
+                  (c.InstructorName != null && c.InstructorName.Contains(word)) ||
+                  (c.InstructorEmail != null && c.InstructorEmail.Contains(word)) ||
+                  (c.Location.Description != null && c.Location.Description.Contains(word)) ||
+                  (c.Location.Room != null && c.Location.Room.Contains(word)) ||
+                  (c.Location.RemoteLink != null && c.Location.RemoteLink.Contains(word)) ||
+                  (c.Location.AddressLine1 != null && c.Location.AddressLine1.Contains(word)) ||
+                  (c.Location.AddressLine2 != null && c.Location.AddressLine2.Contains(word)) ||
+                  (c.Location.City != null && c.Location.City.Contains(word)) ||
+                  (c.Location.State != null && c.Location.State.Contains(word)) ||
+                  (c.Location.PostalCode != null && c.Location.PostalCode.Contains(word)) ||
+                  c.Topics.Any(
+                      t => t.Title.Contains(word) ||
+                      (t.Description != null && t.Description.Contains(word))
+                      )
+                  )
+              .ToListAsync();
+
+          courses.AddRange(coursesForWord);
+        }
 
         foreach (var course in courses)
         {
@@ -635,7 +644,7 @@ namespace EducationAPI.Controllers
         await _educationProgramContext.SaveChangesAsync();
 
         _logger.LogInformation("SearchCourses({SearchString}), called.", searchString);
-        return Ok(courses);
+        return Ok(courses.Distinct());
       }
       catch (Exception ex)
       {
@@ -661,7 +670,7 @@ namespace EducationAPI.Controllers
       {
         // First take all the new classes which will have negative numbers as id's and turn them into 0's
         course.Classes.ToList().ForEach(cls => cls.ClassId = 0);
-        
+
         // Create a copy of the topics collection
         var topicsCopy = course.Topics.ToList();
 
