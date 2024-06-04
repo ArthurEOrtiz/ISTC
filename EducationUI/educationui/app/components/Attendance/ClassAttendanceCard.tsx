@@ -10,13 +10,12 @@ interface ClassAttendanceCardProps {
 const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, errorMessage}) => {
     const [ attendances, setAttendances ] = useState<Attendance[]>(cls.attendances);
     const [ users , setUsers ] = useState<User[]>([]);
-    const [ isLoadingUsers, setIsLoadingUsers ] = useState<Boolean>(true);
+    const [ isLoadingUsers, setIsLoadingUsers ] = useState<Boolean>(false);
     const [ saved, setSaved ] = useState<Boolean | null>(null);
 
     useEffect(() => {
         fetchUsers();
     }, [cls.attendances]);
-    
 
    const HandleAttendanceChange = (studentId: number, attended: boolean) => {
         setSaved(false);
