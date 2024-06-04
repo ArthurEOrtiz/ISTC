@@ -66,7 +66,7 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({ course, isOpen, onExi
                     {classes === null ? (
                         <span className="loading loading-spinner loading-lg"></span>
                     ) : (
-                        <>
+                        <div>
                             <p>Attendance for {course.title}</p>
 
                             {classes.map((classItem, index) => {
@@ -79,8 +79,9 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({ course, isOpen, onExi
       
                                     </div>
                                 );
-                            })}
-                        </>
+                                }
+                            )}
+                        </div>
                     )}
                 </div>
 
