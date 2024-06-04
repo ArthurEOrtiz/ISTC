@@ -214,7 +214,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
                     <div className='flex justify-between mb-2'>
                         <p>{course.title}</p>
                         
-                        <p className={`${enrolledUsers.length >= course.maxAttendance ? 'text-error' :  '' }`}>
+                        <p className={`${enrolledUsers.length >= parseInt(course.maxAttendance as string) ? 'text-error' :  '' }`}>
                             {enrolledUsers.length} of {course.maxAttendance} enrolled.
                         </p>
                     </div>
@@ -222,10 +222,10 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
 
 
                 {/* Main Content */}    
-                <div className="grid grid-cols-2 grid-rows-2 gap-4 w-full h-5/6">
+                <div className="grid grid-cols-2 grid-rows-2 gap-4 w-full h-5/6 overflow-auto">
                         
                     {/* Students */}
-                    <div className='bg-base-300 rounded-xl p-4'>
+                    <div className='bg-base-300 rounded-xl p-4 overflow-auto'>
                         <div className="space-y-2 mb-2">
                             <div className="flex justify-between">
                                 <a className='text-2xl font-bold'>Students</a>
@@ -261,7 +261,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
                             </div>
                         </div>
 
-                        <div>
+                        <div className="">
                             {loadingStudent ? (
                                 <span className="loading loading-spinner loading-lg"></span>
                             ) : (
@@ -289,7 +289,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
 
                     {/* Enrolled Students */}   
 
-                    <div className='bg-base-300 rounded-xl p-4'>
+                    <div className='bg-base-300 rounded-xl p-4 overflow-auto'>
                         <div className='mb-2'>
                             <a className='text-2xl font-bold'>Enrolled Students</a>
                         </div>
@@ -325,7 +325,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
 
                     {/* Enrollment Queue */}
 
-                    <div className='bg-base-300 rounded-xl p-4'>
+                    <div className='bg-base-300 rounded-xl p-4 overflow-auto'>
                         <div className="mb-2">
                             <a className='text-2xl font-bold'>Enrollment Queue</a>
                         </div>
@@ -360,7 +360,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
                     
                     {/* Drop Queue */}
                     
-                    <div className='bg-base-300 rounded-xl p-4'>
+                    <div className='bg-base-300 rounded-xl p-4 overflow-auto'>
                         <div className='mb-2'>
                             <a className='text-2xl font-bold'>Drop Queue</a>
                         </div>
