@@ -2,8 +2,6 @@
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.CodeDom;
-using System.Data.Entity.ModelConfiguration.Configuration;
 using System.Net;
 
 namespace EducationAPI.Controllers
@@ -97,11 +95,11 @@ namespace EducationAPI.Controllers
     private static List<Course> FilterCourses(List<Course> courses, string searchString)
     {
       var searchWords = searchString.Split(' ');
-      List<Course> filteredCourses = [];
+      HashSet<Course> filteredCourses = [];
 
-      if (courses.Count == 0) 
-      { 
-        return filteredCourses;
+      if (courses.Count == 0)
+      {
+        return filteredCourses.ToList();
       }
 
       foreach (var word in searchWords)
@@ -130,10 +128,10 @@ namespace EducationAPI.Controllers
         }
       }
 
-      return filteredCourses;
+      return filteredCourses.ToList();
 
     }
-    
+
 
     private async Task<List<Course>> GetAllCoursesByStatusAndTopics(string[] statuses, int[] topicIds, bool isAdmin = true)
     {
@@ -154,9 +152,9 @@ namespace EducationAPI.Controllers
       if (!isAdmin)
       {
         var today = DateTime.Today;
-        query = query.Where(c => 
-          c.EnrollmentDeadline >= today && 
-          c.Classes.Count != 0 && 
+        query = query.Where(c =>
+          c.EnrollmentDeadline >= today &&
+          c.Classes.Count != 0 &&
           c.Classes.First().Attendances.Count <= c.MaxAttendance
         );
       }
