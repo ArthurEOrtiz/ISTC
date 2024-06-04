@@ -2,6 +2,8 @@
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.CodeDom;
+using System.Data.Entity.ModelConfiguration.Configuration;
 using System.Net;
 
 namespace EducationAPI.Controllers
@@ -57,6 +59,110 @@ namespace EducationAPI.Controllers
         _logger.LogError(ex, "GetAllCourses()");
         return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
       }
+    }
+
+    [HttpGet("GetCourses/{isAdmin=true}")]
+    public async Task<ActionResult<List<Course>>> GetCourses([FromQuery] string[] statuses, [FromQuery] int[] topicIds, bool isAdmin = true, string? searchString = null)
+    {
+      foreach (var status in statuses)
+      {
+        // check and make sure that all the statuses in the array are a valid course status.
+        // "Upcoming", "In Progress", "Archived", case sensitive.
+        if (!Enum.IsDefined(typeof(CourseStatus), status))
+        {
+          return BadRequest($"Invalid status: {status}");
+        }
+      }
+      try
+      {
+        var courses = await GetAllCoursesByStatusAndTopics(statuses, topicIds, isAdmin);
+
+        if (searchString != null)
+        {
+          courses = FilterCourses(courses, searchString);
+        }
+
+        courses.ForEach(UpdateCourseStatus);
+        await _educationProgramContext.SaveChangesAsync();
+        _logger.LogInformation("GetCourses({Statuses}, {TopicIds}, {IsAdmin}, {SearchString}), called", statuses, topicIds, isAdmin, searchString);
+        return Ok(courses);
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "Error in GetCourses(): {Message}", ex.Message);
+        return StatusCode(500);
+      }
+    }
+
+    private static List<Course> FilterCourses(List<Course> courses, string searchString)
+    {
+      var searchWords = searchString.Split(' ');
+      List<Course> filteredCourses = [];
+
+      if (courses.Count == 0) 
+      { 
+        return filteredCourses;
+      }
+
+      foreach (var word in searchWords)
+      {
+        Course? course = courses!
+          .Where(c =>
+            c.Title.Contains(word) ||
+            (c.Description != null && c.Description.Contains(word)) ||
+            (c.InstructorName != null && c.InstructorName.Contains(word)) ||
+            (c.InstructorEmail != null && c.InstructorEmail.Contains(word)) ||
+            (c.Location.Description != null && c.Location.Description.Contains(word)) ||
+            (c.Location.Room != null && c.Location.Room.Contains(word)) ||
+            (c.Location.RemoteLink != null && c.Location.RemoteLink.Contains(word)) ||
+            (c.Location.AddressLine1 != null && c.Location.AddressLine1.Contains(word)) ||
+            (c.Location.AddressLine2 != null && c.Location.AddressLine2.Contains(word)) ||
+            (c.Location.City != null && c.Location.City.Contains(word)) ||
+            (c.Location.State != null && c.Location.State.Contains(word)) ||
+            (c.Location.PostalCode != null && c.Location.PostalCode.Contains(word)) ||
+            c.Topics.Any(t => t.Title.Contains(word))
+            )
+          .FirstOrDefault();
+
+        if (course != null)
+        {
+          filteredCourses.Add(course);
+        }
+      }
+
+      return filteredCourses;
+
+    }
+    
+
+    private async Task<List<Course>> GetAllCoursesByStatusAndTopics(string[] statuses, int[] topicIds, bool isAdmin = true)
+    {
+      IQueryable<Course> query = _educationProgramContext.Courses
+          .Include(c => c.Classes)
+            .ThenInclude(c => c.Attendances)
+          .Include(c => c.Topics)
+          .Include(c => c.Exams)
+          .Include(c => c.Location)
+          .Include(c => c.WaitLists)
+          .Where(c => statuses.Contains(c.Status));
+
+      if (topicIds.Length > 0)
+      {
+        query = query.Where(c => c.Topics.Any(t => topicIds.Contains(t.TopicId)));
+      }
+
+      if (!isAdmin)
+      {
+        var today = DateTime.Today;
+        query = query.Where(c => 
+          c.EnrollmentDeadline >= today && 
+          c.Classes.Count != 0 && 
+          c.Classes.First().Attendances.Count <= c.MaxAttendance
+        );
+      }
+
+      var courses = await query.ToListAsync();
+      return courses;
     }
 
     [HttpGet("GetCoursesByStatus")]
@@ -581,7 +687,7 @@ namespace EducationAPI.Controllers
     [HttpGet("SearchAllCourses/{searchString}")]
     public async Task<ActionResult<List<Course>>> SearchAllCourses(string searchString, [FromQuery] string[] statuses)
     {
-       try
+      try
       {
         if (string.IsNullOrEmpty(searchString))
         {
@@ -604,6 +710,7 @@ namespace EducationAPI.Controllers
 
         foreach (var word in searchWords)
         {
+
           var coursesForWord = await _educationProgramContext.Courses
               .Include(c => c.Classes)
                   .ThenInclude(c => c.Attendances)
@@ -652,6 +759,8 @@ namespace EducationAPI.Controllers
         return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
       }
     }
+
+
 
     /// <summary>
     /// Gives the end user the ability to add a Course record to the database.
