@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import CourseCalendar from "./CourseCalendar"
 import CourseList from "./CourseList";
-import { Course, CourseStatus, User } from "@/app/shared/types/sharedTypes";
-import { GetCoursesByStatus, GetUserByClerkId, GetAllEnrollableCoursesByStatus, SearchAllCourses } from "@/Utilities/api";
+import { Course, CourseStatus, Topic, User } from "@/app/shared/types/sharedTypes";
+import { GetUserByClerkId, getAllTopics, GetCourses } from "@/Utilities/api";
 import ErrorModel from "@/app/shared/modals/ErrorModal";
 import Loading from "@/app/shared/Loading";
 import { useUser } from "@clerk/clerk-react";
@@ -20,25 +20,24 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
     const [ isCourseCalendarVisible, setIsCourseCalendarVisible ] = useState(!isAdmin);
     const [ isCourseListVisible, setIsCourseListVisible ] = useState(isAdmin);
     const [ courses, setCourses ] = useState<Course[]>();
+    const [ topics, setTopics ] = useState<Topic[]>([]);
+    const [ selectedTopics, setSelectedTopics ] = useState<Topic []>([]);
     const [ errorMessages, setErrorMessages ] = useState<string | null>(null);
     const [ isLoading, setIsLoading ] = useState(false); 
 
     // effects
     useEffect(() => {
-        
-        loadCourses();
-        
+        getCourses(isAdmin, selectedStatuses, selectedTopics.map(topic => topic.topicId), searchString);
     }
-    , [selectedStatuses]);
+    , [selectedStatuses, searchString, selectedTopics]);
+
+    useEffect(() => {
+        fetchTopics();
+    }, []);
 
     useEffect(() => {
         fetchUser();
     }, [clerkUser]);
-
-    useEffect(() => {
-        searchCourses();
-    }
-    , [searchString]);
 
     // handlers
     const handleCourseCalendarClick = () => {
@@ -51,25 +50,16 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
         setIsCourseListVisible(true);
     }
 
+    const handleTopicClick = (topic: Topic) => {
+        const isSelected = selectedTopics.some((selectedTopic) => selectedTopic.topicId === topic.topicId);
+        if (isSelected) {
+            setSelectedTopics(selectedTopics.filter(selectedTopic => selectedTopic.topicId !== topic.topicId));
+        } else {
+            setSelectedTopics([...selectedTopics, topic]);
+        }
+    }
+
     // helpers
-    const fetchEnrollableCourses = async () => {
-        const response = await GetAllEnrollableCoursesByStatus(selectedStatuses);
-        if (response.status === 200) {
-            setCourses(response.data); 
-        } else {
-            setErrorMessages(response as unknown as string);
-        }
-    }
-
-    const fetchAllCourses = async () => {
-        const response = await GetCoursesByStatus(selectedStatuses);
-        if (response.status === 200) {
-            setCourses(response.data);
-        } else {
-            setErrorMessages(response);
-        }
-    }
-
     const fetchUser = async () => {
         if (!clerkUser) {
             return;
@@ -83,28 +73,24 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
         }
     }
 
-    const loadCourses = async () => {
-        setIsLoading(true);
-        if (!isAdmin) {
-            await fetchEnrollableCourses();
+    const fetchTopics = async () => {
+        const response = await getAllTopics();
+        if (response.status === 200) {
+            setTopics(response.data);
         } else {
-             await fetchAllCourses();
+            setErrorMessages(response as unknown as string);
         }
-        setIsLoading(false);
     }
 
-    const searchCourses = async () => {
-        if (searchString === '') {
-            await loadCourses();
-            return;
-        }
-
-        const response = await SearchAllCourses(searchString, selectedStatuses);
+    const getCourses = async (isAdmin: boolean, statuses: CourseStatus [], topicIds: number [], searchString: string | null ) => {
+        setIsLoading(true);
+        const response = await GetCourses(statuses, topicIds, searchString|| '', isAdmin);
         if (response.status === 200) {
             setCourses(response.data);
         } else {
             setErrorMessages(response as unknown as string);
         }
+        setIsLoading(false);
     }
 
     
@@ -149,6 +135,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                 </div> */}
 
                 {isCourseListVisible && (
+                <div>
                     <div className="flex justify-between">
                         <div className="join p-1">
                             <button
@@ -191,25 +178,51 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                             </label>
                         </div>
                     </div>
+                    
+                    <div>
+                        <div className=" border border-base-300 rounded-xl space-y-2 bg-base-200 mt-4 p-4">
+                            <div className="">
+                                <h2 className="text-lg font-bold">Filter by Topic</h2>
+                            </div>
+                            <div className="">
+                                <div className="flex flex-wrap gap-2">
+                                    {topics.map((topic) => (
+                                        <button
+                                            key={topic.topicId}
+                                            className={`btn btn-sm ${selectedTopics.some((selectedTopic) => selectedTopic.topicId === topic.topicId) ? 'btn-success text-white' : 'btn-primary text-white'}`}
+                                            onClick={(e) => handleTopicClick(topic)}
+                                        >
+                                            {topic.title}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
                 )}
             </div>
    
-            {isCourseCalendarVisible && courses && <CourseCalendar 
-                                                        isAdmin={isAdmin}
-                                                        courses={courses}
-                                                    />}
+            {isCourseCalendarVisible && courses && 
+                <CourseCalendar 
+                    isAdmin={isAdmin}
+                    courses={courses}
+                />
+            }
 
-            {(isCourseListVisible && user && courses && !isLoading ) ? <CourseList 
-                                                            courses={courses}
-                                                            user={user} 
-                                                            isAdmin={isAdmin}
-                                                            onError={(m) => setErrorMessages(m)}
-                                                            />
-                                                            : (
-                                                                <div className="flex justify-center">
-                                                                    <span className="loading loading-spinner loading-lg"></span>
-                                                                </div>
-                                                            )}
+            {(isCourseListVisible && user && courses && !isLoading ) ? (
+                <CourseList 
+                    courses={courses}
+                    user={user} 
+                    isAdmin={isAdmin}
+                    onError={(m) => setErrorMessages(m)}
+                />
+            ): (
+                <div className="flex justify-center">
+                    <span className="loading loading-spinner loading-lg"></span>
+                </div>
+            )}
             
             {errorMessages && <ErrorModel
                                     title='Error'
