@@ -21,6 +21,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
     const [ isCourseListVisible, setIsCourseListVisible ] = useState(isAdmin);
     const [ courses, setCourses ] = useState<Course[]>();
     const [ topics, setTopics ] = useState<Topic[]>([]);
+    const [ isTopicsDivOpen, setIsTopicsDivOpen ] = useState(false);
     const [ selectedTopics, setSelectedTopics ] = useState<Topic []>([]);
     const [ errorMessages, setErrorMessages ] = useState<string | null>(null);
     const [ isLoading, setIsLoading ] = useState(false); 
@@ -178,28 +179,39 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                             </label>
                         </div>
                     </div>
-                    
-                    <div>
-                        <div className=" border border-base-300 rounded-xl space-y-2 bg-base-200 mt-4 p-4">
-                            <div className="">
-                                <h2 className="text-lg font-bold">Filter by Topic</h2>
-                            </div>
-                            <div className="">
+
+                    <div className="border border-base-300 rounded-xl space-y-2 bg-base-200 mt-2 p-4">
+                        <div onClick={() => setIsTopicsDivOpen(!isTopicsDivOpen)} className="flex justify-between items-center">
+                            <h2 className="text-lg font-bold">Filter by Topic</h2>
+                            {isTopicsDivOpen ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                </svg>
+                            )}
+                        </div>
+                        {isTopicsDivOpen && (
+                            <div>
                                 <div className="flex flex-wrap gap-2">
                                     {topics.map((topic) => (
                                         <button
                                             key={topic.topicId}
                                             className={`btn btn-sm ${selectedTopics.some((selectedTopic) => selectedTopic.topicId === topic.topicId) ? 'btn-success text-white' : 'btn-primary text-white'}`}
-                                            onClick={(e) => handleTopicClick(topic)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleTopicClick(topic);
+                                            }}
                                         >
                                             {topic.title}
                                         </button>
                                     ))}
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </div>
-
                 </div>
                 )}
             </div>
