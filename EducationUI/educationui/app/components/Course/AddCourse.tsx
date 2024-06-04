@@ -12,25 +12,24 @@ import ErrorModal from '@/app/shared/modals/ErrorModal';
 import CourseInfoCard from './CourseInfoCard';
 import CourseFormModal from './CourseFormModal';
 import SelectPDFModal from '../PDF/SelectPDFModal';
+import { areClassesOrderedByDate, courseHasClasses, sortClassesByDate } from '@/Utilities/class';
 
-
-
-/**
+/*
  * Component for adding a new course. 
  * This component is under the CourseComponents folder, and is the central component for 
- * creating a new course. It Contains the NewCourseForm, CourseInfoCard, NewClass, and Select
- * TopicModal components.
+ * creating a new course. 
  */
 const AddCourse: React.FC = () => {
+
     const defaultCourse : Course = {
         courseId: 0,
         status: "Upcoming",
         title: '',
         description: null,
-        attendanceCredit: 0,
+        attendanceCredit: '',
         examCredit: null,
         hasExam: false,
-        maxAttendance: 0,
+        maxAttendance: '',
         enrollmentDeadline: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1), // today plus on day, no time.
         instructorName: null,
         instructorEmail: null,
@@ -53,7 +52,7 @@ const AddCourse: React.FC = () => {
         exams: [],
         waitLists: [],
     };
-
+    // State variables for the component
     const [course, setCourse] = useState<Course>(defaultCourse);
     const [showCourseForm, setShowCourseForm] = useState<boolean>(false);
     const [showSelectTopicModal, setShowSelectTopicModal] = useState<boolean>(false);
@@ -64,6 +63,7 @@ const AddCourse: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState<string>('');
     const router = useRouter();
     
+    // Effects
     useEffect(() => {
         window.scrollTo({
             top: document.body.scrollHeight,
@@ -72,7 +72,19 @@ const AddCourse: React.FC = () => {
     }
     , [course.classes.length]);
 
-    // Event Handlers this component. 
+    useEffect(() => {
+        if (courseHasClasses(course.classes) && !areClassesOrderedByDate(course.classes)) {
+            setCourse({
+                ...course,
+                classes: sortClassesByDate(course.classes)
+            });
+        }
+    }
+    , [course.classes]);
+
+            
+
+    // Event Handlers 
     const handleAddClass = () => {
         const today = new Date();
     
@@ -99,10 +111,12 @@ const AddCourse: React.FC = () => {
             // Set the end time to 5 PM of today
             scheduleEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 17, 0);
         }
+
+        const tempId : number = -course.classes.length;
     
         // Create the new class object
         const newClass = {
-            classId: 0,
+            classId: tempId,
             courseId: 0,
             scheduleStart: scheduleStart,
             scheduleEnd: scheduleEnd,
@@ -169,6 +183,60 @@ const AddCourse: React.FC = () => {
         setCourse(c);
     }
 
+    const renderActions = () => {
+        return (    
+            <>
+                <li>
+                    <details>
+                        <summary>Edit</summary>
+                        <ul className="p-2 z-10 bg-base-300 rounded-xl">
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    onClick={() => setShowCourseForm(true)}
+                                >
+                                    Information
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    onClick={() => setShowSelectTopicModal(true)}
+                                >
+                                    Topics
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    onClick={() => setShowPDFModal(true)}
+                                >
+                                    PDF
+                                </button>
+                            </li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <button
+                        className="text-nowrap text-success font-bold"
+                        onClick={() => setShowConfirmationModal(true)}
+                    >
+                        Save
+                    </button>
+                </li>
+                <li>
+                    <button
+                        className="text-nowrap text-error font-bold"
+                        onClick={() => setCourse(defaultCourse)}
+                    >
+                        Reset
+                    </button>
+                </li>
+            </>
+        );
+    }
+
     return (
         <div className='w-full m-4'>
             {course.title === '' ? (
@@ -186,38 +254,37 @@ const AddCourse: React.FC = () => {
                         <div className='mb-4 bg-base-300 rounded-xl p-4'>
                             <CourseInfoCard course={course} />
                         </div>
-                        <div className='mt-2 space-x-2'>
-                            <button 
-                                className='btn btn-primary text-white'
-                                onClick={()=>setShowCourseForm(true)}
-                                >
-                                    Edit Course Information
-                            </button>
-                            <button 
-                                className='btn btn-primary text-white'
-                                onClick={()=>setShowSelectTopicModal(true)}
-                                >
-                                    Select Topics
-                            </button>
-                            <button
-                                className='btn btn-primary text-white'
-                                onClick={() => setShowPDFModal(true)}
-                                >
-                                    Select PDF
-                            </button>
-                            <button 
-                                className='btn btn-success border-none text-white'
-                                onClick={()=>setShowConfirmationModal(true)}
-                                >
-                                    Save Course
-                            </button>
+                        <div className="navbar">
+                            <div className="navbar-start">
+                                <div className="dropdown">
+                                    <div 
+                                        tabIndex={0} 
+                                        role="button" 
+                                        className="btn btn-circle btn-outline btn-primary text-white lg:hidden"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+                                    </div>
+                                    <ul 
+                                        tabIndex={0}
+                                        className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+                                    >
+                                        {renderActions()}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="navbar-center hidden bg-base-300 rounded-xl lg:flex justify-start">
+                                <ul className="menu menu-horizontal space-x-16">
+                                    {renderActions()}
+                                </ul>
+                            </div>
+                            <div className="navbar-end">
+                            </div>
                         </div>
                     </div>
 
                     <div>
                         {course.classes.map((cls, index) => (
-                            
-                            <div className="bg-base-100 shadow-md rounded-xl p-4 relative mt-2" key={index}> 
+                            <div className="bg-base-100 shadow-md rounded-xl p-4 relative mt-2" key={cls.classId}> 
                                 <h2 className="text-xl font-bold mb-2">Class {index + 1}</h2>
                                 <ClassCard
                                     cls={cls}
@@ -241,13 +308,12 @@ const AddCourse: React.FC = () => {
                             >
                                 &#x2B; Class
                             </button>
-                            
-                            <button
+                            {/* <button
                                 className="btn btn-primary text-white ml-2"
                                 onClick={() => console.log(course)}
                             >
                                 Log Course
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                 </div>

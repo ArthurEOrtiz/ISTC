@@ -10,28 +10,12 @@ interface ClassAttendanceCardProps {
 const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, errorMessage}) => {
     const [ attendances, setAttendances ] = useState<Attendance[]>(cls.attendances);
     const [ users , setUsers ] = useState<User[]>([]);
+    const [ isLoadingUsers, setIsLoadingUsers ] = useState<Boolean>(false);
     const [ saved, setSaved ] = useState<Boolean | null>(null);
 
     useEffect(() => {
-        const fetchUsers = async () => {
-            if (attendances && attendances.length > 0){
-                const promises = attendances.map(async (attendance) => {
-                    const response = await GetUserByStudentId(attendance.studentId);
-                    if (response.status === 200){
-                        return response.data;
-                    } else {
-                        errorMessage(response);
-                        return;
-                    }
-                });
-                const users = await Promise.all(promises);
-                setUsers(users);
-            }
-        };
         fetchUsers();
-        
     }, [cls.attendances]);
-    
 
    const HandleAttendanceChange = (studentId: number, attended: boolean) => {
         setSaved(false);
@@ -67,31 +51,56 @@ const ClassAttendanceCard: React.FC<ClassAttendanceCardProps> = ({ class : cls, 
             errorMessage(response)
         }
     }
+
+    const fetchUsers = async () => {
+        if (attendances && attendances.length > 0){
+            setIsLoadingUsers(true);
+            const promises = attendances.map(async (attendance) => {
+                const response = await GetUserByStudentId(attendance.studentId);
+                if (response.status === 200){
+                    return response.data;
+                } else {
+                    errorMessage(response);
+                    return;
+                }
+            });
+            const users = await Promise.all(promises);
+            setUsers(users);
+            setIsLoadingUsers(false);
+        }
+    };
     
     return (
         <div className="card bg-base-200 w-full">
             <div className="card-body">
                 <h2 className="card-title">{new Date(cls.scheduleStart).toLocaleDateString()}</h2>
-                {users && (
-                    <div className='space-y-0'>
-                        {users.map((user, index) => (
-                            <div key={index} className="flex">
-                                <label className="label cursor-pointer">
-                                    <input 
-                                        type="checkbox"
-                                        className="checkbox mr-2"
-                                        defaultChecked={hasUserAttended(user.student?.studentId as number)}
-                                        onChange={(e) => {HandleAttendanceChange(user.student?.studentId as number, e.target.checked)}}
-                                        
-                                    />
-                                    <p className="label-text">{user.firstName} {user.lastName} | {user.email}</p>
-                                   
+                {isLoadingUsers ? (
+                   <span className="loading loading-spinner loading-lg"></span>
+                ) : (
+                    users.length > 0 ? (
+                        <div className='space-y-0'>
+                            {users.map((user, index) => (
+                                <div key={index} className="flex">
+                                    <label className="label cursor-pointer">
+                                        <input 
+                                            type="checkbox"
+                                            className="checkbox mr-2"
+                                            defaultChecked={hasUserAttended(user.student?.studentId as number)}
+                                            onChange={(e) => {HandleAttendanceChange(user.student?.studentId as number, e.target.checked)}}
+                                            
+                                        />
+                                        <p className="label-text">{user.firstName} {user.lastName} | {user.email}</p>
                                     
-                                </label>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                                        
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-error">No students in this class</p>
+                    )
+                )
+            }
                             
                 <div className="card-actions justify-end">
                     {saved === true ? (

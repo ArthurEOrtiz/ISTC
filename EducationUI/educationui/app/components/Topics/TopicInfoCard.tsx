@@ -127,7 +127,7 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
                                 {loading ? (
                                     <span className="loading loading-spinner loading-xs"></span>
                                 ) : (
-                                    <div className="flex flex-wrap">
+                                    <div className="flex flex-wrap space-y-2 items-baseline">
                                         {courses.map((course, index) => (
                                             <div key={index} className="mr-2">
                                                 <div className="badge badge-info p-3">

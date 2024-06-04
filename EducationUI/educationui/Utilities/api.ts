@@ -57,13 +57,27 @@ export async function getAllCourses() {
     }
 }
 
-export async function GetCoursesByStatus( statuses: CourseStatus[]){
+export async function GetCourses(statuses: CourseStatus[], topicIds: number[], searchString: string, isAdmin: boolean) {
     try {
-        const response = await axiosInstance.get('Course/GetCoursesByStatus', { params: { statuses } });
+        const response = await axiosInstance.get(`Course/GetCourses/${isAdmin}`, {
+            params: { statuses, topicIds, searchString }
+        });
         return response;
     } catch (error : any) {
         console.error('Error fetching courses:', error);
-        return error.response.data;
+        return error.message;
+    }
+}
+
+export async function GetCoursesByStatus( statuses: CourseStatus[]){
+    try {
+        const response = await axiosInstance.get('Course/GetCoursesByStatus', { 
+            params: { statuses } 
+        });
+        return response;
+    } catch (error : any) {
+        console.error('Error fetching courses:', error);
+        return error.response;
     }
 }
 
@@ -79,11 +93,25 @@ export async function GetAllEnrollableCourses() {
 
 export async function GetAllEnrollableCoursesByStatus(statuses: CourseStatus[]) {
     try {
-        const response = await axiosInstance.get('Course/GetAllEnrollableCoursesByStatus', { params: { statuses } });
+        const response = await axiosInstance.get('Course/GetAllEnrollableCoursesByStatus', { 
+            params: { statuses } 
+        });
         return response;
     } catch (error : any) {
         console.error('Error fetching courses:', error);
-        throw error.response.data;
+        throw error.response;
+    }
+}
+
+export async function SearchAllCourses(searchString: string, statuses: CourseStatus[]) {
+    try {
+        const response = await axiosInstance.get(`Course/SearchAllCourses/${searchString}`, {
+             params: { statuses },
+        });
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching courses:', error);
+        return error.message;
     }
 }
 

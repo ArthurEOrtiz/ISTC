@@ -93,8 +93,9 @@ const NewClass: React.FC<NewClassProps> = ({cls: incomingClass, disabled = false
     return (
         <div>
             <button
-                className="absolute top-0 right-0 mr-2 mt-1 text-error px-2 py-1 rounded-full font-bold"
+                className={`absolute top-0 right-0 mr-2 mt-1 px-2 py-1 rounded-full font-bold ${disabled ? ' text-gray-500' : 'text-error'}`}
                 onClick={() => onDelete(cls)}
+                disabled={disabled}
             >
                 Delete
             </button>

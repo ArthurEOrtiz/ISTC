@@ -17,6 +17,7 @@ import EnrollmentModal from "../Enrollment/EnrollmentModal";
 import { deepEquals } from "@/Utilities/deepEquality";
 import Loading from "@/app/shared/Loading";
 import ExamModal from "../Exam/ExamModal";
+import { areClassesOrderedByDate, courseHasClasses, sortClassesByDate } from "@/Utilities/class";
 
 interface EditCourseInfoProps {
     courseId: number;
@@ -25,26 +26,7 @@ interface EditCourseInfoProps {
 const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => { 
 
     // Initializing Logic 
-    const sortClassesByDate = (classes : Class[]): Class[] => {
-        if (!courseHasClasses()) return [];
-
-        const sortedClasses = [...classes].sort((a, b) => {
-            return new Date(a.scheduleStart).getTime() - new Date(b.scheduleStart).getTime();
-        });
-        return sortedClasses;
-    }
-
-    const areClassesOrderedByDate = (): boolean => {
-        if (!courseHasClasses()) return false;
-        for (let i = 0; i < course.classes.length - 1; i++) {
-            const currentClass = course.classes[i];
-            const nextClass = course.classes[i + 1];
-            if (new Date(currentClass.scheduleStart).getTime() > new Date(nextClass.scheduleStart).getTime()) {
-                return false;
-            }
-        }
-        return true;
-    }
+    
 
     // Constants
     const courseId = crsId;
@@ -74,16 +56,11 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
 
     // This will check if the course has been updated and set the unsaved changes flag.
     useEffect(() => {
-        // First check if there are any classes to check.
-        // I need to remove this check because the classes are always present.
-        // if (!courseHasClasses()) {
-        //     return;
-        // }
-
-        // Then sort the classes by date to compare them.
+        // Check if there are classes to this course, if it does then sort the classes by date.
         // This is because the classes are not guaranteed to be in order when they are received from the API.
-        const sortedCourseClasses = courseHasClasses() ? sortClassesByDate(course.classes) : [];
-        const sortedInitialCourseClasses = courseHasClasses() ? sortClassesByDate(initialCourse.classes) : [];
+        // This will allow us to compare the classes in a consistent order.
+        const sortedCourseClasses = courseHasClasses(course.classes) ? sortClassesByDate(course.classes) : [];
+        const sortedInitialCourseClasses = courseHasClasses(course.classes) ? sortClassesByDate(initialCourse.classes) : [];
 
         const sortedCourse = {
             ...course,
@@ -107,11 +84,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
 
     // This will sort the classes by date if they are not already sorted
     useEffect(() => { 
-        if (!courseHasClasses()){
-            return;
-        }
-        // console.log("Checking if classes are ordered by date...");  
-        if (!areClassesOrderedByDate()) {
+        if (courseHasClasses(course.classes) && !areClassesOrderedByDate(course.classes)) {
             // console.log("Classes are not ordered by date. Sorting...");
             setCourse(prevCourse => {
                 return {
@@ -152,7 +125,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     }
 
     const handleOnClassAdd = (): void => {
-        if (!courseHasClasses()) {
+        if (!courseHasClasses(course.classes)) {
             addNewClass();
         } else {
             const lastClass = course.classes[course.classes.length - 1];
@@ -312,21 +285,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
         });
     }
 
-    const courseHasClasses = (): boolean => {
-        if (course.classes === undefined) {
-            return false;
-        }
-        
-        if (course.classes === null) {
-            return false;
-        }
-
-        if (course.classes.length === 0) {
-            return false;
-        }
-
-        return true
-    }
 
     // Render
     
@@ -459,14 +417,14 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                     <div className="navbar-start">
                         <div className="dropdown">
                             <div tabIndex={0} role="button" className="btn btn-circle btn-outline btn-primary text-white lg:hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
                             </div>
                             <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                                 {renderNavList()}
                             </ul>
                         </div>
                     </div>
-                    <div className="navbar-center hidden bg-base-300 rounded-xl lg:flex justify-start ">
+                    <div className="navbar-center hidden bg-base-300 rounded-xl lg:flex justify-start">
                         <ul className="menu menu-horizontal space-x-16">
                             {renderNavList()}
                         </ul>
@@ -526,7 +484,9 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                 <div className="flex justify-left mt-2">
                     <button 
                         className="btn btn-success text-white"
-                        onClick={handleOnClassAdd}>
+                        onClick={handleOnClassAdd}
+                        disabled={course.status === 'Archived'}
+                        >
                             &#x2B; Class
                     </button>
                 </div>

@@ -12,20 +12,20 @@ interface CourseListProps {
 }
 
 const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}) => {
-    const [courseList , setCourseList] = useState<Course[] | null>(courses);
+    const [courseList , setCourseList] = useState<Course[] | null>(null);
 
     useEffect(() => {
         if (courses) {
-            setCourseList(courses);
+            setCourseList(courses.sort(compareDates));
         }
 
     }, [courses]);
 
-    useEffect(() => {
-        if (courseList) {
-            setCourseList(courseList.sort(compareDates));
-        }
-    }, [courseList])
+    // useEffect(() => {
+    //     if (courseList) {
+    //         setCourseList(courseList.sort(compareDates));
+    //     }
+    // }, [courseList])
 
     const compareDates = (a: Course, b: Course): number => {
         const dateA = new Date(a.enrollmentDeadline);

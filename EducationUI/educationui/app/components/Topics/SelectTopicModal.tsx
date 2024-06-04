@@ -56,7 +56,7 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
 
             <div className="bg-base-100 p-8 rounded-lg z-50">
                 
-                <div className="flex justify-between">
+                <div className="flex items-baseline justify-between mb-4">
                     <h1 className="text-2xl font-bold">Select Topics</h1>
                     <button onClick={onClose} className="text-3xl text-error font-bold">&times;</button>
                 </div>
