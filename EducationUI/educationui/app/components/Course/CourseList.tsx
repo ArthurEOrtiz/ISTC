@@ -16,16 +16,16 @@ const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}
 
     useEffect(() => {
         if (courses) {
-            setCourseList(courses);
+            setCourseList(courses.sort(compareDates));
         }
 
     }, [courses]);
 
-    useEffect(() => {
-        if (courseList) {
-            setCourseList(courseList.sort(compareDates));
-        }
-    }, [courseList])
+    // useEffect(() => {
+    //     if (courseList) {
+    //         setCourseList(courseList.sort(compareDates));
+    //     }
+    // }, [courseList])
 
     const compareDates = (a: Course, b: Course): number => {
         const dateA = new Date(a.enrollmentDeadline);
