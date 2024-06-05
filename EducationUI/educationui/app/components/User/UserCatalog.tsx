@@ -23,7 +23,7 @@ const UserCatalog: React.FC = () => {
             fetchUsers();
         }
     }
-    , [searchString]);
+    , []);
     
 
     // helpers
@@ -32,7 +32,6 @@ const UserCatalog: React.FC = () => {
         const response = await getAllUsers();
         if (response.status === 200) {
             setUsers(response.data);
-            console.log(response.data);
         } else {
             setErrorMessages(response as unknown as string);
         }
@@ -41,13 +40,20 @@ const UserCatalog: React.FC = () => {
 
     const searchUsers = async (searchString: string) => {
         setLoading(true);
-        const response = await SearchUsers(searchString);
+        let response;
+
+        if (searchString.length === 0) {
+            response = await getAllUsers();
+        } else {
+            response = await SearchUsers(searchString);
+        }
+
         if (response.status === 200) {
             setUsers(response.data);
-            console.log(response.data);
         } else {
             setErrorMessages(response as unknown as string);
         }
+
         setLoading(false);
     }
 
@@ -59,9 +65,9 @@ const UserCatalog: React.FC = () => {
                 <h1 className="text-3xl text-center font-bold">Users</h1>
             </div>
 
-            <div className="flex justify-between">
+            <div className="flex justify-between mb-2">
 
-                <div className="w-1/2 mb-2">
+                <div>
                     <button 
                         className="btn btn-success text-white"
                         onClick={() => router.push('/admin/users/add')}
@@ -70,16 +76,24 @@ const UserCatalog: React.FC = () => {
                     </button>
                 </div>
 
-                <div className="w-1/3 mb-2">
-                
-                    <input 
-                        type="text" 
-                        name="search" 
-                        id="search" 
-                        placeholder="Search users..." 
-                        className="input input-bordered w-full pr-12 sm:text-sm rounded-md"
-                        onChange={(e) => {setSearchString(e.target.value)}}
-                    />
+                <div>
+                    <label className="input input-bordered flex items-center gap-2">
+                        <input 
+                            type="text" 
+                            name="search" 
+                            id="search" 
+                            placeholder="Search users..." 
+                            className="grow"
+                            onChange={(e) => {setSearchString(e.target.value)}}
+                        />
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 opacity-70"><path fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd" /></svg>
+                        <button
+                            className="btn btn-sm btn-success text-white"
+                            onClick={() => searchUsers(searchString)}
+                        >
+                            Search
+                        </button>
+                    </label>
 
                 </div>
 
