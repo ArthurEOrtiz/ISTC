@@ -281,7 +281,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         placeholder="1234 Fake St."
                         required
                         maxLength={50}
-                        value={user.contact?.addressLine1 ?? ''}
+                        value={user?.contact?.addressLine1 ?? ''}
                         onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine1: e.target.value } })}
                     />
                 </div>
@@ -296,7 +296,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         type="text"
                         placeholder="Apt. 123 / Optional"
                         maxLength={50}
-                        value={user.contact?.addressLine2 ?? ''}
+                        value={user?.contact?.addressLine2 ?? ''}
                         onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine2: e.target.value } })}
                     />
                 </div>
@@ -325,7 +325,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         <select
                             className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                             id="state"
-                            value={user.contact.state ?? "ID"}
+                            value={user.contact?.state ?? "ID"}
                             required
                             onChange={(e) => setUser({ ...user, contact: { ...user.contact, state: e.target.value } })}
                         >
