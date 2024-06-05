@@ -17,7 +17,6 @@ const UserCatalog: React.FC = () => {
 
    //Effect
    useEffect(() => {
-        
         if (searchString.length > 0) {
             searchUsers(searchString);
         } else {
