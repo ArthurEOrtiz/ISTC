@@ -171,7 +171,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                                 <input 
                                     type="text" 
                                     className="grow" 
-                                    placeholder="Search"
+                                    placeholder="Search Courses..."
                                     value={searchString}
                                     onChange={(e) => setSearchString(e.target.value)} 
                                 />
