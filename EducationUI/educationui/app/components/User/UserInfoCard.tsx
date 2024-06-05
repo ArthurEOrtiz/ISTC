@@ -202,16 +202,16 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, viewOnly = fa
             </div>
 
             {viewOnly && (
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex justify-start">
                     <button 
-                        className="btn btn-primary text-white"
+                        className="btn btn-sm btn-primary text-white"
                         onClick={() => router.push(`/admin/users/${user.userId}`)}
                     >
                         Edit
                     </button>
 
                     <button
-                        className="btn btn-error text-white ml-2"
+                        className="btn btn-sm btn-error text-white ml-2"
                         onClick={handleDeleteUser}
                     >
                         Delete
