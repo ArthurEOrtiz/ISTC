@@ -104,11 +104,14 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                 </div>
             </div>
 
-            {course.description ? (
-                <p className="text-base">{course.description}</p>
-            ) : (
-                <p className="text-error">No description has been defined for this course!</p>
-            )}
+            <div className="mt-2">
+                <p className="text-1xl font-bold">Description</p>
+                {course.description ? (
+                    <p className="text-base">{course.description}</p>
+                ) : (
+                    <p className="text-error">No description has been defined for this course!</p>
+                )}
+            </div>
             
             <div className="flex">
 
@@ -199,7 +202,7 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                             <div className="flex space-x-2">
                                 <p className="text-1xl font-bold">Has Exam? :</p>
                                 {course.hasExam ? (
-                                    <p className="text-base">Yes</p>
+                                    <p className="text-success">Yes</p>
                                 ) : (
                                     <p className="text-error">No</p>
                                 )}

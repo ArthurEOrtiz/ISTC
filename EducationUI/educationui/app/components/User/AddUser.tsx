@@ -19,7 +19,6 @@ const AddUser: React.FC = () => {
         }
     }
 
-
     return (
         <div>
             {errorMessage && (

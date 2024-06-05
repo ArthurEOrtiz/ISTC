@@ -2,6 +2,7 @@ import ErrorModal from "@/app/shared/modals/ErrorModal";
 import { Course, User } from "@/app/shared/types/sharedTypes";
 import { GetUserEnrolledCoursesById } from "@/Utilities/api";
 import React, { useEffect, useState } from "react";
+import CourseInfoCard from "../Course/CourseInfoCard";
 
 interface UserEnrolledCoursesProps {
     user: User;
@@ -44,14 +45,16 @@ const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
                     courses.map((course: Course, index) => (
                         <div
                             key={index}
-                            className='card w-full bg-base-300 shadow-xl'
+                            className='card w-full bg-base-300 p-4'
                         >
-                            <p className='text-center p-4'>{course.title}</p>
-                            <p className='text-center p-4'>{course.description}</p>
+                            <CourseInfoCard
+                                course={course}
+                                expanded={false}
+                            />
                         </div> 
                     ))
                 ) : (
-                    <div className='card w-full bg-base-100 shadow-xl'>
+                    <div className='card w-full bg-base-100'>
                         <p className='text-center p-4'>No courses found.</p>
                     </div>
                 )}

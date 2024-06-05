@@ -39,52 +39,179 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, viewOnly = fa
     // render
     return (
         <div className="bg-base-100 shawdow-md rounded-xl p-4 w-full">
-            <h1 className="text-2xl text-center font-bold">{user.firstName} {user.lastName}</h1>
-            <div>
-                <p className="text-center">{user.employer} | {user.jobTitle}</p>
-                <p className="text-center">{user.email} | {formattedPhoneNumber}</p>
-                <p className="text-center">{user.contact.addressLine1}</p>
-                <p className="text-center"> {user.contact.addressLine2}</p> 
-                <p className="text-center"> {user.contact.city}, {user.contact.state}, {user.contact.zip}</p>
+            <div className="flex justify-between">
+                <h1 className="text-2xl font-bold">{user.firstName} {user.middleName ?? ""} {user.lastName}</h1>
+                <div>
+                    <p className="text-base">User Id: {user.userId}</p>
+                </div>
             </div>
 
-            <div className="mt-4">
-                {user.student  && (
-                    <div>
-                        <div className="flex">
-                            <p className="text-base font-bold mr-2">Student Id:</p>
-                            <p>{user.student.studentId}</p>
+            <div className="space-y-2">
+                <div className="space-y-2">
+                    <div className="flex">
+                        <div className="w-full">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Employer :</p>
+                                {user.employer ? (
+                                <p className="text-base">{user.employer}</p>
+                                ) : (
+                                    <p className="text-error">None</p>
+                                )}
+                            </div>
                         </div>
-
-                        <div className="flex">
-                            <p className="text-base font-bold mr-2">Accumulated Credits:</p>
-                            <p>{user.student.accumulatedCredit}</p>
-                        </div>
-
-                        <div className="flex">
-                            <p className="text-base font-bold mr-2">Appriasal Certified:</p>
-                            <p>{user.student.appraisalCertified ? "Yes" : "No"}</p>
-                        </div>
-
-                        <div className="flex">
-                            <p className="text-base font-bold mr-2">Mapping Certified:</p>
-                            <p>{user.student.mappingCertified ? "Yes" : "No"}</p>
+                        <div className="w-full">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Job Title :</p>
+                                {user.jobTitle ? (
+                                    <p className="text-base">{user.jobTitle}</p>
+                                ) : (
+                                    <p className="text-error">None</p>
+                                )}
+                            </div>
                         </div>
                     </div>
-                )}
+
+                    <div className="flex">
+                        <div className="w-full">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Email :</p>
+                                {user.email ? (
+                                    <p className="text-base">{user.email}</p>
+                                ) : (
+                                    <p className="text-error">None</p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="w-full">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Phone :</p>
+                                {user.contact.phone ? (
+                                    <p className="text-base">{formattedPhoneNumber}</p>
+                                ) : (
+                                    <p className="text-error">None</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <hr />
+                <div className="space-y-2">
+                        <div className="flex space-x-2">
+                            <p className="text-1xl font-bold">Address Line 1 :</p>
+                            {user.contact.addressLine1 ? (
+                                <p className="text-base">{user.contact.addressLine1}</p>
+                            ) : (
+                                <p className="text-error">None</p>
+                            )}
+                        </div>
+
+                        <div className="flex space-x-2">
+                            <p className="text-1xl font-bold">Address Line 2 :</p>
+                            {user.contact.addressLine2 ? (
+                                <p className="text-base">{user.contact.addressLine2}</p>
+                            ) : (
+                                <p className="text-error">None</p>
+                            )}
+                        </div>
+
+                        <div className="flex">
+                            <div className="w-full">
+                                <div className="flex space-x-2">
+                                    <p className="text-1xl font-bold">City :</p>
+                                    {user.contact.city ? (
+                                        <p className="text-base">{user.contact.city}</p>
+                                    ) : (
+                                        <p className="text-error">None</p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="w-full">
+                                <div className="flex space-x-2">
+                                    <p className="text-1xl font-bold">State :</p>
+                                    {user.contact.state ? (
+                                        <p className="text-base">{user.contact.state}</p>
+                                    ) : (
+                                        <p className="text-error">None</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex space-x-2">
+                            <p className="text-1xl font-bold">Zip Code :</p>
+                            {user.contact.zip ? (
+                                <p className="text-base">{user.contact.zip}</p>
+                            ) : (
+                                <p className="text-error">None</p>
+                            )}
+                        </div>
+
+                </div>
+                <hr />
+                <div>
+                    {user.student ? (
+                        <div className="space-y-2">
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Student Id :</p>
+                                {user.student.studentId ? (
+                                    <p className="text-base">{user.student.studentId}</p>
+                                ) : (
+                                    <p className="text-error">None</p>
+                                )}
+                            </div>
+
+                            <div className="flex space-x-2">
+                                <p className="text-1xl font-bold">Accumulated Credits :</p>
+                                {user.student.accumulatedCredit ? (
+                                    <p className="text-base">{user.student.accumulatedCredit}</p>
+                                ) : (
+                                    <p className="text-error">None</p>
+                                )}
+                            </div>
+
+                            <div className="flex">
+                                <div className="w-full">
+                                    <div className="flex space-x-2">
+                                        <p className="text-1xl font-bold">Appraisal Certified :</p>
+                                        {user.student.appraisalCertified ? (
+                                            <p className="text-success">Yes</p>
+                                        ) : (
+                                            <p className="text-error">No</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="w-full">
+                                    <div className="flex space-x-2">
+                                        <p className="text-1xl font-bold">Mapping Certified :</p>
+                                        {user.student.mappingCertified ? (
+                                            <p className="text-success">Yes</p>
+                                        ) : (
+                                            <p className="text-error">No</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                           
+                        </div>
+                        ) : (
+                            <p className="text-error">No student information</p>
+                        )
+                    }
+                </div>
             </div>
 
             {viewOnly && (
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex justify-start">
                     <button 
-                        className="btn btn-primary text-white"
+                        className="btn btn-sm btn-primary text-white"
                         onClick={() => router.push(`/admin/users/${user.userId}`)}
                     >
                         Edit
                     </button>
 
                     <button
-                        className="btn btn-error text-white ml-2"
+                        className="btn btn-sm btn-error text-white ml-2"
                         onClick={handleDeleteUser}
                     >
                         Delete
