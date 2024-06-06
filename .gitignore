@@ -372,3 +372,4 @@ FodyWeavers.xsd
 /educationui/package-lock.json
 /EducationAPI/appsettings.Development.json
 /EducationAPI/appsettings.json
+EducationUI/educationui/.env
