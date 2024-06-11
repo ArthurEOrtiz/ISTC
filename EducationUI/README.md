@@ -22,6 +22,7 @@ The ISTC Education application is a platform designed to manage educational prog
 - Moment-TimeZone
 - [qs](https://www.npmjs.com/package/qs)
 - [Nodemailer](https://nodemailer.com/)
+- [types/nodemailer](https://www.npmjs.com/package/@types/nodemailer)
 
 ***
 
