@@ -3,9 +3,6 @@ import axios from 'axios';
 import https from 'https';
 import qs from 'qs';
 
-
-
-
 const axiosInstance = axios.create({
     baseURL: 'https://localhost:7144/',
     httpsAgent: new https.Agent({ rejectUnauthorized: false }), // This line is for handling self-signed certificates, remove if not needed
