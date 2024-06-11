@@ -10,9 +10,10 @@ import { useUser } from "@clerk/clerk-react";
 
 interface CourseCatalogProps {
     isAdmin?: boolean;
+    sendEmail?: (to: User, subject: string, body: string) => void;
 }
 
-const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
+const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail}) => {
     const { user: clerkUser, isLoaded } = useUser();
     const [ user, setUser ] = useState<User>();
     const [ selectedStatuses, setSelectedStatuses ] = useState<CourseStatus []>(['Upcoming', 'InProgress']);
@@ -95,8 +96,10 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
     }
 
     
+
+    
     // render
-    if ( !isLoaded || !user) {
+    if ( !isLoaded ) {
         return <Loading />
     }
 
@@ -235,11 +238,19 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                     user={user} 
                     isAdmin={isAdmin}
                     onError={(m) => setErrorMessages(m)}
+                    sendEmail = {(to: User, subject: string, body: string) => sendEmail && sendEmail(to, subject, body)}
                 />
-            ): (
+            ) : (
+                isLoading ? (
                 <div className="flex justify-center">
                     <span className="loading loading-spinner loading-lg"></span>
                 </div>
+                ) : (
+                    <div className="flex justify-center">
+                        <p className="text-error">{errorMessages}</p>
+                    </div>
+                )
+                
             )}
             
             {errorMessages && <ErrorModel
