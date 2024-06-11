@@ -9,9 +9,10 @@ interface CourseListProps {
     user: User;
     isAdmin: boolean;   
     onError: (message: string) => void;
+    sendEmail: (to: User, subject: string, body: string) => void;
 }
 
-const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}) => {
+const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError, sendEmail}) => {
     const [courseList , setCourseList] = useState<Course[] | null>(null);
 
     useEffect(() => {
@@ -38,6 +39,7 @@ const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}
                                 user={user} 
                                 isAdmin={isAdmin}
                                 onError={(m) => onError(m)}
+                                sendEmail={(to: User, subject: string, body: string) => sendEmail(to, subject, body)}
                             />
                         </div>
                     ))
