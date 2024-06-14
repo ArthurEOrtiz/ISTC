@@ -1,5 +1,5 @@
 'use client';
-import { Class, Course, User, WaitList } from "@/app/shared/types/sharedTypes";
+import { Attendance, Class, Course, User, WaitList } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import { SignedIn } from "@clerk/nextjs";
 import CourseActionBar from "./CourseActionBar";
@@ -18,6 +18,7 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
     const [ isEnrolled, setIsEnrolled ] = useState<boolean>(false);
     const [ isWaitListed, setIsWaitListed ] = useState<boolean>(false);
     const [ userWaitList, setUserWaitList ] = useState<WaitList | null>(null);
+    const [ attendance, setAttendance ] = useState<boolean[]>([]);
     const [ isLoading, setIsLoading ] = useState<boolean>(true);
     const [ errorMessage, setErrorMessage ] = useState<string>("");
     const [ showConfirmationModal, setShowConfirmationModal ] = useState<boolean>(false);
@@ -169,6 +170,13 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
         }
     }
 
+    const checkUserAttendance = async () => {
+        const attendance = await Promise.all(classes.map(cls =>
+            isEnrolled ? hasUserAttended(cls.classId, userId) : Promise.resolve(false)
+        ));
+        setAttendance(attendance);
+    }
+
     const hasUserAttended = async (classId: number, userId: number) => {
         const response = await HasAttendedByClassIdUserId(classId, userId);
         if (response.status === 200) {
@@ -223,47 +231,47 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
         );
     }
 
-    // const renderClasses = async () => {
-    //     return (
-    //         <>
-    //             {classes.map(async (cls, index) => {
-    //                 const hasAttended = await hasUserAttended(cls.classId, userId);
-    //                 return (
-    //                     <div key={index} className='bg-base-100 rounded-xl p-5 min-w-72 m-1'>
-    //                         <div className='flex justify-between'>
-    //                             <p className='text-2xl font-bold'>Class {index + 1}</p>     
-    //                             <p className='text-base'>Class Id: {cls.classId}</p>
-    //                         </div>
-    //                         <hr />
-    //                         <div className='flex justify-between mt-2'>
-    //                             <p className='text-lg font-bold'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('dddd')}</p>
-    //                             <p className='text-lg'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('MMMM Do YYYY')}</p>
-    //                         </div>
+    const renderClasses = async () => {
+        return (
+            <>
+                {classes.map(async (cls, index) => {
+                    const hasAttended = attendance[index];
+                    return (
+                        <div key={index} className='bg-base-100 rounded-xl p-5 min-w-72 m-1'>
+                            <div className='flex justify-between'>
+                                <p className='text-2xl font-bold'>Class {index + 1}</p>     
+                                <p className='text-base'>Class Id: {cls.classId}</p>
+                            </div>
+                            <hr />
+                            <div className='flex justify-between mt-2'>
+                                <p className='text-lg font-bold'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('dddd')}</p>
+                                <p className='text-lg'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('MMMM Do YYYY')}</p>
+                            </div>
 
-    //                         <div className='flex justify-between'>
-    //                             <p className='text-lg font-bold'>Start Time</p>
-    //                             <p className='text-lg'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('hh:mm a')}</p>
-    //                         </div>
+                            <div className='flex justify-between'>
+                                <p className='text-lg font-bold'>Start Time</p>
+                                <p className='text-lg'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('hh:mm a')}</p>
+                            </div>
 
-    //                         <div className='flex justify-between'>
-    //                             <p className='text-lg font-bold'>End Time</p>
-    //                             <p className='text-lg'>{moment.utc(cls.scheduleEnd).tz('America/Denver').format('hh:mm a')}</p>
-    //                         </div>
+                            <div className='flex justify-between'>
+                                <p className='text-lg font-bold'>End Time</p>
+                                <p className='text-lg'>{moment.utc(cls.scheduleEnd).tz('America/Denver').format('hh:mm a')}</p>
+                            </div>
 
-    //                         <SignedIn>
-    //                             {isEnrolled ? (
-    //                                 <div className='flex justify-between'>
-    //                                     <p className='text-lg font-bold'>Attended</p>
-    //                                     <p className={`${hasAttended ? 'text-success' : 'text-error'}`}>{hasAttended ? "Yes" : "No"}</p>
-    //                                 </div> 
-    //                             ) : null}
-    //                         </SignedIn>
-    //                     </div>
-    //                 );
-    //             })}
-    //         </>
-    //     );
-    // };
+                            <SignedIn>
+                                {isEnrolled ? (
+                                    <div className='flex justify-between'>
+                                        <p className='text-lg font-bold'>Attended</p>
+                                        <p className={`${hasAttended ? 'text-success' : 'text-error'}`}>{hasAttended ? "Yes" : "No"}</p>
+                                    </div> 
+                                ) : null}
+                            </SignedIn>
+                        </div>
+                    );
+                })}
+            </>
+        );
+    };
 
     return (
         <div className="p-4 space-y-2">
@@ -300,10 +308,11 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
                                         <p className="text-error">Not Enrolled</p>
                                     )}
                                 </div>
-                                <div>
-                                    <CourseActionBar navList = {renderNavList()}/> 
-                                </div>
-                                
+                                {course?.status !== "Archived" ? (
+                                    <div>
+                                        <CourseActionBar navList = {renderNavList()}/> 
+                                    </div>
+                                ) : null}
                             </div>   
                     )}
                 </SignedIn>
@@ -340,24 +349,11 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
                                 <p className='text-lg font-bold'>End Time</p>
                                 <p className='text-lg'>{endTime}</p>
                             </div>
-
-                            <SignedIn>
-                                {isEnrolled ? (
-                                    <div className='flex justify-between'>
-                                        <p className='text-lg font-bold'>Attended</p>
-                                        <p className='text-lg'>{hasAttended ? "Yes" : "No"}</p>
-                                    </div>
-                                ) : (
-                                    null
-                                )}
-
-                                
-                            </SignedIn>
                         </div>
                     );
                 })} */}
 
-                {/* {renderClasses()} */}
+                {renderClasses()}
             </div>
 
             {errorMessage !== "" && (
