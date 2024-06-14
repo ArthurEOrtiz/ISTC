@@ -48,7 +48,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
                 break;
             case 'Enroll Student':
                 enrollUser(userToEnroll!);
-                removeStudentFromEnrollmentQueue(userToEnroll!);
+                removeUserFromQueues(userToEnroll!);
                 break;
         }
         setShowConfirmationModal(false);
@@ -152,7 +152,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
         usersToEnroll.forEach(async (user) => {
             const isUserWaitListed = enrollmentQueue?.some(enrollmentUser => enrollmentUser.userId === user.userId);
             if (isUserWaitListed) {
-                removeStudentFromEnrollmentQueue(user);
+                removeUserFromQueues(user);
             }
         });
     }
@@ -183,16 +183,20 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
         if (response.status === 204) {
             await getEnrolledUsers();
             onEnroll && onEnroll();
+            if (userToDrop) {
+                removeUserFromQueues(userToDrop);
+                setUserToDrop(undefined);
+            }
         } else {
             onError(response as unknown as string);
         }
-        setUserToDrop(undefined);
     }
 
-    const removeStudentFromEnrollmentQueue = async (user: User) => {
+    const removeUserFromQueues = async (user: User) => {
         const response = await DeleteWaitListByUserIdCourseId(user.userId, course.courseId);
         if (response.status === 204) {
             await getEnrollmentQueue();
+            await getDropQueue();
             onEnroll && onEnroll();
         } else {
             onError(response as unknown as string);
