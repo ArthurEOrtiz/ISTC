@@ -4,7 +4,7 @@ import CourseInfoCard from "./CourseInfoCard";
 import { SignedIn } from "@clerk/nextjs";
 import CourseActionBar from "./CourseActionBar";
 import moment from "moment-timezone";
-import { DeleteWaitListById, GetWaitListByUserIdCourseId, IsUserEnrolledInCourse, IsUserWaitListed, PostWaitList } from "@/Utilities/api";
+import { DeleteWaitListById, GetWaitListByUserIdCourseId, HasAttendedByClassIdUserId, IsUserEnrolledInCourse, IsUserWaitListed, PostWaitList } from "@/Utilities/api";
 import { useEffect, useState } from "react";
 import ErrorModal from "@/app/shared/modals/ErrorModal";
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
@@ -169,6 +169,16 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
         }
     }
 
+    const hasUserAttended = async (classId: number, userId: number) => {
+        const response = await HasAttendedByClassIdUserId(classId, userId);
+        if (response.status === 200) {
+            return response.data as boolean;
+        } else {
+            setErrorMessage("Error checking if user has attended");
+            return false;
+        }
+    }
+
     const getUserWaitList = async (userId: number, courseId: number) => {
         const response = await GetWaitListByUserIdCourseId(userId, courseId);
         if (response.status === 200) {
@@ -213,6 +223,48 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
         );
     }
 
+    // const renderClasses = async () => {
+    //     return (
+    //         <>
+    //             {classes.map(async (cls, index) => {
+    //                 const hasAttended = await hasUserAttended(cls.classId, userId);
+    //                 return (
+    //                     <div key={index} className='bg-base-100 rounded-xl p-5 min-w-72 m-1'>
+    //                         <div className='flex justify-between'>
+    //                             <p className='text-2xl font-bold'>Class {index + 1}</p>     
+    //                             <p className='text-base'>Class Id: {cls.classId}</p>
+    //                         </div>
+    //                         <hr />
+    //                         <div className='flex justify-between mt-2'>
+    //                             <p className='text-lg font-bold'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('dddd')}</p>
+    //                             <p className='text-lg'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('MMMM Do YYYY')}</p>
+    //                         </div>
+
+    //                         <div className='flex justify-between'>
+    //                             <p className='text-lg font-bold'>Start Time</p>
+    //                             <p className='text-lg'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('hh:mm a')}</p>
+    //                         </div>
+
+    //                         <div className='flex justify-between'>
+    //                             <p className='text-lg font-bold'>End Time</p>
+    //                             <p className='text-lg'>{moment.utc(cls.scheduleEnd).tz('America/Denver').format('hh:mm a')}</p>
+    //                         </div>
+
+    //                         <SignedIn>
+    //                             {isEnrolled ? (
+    //                                 <div className='flex justify-between'>
+    //                                     <p className='text-lg font-bold'>Attended</p>
+    //                                     <p className={`${hasAttended ? 'text-success' : 'text-error'}`}>{hasAttended ? "Yes" : "No"}</p>
+    //                                 </div> 
+    //                             ) : null}
+    //                         </SignedIn>
+    //                     </div>
+    //                 );
+    //             })}
+    //         </>
+    //     );
+    // };
+
     return (
         <div className="p-4 space-y-2">
     
@@ -234,18 +286,38 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
                             <span className="loading loading-spinner"></span>
                         </div>
                         ) : (
-                        <CourseActionBar navList = {renderNavList()}/>    
+                            <div className="flex items-baseline justify-center space-x-4">
+                                <div>
+                                    <p className='text-center'>Enrollment Status</p>
+                                    <hr />
+                                    {isEnrolled && !isWaitListed ? (
+                                        <p className="text-success">Enrolled</p>
+                                    ) : isEnrolled && isWaitListed ? (
+                                        <p className="text-warning">On Wait List To Drop</p>
+                                    ) : !isEnrolled && isWaitListed ? (
+                                        <p className="text-warning">On Wait List To Enroll</p>
+                                    ) : (
+                                        <p className="text-error">Not Enrolled</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <CourseActionBar navList = {renderNavList()}/> 
+                                </div>
+                                
+                            </div>   
                     )}
                 </SignedIn>
 
             </div>
 
             <div className='flex flex-wrap justify-start items-baseline'>
-                {classes.map((cls, index) => {
+                {/* {classes.map((cls, index) => {
                     const weekDay = moment.utc(cls.scheduleStart).tz('America/Denver').format('dddd');
                     const date = moment.utc(cls.scheduleStart).tz('America/Denver').format('MMMM Do YYYY');
                     const startTime = moment.utc(cls.scheduleStart).tz('America/Denver').format('hh:mm a');
                     const endTime = moment.utc(cls.scheduleEnd).tz('America/Denver').format('hh:mm a');
+
+                    let hasAttended = false;
 
                     return (
                         <div key={index} className='bg-base-100 rounded-xl p-5 min-w-72 m-1'>
@@ -268,9 +340,24 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
                                 <p className='text-lg font-bold'>End Time</p>
                                 <p className='text-lg'>{endTime}</p>
                             </div>
+
+                            <SignedIn>
+                                {isEnrolled ? (
+                                    <div className='flex justify-between'>
+                                        <p className='text-lg font-bold'>Attended</p>
+                                        <p className='text-lg'>{hasAttended ? "Yes" : "No"}</p>
+                                    </div>
+                                ) : (
+                                    null
+                                )}
+
+                                
+                            </SignedIn>
                         </div>
                     );
-                })}
+                })} */}
+
+                {/* {renderClasses()} */}
             </div>
 
             {errorMessage !== "" && (
