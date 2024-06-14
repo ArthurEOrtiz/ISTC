@@ -466,17 +466,15 @@ export async function IsUserAdminByClerkId(clerkId: String) {
     }
 }
 
-export async function IsUserEnrolledInCourse(clerkId: String, courseId: Number) {
+export async function IsUserEnrolledInCourse(userId: Number, courseId: Number) {
     try {
-        const response = await axiosInstance.get(`User/IsUserEnrolledInCourse/${clerkId}/${courseId}`);
+        const response = await axiosInstance.get(`User/IsUserEnrolledInCourse/${userId}/${courseId}`);
         return response;
     } catch (error: any) {
         console.error('Error fetching user:', error);
         return error.message;
     }
 }
-
-
 
 export async function DeleteUserById(userId: Number) {
     try {
