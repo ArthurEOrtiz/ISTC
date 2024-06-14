@@ -15,7 +15,7 @@ interface CourseCatalogProps {
 
 const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail}) => {
     const { user: clerkUser, isLoaded } = useUser();
-    const [ user, setUser ] = useState<User>();
+    const [ user, setUser ] = useState<User | null>(null);
     const [ selectedStatuses, setSelectedStatuses ] = useState<CourseStatus []>(['Upcoming', 'InProgress']);
     const [ searchString, setSearchString ] = useState<string>(''); 
     const [ isCourseCalendarVisible, setIsCourseCalendarVisible ] = useState(!isAdmin);
@@ -232,7 +232,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
                 />
             }
 
-            {(isCourseListVisible && user && courses && !isLoading ) ? (
+            {(isCourseListVisible && courses && !isLoading ) ? (
                 <CourseList 
                     courses={courses}
                     user={user} 
