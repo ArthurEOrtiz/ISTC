@@ -1,3 +1,4 @@
+'use client';
 import { Course } from "@/app/shared/types/sharedTypes";
 import moment from 'moment-timezone';
 import { useEffect, useState } from "react";
