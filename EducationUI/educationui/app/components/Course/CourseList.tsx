@@ -6,7 +6,7 @@ import CourseActionContainer from './CourseActionContainer';
 
 interface CourseListProps {
     courses: Course[] | null;
-    user: User;
+    user: User | null;
     isAdmin: boolean;   
     onError: (message: string) => void;
     sendEmail: (to: User, subject: string, body: string) => void;
