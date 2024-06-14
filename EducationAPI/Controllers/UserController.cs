@@ -125,17 +125,20 @@ namespace EducationAPI.Controllers
         var user = await _educationProgramContext.Users
             .Include(u => u.Contact)
             .Include(u => u.Student)
+              .ThenInclude(s => s.Attendances)
+            .Include(u => u.Student)
+              .ThenInclude(s => s.Exams)
             .FirstOrDefaultAsync(u => u.ClerkId == clerkId);
 
         if (user == null)
         {
           // If user with the given ClerkId doesn't exist, return 404 Not Found
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          return NotFound("User not found.");
         }
 
         _logger.LogInformation("GetUserByClerkId({ClerkId}), called", clerkId);
         // If user found, return it
-        return user;
+        return Ok(user);
       }
       catch (Exception ex)
       {
@@ -231,20 +234,20 @@ namespace EducationAPI.Controllers
       }
     }
 
-    [HttpGet("IsUserEnrolledInCourse/{clerkId}/{courseId}")]
-    public async Task<ActionResult<bool>> IsUserEnrolledInCourse(string clerkId, int courseId)
+    [HttpGet("IsUserEnrolledInCourse/{userId}/{courseId}")]
+    public async Task<ActionResult<bool>> IsUserEnrolledInCourse(int userId, int courseId)
     {
       try
       {
         var user = await _educationProgramContext.Users
           .Include(u => u.Student)
-          .ThenInclude(s => s!.Attendances)
-          .FirstOrDefaultAsync(u => u.ClerkId == clerkId);
+            .ThenInclude(s => s.Attendances)
+          .FirstOrDefaultAsync(u => u.UserId == userId);
 
         if (user == null)
         {
-          _logger.LogError("IsUserEnrolledInCourse({ClerkId}, {CourseId}), user not found.", clerkId, courseId);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          _logger.LogError("IsUserEnrolledInCourse({UserId}, {CourseId}), user not found.", userId, courseId);
+          return NotFound("User not found.");
         }
 
         var course = await _educationProgramContext.Courses
@@ -253,8 +256,8 @@ namespace EducationAPI.Controllers
 
         if (course == null)
         {
-          _logger.LogError("IsUserEnrolledInCourse({ClerkId}, {CourseId}), course not found.", clerkId, courseId);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          _logger.LogError("IsUserEnrolledInCourse({UserId}, {CourseId}), course not found.", userId, courseId);
+          return NotFound("Course not found.");
         }
 
         // Check if there are any attendances for the user and the course
@@ -262,12 +265,12 @@ namespace EducationAPI.Controllers
                          user.Student.Attendances.Any(a => a.Class?.CourseId == courseId);
 
 
-        return isSignedUp;
+        return Ok(isSignedUp);
 
       }
       catch (Exception ex)
       {
-        _logger.LogError(ex, "IsUserEnrolledInCourse({ClerkId}, {CourseId})", clerkId, courseId);
+        _logger.LogError(ex, "IsUserEnrolledInCourse({UserId}, {CourseId})", userId, courseId);
         return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
       }
     }
