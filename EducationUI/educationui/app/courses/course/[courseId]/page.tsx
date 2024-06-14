@@ -13,7 +13,7 @@ const CourseDetail: React.FC<{ params: { courseId: string } }> = async ({ params
         if (response.status === 200) {
             return response.data as Course;
         } else {
-            throw new Error("Error fetching course");
+            throw new Error("Error fetching course!");
         }
     }
 
