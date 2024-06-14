@@ -43,6 +43,16 @@ export async function CalculateStudentCreditHours(studentId: Number) {
     }
 }
 
+export async function HasAttendedByClassIdUserId(classId: Number, userId: Number) {
+    try {
+        const response = await axiosInstance.get(`Attendance/HasAttendedByClassIdUserId/${classId}/${userId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching attendance:', error);
+        return error.message;
+    }
+}
+
 // Courses 
 export async function getAllCourses() {
     try {
