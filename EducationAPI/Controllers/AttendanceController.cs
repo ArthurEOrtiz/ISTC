@@ -45,6 +45,64 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpGet("HasAttended/{attendanceId}")]
+		public async Task<ActionResult<bool>> HasAttended(int attendanceId)
+		{
+			try
+			{
+				var attendance = await _educationProgramContext.Attendances
+					.FirstOrDefaultAsync(a => a.AttendanceId == attendanceId);
+
+				if (attendance == null)
+				{
+					_logger.LogError("HassAttended({AttendanceId}), attendance not found.", attendanceId);
+					return NotFound("Attendance not found.");
+				}
+
+				_logger.LogInformation("HasAttended({AttendanceId}) called.", attendanceId);
+				return Ok(attendance.Attended);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "HasAttended({AttendanceId})", attendanceId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpGet("HasAttendedByClassIdUserId/{classId}/{userId}")]
+		public async Task<ActionResult<bool>> HasAttendedByClassIdUserId(int classId, int userId)
+		{
+			try
+			{
+				var user = await _educationProgramContext.Users
+					.Include(u => u.Student)
+					.FirstOrDefaultAsync(u => u.UserId == userId);
+
+				if (user == null)
+				{
+					_logger.LogError("HasAttendedByClassIdUserId({ClassId}, {UserId}), user not found.", classId, userId);
+					return NotFound("User not found.");
+				}
+
+				var attendance = await _educationProgramContext.Attendances
+					.FirstOrDefaultAsync(a => a.ClassId == classId && a.StudentId == user.Student.StudentId);
+
+				if (attendance == null)
+				{
+					_logger.LogError("HasAttendedByClassIdUserId({ClassId}, {UserId}), attendance not found.", classId, userId);
+					return NotFound("Attendance not found.");
+				}
+
+				_logger.LogInformation("HasAttendedByClassIdUserId({ClassId}, {UserId}) called.", classId, userId);
+				return Ok(attendance.Attended);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "HasAttendedByClassIdUserId({ClassId}, {UserId})", classId, userId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 		[HttpPut("UpdateAttendanceById/{attendanceId}/{attended}")]
 		public async Task<ActionResult> UpdateAttendanceById(int attendanceId, bool attended)
 		{
