@@ -34,7 +34,13 @@ const EditContactModal: React.FC<EditContactModalProps> = ({user, isOpen, onCanc
             <div className="modal-box">
 
                 <div className='modal-top'>
-                    <h3 className="font-bold text-lg">Update Contact Information</h3>
+                    <div className='flex items-baseline justify-between'>
+                        <h3 className="font-bold text-lg">Update Contact Information</h3>
+                        <button 
+                            onClick={handleCancelOnClick}
+                            className="text-error font-bold text-2xl">&times;
+                        </button>
+                    </div>
                 </div>
                 <form onSubmit={(formEvent) => {
                     handleSubmitOnClick(formEvent);

@@ -58,7 +58,7 @@ const EditEmployerModal: React.FC<EditEmployerModalProps> = ({ user, isOpen, onC
     ]
 
     const handleSelectEmployer = () => {
-        if (!countyArray.includes(editedUser.employer) && editedUser.employer !=='tax commision' ) {
+        if (!countyArray.includes(editedUser.employer) && editedUser.employer !=='Tax Commision' ) {
             return "other"
         }
         return editedUser.employer;
@@ -80,7 +80,14 @@ const EditEmployerModal: React.FC<EditEmployerModalProps> = ({ user, isOpen, onC
             <div className="modal-box">
 
                 <div className='modal-top'>
-                    <h2 className="text-lg font-bold">Edit Employer</h2>
+                    <div className="flex items-baseline justify-between">
+                        <h2 className="text-lg font-bold">Edit Employer</h2>
+                        <button
+                            className='text-2xl text-error font-bold'
+                            onClick={handleCancelOnClick}>
+                            &times;
+                        </button>
+                    </div>
                 </div>
                 <form onSubmit={(e)=> handleSubmitOnClick(e)}>
                     <div className='modal-middle mt-4 space-y-3'>
