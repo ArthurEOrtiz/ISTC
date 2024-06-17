@@ -94,9 +94,6 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
         }
         setIsLoading(false);
     }
-
-    
-
     
     // render
     if ( !isLoaded ) {
