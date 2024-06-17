@@ -1,8 +1,8 @@
-interface CourseActionBarProps {
+interface ActionBarProps {
     navList: JSX.Element;
 }
 
-const CourseActionBar: React.FC<CourseActionBarProps> = ({ navList }) => {
+const ActionBar: React.FC<ActionBarProps> = ({ navList }) => {
     return (
         <div className="navbar">
             <div className="navbar-start">
@@ -26,4 +26,4 @@ const CourseActionBar: React.FC<CourseActionBarProps> = ({ navList }) => {
     );
 }
 
-export default CourseActionBar;
+export default ActionBar;

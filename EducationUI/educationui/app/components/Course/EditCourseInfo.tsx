@@ -18,7 +18,7 @@ import { deepEquals } from "@/Utilities/deepEquality";
 import Loading from "@/app/shared/Loading";
 import ExamModal from "../Exam/ExamModal";
 import { areClassesOrderedByDate, courseHasClasses, sortClassesByDate } from "@/Utilities/class";
-import CourseActionBar from "./CourseActionBar";
+import CourseActionBar from "../../shared/ActionBar";
 
 interface EditCourseInfoProps {
     courseId: number;

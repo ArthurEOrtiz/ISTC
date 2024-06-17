@@ -1,8 +1,8 @@
 'use client';
-import { Attendance, Class, Course, User, WaitList } from "@/app/shared/types/sharedTypes";
+import { Class, Course, User, WaitList } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import { SignedIn } from "@clerk/nextjs";
-import CourseActionBar from "./CourseActionBar";
+import ActionBar from "../../shared/ActionBar";
 import moment from "moment-timezone";
 import { DeleteWaitListById, GetWaitListByUserIdCourseId, HasAttendedByClassIdUserId, IsUserEnrolledInCourse, IsUserWaitListed, PostWaitList } from "@/Utilities/api";
 import { useEffect, useState } from "react";
@@ -64,8 +64,8 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
                 } 
             });
 
+            checkUserAttendance();
             setIsLoading(false);
-
         }
     }, []);
 
@@ -235,7 +235,13 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
         return (
             <>
                 {classes.map(async (cls, index) => {
+
                     const hasAttended = attendance[index];
+                    const day = moment.utc(cls.scheduleStart).tz('America/Denver').format('dddd');
+                    const date = moment.utc(cls.scheduleStart).tz('America/Denver').format('MMMM Do YYYY');
+                    const startTime = moment.utc(cls.scheduleStart).tz('America/Denver').format('hh:mm a');
+                    const endTime = moment.utc(cls.scheduleEnd).tz('America/Denver').format('hh:mm a');
+
                     return (
                         <div key={index} className='bg-base-100 rounded-xl p-5 min-w-72 m-1'>
                             <div className='flex justify-between'>
@@ -244,24 +250,24 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
                             </div>
                             <hr />
                             <div className='flex justify-between mt-2'>
-                                <p className='text-lg font-bold'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('dddd')}</p>
-                                <p className='text-lg'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('MMMM Do YYYY')}</p>
+                                <p className='text-lg font-bold'>{day}</p>
+                                <p className='text-lg'>{date}</p>
                             </div>
 
                             <div className='flex justify-between'>
                                 <p className='text-lg font-bold'>Start Time</p>
-                                <p className='text-lg'>{moment.utc(cls.scheduleStart).tz('America/Denver').format('hh:mm a')}</p>
+                                <p className='text-lg'>{startTime}</p>
                             </div>
 
                             <div className='flex justify-between'>
                                 <p className='text-lg font-bold'>End Time</p>
-                                <p className='text-lg'>{moment.utc(cls.scheduleEnd).tz('America/Denver').format('hh:mm a')}</p>
+                                <p className='text-lg'>{endTime}</p>
                             </div>
 
                             <SignedIn>
                                 {isEnrolled ? (
                                     <div className='flex justify-between'>
-                                        <p className='text-lg font-bold'>Attended</p>
+                                        <p className='text-lg font-bold'>Attended?</p>
                                         <p className={`${hasAttended ? 'text-success' : 'text-error'}`}>{hasAttended ? "Yes" : "No"}</p>
                                     </div> 
                                 ) : null}
@@ -310,49 +316,15 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
                                 </div>
                                 {course?.status !== "Archived" ? (
                                     <div>
-                                        <CourseActionBar navList = {renderNavList()}/> 
+                                        <ActionBar navList = {renderNavList()}/> 
                                     </div>
                                 ) : null}
                             </div>   
                     )}
                 </SignedIn>
-
             </div>
 
             <div className='flex flex-wrap justify-start items-baseline'>
-                {/* {classes.map((cls, index) => {
-                    const weekDay = moment.utc(cls.scheduleStart).tz('America/Denver').format('dddd');
-                    const date = moment.utc(cls.scheduleStart).tz('America/Denver').format('MMMM Do YYYY');
-                    const startTime = moment.utc(cls.scheduleStart).tz('America/Denver').format('hh:mm a');
-                    const endTime = moment.utc(cls.scheduleEnd).tz('America/Denver').format('hh:mm a');
-
-                    let hasAttended = false;
-
-                    return (
-                        <div key={index} className='bg-base-100 rounded-xl p-5 min-w-72 m-1'>
-                            <div className='flex justify-between'>
-                                <p className='text-2xl font-bold'>Class {index + 1}</p>     
-                                <p className='text-base'>Class Id: {cls.classId}</p>
-                            </div>
-                            <hr />
-                            <div className='flex justify-between mt-2'>
-                                <p className='text-lg font-bold'>{weekDay}</p>
-                                <p className='text-lg'>{date}</p>
-                            </div>
-
-                            <div className='flex justify-between'>
-                                <p className='text-lg font-bold'>Start Time</p>
-                                <p className='text-lg'>{startTime}</p>
-                            </div>
-
-                            <div className='flex justify-between'>
-                                <p className='text-lg font-bold'>End Time</p>
-                                <p className='text-lg'>{endTime}</p>
-                            </div>
-                        </div>
-                    );
-                })} */}
-
                 {renderClasses()}
             </div>
 
@@ -381,7 +353,6 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
                     }}
                 />
             )}
-
         </div>
   );
 

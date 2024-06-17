@@ -11,6 +11,7 @@ import ConfirmationModal from '@/app/shared/modals/ConfirmationModal';
 import EditEmployerModal from './EditEmployerModal';
 import { useRouter } from 'next/navigation';
 import UserEnrolledCourses from './UserEnrolledCourses';
+import ActionBar from '@/app/shared/ActionBar';
 
 interface UserDashboardProps {
     clerkId: string;    
@@ -224,6 +225,82 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     
 
     // Render
+    const renderUserActions = () => {
+        return (
+            <>
+                <li>
+                    <details>
+                        <summary>Account</summary>
+                        <ul className='p-2 bg-base-300 z-10'>
+                            <li>
+                                <button
+                                    className='text-nowrap'
+                                    onClick={() => setShowEditContactModal(true)}
+                                    >
+                                        Update Contact Information
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    onClick={() => setShowEditEmployerModal(true)}
+                                    >
+                                        Update Employer Information
+                                </button>
+                            </li>
+                        </ul>
+                    </details>
+                </li>
+
+                <li>
+                    <details>
+                        <summary>Certifications</summary>
+                        <ul className='p-2 bg-base-300 z-10'>
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    >
+                                        Apply for Appraisor Certification
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    >
+                                        Apply for Mapping Certification
+                                </button>
+                            </li>
+                        </ul>
+                    </details>
+                </li>
+
+                <li>
+                    <details>
+                        <summary className='text-error'>
+                            Sign Out/Delete
+                        </summary>
+                        <ul className='p-2 bg-base-300 z-10'>
+                            <li>
+                                <SignOutButton
+                                    signOutCallback={handleOnSignOut}>
+                                    <button className="text-nowrap text-error">Sign Out</button>
+                                </SignOutButton>
+                            </li>
+                            <li>
+                                <button
+                                    className="text-nowrap text-error"
+                                    onClick={handleOnDeleteAccount}
+                                    >
+                                        Delete Account
+                                </button>
+                            </li>
+                        </ul>
+                    </details>
+                </li>
+            </>
+        );
+    }
+
     if (!user) {
         return <Loading />
     }
@@ -231,115 +308,22 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     return (
         <div>
             <h1 className="p-2 text-3xl text-center font-bold">User Dashboard</h1>
-
-            <div className='flex flex-row mt-4'>
-                <div className='basis-1/4' ></div>
-                <div className='basis-1/2 space-y-3'>
-                    <div>
+         
+            <div className='space-y-2 p-4'>
+                <div className='bg-base-100 rounded-xl p-5'>
+                    <div className='bg-base-300 rounded-xl p-4'>
                         <UserInfoCard user={user}/>
                     </div>
-                    <div>
-                        <UserEnrolledCourses user={user}/>
-                    </div>
                     
+                    <ActionBar navList={renderUserActions()} />
                 </div>
-                <div className='basis-1/4'>
-                    <div className='ml-2'>
-                        <div className='flex flex-col pr-2'>
-
-
-                            <ul className='menu bg-base-100 rounded-box w-full'>
-                                <li>
-                                    <a className="text-2xl">User Actions</a>
-                                </li>
-                                <ul>
-                                    <details open>
-                                        <summary className='text-lg'>Account</summary>
-                                        <ul className='space-y-2 mt-1'>
-                                            <li>
-                                                <button
-                                                    className="btn btn-primary text-white w-full"
-                                                    onClick={() => setShowEditContactModal(true)}
-                                                    >
-                                                        Update Contact Information
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button
-                                                    className="btn btn-primary text-white w-full"
-                                                    onClick={() => setShowEditEmployerModal(true)}
-                                                    >
-                                                        Update Employer Information
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </details>
-                                </ul>
-                                <ul>
-                                    <details open>
-                                        <summary className='text-lg mt-2'>Certifications</summary>
-                                        <ul className='space-y-2 mt-1'>
-                                            <li>
-                                                <button
-                                                    className="btn btn-primary text-white w-full"
-                                                    >
-                                                        Apply for Appraisor Certification
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button
-                                                    className="btn btn-primary text-white w-full"
-                                                    >
-                                                        Apply for Mapping Certification
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </details>
-                                </ul>
-                                <ul>
-                                    <details>
-                                        <summary className='text-lg text-error mt-2'>
-                                            Sign Out/Delete
-                                        </summary>
-                                        <ul className='space-y-2 mt-1'>
-                                            <SignOutButton
-                                                signOutCallback={handleOnSignOut}>
-                                                <button className="btn btn-error text-white w-full">Sign Out</button>
-                                            </SignOutButton>
-                                            <li>
-                                                <button
-                                                    className="btn btn-error text-white w-full"
-                                                    onClick={handleOnDeleteAccount}
-                                                    >
-                                                        Delete Account
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </details>    
-                                </ul>
-                                {isUserAdmin() && (
-                                <ul>
-                                    <details open>
-                                        <summary className='text-lg mt-2'>Admin</summary>
-                                        <ul className='space-y-2 mt-1'>
-                                            <li>
-                                                <button
-                                                    className="btn btn-primary text-white w-full"
-                                                    onClick={() => router.push('/admin')}
-                                                    >
-                                                        Admin Dashboard
-                                                </button>
-                                            </li>
-
-                                        </ul>
-                                    </details>
-                                </ul>
-                                )}
-                            </ul>
-                        </div>
-                    </div>
+                <div>
+                    <UserEnrolledCourses user={user}/>
                 </div>
+                    
             </div>
+
+            
                 
             <EditContactModal 
                 user={user} 
