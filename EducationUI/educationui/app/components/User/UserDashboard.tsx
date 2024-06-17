@@ -297,6 +297,33 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                         </ul>
                     </details>
                 </li>
+
+                {isUserAdmin() && (
+                    <li>
+                        <details>
+                            <summary>Admin</summary>
+                            <ul className='p-2 bg-base-300 z-10'>
+                                <li>
+                                    <button
+                                        className="text-nowrap"
+                                        onClick={() => router.push('/admin/editcourse')}
+                                        >
+                                            Edit Courses
+                                    </button>
+
+                                </li>
+                                <li>
+                                    <button
+                                        className="text-nowrap"
+                                        onClick={() => router.push('/admin/users')}
+                                        >
+                                            Edit Users
+                                    </button>
+                                </li>
+                            </ul>
+                        </details>
+                    </li>
+                )}
             </>
         );
     }
