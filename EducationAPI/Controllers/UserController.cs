@@ -338,12 +338,16 @@ namespace EducationAPI.Controllers
       {
         var userToUpdate = await _educationProgramContext.Users
           .Include(u => u.Contact)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Attendances)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Exams)
           .FirstOrDefaultAsync(u => u.UserId == user.UserId);
 
         if (userToUpdate == null)
         {
           _logger.LogError("UpdateUserContact({User}), user not found", user);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          return NotFound("User not found.");
         }
 
         if (user.Contact != null && userToUpdate.Contact != null)
@@ -356,13 +360,11 @@ namespace EducationAPI.Controllers
         else
         {
           _logger.LogError("UpdateUserContact({User}), user has no contact", user);
-          return new StatusCodeResult((int)HttpStatusCode.BadRequest);
+          return BadRequest("User has no contact information.");
         }
 
-        // Update user properties
-
         _logger.LogInformation("UpdateUserContact({User}), called", user);
-        return new StatusCodeResult((int)HttpStatusCode.OK);
+        return Ok(userToUpdate);
 
       }
       catch (Exception ex)
@@ -388,18 +390,23 @@ namespace EducationAPI.Controllers
       try
       {
         var userToUpdate = await _educationProgramContext.Users
+          .Include(u => u.Contact)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Attendances)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Exams)
           .FirstOrDefaultAsync(u => u.UserId == user.UserId);
 
         if (userToUpdate == null)
         {
           _logger.LogError("UpdateUser({User}), could not find user", user);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          return NotFound("User not found.");
         }
 
         _educationProgramContext.Entry(userToUpdate).CurrentValues.SetValues(user);
         await _educationProgramContext.SaveChangesAsync();
         _logger.LogInformation("UpdateUser({User}) called", user);
-        return new StatusCodeResult((int)HttpStatusCode.OK);
+        return Ok(userToUpdate);
       }
       catch (Exception ex)
       {
@@ -409,14 +416,18 @@ namespace EducationAPI.Controllers
     }
 
     [HttpDelete("DeleteUserById/{id}")]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public async Task<ActionResult> DeleteUserById(int id)
     {
       try
       {
         var existingUser = await _educationProgramContext.Users
-            .Include(u => u.Contact)
-            .Include(u => u.Student)
-            .FirstOrDefaultAsync(u => u.UserId == id);
+          .Include(u => u.Contact)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Attendances)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Exams)
+          .FirstOrDefaultAsync(u => u.UserId == id);
 
         if (existingUser == null)
         {
@@ -425,9 +436,30 @@ namespace EducationAPI.Controllers
         }
 
         _educationProgramContext.Users.Remove(existingUser);
+
+        if (existingUser.Contact != null)
+        {
+          _educationProgramContext.Contacts.Remove(existingUser.Contact);
+        }
+
+        if (existingUser.Student != null)
+        {
+          _educationProgramContext.Students.Remove(existingUser.Student);
+
+          if (existingUser.Student.Exams != null)
+          {
+            _educationProgramContext.Exams.RemoveRange(existingUser.Student.Exams);
+          }
+
+          if (existingUser.Student.Attendances != null)
+          {
+            _educationProgramContext.Attendances.RemoveRange(existingUser.Student.Attendances);
+          }
+        }
+
         await _educationProgramContext.SaveChangesAsync();
         _logger.LogInformation("DeleUserById({Id}) called", id);
-        return new StatusCodeResult((int)HttpStatusCode.OK);
+        return NoContent();
       }
       catch (Exception ex)
       {
@@ -435,7 +467,5 @@ namespace EducationAPI.Controllers
         return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
       }
     }
-
-
   }
 }
