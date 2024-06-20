@@ -16,15 +16,9 @@ const UserCatalog: React.FC = () => {
    
 
    //Effect
-   useEffect(() => {
-        if (searchString.length > 0) {
-            searchUsers(searchString);
-        } else {
-            fetchUsers();
-        }
-    }
-    , []);
-    
+    useEffect(() => {
+        fetchUsers();
+    }, []);
 
     // helpers
     const fetchUsers = async () => {
@@ -101,14 +95,15 @@ const UserCatalog: React.FC = () => {
             
             <div className="space-y-2">
                 {users.map((user) =>
-                    <div key={user.userId}>
+                    <div 
+                        key={user.userId}
+                        className="bg-base-100 rounded-xl p-4"
+                    >
                         <UserInfoCard user={user} viewOnly={true}/>
                     </div>
                 )}
-
-
-                
             </div>
+            
             {loading && <Loading/>}
 
             {errorMessages && <ErrorModal title="Error" message={errorMessages} onClose={() => setErrorMessages(null)}/>}

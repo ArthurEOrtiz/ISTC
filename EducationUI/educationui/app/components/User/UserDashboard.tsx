@@ -36,65 +36,20 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
 
     const router = useRouter();
     const { user: clerkUser } = useUser(); 
-  
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const response = await GetUserByClerkId(clerkId);
-            switch (response.status) {
-                case 200:
-                    setUser(response.data);
-                    break;
-                case 404:
-                    setErrorMessage('User not found.');
-                    setShowErrorMessage(true);
-                    break;
-                case 500:
-                    setErrorMessage('Internal server error.');
-                    setShowErrorMessage(true);
-                    break;
-                default:
-                    // Handle other status codes if needed
-                    break;
-            }
-        };
-
         fetchUser();
     }, []);
 
     useEffect(() => {
-        const fetchStudent = async () => {
-            if (!user) {
-                return;
-            }
-            const response = await getStudentIdByClerkId(clerkId);
-            if (response.status === 200) {
-                setStudentId(response.data);
-            } else {
-                setErrorMessage('Student not found.');
-                setShowErrorMessage(true);
-            }
-        }
         fetchStudent();
     }
     , [user]);
 
     useEffect(() => {
-        const calculateCreditHours = async () => {
-            if (!studentId) {
-                return;
-            }
-            const response = await CalculateStudentCreditHours(studentId);
-            if (response.status !== 200) {
-                setErrorMessage('Error calculating credit hours.');
-                setShowErrorMessage(true);
-            }
-        }
         calculateCreditHours();
     }
     , [studentId]);
-            
-
 
     // Handlers
     const handleOnSignOut = () => {
@@ -104,9 +59,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     const handleEditContactModelOnSubmit =  async (editUser: User) => {
         console.log(editUser);
         const response = await UpdateUserContact(editUser);
+        //console.log(response);
 
         switch (response.status) {
             case 200:
+                console.log(response.data);
                 setUser(response.data);
                 setShowEditContactModal(false);
                 setConfirmationModalTitle('Success');
@@ -132,10 +89,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     }
 
     const handleEditEmployerModalOnSubmit = async (editUser: User) => {
-        
         const response = await UpdateUser(editUser);
-        console.log("editUser", editUser)
-        console.log(response.status);
+        // console.log("editUser", editUser)
+        // console.log(response.status);
+        // console.log(response);
         switch (response.status) {
             case 200:
                 setUser(response.data);
@@ -153,13 +110,15 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                 setShowErrorMessage(true);
                 break;
             default:
-                // Handle other status codes if needed
+                console.error('Unhandled status code:', response);
                 break;
         }
     }
 
     const handleModalConfirm = () => {
         setShowConfirmationModal(false);
+        setConfirmationModalTitle('');
+        setConfirmationMessage('');
         if (confirmationModalTitle === 'Delete Account') {
             deleteAccount();
         }
@@ -167,9 +126,18 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
 
     const handleOnDeleteAccount = () => {
         setConfirmationModalTitle('Delete Account');
-        setConfirmationMessage('Are you sure you want to delete your account?');
-        setShowConfirmationModalCancel(true);
+        setConfirmationMessage('Are you sure you want to delete your account? All records will be lost and cannot be recovered.');
         setShowConfirmationModal(true);
+        setShowConfirmationModalCancel(true);
+    }
+
+    const handleConfirmationModalOnCancel = () => {
+        return(
+            setShowConfirmationModal(false),
+            setShowConfirmationModalCancel(false),
+            setConfirmationModalTitle(''),
+            setConfirmationMessage('')
+        )
     }
 
     // Helper Methods
@@ -198,7 +166,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         const response = await DeleteUserById(user.userId)
 
         switch (response.status) {
-            case 200:
+            case 204:
                 router.push('/');
                 break;
             case 404:
@@ -222,7 +190,52 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         const isAdmin = clerkUser.publicMetadata.isAdmin;
         return isAdmin as boolean;
     }
-    
+
+    const fetchStudent = async () => {
+        if (user === undefined) {
+            setErrorMessage('User not found.');
+            return;
+        }
+
+        const response = await getStudentIdByClerkId(clerkId);
+        if (response.status === 200) {
+            setStudentId(response.data);
+        } else {
+            setErrorMessage('Student not found.');
+            setShowErrorMessage(true);
+        }
+    }
+
+    const calculateCreditHours = async () => {
+        if (!studentId) {
+            return;
+        }
+        const response = await CalculateStudentCreditHours(studentId);
+        if (response.status !== 200) {
+            setErrorMessage('Error calculating credit hours.');
+            setShowErrorMessage(true);
+        }
+    }
+
+    const fetchUser = async () => {
+        const response = await GetUserByClerkId(clerkId);
+        switch (response.status) {
+            case 200:
+                setUser(response.data);
+                break;
+            case 404:
+                setErrorMessage('User not found.');
+                setShowErrorMessage(true);
+                break;
+            case 500:
+                setErrorMessage('Internal server error.');
+                setShowErrorMessage(true);
+                break;
+            default:
+                // Handle other status codes if needed
+                break;
+        }
+    };
 
     // Render
     const renderUserActions = () => {
@@ -370,28 +383,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
                 <ErrorModal
                     title="Error"
                     message={errorMessage}
-                    onClose={() => setShowErrorMessage(false)}
+                    onClose={() => {
+                        setShowErrorMessage(false)
+                        setErrorMessage('')
+                    }}
                 />
             )}
 
-            {
-                showConfirmationModal && (!showConfirmationModalCancel ? (
-                    <ConfirmationModal
-                        title={confirmationModalTitle}
-                        message={confirmationMessage}
-                        onConfirm={() => setShowConfirmationModal(false)}
-                    />
-                ) : (
-                    <ConfirmationModal
-                        title={confirmationModalTitle}
-                        message={confirmationMessage}
-                        onConfirm={handleModalConfirm}
-                        onCancel={() => setShowConfirmationModalCancel(false)}
-                    />
-                ))
-            }
-
-
+            {showConfirmationModal && (
+                <ConfirmationModal
+                    title={confirmationModalTitle}
+                    message={confirmationMessage}
+                    onConfirm={handleModalConfirm}
+                    {...showConfirmationModalCancel && {onCancel: handleConfirmationModalOnCancel}}
+                />
+            )}
         </div>
     );
 }

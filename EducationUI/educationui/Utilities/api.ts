@@ -432,7 +432,7 @@ export async function UpdateUserContact(user: User) {
         return response;
     } catch (error: any) {
         console.error('Error updating user:', error);
-        return error.message;
+        return error;
     }
 }
 
@@ -442,7 +442,7 @@ export async function UpdateUser(user: User) {
         return response;
     } catch (error: any) {
         console.error('Error updating user:', error);
-        return error.message;
+        return error;
     }
 }
 
@@ -492,7 +492,7 @@ export async function DeleteUserById(userId: Number) {
         return response;
     } catch (error: any) {
         console.error('Error deleting user:', error);
-        return error.message;
+        return error;
     }
 }
 

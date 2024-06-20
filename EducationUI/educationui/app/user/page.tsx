@@ -16,11 +16,11 @@ import { User } from "@clerk/nextjs/server";
 * Regardless of the scenario, if the user gets to the page, they will have a clerk ID.
 */
 const UserPage: React.FC = async() => {
-    const user: User | null = await currentUser(); // get the clerk user
+    const user: User | null = await currentUser().catch(() => null);
     
     // if there is no user, redirect to the home page
     if (!user) {
-         redirect('/');
+        redirect('/');
     }
     
     // check if the user has signed up
