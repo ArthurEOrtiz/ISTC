@@ -22,7 +22,7 @@ const AddUser: React.FC = () => {
     return (
         <div>
             {errorMessage && (
-                <div className="bg-red-500 text-white p-2 text-center">{errorMessage}</div>
+                <div className="bg-red-500 text-white p-2 text-center rounded-xl mb-2">{errorMessage}</div>
             )}
             {newUser ? (
                 <UserInfoCard user={newUser}/>
