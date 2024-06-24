@@ -13,7 +13,7 @@ interface NewUserFormProps {
 
 const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : incomingUser}) => {
     // Constants
-    const [ user, setUser ] = useState<User>();
+    const [ user, setUser ] = useState<User | undefined>(undefined);
     const [ isEmailValid, setIsEmailValid ] = useState<boolean>(true);
     const [ doesUserExist, setDoesUserExist ] = useState<boolean>(false);
     const [ otherEmployer, setOtherEmployer ] = useState<string | null>(null);
@@ -67,23 +67,45 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
     //Effects
     useEffect(() => {
         if (incomingUser) {
+            const employer = incomingUser.employer === "" ? "select" : incomingUser.employer;
+
+            if (employer !== "Tax Commision" && !countyArray.includes(employer) && employer !== "select") {
+                incomingUser.employer = "other";
+                setOtherEmployer(employer);
+            } 
+
             setUser(incomingUser);
         }
-    }, [incomingUser]);
+    }, []);
 
 
     // Handlers
     const handleOnSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        //console.log("Submitting");
+
         if (!user) {
             return;
         }
+
         if (!isEmailValid || isEmailValid === null) {
             onError("Please enter a valid email address!");
             return;
-        } else  {
-            user.employer = "other" ? otherEmployer! : user.employer;
-            onSubmit(user);
+        } 
+
+        // If the user employer is an empty strng, set it to the otherEmployer value if it is not null
+        user.employer = user.employer === "" ? otherEmployer ?? "" : user.employer;
+        // If the user employer is "select", set it to an empty string
+        user.employer = user.employer === "select" ? "" : user.employer;
+        // If the user employer is still an empty string, throw an error
+            
+            
+        if (user.employer === ""){
+            onError("Employer is required!");   
+        } else {
+            // onSubmit(user);
+            console.log(user);
         }
     }
 
@@ -147,6 +169,8 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
         }
         return false;
     }
+
+    
 
     if (user) {
         return (
@@ -217,13 +241,15 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         id="email"
                         type="email"
                         placeholder="JohnEdwardDoe@Tax.Idaho.gov"
+                        required
                         value={user?.email}
                         onChange={(e) => setUser({ ...user, email: e.target.value})}
                         onBlur={handleEmailBlur}
                     />
-                    {isEmailValid === false && (<p className="text-red-500 text-xs italic">Please enter a valid email address</p>)}
-                    <p className='text-green-600 text-xs italic'>
-                        Optional
+                    {isEmailValid === false && (<p className="text-error text-xs italic">Please enter a valid email address</p>)}
+                    {doesUserExist && (<p className="text-error text-xs italic">The E-mail provided is already in use!</p>)}
+                    <p className='text-error text-xs italic'>
+                        Required
                     </p>
                 </div>
 
@@ -237,20 +263,22 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         value={user?.employer}
                         required
                         onChange={(e) => {
-                            if (e.target.value !== "select" && e.target.value !== "other") {
-                                setUser({ ...user, employer: e.target.value})
-                                setOtherEmployer(null);
+                            const value = e.target.value;
+    
+                            if (value !== "select" && value !== "other" && !countyArray.includes(value) && value !== "Tax Commision") {
+                                setUser({ ...user, employer: "other" });
+                                setOtherEmployer(value);
+                                return;
+                            } 
+                        
+                            if (value === "other" || value === "select") {
+                                setUser({ ...user, employer: value === "select" ? "select" : "other"});
+                                setOtherEmployer(value === "other" ? "" : null);
                                 return;
                             }
-                            
-                            if (e.target.value === "other") {
-                                setUser({ ...user, employer: "other"})
-                                setOtherEmployer("");
-                                return;
-                            }
-
-                            if (e.target.value === "select") {
-                                setUser({ ...user, employer: "select"})
+                        
+                            if (value === "Tax Commision" || countyArray.includes(value)) {
+                                setUser({ ...user, employer: value });
                                 setOtherEmployer(null);
                                 return;
                             }
@@ -317,7 +345,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         onChange={(phone) => setUser({ ...user, contact: { ...user.contact, phone }})}
                         buttonStyle={{display: 'none'}}
                         inputProps={{
-                            required: true,
+                            required: false,
                             maxLength: 14,
                             minLength: 14,
                             className: 'shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline',
