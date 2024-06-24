@@ -30,7 +30,14 @@ const AddUser: React.FC = () => {
             <NewUserForm
                 onSubmit={handleNewUserFormOnSubmit}
                 onError={(error) => setErrorMessage(error)}
-                user={{} as User}
+                user={{
+                    userId: 0,
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    employer: '',
+                    jobTitle: '',
+                } as User}
                 />
             )}
             
