@@ -58,7 +58,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
 
         switch (response.status) {
             case 200:
-                console.log(response.data);
+                //console.log(response.data);
                 setUser(response.data);
                 setShowEditContactModal(false);
                 setConfirmationModalTitle('Success');
@@ -148,6 +148,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
             setShowErrorMessage(true);
             return;
         }
+
+
         // Delete account
         try {
             clerkUser.delete();

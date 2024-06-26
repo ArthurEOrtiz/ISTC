@@ -54,7 +54,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, onDeleted, vi
                             <div className="flex space-x-2">
                                 <p className="text-1xl font-bold">Employer :</p>
                                 {user.employer ? (
-                                <p className="text-base">{user.employer}</p>
+                                    <p className="text-base">{user.employer}</p>
                                 ) : (
                                     <p className="text-error">None</p>
                                 )}
