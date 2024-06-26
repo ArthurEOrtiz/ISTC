@@ -78,6 +78,9 @@ namespace EducationAPI.Controllers
         var users = await _educationProgramContext.Users
             .Include(u => u.Contact)
             .Include(u => u.Student)
+              .ThenInclude(s => s.Exams)
+            .Include(u => u.Student)
+              .ThenInclude(s => s.Attendances)
             .Where(predicate)
             .ToListAsync();
 
@@ -98,16 +101,19 @@ namespace EducationAPI.Controllers
         var user = await _educationProgramContext.Users
           .Include(u => u.Contact)
           .Include(u => u.Student)
+            .ThenInclude(s => s.Exams)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Attendances)
           .FirstOrDefaultAsync(u => u.UserId == id);
 
         if (user == null)
         {
-          _logger.LogError("GetUserById({Id}), user not found1", id);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          _logger.LogError("GetUserById({Id}), user not found", id);
+          return NotFound("User not found.");
         }
 
         _logger.LogInformation("GetUserById({Id}), called", id);
-        return user;
+        return Ok(user);
       }
       catch (Exception ex)
       {
@@ -308,7 +314,7 @@ namespace EducationAPI.Controllers
         await _educationProgramContext.SaveChangesAsync();
 
         _logger.LogInformation("PostUser({User}), called", user);
-        return new StatusCodeResult((int)HttpStatusCode.OK);
+        return Ok(user);
       }
       catch (Exception ex)
       {
