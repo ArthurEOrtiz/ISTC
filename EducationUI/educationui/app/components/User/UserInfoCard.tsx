@@ -10,9 +10,10 @@ interface UserInfoCardProps {
     user: User;
     viewOnly?: boolean;
     onError?: (message: string) => void;
+    onDeleted?: () => void;
 }
 
-const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, viewOnly = false}) => {
+const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, onDeleted, viewOnly = false}) => {
     // constants
     const [ showConfirmationModal, setShowConfirmationModal ] = useState(false);
     const formattedPhoneNumber = user.contact?.phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
@@ -28,8 +29,8 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, viewOnly = fa
         console.log('Delete user');
         setShowConfirmationModal(false);
         const response = await DeleteUserById(user.userId);
-        if (response.status === 200) {
-            window.location.reload();
+        if (response.status === 204) {
+            onDeleted && onDeleted();
         } else {
             onError && onError(`There was an error deleting the user. \n '${response}`);
         }

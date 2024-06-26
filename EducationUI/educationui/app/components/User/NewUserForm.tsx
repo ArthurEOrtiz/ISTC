@@ -13,10 +13,12 @@ interface NewUserFormProps {
 
 const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : incomingUser}) => {
     // Constants
-    const [ user, setUser ] = useState<User | undefined>(undefined);
+    const [ user, setUser ] = useState<User | null>(null);
     const [ isEmailValid, setIsEmailValid ] = useState<boolean>(true);
     const [ doesUserExist, setDoesUserExist ] = useState<boolean>(false);
+    const [ emailCheckLoading, setEmailCheckLoading ] = useState<boolean>(false);
     const [ otherEmployer, setOtherEmployer ] = useState<string | null>(null);
+    
     const countyArray = [
         "Ada",
         "Adams",
@@ -95,7 +97,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
         } 
 
         // If the user employer is an empty strng, set it to the otherEmployer value if it is not null
-        user.employer = user.employer === "" ? otherEmployer ?? "" : user.employer;
+        user.employer = user.employer === "other" ? otherEmployer ?? "" : user.employer;
         // If the user employer is "select", set it to an empty string
         user.employer = user.employer === "select" ? "" : user.employer;
         // If the user employer is still an empty string, throw an error
@@ -104,8 +106,9 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
         if (user.employer === ""){
             onError("Employer is required!");   
         } else {
-            // onSubmit(user);
-            console.log(user);
+            onSubmit(user);
+
+            //console.log(user);
         }
     }
 
@@ -130,9 +133,12 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
         }
 
         if (input !== '' && validatEamil(input)) {
+            setEmailCheckLoading(true);
             const doesEmailExist = await checkUserExistsByEmail(input);
             setDoesUserExist(doesEmailExist as boolean);
             setIsEmailValid(!doesEmailExist);
+            setEmailCheckLoading(false);
+            onError(doesEmailExist ? "The E-mail provided is already in use!" : "");
             return;
         }
 
@@ -246,6 +252,12 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         onChange={(e) => setUser({ ...user, email: e.target.value})}
                         onBlur={handleEmailBlur}
                     />
+                    {emailCheckLoading && (
+                        <div className='flex space-x-2'>
+                            <span className="loading loading-spinner loading-xs"></span>
+                            <p className="text-green-600 text-xs italic">Checking Email...</p>
+                        </div>
+                    )}
                     {isEmailValid === false && (<p className="text-error text-xs italic">Please enter a valid email address</p>)}
                     {doesUserExist && (<p className="text-error text-xs italic">The E-mail provided is already in use!</p>)}
                     <p className='text-error text-xs italic'>

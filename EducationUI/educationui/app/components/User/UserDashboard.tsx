@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { CalculateStudentCreditHours, DeleteUserById, getStudentIdByClerkId, GetUserByClerkId, UpdateUser, UpdateUserContact } from "@/Utilities/api";
+import { use, useEffect, useState } from 'react';
+import { CalculateStudentCreditHours, DeleteUserById, getStudentIdByClerkId, GetUserById, UpdateUser, UpdateUserContact } from "@/Utilities/api";
 import {  User } from '@/app/shared/types/sharedTypes';
 import Loading from '@/app/shared/Loading';
 import UserInfoCard from './UserInfoCard';
@@ -14,13 +14,12 @@ import UserEnrolledCourses from './UserEnrolledCourses';
 import ActionBar from '@/app/shared/ActionBar';
 
 interface UserDashboardProps {
-    clerkId: string;    
+    userId: number;    
 }
 
-const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
+const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
     
     const [ user, setUser ] = useState<User>();
-    const [ studentId, setStudentId ] = useState<number>();
 
     const [ showErrorMessage, setShowErrorMessage ] = useState(false);
     const [ errorMessage, setErrorMessage ] = useState('');
@@ -42,14 +41,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     }, []);
 
     useEffect(() => {
-        fetchStudent();
-    }
-    , [user]);
-
-    useEffect(() => {
-        calculateCreditHours();
-    }
-    , [studentId]);
+        if (user) {
+            calculateCreditHours();
+        }
+    }, [user]);
 
     // Handlers
     const handleOnSignOut = () => {
@@ -191,26 +186,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
         return isAdmin as boolean;
     }
 
-    const fetchStudent = async () => {
-        if (user === undefined) {
-            setErrorMessage('User not found.');
-            return;
-        }
-
-        const response = await getStudentIdByClerkId(clerkId);
-        if (response.status === 200) {
-            setStudentId(response.data);
-        } else {
-            setErrorMessage('Student not found.');
-            setShowErrorMessage(true);
-        }
-    }
-
     const calculateCreditHours = async () => {
-        if (!studentId) {
+        if (!user) {
             return;
         }
-        const response = await CalculateStudentCreditHours(studentId);
+        const response = await CalculateStudentCreditHours(user.student.studentId);
         if (response.status !== 200) {
             setErrorMessage('Error calculating credit hours.');
             setShowErrorMessage(true);
@@ -218,22 +198,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({clerkId}) => {
     }
 
     const fetchUser = async () => {
-        const response = await GetUserByClerkId(clerkId);
-        switch (response.status) {
-            case 200:
-                setUser(response.data);
-                break;
-            case 404:
-                setErrorMessage('User not found.');
-                setShowErrorMessage(true);
-                break;
-            case 500:
-                setErrorMessage('Internal server error.');
-                setShowErrorMessage(true);
-                break;
-            default:
-                // Handle other status codes if needed
-                break;
+        const response = await GetUserById(userId);
+        console.log(response);
+        if (response.status === 200) {
+            setUser(response.data);
+        } else {
+            setErrorMessage('Error fetching user information');
+            setShowErrorMessage(true);
         }
     };
 

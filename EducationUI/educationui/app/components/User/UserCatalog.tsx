@@ -97,9 +97,14 @@ const UserCatalog: React.FC = () => {
                 {users.map((user) =>
                     <div 
                         key={user.userId}
-                        className="bg-base-100 rounded-xl p-4"
+                        className="bg-base-100 rounded-xl"
                     >
-                        <UserInfoCard user={user} viewOnly={true}/>
+                        <UserInfoCard 
+                            user={user} 
+                            viewOnly={true}
+                            onDeleted={() => fetchUsers()}
+                            onError={(error) => setErrorMessages(error)}
+                        />
                     </div>
                 )}
             </div>

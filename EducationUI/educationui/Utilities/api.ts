@@ -379,10 +379,10 @@ export async function SearchUsers(searchString: string) {
 export async function GetUserById(userId: Number) {
     try {
         const response = await axiosInstance.get(`User/GetUserById/${userId}`);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error fetching user:', error);
-        throw error;
+        return error;
     }
 }
 
