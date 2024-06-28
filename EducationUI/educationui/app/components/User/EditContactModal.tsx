@@ -227,10 +227,10 @@ const EditContactModal: React.FC<EditContactModalProps> = ({user, isOpen, onCanc
                                 Cancel
                         </button>
                         <button 
-                            className="btn btn-primary text-white"
+                            className="btn btn-success text-white"
                             type='submit'
                             >
-                                Submit
+                                Update
                         </button>
                     </div>
                    

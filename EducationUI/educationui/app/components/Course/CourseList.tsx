@@ -33,7 +33,7 @@ const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError,
             {courseList != null ? 
                 (
                     courseList.map((course: Course, index : number) => (
-                        <div key={index} className="bg-base-100 rounded-xl p-4">
+                        <div key={index}>
                             <CourseActionContainer 
                                 course={course}
                                 user={user} 

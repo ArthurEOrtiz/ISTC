@@ -1,5 +1,5 @@
 import { User } from "@/app/shared/types/sharedTypes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface EditEmployerModalProps {
     user: User;
@@ -10,6 +10,7 @@ interface EditEmployerModalProps {
 
 const EditEmployerModal: React.FC<EditEmployerModalProps> = ({ user, isOpen, onCancel, onSubmit }) => {
     const [ editedUser, setEditedUser ] = useState<User>(user);
+    const [ otherEmployer, setOtherEmployer ] = useState<string | null>('');
     const countyArray = [
         "Ada",
         "Adams",
@@ -57,6 +58,14 @@ const EditEmployerModal: React.FC<EditEmployerModalProps> = ({ user, isOpen, onC
         "Washington"
     ]
 
+    useEffect(() => {
+        if (!countyArray.includes(user.employer) && user.employer !== 'Tax Commision' ) {
+            setEditedUser({...user, employer: 'other'});
+            setOtherEmployer(user.employer);
+        }
+    }, [])
+
+
     const handleSelectEmployer = () => {
         if (!countyArray.includes(editedUser.employer) && editedUser.employer !=='Tax Commision' ) {
             return "other"
@@ -71,7 +80,13 @@ const EditEmployerModal: React.FC<EditEmployerModalProps> = ({ user, isOpen, onC
 
     const handleSubmitOnClick = (e: React.FormEvent) => {
         e.preventDefault();
-        onSubmit(editedUser);
+    
+        const updatedUser = {
+            ...editedUser,
+            ...(otherEmployer !== null && { employer: otherEmployer })
+        };
+    
+        onSubmit(updatedUser);
     }
 
     return (
@@ -89,12 +104,21 @@ const EditEmployerModal: React.FC<EditEmployerModalProps> = ({ user, isOpen, onC
                         </button>
                     </div>
                 </div>
+
                 <form onSubmit={(e)=> handleSubmitOnClick(e)}>
                     <div className='modal-middle mt-4 space-y-3'>
                         <select
-                            className='select select-bordered w-full '
+                            className='select select-bordered w-full'
                             defaultValue={handleSelectEmployer()}
-                            onChange={(e) => setEditedUser({...editedUser, employer: e.target.value})}>
+                            onChange={(e) => {
+                                if (e.target.value !== 'other') {
+                                    setOtherEmployer(null);
+                                } else {
+                                    setOtherEmployer(user.employer);
+                                }
+
+                                setEditedUser({...editedUser, employer: e.target.value})
+                            }}>
                             <option value='select'>Select Employer</option>
                             <option value='other'>Other</option>    
                             <option value='Tax Commision'>Tax Commision</option>
@@ -103,16 +127,13 @@ const EditEmployerModal: React.FC<EditEmployerModalProps> = ({ user, isOpen, onC
                             ))}
                         </select>
 
-                        {!countyArray.includes(editedUser.employer) 
-                        && editedUser.employer !== 'select' 
-                        && editedUser.employer !== 'Tax Commision'
-                        && (
+                        {editedUser.employer === "other" && (
                             <label className='input input-bordered flex items-center gap-2'>
                                 <p className='text-primary'> Other Employer</p>
                                 <input 
                                     type='text'
-                                    value={editedUser.employer}
-                                    onChange={(e) => setEditedUser({...editedUser, employer: e.target.value})}
+                                    defaultValue={otherEmployer ? otherEmployer : ''}
+                                    onChange={(e) => setOtherEmployer(e.target.value)}
                                 />
                             </label>
                         )}

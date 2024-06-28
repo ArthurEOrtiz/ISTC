@@ -2,6 +2,7 @@
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
 import { User } from "@/app/shared/types/sharedTypes";
 import { DeleteUserById } from "@/Utilities/api";
+import { on } from "events";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
 
@@ -26,7 +27,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, onDeleted, vi
 
     // helpers
     const deleteUserAsync = async () => {
-        console.log('Delete user');
+        //console.log('Delete user');
         setShowConfirmationModal(false);
         const response = await DeleteUserById(user.userId);
         if (response.status === 204) {
@@ -208,15 +209,17 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, onDeleted, vi
                         className="btn btn-sm btn-primary text-white"
                         onClick={() => router.push(`/admin/users/${user.userId}`)}
                     >
-                        Edit
+                        View User
                     </button>
 
-                    <button
-                        className="btn btn-sm btn-error text-white ml-2"
-                        onClick={handleDeleteUser}
-                    >
-                        Delete
-                    </button>
+                    {onDeleted && (
+                        <button
+                            className="btn btn-sm btn-error text-white ml-2"
+                            onClick={handleDeleteUser}
+                        >
+                            Delete
+                        </button>
+                    )}
                 </div>
             )}
 
@@ -224,6 +227,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, onDeleted, vi
                 <ConfirmationModal
                     title="Delete User"
                     message="Are you sure you want to delete this user?"
+                    isOpen={showConfirmationModal}
                     onConfirm={deleteUserAsync}
                     onCancel={() => setShowConfirmationModal(false)}
                 />

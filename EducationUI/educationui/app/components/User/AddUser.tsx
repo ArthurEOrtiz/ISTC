@@ -48,7 +48,6 @@ const AddUser: React.FC = () => {
                     <div className='bg-base-100 rounded-xl p-5'>
                         <div className='bg-base-300 rounded-xl'>
                             <UserInfoCard user={newUser}/>
-
                         </div>
                         <ActionBar
                             navList={renderNavList()}
@@ -57,21 +56,25 @@ const AddUser: React.FC = () => {
                     </div>
                 </div>
             ) : (
-            <NewUserForm
-                onSubmit={handleNewUserFormOnSubmit}
-                onError={(error) => setErrorMessage(error)}
-                user={{
-                    userId: 0,
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    employer: '',
-                    jobTitle: '',
-                    contact: {
-                        state: 'ID'
-                    } as Contact,
-                } as User}
-                />
+                <div className='w-3/5 mx-auto'>
+                    <NewUserForm
+                        onSubmit={handleNewUserFormOnSubmit}
+                        onError={(error) => setErrorMessage(error)}
+                        user={{
+                            userId: 0,
+                            firstName: '',
+                            lastName: '',
+                            email: '',
+                            employer: '',
+                            jobTitle: '',
+                            isAdmin: false,
+                            isStudent: true,
+                            contact: {
+                                state: 'ID'
+                            } as Contact,
+                        } as User}
+                        />
+                </div>
             )}
             
         </div>

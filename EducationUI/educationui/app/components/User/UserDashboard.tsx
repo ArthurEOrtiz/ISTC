@@ -1,6 +1,6 @@
 'use client';
-import { use, useEffect, useState } from 'react';
-import { CalculateStudentCreditHours, DeleteUserById, getStudentIdByClerkId, GetUserById, UpdateUser, UpdateUserContact } from "@/Utilities/api";
+import { useEffect, useState } from 'react';
+import { CalculateAccumulatedCredit, DeleteUserById, GetUserById, UpdateUser, UpdateUserContact } from "@/Utilities/api";
 import {  User } from '@/app/shared/types/sharedTypes';
 import Loading from '@/app/shared/Loading';
 import UserInfoCard from './UserInfoCard';
@@ -38,13 +38,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
 
     useEffect(() => {
         fetchUser();
+        calculateCreditHours();
     }, []);
-
-    useEffect(() => {
-        if (user) {
-            calculateCreditHours();
-        }
-    }, [user]);
 
     // Handlers
     const handleOnSignOut = () => {
@@ -192,8 +187,22 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
         if (!user) {
             return;
         }
-        const response = await CalculateStudentCreditHours(user.student.studentId);
-        if (response.status !== 200) {
+
+        const response = await CalculateAccumulatedCredit(user.userId);
+        if (response.status === 200) {
+            setUser((prevUser) => {
+                if (prevUser) {
+                    return {
+                        ...prevUser,
+                        student: {
+                            ...prevUser.student,
+                            accumulatedCredit: response.data
+                        }
+                    }
+                }
+                return prevUser;
+            });
+        } else{
             setErrorMessage('Error calculating credit hours.');
             setShowErrorMessage(true);
         }
@@ -201,7 +210,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
 
     const fetchUser = async () => {
         const response = await GetUserById(userId);
-        console.log(response);
+        //console.log(response);
         if (response.status === 200) {
             setUser(response.data);
         } else {

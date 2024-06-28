@@ -33,15 +33,17 @@ export async function UpdateAttendanceById(attendanceId: Number, attended: Boole
     }
 }
 
-export async function CalculateStudentCreditHours(studentId: Number) {
-    try {
-        const response = await axiosInstance.put(`Attendance/CalculateStudentCreditHours/${studentId}`);
-        return response;
-    } catch (error: any) {
-        console.error('Error calculating student credit hours:', error);
-        return error.message;
-    }
-}
+// Not in use
+// export async function CalculateStudentCreditHours(studentId: Number) {
+//     try {
+//         const response = await axiosInstance.put(`Attendance/CalculateStudentCreditHours/${studentId}`);
+//         return response;
+//     } catch (error: any) {
+//         console.error('Error calculating student credit hours:', error);
+//         return error.message;
+//     }
+// }
+// Not in use 
 
 export async function HasAttendedByClassIdUserId(classId: Number, userId: Number) {
     try {
@@ -504,7 +506,7 @@ export async function GetStudentAttendanceById(studentId: Number) {
         return response;
     } catch (error: any) {
         console.error('Error fetching student attendance:', error);
-        throw error.message;
+        return error.message;
     }
 }
 
@@ -514,9 +516,21 @@ export async function getStudentIdByClerkId(clerkId: String) {
         return response;
     } catch (error: any) {
         console.error('Error fetching user:', error);
-        throw error.message;
+        return error.message;
     }
 }
+
+export async function CalculateAccumulatedCredit(userId: Number) {
+    try {
+        const response = await axiosInstance.put(`Student/CalculateAccumulatedCredit/${userId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error calculating credit:', error);
+        return error.message;
+    }
+}
+
+
 
 // WaitList
 

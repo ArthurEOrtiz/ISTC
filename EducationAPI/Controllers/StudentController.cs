@@ -122,6 +122,7 @@ namespace EducationAPI.Controllers
 						.ThenInclude(s => s.Attendances)
 							.ThenInclude(a => a.Class)
 								.ThenInclude(c => c.Course)
+									.ThenInclude(c => c.Exams)
 					.FirstOrDefaultAsync(u => u.UserId == userId);
 
 				if (user == null)

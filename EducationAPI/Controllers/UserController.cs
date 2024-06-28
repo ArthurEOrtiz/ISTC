@@ -410,6 +410,17 @@ namespace EducationAPI.Controllers
         }
 
         _educationProgramContext.Entry(userToUpdate).CurrentValues.SetValues(user);
+
+        if (user.Contact != null)
+        {
+          _educationProgramContext.Entry(userToUpdate.Contact!).CurrentValues.SetValues(user.Contact);
+        }
+        if (user.Student != null)
+        {
+          _educationProgramContext.Entry(userToUpdate.Student).CurrentValues.SetValues(user.Student);
+        }
+                                           
+
         await _educationProgramContext.SaveChangesAsync();
         _logger.LogInformation("UpdateUser({User}) called", user);
         return Ok(userToUpdate);

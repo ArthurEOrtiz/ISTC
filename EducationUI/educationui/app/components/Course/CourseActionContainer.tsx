@@ -7,6 +7,7 @@ import AttendanceModal from "../Attendance/AttendanceModal";
 import EnrollmentModal from "../Enrollment/EnrollmentModal";
 import { useRouter } from 'next/navigation';
 import { SignedIn } from "@clerk/nextjs";
+import ExamModal from "../Exam/ExamModal";
 
 interface CourseActionContainerProps {
     course: Course;
@@ -25,6 +26,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     const [confirmationMessage, setConfirmationMessage] = useState<string>();
     const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false);
     const [showAttendanceModal, setShowAttendanceModal] = useState<boolean>(false); 
+    const [showExamModal, setShowExamModal] = useState<boolean>(false);
     const router = useRouter();
     const userId = user === null ? 0 : user?.userId; 
   
@@ -172,14 +174,15 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
         setConfirmationMessage('');
         setShowConfirmationModal(false);
     };
-
-    
     
     return (
         <div>
-            <div className='space-y-4'>
-                <CourseInfoCard course={course} expanded={false}/>
-                <div>
+            <div className='bg-base-100 rounded-xl p-5'>
+                <div className='bg-base-300 rounded-xl p-4'>
+                    <CourseInfoCard course={course} expanded={false}/>
+                </div>
+                
+                <div className='mt-4'>
                     {isAdmin && (
                         <div>
                             <div className="flex space-x-2">
@@ -201,6 +204,14 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                                     >
                                         Manage Attendance
                                 </button>
+                                {course.hasExam && (
+                                    <button
+                                        className="btn btn-primary btn-sm text-white"
+                                        onClick={() => {setShowExamModal(true)}}
+                                        >
+                                            Manage Exams
+                                    </button>
+                                )}
                                 {/* <button
                                     className="btn btn-primary text-white"
                                     onClick={() => console.log(course)}
@@ -244,7 +255,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                     
                 </div>
             </div>
-
+                
             
                 <EnrollmentModal
                     course={course}
@@ -256,7 +267,17 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                 <AttendanceModal
                     course={course}
                     isOpen={showAttendanceModal}
-                    onExit={() => setShowAttendanceModal(false)}
+                    onExit={() => {
+                        setShowAttendanceModal(false)
+                    }}
+                />
+
+                <ExamModal
+                    exams={course.exams}
+                    courseId={course.courseId}
+                    isOpen={showExamModal}
+                    onExit={() => setShowExamModal(false)}
+                    onError={(message: string) => onError(message)}
                 />
 
                 {showConfirmationModal && (
