@@ -15,7 +15,7 @@ const AddUser: React.FC = () => {
         const response = await PostUser(newUser);
         if (response.status === 200) {
             setNewUser(response.data);
-            console.log(response);
+            //console.log(response);
         } else {
             setErrorMessage(response);
         }

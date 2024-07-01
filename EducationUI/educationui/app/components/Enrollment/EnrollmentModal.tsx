@@ -404,6 +404,7 @@ const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ course, isOpen, onExi
             {showConfirmationModal && (
                 <ConfirmationModal
                     title={confirmationTitle}
+                    isOpen={showConfirmationModal}
                     message={confirmationMessage}
                     onConfirm={handleOnConfirm}
                     onCancel={() => setShowConfirmationModal(false)}

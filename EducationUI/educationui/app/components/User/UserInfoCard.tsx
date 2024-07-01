@@ -2,7 +2,6 @@
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
 import { User } from "@/app/shared/types/sharedTypes";
 import { DeleteUserById } from "@/Utilities/api";
-import { on } from "events";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
 
