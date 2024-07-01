@@ -78,6 +78,9 @@ namespace EducationAPI.Controllers
         var users = await _educationProgramContext.Users
             .Include(u => u.Contact)
             .Include(u => u.Student)
+              .ThenInclude(s => s.Exams)
+            .Include(u => u.Student)
+              .ThenInclude(s => s.Attendances)
             .Where(predicate)
             .ToListAsync();
 
@@ -98,16 +101,19 @@ namespace EducationAPI.Controllers
         var user = await _educationProgramContext.Users
           .Include(u => u.Contact)
           .Include(u => u.Student)
+            .ThenInclude(s => s.Exams)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Attendances)
           .FirstOrDefaultAsync(u => u.UserId == id);
 
         if (user == null)
         {
-          _logger.LogError("GetUserById({Id}), user not found1", id);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          _logger.LogError("GetUserById({Id}), user not found", id);
+          return NotFound("User not found.");
         }
 
         _logger.LogInformation("GetUserById({Id}), called", id);
-        return user;
+        return Ok(user);
       }
       catch (Exception ex)
       {
@@ -125,17 +131,20 @@ namespace EducationAPI.Controllers
         var user = await _educationProgramContext.Users
             .Include(u => u.Contact)
             .Include(u => u.Student)
+              .ThenInclude(s => s.Attendances)
+            .Include(u => u.Student)
+              .ThenInclude(s => s.Exams)
             .FirstOrDefaultAsync(u => u.ClerkId == clerkId);
 
         if (user == null)
         {
           // If user with the given ClerkId doesn't exist, return 404 Not Found
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          return NotFound("User not found.");
         }
 
         _logger.LogInformation("GetUserByClerkId({ClerkId}), called", clerkId);
         // If user found, return it
-        return user;
+        return Ok(user);
       }
       catch (Exception ex)
       {
@@ -231,20 +240,20 @@ namespace EducationAPI.Controllers
       }
     }
 
-    [HttpGet("IsUserEnrolledInCourse/{clerkId}/{courseId}")]
-    public async Task<ActionResult<bool>> IsUserEnrolledInCourse(string clerkId, int courseId)
+    [HttpGet("IsUserEnrolledInCourse/{userId}/{courseId}")]
+    public async Task<ActionResult<bool>> IsUserEnrolledInCourse(int userId, int courseId)
     {
       try
       {
         var user = await _educationProgramContext.Users
           .Include(u => u.Student)
-          .ThenInclude(s => s!.Attendances)
-          .FirstOrDefaultAsync(u => u.ClerkId == clerkId);
+            .ThenInclude(s => s.Attendances)
+          .FirstOrDefaultAsync(u => u.UserId == userId);
 
         if (user == null)
         {
-          _logger.LogError("IsUserEnrolledInCourse({ClerkId}, {CourseId}), user not found.", clerkId, courseId);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          _logger.LogError("IsUserEnrolledInCourse({UserId}, {CourseId}), user not found.", userId, courseId);
+          return NotFound("User not found.");
         }
 
         var course = await _educationProgramContext.Courses
@@ -253,8 +262,8 @@ namespace EducationAPI.Controllers
 
         if (course == null)
         {
-          _logger.LogError("IsUserEnrolledInCourse({ClerkId}, {CourseId}), course not found.", clerkId, courseId);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          _logger.LogError("IsUserEnrolledInCourse({UserId}, {CourseId}), course not found.", userId, courseId);
+          return NotFound("Course not found.");
         }
 
         // Check if there are any attendances for the user and the course
@@ -262,12 +271,12 @@ namespace EducationAPI.Controllers
                          user.Student.Attendances.Any(a => a.Class?.CourseId == courseId);
 
 
-        return isSignedUp;
+        return Ok(isSignedUp);
 
       }
       catch (Exception ex)
       {
-        _logger.LogError(ex, "IsUserEnrolledInCourse({ClerkId}, {CourseId})", clerkId, courseId);
+        _logger.LogError(ex, "IsUserEnrolledInCourse({UserId}, {CourseId})", userId, courseId);
         return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
       }
     }
@@ -305,7 +314,7 @@ namespace EducationAPI.Controllers
         await _educationProgramContext.SaveChangesAsync();
 
         _logger.LogInformation("PostUser({User}), called", user);
-        return new StatusCodeResult((int)HttpStatusCode.OK);
+        return Ok(user);
       }
       catch (Exception ex)
       {
@@ -335,12 +344,16 @@ namespace EducationAPI.Controllers
       {
         var userToUpdate = await _educationProgramContext.Users
           .Include(u => u.Contact)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Attendances)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Exams)
           .FirstOrDefaultAsync(u => u.UserId == user.UserId);
 
         if (userToUpdate == null)
         {
           _logger.LogError("UpdateUserContact({User}), user not found", user);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          return NotFound("User not found.");
         }
 
         if (user.Contact != null && userToUpdate.Contact != null)
@@ -353,13 +366,11 @@ namespace EducationAPI.Controllers
         else
         {
           _logger.LogError("UpdateUserContact({User}), user has no contact", user);
-          return new StatusCodeResult((int)HttpStatusCode.BadRequest);
+          return BadRequest("User has no contact information.");
         }
 
-        // Update user properties
-
         _logger.LogInformation("UpdateUserContact({User}), called", user);
-        return new StatusCodeResult((int)HttpStatusCode.OK);
+        return Ok(userToUpdate);
 
       }
       catch (Exception ex)
@@ -385,18 +396,34 @@ namespace EducationAPI.Controllers
       try
       {
         var userToUpdate = await _educationProgramContext.Users
+          .Include(u => u.Contact)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Attendances)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Exams)
           .FirstOrDefaultAsync(u => u.UserId == user.UserId);
 
         if (userToUpdate == null)
         {
           _logger.LogError("UpdateUser({User}), could not find user", user);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          return NotFound("User not found.");
         }
 
         _educationProgramContext.Entry(userToUpdate).CurrentValues.SetValues(user);
+
+        if (user.Contact != null)
+        {
+          _educationProgramContext.Entry(userToUpdate.Contact!).CurrentValues.SetValues(user.Contact);
+        }
+        if (user.Student != null)
+        {
+          _educationProgramContext.Entry(userToUpdate.Student).CurrentValues.SetValues(user.Student);
+        }
+                                           
+
         await _educationProgramContext.SaveChangesAsync();
         _logger.LogInformation("UpdateUser({User}) called", user);
-        return new StatusCodeResult((int)HttpStatusCode.OK);
+        return Ok(userToUpdate);
       }
       catch (Exception ex)
       {
@@ -406,14 +433,18 @@ namespace EducationAPI.Controllers
     }
 
     [HttpDelete("DeleteUserById/{id}")]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public async Task<ActionResult> DeleteUserById(int id)
     {
       try
       {
         var existingUser = await _educationProgramContext.Users
-            .Include(u => u.Contact)
-            .Include(u => u.Student)
-            .FirstOrDefaultAsync(u => u.UserId == id);
+          .Include(u => u.Contact)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Attendances)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Exams)
+          .FirstOrDefaultAsync(u => u.UserId == id);
 
         if (existingUser == null)
         {
@@ -422,9 +453,30 @@ namespace EducationAPI.Controllers
         }
 
         _educationProgramContext.Users.Remove(existingUser);
+
+        if (existingUser.Contact != null)
+        {
+          _educationProgramContext.Contacts.Remove(existingUser.Contact);
+        }
+
+        if (existingUser.Student != null)
+        {
+          _educationProgramContext.Students.Remove(existingUser.Student);
+
+          if (existingUser.Student.Exams != null)
+          {
+            _educationProgramContext.Exams.RemoveRange(existingUser.Student.Exams);
+          }
+
+          if (existingUser.Student.Attendances != null)
+          {
+            _educationProgramContext.Attendances.RemoveRange(existingUser.Student.Attendances);
+          }
+        }
+
         await _educationProgramContext.SaveChangesAsync();
         _logger.LogInformation("DeleUserById({Id}) called", id);
-        return new StatusCodeResult((int)HttpStatusCode.OK);
+        return NoContent();
       }
       catch (Exception ex)
       {
@@ -432,7 +484,5 @@ namespace EducationAPI.Controllers
         return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
       }
     }
-
-
   }
 }

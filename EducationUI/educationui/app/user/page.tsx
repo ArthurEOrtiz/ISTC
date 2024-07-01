@@ -1,9 +1,10 @@
-import { checkUserExistsByClerkId } from "@/Utilities/api";
+import { checkUserExistsByClerkId, GetUserByClerkId } from "@/Utilities/api";
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import NewUserRegistration from "../components/User/NewUserRegistration";
 import UserDashboard from "../components/User/UserDashboard";
-import { User } from "@clerk/nextjs/server";
+import { User as ClerkUser } from "@clerk/nextjs/server";
+import { User } from "../shared/types/sharedTypes";
 
 /*
 * This is the page the user will see when they log in or sign up. There are three possible scenarios:
@@ -16,21 +17,23 @@ import { User } from "@clerk/nextjs/server";
 * Regardless of the scenario, if the user gets to the page, they will have a clerk ID.
 */
 const UserPage: React.FC = async() => {
-    const user: User | null = await currentUser(); // get the clerk user
+    const clerkUser: ClerkUser | null = await currentUser().catch(() => {throw new Error('Error getting current user')});
     
     // if there is no user, redirect to the home page
-    if (!user) {
-         redirect('/');
+    if (!clerkUser) {
+        redirect('/');
     }
     
     // check if the user has signed up
-    const hasTheUserSignedUp: boolean = await checkUserExistsByClerkId(user.id);
+    const hasTheUserSignedUp: boolean = await checkUserExistsByClerkId(clerkUser.id).catch(() => {throw new Error('Error checking if user exists')});
+
+    const user: User | null = hasTheUserSignedUp ? await GetUserByClerkId(clerkUser.id).then((response) => response.data).catch(() => {throw new Error("Error check user status")}) : null;
     
-    // render the page
+    // render
     return (
         <div>
-            {hasTheUserSignedUp ? (
-                <UserDashboard clerkId={user.id} />
+            {hasTheUserSignedUp && user ? (
+                <UserDashboard userId={user.userId} />
             ) : (
                 <NewUserRegistration />
             )}

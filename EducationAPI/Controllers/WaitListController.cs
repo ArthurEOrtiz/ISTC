@@ -179,7 +179,7 @@ namespace EducationAPI.Controllers
 				if (course == null)
 				{
 					_logger.LogError("IsUserWaitListed({CourseId},{UserId}), course not found.", courseId, userId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("Course not found.");
 				}
 
 				var user = await _educationProgramContext.Users
@@ -188,11 +188,11 @@ namespace EducationAPI.Controllers
 				if (user == null)
 				{
 					_logger.LogError("IsUserWaitListed({CourseId},{UserId}), user not found.", courseId, userId);
-					return new StatusCodeResult((int)HttpStatusCode.NotFound);
+					return NotFound("User not found.");
 				}
 
 				_logger.LogInformation("IsUserWaitListed({CourseId},{UserId}), called", courseId, userId);
-				return course.WaitLists.Any(wl => wl.UserId == userId);
+				return Ok(course.WaitLists.Any(wl => wl.UserId == userId));
 
 			}
 			catch (Exception ex)

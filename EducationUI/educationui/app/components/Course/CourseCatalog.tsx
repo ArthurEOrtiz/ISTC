@@ -10,11 +10,12 @@ import { useUser } from "@clerk/clerk-react";
 
 interface CourseCatalogProps {
     isAdmin?: boolean;
+    sendEmail?: (to: User, subject: string, body: string) => void;
 }
 
-const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
+const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail}) => {
     const { user: clerkUser, isLoaded } = useUser();
-    const [ user, setUser ] = useState<User>();
+    const [ user, setUser ] = useState<User | null>(null);
     const [ selectedStatuses, setSelectedStatuses ] = useState<CourseStatus []>(['Upcoming', 'InProgress']);
     const [ searchString, setSearchString ] = useState<string>(''); 
     const [ isCourseCalendarVisible, setIsCourseCalendarVisible ] = useState(!isAdmin);
@@ -93,10 +94,9 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
         }
         setIsLoading(false);
     }
-
     
     // render
-    if ( !isLoaded || !user) {
+    if ( !isLoaded ) {
         return <Loading />
     }
 
@@ -229,17 +229,25 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false}) => {
                 />
             }
 
-            {(isCourseListVisible && user && courses && !isLoading ) ? (
+            {(isCourseListVisible && courses && !isLoading ) ? (
                 <CourseList 
                     courses={courses}
                     user={user} 
                     isAdmin={isAdmin}
                     onError={(m) => setErrorMessages(m)}
+                    sendEmail = {(to: User, subject: string, body: string) => sendEmail && sendEmail(to, subject, body)}
                 />
-            ): (
+            ) : (
+                isLoading ? (
                 <div className="flex justify-center">
                     <span className="loading loading-spinner loading-lg"></span>
                 </div>
+                ) : (
+                    <div className="flex justify-center">
+                        <p className="text-error">{errorMessages}</p>
+                    </div>
+                )
+                
             )}
             
             {errorMessages && <ErrorModel

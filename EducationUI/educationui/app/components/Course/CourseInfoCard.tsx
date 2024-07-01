@@ -1,3 +1,4 @@
+'use client';
 import { Course } from "@/app/shared/types/sharedTypes";
 import moment from 'moment-timezone';
 import { useEffect, useState } from "react";
@@ -72,9 +73,14 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                 <div className="flex justify-between">
                     <div className="flex items-center space-x-2">
                         <p className="text-2xl font-bold">{course.title} </p>
-                        <div className={`badge badge-sm ${courseStatusColor ? courseStatusColor : 'badge-error'}`}>
+                        <div className={`badge ${courseStatusColor ? courseStatusColor : 'badge-error'}`}>
                             <p className="text-white">{courseStatusText? courseStatusText : 'unknown'}</p>
                         </div>
+                        {course.hasExam && (
+                        <div className="badge badge-error">
+                            <p className="text-white">{course.hasExam ? 'Exam' : 'No Exam'}</p>
+                        </div>
+                        )}
                     </div>
                     <p className="text-base">Course Id: {course.courseId}</p>
                 </div>
@@ -174,6 +180,7 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                         <p className="text-error">None</p>
                     )}
                 </div>
+
                 <div className="w-full">
                     <p className="text-1xl font-bold">PDF</p>
                     {course.pdf ? (

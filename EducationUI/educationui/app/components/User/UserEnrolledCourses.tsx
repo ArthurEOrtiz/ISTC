@@ -3,6 +3,8 @@ import { Course, User } from "@/app/shared/types/sharedTypes";
 import { GetUserEnrolledCoursesById } from "@/Utilities/api";
 import React, { useEffect, useState } from "react";
 import CourseInfoCard from "../Course/CourseInfoCard";
+import Link from "next/link";
+
 
 interface UserEnrolledCoursesProps {
     user: User;
@@ -40,18 +42,21 @@ const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
                 <h1 className='text-2xl text-center font-bold mb-2'>Enrolled Courses</h1>
             </div>
 
-            <div className='space-y-4'>
+            <div className=''>
                 {courses.length > 0 ? (
                     courses.map((course: Course, index) => (
-                        <div
+                        <Link 
+                            href={`/admin/editcourse/edit/course/${course.courseId}`} 
                             key={index}
-                            className='card w-full bg-base-300 p-4'
+                            className=""
                         >
-                            <CourseInfoCard
-                                course={course}
-                                expanded={false}
-                            />
-                        </div> 
+                            <div className='card w-full bg-base-300 p-4 mb-4'>
+                                <CourseInfoCard
+                                    course={course}
+                                    expanded={false}
+                                />
+                            </div>
+                        </Link> 
                     ))
                 ) : (
                     <div className='card w-full bg-base-100'>

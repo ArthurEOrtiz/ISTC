@@ -3,9 +3,6 @@ import axios from 'axios';
 import https from 'https';
 import qs from 'qs';
 
-
-
-
 const axiosInstance = axios.create({
     baseURL: 'https://localhost:7144/',
     httpsAgent: new https.Agent({ rejectUnauthorized: false }), // This line is for handling self-signed certificates, remove if not needed
@@ -36,12 +33,24 @@ export async function UpdateAttendanceById(attendanceId: Number, attended: Boole
     }
 }
 
-export async function CalculateStudentCreditHours(studentId: Number) {
+// Not in use
+// export async function CalculateStudentCreditHours(studentId: Number) {
+//     try {
+//         const response = await axiosInstance.put(`Attendance/CalculateStudentCreditHours/${studentId}`);
+//         return response;
+//     } catch (error: any) {
+//         console.error('Error calculating student credit hours:', error);
+//         return error.message;
+//     }
+// }
+// Not in use 
+
+export async function HasAttendedByClassIdUserId(classId: Number, userId: Number) {
     try {
-        const response = await axiosInstance.put(`Attendance/CalculateStudentCreditHours/${studentId}`);
+        const response = await axiosInstance.get(`Attendance/HasAttendedByClassIdUserId/${classId}/${userId}`);
         return response;
     } catch (error: any) {
-        console.error('Error calculating student credit hours:', error);
+        console.error('Error fetching attendance:', error);
         return error.message;
     }
 }
@@ -372,10 +381,10 @@ export async function SearchUsers(searchString: string) {
 export async function GetUserById(userId: Number) {
     try {
         const response = await axiosInstance.get(`User/GetUserById/${userId}`);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error fetching user:', error);
-        throw error;
+        return error;
     }
 }
 
@@ -425,7 +434,7 @@ export async function UpdateUserContact(user: User) {
         return response;
     } catch (error: any) {
         console.error('Error updating user:', error);
-        return error.message;
+        return error;
     }
 }
 
@@ -435,7 +444,7 @@ export async function UpdateUser(user: User) {
         return response;
     } catch (error: any) {
         console.error('Error updating user:', error);
-        return error.message;
+        return error;
     }
 }
 
@@ -469,9 +478,9 @@ export async function IsUserAdminByClerkId(clerkId: String) {
     }
 }
 
-export async function IsUserEnrolledInCourse(clerkId: String, courseId: Number) {
+export async function IsUserEnrolledInCourse(userId: Number, courseId: Number) {
     try {
-        const response = await axiosInstance.get(`User/IsUserEnrolledInCourse/${clerkId}/${courseId}`);
+        const response = await axiosInstance.get(`User/IsUserEnrolledInCourse/${userId}/${courseId}`);
         return response;
     } catch (error: any) {
         console.error('Error fetching user:', error);
@@ -479,15 +488,13 @@ export async function IsUserEnrolledInCourse(clerkId: String, courseId: Number) 
     }
 }
 
-
-
 export async function DeleteUserById(userId: Number) {
     try {
         const response = await axiosInstance.delete(`User/DeleteUserById/${userId}`);
         return response;
     } catch (error: any) {
         console.error('Error deleting user:', error);
-        return error.message;
+        return error;
     }
 }
 
@@ -499,7 +506,7 @@ export async function GetStudentAttendanceById(studentId: Number) {
         return response;
     } catch (error: any) {
         console.error('Error fetching student attendance:', error);
-        throw error.message;
+        return error.message;
     }
 }
 
@@ -509,9 +516,21 @@ export async function getStudentIdByClerkId(clerkId: String) {
         return response;
     } catch (error: any) {
         console.error('Error fetching user:', error);
-        throw error.message;
+        return error.message;
     }
 }
+
+export async function CalculateAccumulatedCredit(userId: Number) {
+    try {
+        const response = await axiosInstance.put(`Student/CalculateAccumulatedCredit/${userId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error calculating credit:', error);
+        return error.message;
+    }
+}
+
+
 
 // WaitList
 

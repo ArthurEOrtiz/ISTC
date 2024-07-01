@@ -1,20 +1,23 @@
 import { Course, User, WaitList } from "@/app/shared/types/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import { useEffect, useState } from "react";
-import { DeleteWaitListById, IsUserEnrolledInCourse, IsUserWaitListed, PostWaitList } from "@/Utilities/api";
+import { DeleteWaitListById, GetWaitListByUserIdCourseId, IsUserEnrolledInCourse, IsUserWaitListed, PostWaitList } from "@/Utilities/api";
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
 import AttendanceModal from "../Attendance/AttendanceModal";
 import EnrollmentModal from "../Enrollment/EnrollmentModal";
 import { useRouter } from 'next/navigation';
+import { SignedIn } from "@clerk/nextjs";
+import ExamModal from "../Exam/ExamModal";
 
 interface CourseActionContainerProps {
     course: Course;
-    user: User; 
+    user: User | null; 
     isAdmin: boolean;
     onError: (message: string) => void;
+    sendEmail: (to: User, subject: string, body: string) => void;
 }
 
-const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, user, isAdmin, onError}) => {
+const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, user, isAdmin, onError, sendEmail}) => {
     const [isEnrolled, setIsEnrolled] = useState<boolean>(false);
     const [isWaitListed, setIsWaitListed] = useState<boolean>(false);
     const [userWaitList, setUserWaitList] = useState<WaitList>(); 
@@ -23,12 +26,14 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     const [confirmationMessage, setConfirmationMessage] = useState<string>();
     const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false);
     const [showAttendanceModal, setShowAttendanceModal] = useState<boolean>(false); 
+    const [showExamModal, setShowExamModal] = useState<boolean>(false);
     const router = useRouter();
+    const userId = user === null ? 0 : user?.userId; 
   
     const defaultWaitListToEnroll: WaitList = {
         waitListId: 0,
         courseId: course.courseId,
-        userId: user.userId,
+        userId: userId,
         dateAdded: new Date(),
         toEnroll: true
     }
@@ -36,7 +41,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     const defaultWaitListToDrop: WaitList = {
         waitListId: 0,
         courseId: course.courseId,
-        userId: user.userId,
+        userId: userId,
         dateAdded: new Date(),
         toEnroll: false
     }
@@ -46,11 +51,6 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
         checkIfUserIsEnrolledInCourse();
         checkIfUserIsOnWaitList();
     }, []);
-
-    useEffect(() => {
-        checkIfUserIsOnWaitList();
-    }
-    , [userWaitList]);
     
     // handlers
     const handleEnrollmentClick = () => {
@@ -103,7 +103,9 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
 
     // helpers
     const checkIfUserIsEnrolledInCourse = async() => {
-         const response = await IsUserEnrolledInCourse(user.clerkId!, course.courseId);
+        if (!user) return;
+
+         const response = await IsUserEnrolledInCourse(userId, course.courseId);
          if (response.status === 200) {
                 setIsEnrolled(response.data);
          } else {
@@ -112,24 +114,41 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     };
 
     const checkIfUserIsOnWaitList = async() => {
-        const response = await IsUserWaitListed(course.courseId, user.userId);
+        if (!user) return;
+        const response = await IsUserWaitListed(course.courseId, userId);
         if (response.status === 200) {
             setIsWaitListed(response.data);
+            if (response.data) {
+                await getUserWailList();
+            }
         } else {
             onError(`Failed to check user wait list. \n ${response as unknown as string}`);
         }
     };
 
     const waitListUser = async(waitList: WaitList) => {
-       
+        if (!user) return;
         const response = await PostWaitList(waitList);
         if (response.status === 201) {
             setUserWaitList(response.data);
+            setIsWaitListed(true);
+            sendEmail(user, 'Wait List Confirmation', `You have been added to the wait list for ${course.title}.`);
         } else {
             onError(`Failed to wait list user. \n ${response as unknown as string}`);
         }
         
     };
+
+    const getUserWailList = async() => {
+        if (!user) return;
+
+        const response = await GetWaitListByUserIdCourseId(user.userId, course.courseId);
+        if (response.status === 200) {
+            setUserWaitList(response.data);
+        } else {
+            onError(`Failed to get user wait list. \n ${response as unknown as string}`);
+        }
+    }
 
     const removeUserFromWaitList = async() => {
 
@@ -137,9 +156,11 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
             onError('Wait list not found.');
             return;
         }
-       
-        const response = await DeleteWaitListById(userWaitList.waitListId);
-        if (response.status === 200) {
+
+        const response = await DeleteWaitListById(userWaitList.waitListId);  
+        //console.log(response);
+
+        if (response.status === 204) {
             setUserWaitList(undefined);
             setIsWaitListed(false);
         } else {
@@ -156,9 +177,12 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
     
     return (
         <div>
-            <div className='space-y-4'>
-                <CourseInfoCard course={course} expanded={false}/>
-                <div>
+            <div className='bg-base-100 rounded-xl p-5'>
+                <div className='bg-base-300 rounded-xl p-4'>
+                    <CourseInfoCard course={course} expanded={false}/>
+                </div>
+                
+                <div className='mt-4'>
                     {isAdmin && (
                         <div>
                             <div className="flex space-x-2">
@@ -180,6 +204,14 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                                     >
                                         Manage Attendance
                                 </button>
+                                {course.hasExam && (
+                                    <button
+                                        className="btn btn-primary btn-sm text-white"
+                                        onClick={() => {setShowExamModal(true)}}
+                                        >
+                                            Manage Exams
+                                    </button>
+                                )}
                                 {/* <button
                                     className="btn btn-primary text-white"
                                     onClick={() => console.log(course)}
@@ -194,18 +226,22 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                     {!isAdmin && (
                         <div>
                             <div className="flex space-x-2">
+                                <SignedIn>
+                                    <button 
+                                        className={`btn ${(isEnrolled || isWaitListed) ? 'btn-error' : 'btn-primary'} btn-sm text-white`}
+                                        onClick={handleEnrollmentClick}>
+                                            {isEnrolled || isWaitListed ? 'Drop Course' : 'Apply to Enroll'}
+                                    </button>
+                                </SignedIn>
 
-                                <button 
-                                    className={`btn ${(isEnrolled || isWaitListed) ? 'btn-error' : 'btn-primary'} btn-sm text-white`}
-                                    onClick={handleEnrollmentClick}>
-                                        {isEnrolled || isWaitListed ? 'Drop Course' : 'Apply to Enroll'}
-                                </button>
-
-                                <button 
+                                <a
                                     className="btn btn-primary text-white btn-sm"
+                                    href={`/courses/course/${course.courseId}`}
+                                    target="_blank"
+                                    rel=" noopener noreferrer"
                                     >
                                         View Course
-                                </button>
+                                </a>
                                 {/* <button
                                     className="btn btn-primary text-white"
                                     onClick={() => console.log(course)}
@@ -219,7 +255,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                     
                 </div>
             </div>
-
+                
             
                 <EnrollmentModal
                     course={course}
@@ -231,7 +267,17 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                 <AttendanceModal
                     course={course}
                     isOpen={showAttendanceModal}
-                    onExit={() => setShowAttendanceModal(false)}
+                    onExit={() => {
+                        setShowAttendanceModal(false)
+                    }}
+                />
+
+                <ExamModal
+                    exams={course.exams}
+                    courseId={course.courseId}
+                    isOpen={showExamModal}
+                    onExit={() => setShowExamModal(false)}
+                    onError={(message: string) => onError(message)}
                 />
 
                 {showConfirmationModal && (

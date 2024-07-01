@@ -124,7 +124,7 @@ const NewUserRegistration: React.FC = () => {
         if (response.status === 200) {
             window.location.reload();
         } else {
-            setErrorMessage(response);
+            setErrorMessage(response.message);
             setShowErrorMessage(true);
         }
     }

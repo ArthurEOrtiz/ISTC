@@ -6,12 +6,13 @@ import CourseActionContainer from './CourseActionContainer';
 
 interface CourseListProps {
     courses: Course[] | null;
-    user: User;
+    user: User | null;
     isAdmin: boolean;   
     onError: (message: string) => void;
+    sendEmail: (to: User, subject: string, body: string) => void;
 }
 
-const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}) => {
+const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError, sendEmail}) => {
     const [courseList , setCourseList] = useState<Course[] | null>(null);
 
     useEffect(() => {
@@ -32,12 +33,13 @@ const CourseList: React.FC<CourseListProps> = ({courses, user, isAdmin, onError}
             {courseList != null ? 
                 (
                     courseList.map((course: Course, index : number) => (
-                        <div key={index} className="bg-base-100 rounded-xl p-4">
+                        <div key={index}>
                             <CourseActionContainer 
                                 course={course}
                                 user={user} 
                                 isAdmin={isAdmin}
                                 onError={(m) => onError(m)}
+                                sendEmail={(to: User, subject: string, body: string) => sendEmail(to, subject, body)}
                             />
                         </div>
                     ))

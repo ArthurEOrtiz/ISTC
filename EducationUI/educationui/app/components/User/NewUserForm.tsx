@@ -13,8 +13,12 @@ interface NewUserFormProps {
 
 const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : incomingUser}) => {
     // Constants
-    const [ user, setUser ] = useState<User>();
+    const [ user, setUser ] = useState<User | null>(null);
     const [ isEmailValid, setIsEmailValid ] = useState<boolean>(true);
+    const [ doesUserExist, setDoesUserExist ] = useState<boolean>(false);
+    const [ emailCheckLoading, setEmailCheckLoading ] = useState<boolean>(false);
+    const [ otherEmployer, setOtherEmployer ] = useState<string | null>(null);
+    
     const countyArray = [
         "Ada",
         "Adams",
@@ -65,22 +69,46 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
     //Effects
     useEffect(() => {
         if (incomingUser) {
+            const employer = incomingUser.employer === "" ? "select" : incomingUser.employer;
+
+            if (employer !== "Tax Commision" && !countyArray.includes(employer) && employer !== "select") {
+                incomingUser.employer = "other";
+                setOtherEmployer(employer);
+            } 
+
             setUser(incomingUser);
         }
-    }, [incomingUser]);
+    }, []);
 
 
     // Handlers
     const handleOnSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        //console.log("Submitting");
+
         if (!user) {
             return;
         }
+
         if (!isEmailValid || isEmailValid === null) {
             onError("Please enter a valid email address!");
             return;
-        } else  {
+        } 
+
+        // If the user employer is an empty strng, set it to the otherEmployer value if it is not null
+        user.employer = user.employer === "other" ? otherEmployer ?? "" : user.employer;
+        // If the user employer is "select", set it to an empty string
+        user.employer = user.employer === "select" ? "" : user.employer;
+        // If the user employer is still an empty string, throw an error
+            
+            
+        if (user.employer === ""){
+            onError("Employer is required!");   
+        } else {
             onSubmit(user);
+
+            //console.log(user);
         }
     }
 
@@ -88,24 +116,37 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
         if (e.key === 'Backspace' || e.key === 'Delete') {
             return;
         }
+
         if (isNaN(Number(e.key))) {
             e.preventDefault();
         }
     }
 
     const handleEmailBlur = async (event: React.FocusEvent<HTMLInputElement>): Promise<void> => {
-        if (event.target.value) {
-      
-            const isEmailValid = validatEamil(event.target.value);
-            const doesEmailExist = await checkUserExistsByEmail(event.target.value);
-          
-            if (isEmailValid && !doesEmailExist) {
-                setIsEmailValid(true);
-            } else {
-                setIsEmailValid(false);
-            }
-        } else {
+        const input = event.target.value;
+
+        if (!input) {
+            setIsEmailValid(true);
+            setDoesUserExist(false);
+            onError("");
+            return;
+        }
+
+        if (input !== '' && validatEamil(input)) {
+            setEmailCheckLoading(true);
+            const doesEmailExist = await checkUserExistsByEmail(input);
+            setDoesUserExist(doesEmailExist as boolean);
+            setIsEmailValid(!doesEmailExist);
+            setEmailCheckLoading(false);
+            onError(doesEmailExist ? "The E-mail provided is already in use!" : "");
+            return;
+        }
+
+        if (input !== '' && !validatEamil(input)) {
             setIsEmailValid(false);
+            setDoesUserExist(false);
+            onError("Please enter a valid email address!");
+            return;
         }
     }
 
@@ -128,6 +169,14 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
         }
     }
 
+    const isFormValid = () => {
+        if (user?.firstName && user?.lastName && user?.employer && user?.jobTitle) {
+            return true;
+        }
+        return false;
+    }
+
+    
 
     if (user) {
         return (
@@ -140,13 +189,16 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="firstName"
                         type="text"
-                        placeholder="First Name"
+                        placeholder="John"
                         required
                         maxLength={50}
                         minLength={2}
                         value={user?.firstName}
                         onChange={(e) => setUser({ ...user, firstName: e.target.value})}
                     />
+                    <p className='text-error text-xs italic'>
+                        Required
+                    </p>
                 </div>
 
                 <div className="mb-4">
@@ -157,10 +209,13 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="middleName"
                         type="text"
-                        placeholder="Middle Name/ Optional"
+                        placeholder="Edward"
                         value={user?.middleName ?? ''}
                         onChange={(e) => setUser({ ...user, middleName: e.target.value})}
                     />
+                    <p className='text-green-600 text-xs italic'>
+                        Optional
+                    </p>
                 </div>
 
                 <div className="mb-4">
@@ -171,29 +226,43 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="lastName"
                         type="text"
-                        placeholder="Last Name"
+                        placeholder="Doe"
                         required
                         maxLength={50}
                         minLength={2}
                         value={user?.lastName}
                         onChange={(e) => setUser({ ...user, lastName: e.target.value})}
                     />
+                    <p className='text-error text-xs italic'>
+                        Required
+                    </p>
                 </div>
 
                 <div className="mb-4">
                     <label className="block text-sm font-bold mb-2" htmlFor="email">
-                        Email
+                        E-mail
                     </label>
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="email"
                         type="email"
-                        placeholder="Email"
+                        placeholder="JohnEdwardDoe@Tax.Idaho.gov"
+                        required
                         value={user?.email}
                         onChange={(e) => setUser({ ...user, email: e.target.value})}
                         onBlur={handleEmailBlur}
                     />
-                    {isEmailValid === false && (<p className="text-red-500 text-xs italic">Please enter a valid email address</p>)}
+                    {emailCheckLoading && (
+                        <div className='flex space-x-2'>
+                            <span className="loading loading-spinner loading-xs"></span>
+                            <p className="text-green-600 text-xs italic">Checking Email...</p>
+                        </div>
+                    )}
+                    {isEmailValid === false && (<p className="text-error text-xs italic">Please enter a valid email address</p>)}
+                    {doesUserExist && (<p className="text-error text-xs italic">The E-mail provided is already in use!</p>)}
+                    <p className='text-error text-xs italic'>
+                        Required
+                    </p>
                 </div>
 
                 <div className="mb-4">
@@ -205,7 +274,27 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         id="employer"
                         value={user?.employer}
                         required
-                        onChange={(e) => setUser({ ...user, employer: e.target.value})}
+                        onChange={(e) => {
+                            const value = e.target.value;
+    
+                            if (value !== "select" && value !== "other" && !countyArray.includes(value) && value !== "Tax Commision") {
+                                setUser({ ...user, employer: "other" });
+                                setOtherEmployer(value);
+                                return;
+                            } 
+                        
+                            if (value === "other" || value === "select") {
+                                setUser({ ...user, employer: value === "select" ? "select" : "other"});
+                                setOtherEmployer(value === "other" ? "" : null);
+                                return;
+                            }
+                        
+                            if (value === "Tax Commision" || countyArray.includes(value)) {
+                                setUser({ ...user, employer: value });
+                                setOtherEmployer(null);
+                                return;
+                            }
+                        }}
                     >
                         <option value="select">Select</option>
                         <option value="other">Other</option>
@@ -214,20 +303,23 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                             <option key={index} value={county}>{county}</option>
                         ))}
                     </select>
+                    <p className='text-error text-xs italic'>
+                        Required
+                    </p>
                 </div>
 
-                {!countyArray.includes(user.employer) && user.employer !=="select" && user.employer !== "Tax Commision" && (
+                {otherEmployer !== null && (
                     <div className="mb-4">
                         <label className="block text-sm font-bold mb-2" htmlFor="otherEmployer">
-                            Other Employer
+                            Employer
                         </label>
                         <input
                             className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                             id="otherEmployer"
                             type="text"
                             placeholder="Other Employer"
-                            value={user?.employer}
-                            onChange={(e) => setUser({ ...user, employer: e.target.value})}
+                            value={otherEmployer}
+                            onChange={(e) => setOtherEmployer(e.target.value)}
                         />
                     </div>
                 )}
@@ -246,6 +338,9 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         value={user?.jobTitle}
                         onChange={(e) => setUser({ ...user, jobTitle: e.target.value})}
                     />
+                    <p className='text-error text-xs italic'>
+                        Required
+                    </p>
                 </div>
 
                 <div className="mb-4">
@@ -262,14 +357,16 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         onChange={(phone) => setUser({ ...user, contact: { ...user.contact, phone }})}
                         buttonStyle={{display: 'none'}}
                         inputProps={{
-                            required: true,
+                            required: false,
                             maxLength: 14,
                             minLength: 14,
                             className: 'shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline',
                         }}
                     />
+                    <p className='text-green-600 text-xs italic'>
+                        Optional
+                    </p>
                 </div>
-
                 <div className="mb-4">
                     <label className="block text-sm font-bold mb-2" htmlFor="addressLine1">
                         Address Line 1
@@ -279,11 +376,13 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         id="addressLine1"
                         type="text"
                         placeholder="1234 Fake St."
-                        required
                         maxLength={50}
                         value={user?.contact?.addressLine1 ?? ''}
                         onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine1: e.target.value } })}
                     />
+                    <p className='text-green-600 text-xs italic'>
+                        Optional
+                    </p>
                 </div>
 
                 <div className="mb-4">
@@ -294,11 +393,14 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                         className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                         id="addressLine2"
                         type="text"
-                        placeholder="Apt. 123 / Optional"
+                        placeholder="Apt. 123"
                         maxLength={50}
                         value={user?.contact?.addressLine2 ?? ''}
                         onChange={(e) => setUser({ ...user, contact: { ...user.contact, addressLine2: e.target.value } })}
                     />
+                    <p className='text-green-600 text-xs italic'>
+                        Optional
+                    </p>
                 </div>
 
                 <div className="flex justify-between space-x-2">
@@ -311,11 +413,13 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                             id="city"
                             type="text"
                             placeholder="City"
-                            required
                             maxLength={50}
                             value={user.contact?.city ?? ''}
                             onChange={(e) => setUser({ ...user, contact: { ...user.contact, city: e.target.value } })}
                         />
+                        <p className='text-green-600 text-xs italic'>
+                            Optional
+                        </p>
                     </div>
 
                     <div className="mb-4">
@@ -326,7 +430,6 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                             className="shadow appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
                             id="state"
                             value={user.contact?.state ?? "ID"}
-                            required
                             onChange={(e) => setUser({ ...user, contact: { ...user.contact, state: e.target.value } })}
                         >
                             <option value="AL">Alabama</option>
@@ -381,6 +484,9 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                             <option value="WI">Wisconsin</option>
                             <option value="WY">Wyoming</option>
                         </select>
+                        <p className='text-green-600 text-xs italic'>
+                            Optional
+                        </p>
                     </div>
 
                     <div className="mb-4 w-1/3">
@@ -392,23 +498,29 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
                             id="zip"
                             type="text"
                             placeholder="Zip"
-                            required
                             maxLength={5}
                             minLength={5}
                             value={user.contact?.zip ?? ''}
                             onKeyDown={(e) => {handleZipInput(e)}}
                             onChange={(e) => setUser({ ...user, contact: { ...user.contact, zip: e.target.value } })}
                         />
+                        <p className='text-green-600 text-xs italic'>
+                            Optional
+                        </p>
                     </div>
                 
                 </div>
-    
-                <button 
-                    type="submit"
-                    className="btn btn-primary text-white  mt-4"
-                    >
-                        Add User
-                </button>
+                
+                <div className='flex items-center justify-between'>
+                    <button 
+                        type="submit"
+                        className="btn btn-success text-white mt-4"
+                        disabled={!isFormValid()}
+                        >
+                            Add User
+                    </button>
+                    {!isFormValid() && (<p className="text-error text-xs italic">Please fill out all required fields</p>)}
+                </div>
 
                 {/* <button
                     type="button"

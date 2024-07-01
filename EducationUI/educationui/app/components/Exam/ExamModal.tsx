@@ -72,7 +72,7 @@ const ExamModal: React.FC<ExamModalProps> = ({exams, courseId, isOpen, onExit, o
             <div className="bg-base-100 p-4 rounded-xl z-10 min-w-96">
                 <div>
                     {/* Header */}
-                    <div className="flex justify-between mb-4">
+                    <div className="flex justify-between items-baseline mb-4">
                         <h1 className="text-2xl font-bold">Exams</h1>
                         <button onClick={() => onExit(null)} className="text-3xl text-error font-bold">&times;</button>
                     </div>
@@ -81,7 +81,7 @@ const ExamModal: React.FC<ExamModalProps> = ({exams, courseId, isOpen, onExit, o
                         {/* Exams */}
                         <div className="bg-base-300 p-4 rounded-xl">
                             {!isLoading ? (
-                                examList != null && users ? 
+                                examList != null && users && users?.length > 0 ? 
                                     (   
                                         <table className="table w-full border-separate border-spacing-2">
                                             <thead>

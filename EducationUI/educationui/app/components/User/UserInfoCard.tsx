@@ -10,9 +10,10 @@ interface UserInfoCardProps {
     user: User;
     viewOnly?: boolean;
     onError?: (message: string) => void;
+    onDeleted?: () => void;
 }
 
-const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, viewOnly = false}) => {
+const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, onDeleted, viewOnly = false}) => {
     // constants
     const [ showConfirmationModal, setShowConfirmationModal ] = useState(false);
     const formattedPhoneNumber = user.contact?.phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
@@ -25,11 +26,11 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, viewOnly = fa
 
     // helpers
     const deleteUserAsync = async () => {
-        console.log('Delete user');
+        //console.log('Delete user');
         setShowConfirmationModal(false);
         const response = await DeleteUserById(user.userId);
-        if (response.status === 200) {
-            window.location.reload();
+        if (response.status === 204) {
+            onDeleted && onDeleted();
         } else {
             onError && onError(`There was an error deleting the user. \n '${response}`);
         }
@@ -38,7 +39,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, viewOnly = fa
 
     // render
     return (
-        <div className="bg-base-100 shawdow-md rounded-xl p-4 w-full">
+        <div className="p-4 w-full">
             <div className="flex justify-between">
                 <h1 className="text-2xl font-bold">{user.firstName} {user.middleName ?? ""} {user.lastName}</h1>
                 <div>
@@ -53,7 +54,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, viewOnly = fa
                             <div className="flex space-x-2">
                                 <p className="text-1xl font-bold">Employer :</p>
                                 {user.employer ? (
-                                <p className="text-base">{user.employer}</p>
+                                    <p className="text-base">{user.employer}</p>
                                 ) : (
                                     <p className="text-error">None</p>
                                 )}
@@ -207,15 +208,17 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, viewOnly = fa
                         className="btn btn-sm btn-primary text-white"
                         onClick={() => router.push(`/admin/users/${user.userId}`)}
                     >
-                        Edit
+                        View User
                     </button>
 
-                    <button
-                        className="btn btn-sm btn-error text-white ml-2"
-                        onClick={handleDeleteUser}
-                    >
-                        Delete
-                    </button>
+                    {onDeleted && (
+                        <button
+                            className="btn btn-sm btn-error text-white ml-2"
+                            onClick={handleDeleteUser}
+                        >
+                            Delete
+                        </button>
+                    )}
                 </div>
             )}
 
@@ -223,6 +226,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, viewOnly = fa
                 <ConfirmationModal
                     title="Delete User"
                     message="Are you sure you want to delete this user?"
+                    isOpen={showConfirmationModal}
                     onConfirm={deleteUserAsync}
                     onCancel={() => setShowConfirmationModal(false)}
                 />
