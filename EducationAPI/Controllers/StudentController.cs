@@ -112,6 +112,32 @@ namespace EducationAPI.Controllers
 			}
 		}
 
+		[HttpPut("UpdateStudent")]
+		public async Task<ActionResult<Student>> UpdateStudent(Student student)
+		{
+			try
+			{
+				var studentToUpdate = await _educationProgramContext.Students
+					.FirstOrDefaultAsync(s => s.StudentId == student.StudentId);
+
+				if (studentToUpdate == null)
+				{
+					_logger.LogError("UpdateStudent({Student}), student not found", student);
+					return NotFound("Student not found");
+				}
+
+				_educationProgramContext.Entry(studentToUpdate).CurrentValues.SetValues(student);
+				await _educationProgramContext.SaveChangesAsync();
+				_logger.LogInformation("UpdateStudent({StudentId}) called", student.StudentId);
+				return Ok(student);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "UpdateStudent({StudentId})", student.StudentId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
 		[HttpPut("CalculateAccumulatedCredit/{userId}")]
 		public async Task<ActionResult<int>> CalculateAccumulatedCredit(int userId)
 		{
