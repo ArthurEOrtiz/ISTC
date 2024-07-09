@@ -1,4 +1,4 @@
-import { Attendance, Course, CourseStatus, Exam, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
+import { Attendance, Certification, Course, CourseStatus, Exam, Student, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
 import axios from 'axios';
 import https from 'https';
 import qs from 'qs';
@@ -51,6 +51,57 @@ export async function HasAttendedByClassIdUserId(classId: Number, userId: Number
         return response;
     } catch (error: any) {
         console.error('Error fetching attendance:', error);
+        return error.message;
+    }
+}
+
+// Certifications
+export async function PostCertification(certification: Certification) {
+    try {
+        const response = await axiosInstance.post('Certification/PostCertification', certification);
+        return response;
+    } catch (error: any) {
+        console.error('Error posting certification:', error);
+        return error.message;
+    }
+}
+
+export async function PostCertificationToUser(userId: number, certification: Certification) {
+    try {
+        const response = await axiosInstance.post(`Certification/PostCertificationToUser/${userId}`, certification);
+        return response;
+    } catch (error: any) {
+        console.error('Error posting certification:', error);
+        return error.message;
+    }
+}
+
+export async function ApproveCertification(certificationId: Number, studentId: Number, adminId: Number) {
+    try {
+        const response = await axiosInstance.patch(`Certification/ApproveCertification/${certificationId}/${studentId}/${adminId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error approving certification:', error);
+        return error.message;
+    }
+}
+
+export async function RevokeCertification(certificationId: Number, studentId: Number, adminId: Number) {
+    try {
+        const response = await axiosInstance.patch(`Certification/RevokeCertification/${certificationId}/${studentId}/${adminId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error revoking certification:', error);
+        return error.message;
+    }
+}
+
+export async function DeleteCertification(certificationId: Number) {
+    try {
+        const response = await axiosInstance.delete(`Certification/DeleteCertification/${certificationId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error deleting certification:', error);
         return error.message;
     }
 }
@@ -530,6 +581,15 @@ export async function CalculateAccumulatedCredit(userId: Number) {
     }
 }
 
+export async function UpdateStudent(student: Student) {
+    try {
+        const response = await axiosInstance.put('Student/UpdateStudent', student);
+        return response;
+    } catch (error: any) {
+        console.error('Error updating student:', error);
+        return error.message;
+    }
+}
 
 
 // WaitList
