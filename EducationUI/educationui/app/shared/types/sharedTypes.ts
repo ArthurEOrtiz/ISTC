@@ -5,6 +5,17 @@ export interface Attendance {
   classId: number;
 }
 
+export type CertificationType = 'Appraiser' | 'Mapping';
+
+export interface Certification {
+  certificationId: number;
+  certificationType: CertificationType;
+  requestDate: Date; 
+  approvalDate: Date | null; 
+  isApproved: boolean; 
+  approvedBy: number | null;  
+}
+
 export interface Class {
   classId: number;
   courseId: number;
@@ -48,11 +59,6 @@ export interface Course {
   waitLists: WaitList[];
 }
 
-export interface CourseDTO {
-  course: Course;
-  newClassIds: number[];
-}
-
 export interface Exam {
   examId: number;
   courseId: number;
@@ -86,6 +92,8 @@ export interface Student {
   appraisalCertified: boolean;
   mappingCertified: boolean;
   attendances: Attendance[];
+  exams: Exam[];
+  certifications: Certification[];
 }
 
 export interface Topic {
