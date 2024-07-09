@@ -21,5 +21,7 @@ namespace EducationAPI.Models
 		public virtual ICollection<Attendance> Attendances { get; set; } = [];
 		
 		public virtual ICollection<Exam> Exams { get; set; } = [];
+
+		public virtual ICollection<Certification> Certifications { get; set; } = [];
 	}
 }
