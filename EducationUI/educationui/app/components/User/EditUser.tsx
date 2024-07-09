@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useState } from "react";
 import UserInfoCard from "./UserInfoCard";
-import { User } from "@/app/shared/types/sharedTypes";
-import { CalculateAccumulatedCredit, DeleteUserById, GetUserById, UpdateUser } from "@/Utilities/api";
+import { Student, User } from "@/app/shared/types/sharedTypes";
+import { CalculateAccumulatedCredit, DeleteUserById, GetUserByClerkId, GetUserById, UpdateUser } from "@/Utilities/api";
 import Loading from "@/app/shared/Loading";
 import ActionBar from "@/app/shared/ActionBar";
 import ErrorModal from "@/app/shared/modals/ErrorModal";
@@ -11,56 +11,34 @@ import EditContactModal from "./EditContactModal";
 import EditEmployerModal from "./EditEmployerModal";
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
 import UserDeleteModal from "./UserDeleteModal";
+import CertificationModal from "../Certification/CertificationModal";
 
 interface EditUserProps {
     userId: number;
+    clerkId: string;
 }
 
-const EditUser: React.FC<EditUserProps> = ({ userId }) => {
+const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
     const [ user, setUser ] = useState<User | null>(null);
+    const [ admin, setAdmin ] = useState<User | null>(null);
     const [ isLoadingUser, setIsLoadingUser ] = useState<boolean>(false);
     const [ confirmationMessage, setConfirmationMessage ] = useState<string | null>("");
     const [ confirmationTitle, setConfirmationTitle ] = useState<string | null>("");
     const [ showConfirmationModal, setShowConfirmationModal ] = useState<boolean>(false);
     const [ showUserDeleteModal, setShowUserDeleteModal ] = useState<boolean>(false);   
     const [ errorMessage, setErrorMessage ] = useState<string | null>(null);
+    const [ showCertificationModal, setShowCertificationModal ] = useState<boolean>(false); 
     const [ showContactModal, setShowContactModal ] = useState<boolean>(false);
     const [ showEmployerModal, setShowEmployerModal ] = useState<boolean>(false);
 
     //Effect
     useEffect(() => {
         getUser();
+        getAdmin();
         calcAccumulatedCredit();
     }, []);
 
     // Handlers
-    const handleAppraisalCertification = () => {
-        if (!user) return;
-
-        const updatedUser = {
-            ...user,
-            student: {
-                ...user.student,
-                appraisalCertified: !user.student.appraisalCertified
-            }
-        }
-        //console.log(updatedUser)
-        updateUser(updatedUser);
-    }
-
-    const handleMappingCertification = () => {
-        if (!user) return;
-
-        const updatedUser = {
-            ...user,
-            student: {
-                ...user.student,
-                mappingCertified: !user.student.mappingCertified
-            }
-        }
-        updateUser(updatedUser);
-    }
-
     const handleOnDeleteUser = () => {
         setConfirmationTitle("Delete User");
         setConfirmationMessage("Are you sure you want to delete this user? All data on the user will be lost!");
@@ -90,6 +68,15 @@ const EditUser: React.FC<EditUserProps> = ({ userId }) => {
             setUser(null);
         }
         setIsLoadingUser(false);
+    }
+
+    const getAdmin = async () => {
+        const response = await GetUserByClerkId(clerkId);
+        if (response.status === 200) {
+            setAdmin(response.data);
+        } else {
+            setErrorMessage("Error fetching admin data, please try again later.");
+        }
     }
 
     const calcAccumulatedCredit = async () => {
@@ -134,6 +121,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId }) => {
         } else {
             setIsLoadingUser(false);
             setErrorMessage(response.data);
+            setIsLoadingUser(false);
         }
     }
 
@@ -163,6 +151,14 @@ const EditUser: React.FC<EditUserProps> = ({ userId }) => {
                             </li>
                             <li>
                                 <button
+                                    className="text-nowrap"
+                                    onClick={() => setShowCertificationModal(true)}
+                                >
+                                    Certification
+                                </button>
+                            </li>
+                            <li>
+                                <button
                                     className='text-nowrap text-error'
                                     onClick={handleOnDeleteUser}
                                 >
@@ -170,29 +166,6 @@ const EditUser: React.FC<EditUserProps> = ({ userId }) => {
                                 </button>
                             </li>
                             
-                        </ul>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>Certify</summary>
-                        <ul className="p-2 bg-base-300 z-10">
-                            <li>
-                                <button
-                                    className='text-nowrap'
-                                    onClick={handleAppraisalCertification}
-                                >
-                                    {user?.student.appraisalCertified ? 'Revoke Appraiser Certification' : 'Certify As Appraiser'}
-                                </button>
-                            </li>
-                            <li>
-                                <button
-                                    className='text-nowrap'
-                                    onClick={handleMappingCertification}
-                                >
-                                    {user?.student.mappingCertified ? 'Revoke Mapper Certification' : 'Certify As Mapper'}
-                                </button>
-                            </li>
                         </ul>
                     </details>
                 </li>
@@ -268,6 +241,30 @@ const EditUser: React.FC<EditUserProps> = ({ userId }) => {
                         setShowEmployerModal(false)
                     }}
                 />
+
+                {showCertificationModal && (
+                    <CertificationModal
+                        adminId={admin? admin.userId : 0}
+                        user={user}
+                        isOpen={showCertificationModal}
+                        onSubmit={(student: Student) => {
+                            setUser((prevUser) => {
+                                if (prevUser) {
+                                    return {
+                                        ...prevUser,
+                                        student: student
+                                    }
+                                }
+                                return prevUser;
+                            })
+                        }}
+                        onCancel={() => setShowCertificationModal(false)}
+                        onError={(message: string) => {
+                            setErrorMessage(message)
+                            setShowCertificationModal(false)
+                        }}
+                    />
+                )}
 
                 <ConfirmationModal
                     title={confirmationTitle || ""}

@@ -137,12 +137,13 @@ const NewUserRegistration: React.FC = () => {
             </div>
             <div className="flex justify-center">
                 <div className="w-1/2">
-         
-                    <NewUserForm 
-                    onSubmit={handleNewUserFormOnSubmit} 
-                    onError={handleNewUserFormError}
-                    user={user}
-                    />
+                    {user && (
+                        <NewUserForm 
+                        onSubmit={handleNewUserFormOnSubmit} 
+                        onError={handleNewUserFormError}
+                        user={user}
+                        />
+                    )}
          
                 </div>
             </div>

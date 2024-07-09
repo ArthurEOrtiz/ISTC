@@ -12,6 +12,8 @@ import EditEmployerModal from './EditEmployerModal';
 import { useRouter } from 'next/navigation';
 import UserEnrolledCourses from './UserEnrolledCourses';
 import ActionBar from '@/app/shared/ActionBar';
+import UserDeleteModal from './UserDeleteModal';
+import UserCertificationModal from '../Certification/UserCertificationModal';
 
 interface UserDashboardProps {
     userId: number;    
@@ -32,6 +34,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
     const [ showConfirmationModalCancel, setShowConfirmationModalCancel ] = useState(false);
     const [ confirmationModalTitle, setConfirmationModalTitle ] = useState('');
     const [ confirmationMessage, setConfirmationMessage ] = useState('');
+
+    const [ showUserCertificationModal, setShowUserCertificationModal ] = useState(false);  
+
+    const [ showUserDeleteModal, setShowUserDeleteModal] = useState(false);  
 
     const router = useRouter();
     const { user: clerkUser } = useUser(); 
@@ -110,7 +116,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
         setConfirmationModalTitle('');
         setConfirmationMessage('');
         if (confirmationModalTitle === 'Delete Account') {
-            deleteAccount();
+            setShowUserDeleteModal(true);
+            //deleteAccount();
         }
     }
 
@@ -232,7 +239,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
                                     className='text-nowrap'
                                     onClick={() => setShowEditContactModal(true)}
                                     >
-                                        Update Contact Information
+                                        Update Contact 
                                 </button>
                             </li>
                             <li>
@@ -240,57 +247,40 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
                                     className="text-nowrap"
                                     onClick={() => setShowEditEmployerModal(true)}
                                     >
-                                        Update Employer Information
+                                        Update Employer
                                 </button>
                             </li>
+                            <details>
+                                <summary className='text-error'>Sign Out/Delete</summary>
+                                <ul className='p-2 bg-base-300 z-10'>
+                                    <li>
+                                        <SignOutButton
+                                            signOutCallback={handleOnSignOut}>
+                                            <button className="text-nowrap text-error">Sign Out</button>
+                                        </SignOutButton>
+                                    </li>
+                                    <li>
+                                        <button
+                                            className="text-nowrap text-error"
+                                            onClick={handleOnDeleteAccount}
+                                            >
+                                                Delete Account
+                                        </button>
+                                    </li>
+                                </ul>
+
+                            </details>
                         </ul>
                     </details>
                 </li>
 
                 <li>
-                    <details>
-                        <summary>Certifications</summary>
-                        <ul className='p-2 bg-base-300 z-10'>
-                            <li>
-                                <button
-                                    className="text-nowrap"
-                                    >
-                                        Apply for Appraisor Certification
-                                </button>
-                            </li>
-                            <li>
-                                <button
-                                    className="text-nowrap"
-                                    >
-                                        Apply for Mapping Certification
-                                </button>
-                            </li>
-                        </ul>
-                    </details>
-                </li>
-
-                <li>
-                    <details>
-                        <summary className='text-error'>
-                            Sign Out/Delete
-                        </summary>
-                        <ul className='p-2 bg-base-300 z-10'>
-                            <li>
-                                <SignOutButton
-                                    signOutCallback={handleOnSignOut}>
-                                    <button className="text-nowrap text-error">Sign Out</button>
-                                </SignOutButton>
-                            </li>
-                            <li>
-                                <button
-                                    className="text-nowrap text-error"
-                                    onClick={handleOnDeleteAccount}
-                                    >
-                                        Delete Account
-                                </button>
-                            </li>
-                        </ul>
-                    </details>
+                    <button
+                        className="text-nowrap"
+                        onClick={() => setShowUserCertificationModal(true)} 
+                        >
+                            Certifications
+                    </button>
                 </li>
 
                 {isUserAdmin() && (
@@ -303,7 +293,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
                                         className="text-nowrap"
                                         onClick={() => router.push('/admin/editcourse')}
                                         >
-                                            Edit Courses
+                                            Courses
                                     </button>
 
                                 </li>
@@ -312,7 +302,23 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
                                         className="text-nowrap"
                                         onClick={() => router.push('/admin/users')}
                                         >
-                                            Edit Users
+                                            Users
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className="text-nowrap"
+                                        onClick={() => router.push('/admin/attendance')}
+                                        >
+                                            Attendance
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className="text-nowrap"
+                                        onClick={() => router.push('/admin/edittopics')}
+                                        >
+                                            Topics
                                     </button>
                                 </li>
                             </ul>
@@ -375,11 +381,54 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
             {showConfirmationModal && (
                 <ConfirmationModal
                     title={confirmationModalTitle}
+                    isOpen={showConfirmationModal}
                     message={confirmationMessage}
                     onConfirm={handleModalConfirm}
                     {...showConfirmationModalCancel && {onCancel: handleConfirmationModalOnCancel}}
                 />
             )}
+
+            {showUserCertificationModal && (
+                <UserCertificationModal
+                    userId={user.userId}
+                    certifications={user.student.certifications}
+                    isOpen={showUserCertificationModal}
+                    onCancel={() => setShowUserCertificationModal(false)}
+                    onSubmit={(certifications) => { 
+                        setUser((prevUser) => {
+                            if (prevUser) {
+                                return {
+                                    ...prevUser,
+                                    student: {
+                                        ...prevUser.student,
+                                        certifications: certifications
+                                    }
+                                }
+                            }
+                            return prevUser;
+                        });
+                        console.log('certifications', certifications);
+                    }}
+                    onError={(message) => {
+                        setShowUserCertificationModal(false);
+                        setErrorMessage(message);
+                        setShowErrorMessage(true);
+                    } }
+                />
+            )}
+
+            {showUserDeleteModal && (
+                <UserDeleteModal
+                    user={user}
+                    isOpen={showUserDeleteModal}
+                    onCancel={() => setShowUserDeleteModal(false)}
+                    onConfirm={() => {
+                        setShowUserDeleteModal(false);
+                        deleteAccount();
+                    }}
+                />
+            )}
+
         </div>
     );
 }

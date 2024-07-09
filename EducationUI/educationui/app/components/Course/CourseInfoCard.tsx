@@ -1,6 +1,6 @@
 'use client';
 import { Course } from "@/app/shared/types/sharedTypes";
-import moment from 'moment-timezone';
+import { formatToMountainTime } from "@/Utilities/dateTime";
 import { useEffect, useState } from "react";
 
 interface CourseInfoCardProps {
@@ -41,11 +41,6 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
     }, [course.pdfId]);
     
     // helpers
-    const formatToMountainTime = (utcDate: Date): string => {
-        const mountainTime = moment.utc(utcDate).tz('America/Denver').format('dddd, MMMM Do YYYY, h:mm a');
-        return mountainTime;
-    }
-
     const downloadPDF = () => {
         if (course.pdf?.data) {
             const byteCharacters = atob(course.pdf.data);
@@ -149,11 +144,11 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course, expanded = true
                     <>
                         <div className="w-full">
                             <p className="text-1xl font-bold">Start Date</p>
-                            <p>{formatToMountainTime(course.classes[0].scheduleStart)}</p>
+                            <p>{formatToMountainTime(course.classes[0].scheduleStart, 'dddd, MMMM Do YYYY, h:mm a')}</p>
                         </div>
                         <div className="w-full">
                             <p className="text-1xl font-bold">End Date</p>
-                            <p>{formatToMountainTime(course.classes[course.classes.length - 1].scheduleEnd)}</p>
+                            <p>{formatToMountainTime(course.classes[course.classes.length - 1].scheduleEnd, 'dddd, MMMM Do YYYY, h:mm a')}</p>
                         </div>
                     </>    
                     ) : (
