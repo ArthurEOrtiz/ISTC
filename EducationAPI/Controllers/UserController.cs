@@ -104,6 +104,8 @@ namespace EducationAPI.Controllers
             .ThenInclude(s => s.Exams)
           .Include(u => u.Student)
             .ThenInclude(s => s.Attendances)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Certifications)
           .FirstOrDefaultAsync(u => u.UserId == id);
 
         if (user == null)
@@ -188,6 +190,12 @@ namespace EducationAPI.Controllers
       {
         var user = await _educationProgramContext.Users
           .Include(u => u.Contact)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Attendances)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Exams)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Certifications)
           .FirstOrDefaultAsync(u => u.Email == email);
 
         if (user == null)
