@@ -1,4 +1,5 @@
 import EditUser from "@/app/components/User/EditUser";
+import { auth } from "@clerk/nextjs/server";
 
 interface UserPage {
     params: {
@@ -8,10 +9,15 @@ interface UserPage {
 
 const UserPage: React.FC<UserPage> = async ({params}) => {
     const userId = parseInt(params.userId);
+    const { userId: clerkId } = auth();
+
+    if (!clerkId) {
+        throw new Error('Admin user id is required.');
+    }
 
     return (
         <div className="p-4">
-            <EditUser userId={userId} />
+            <EditUser userId={userId} clerkId={clerkId} />
         </div>
     );
 } 
