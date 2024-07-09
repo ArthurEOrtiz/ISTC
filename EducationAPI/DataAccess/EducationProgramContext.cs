@@ -12,6 +12,7 @@ namespace EducationAPI.DataAccess
 		}
 
 		public DbSet<Attendance> Attendances { get; set; }
+		public DbSet<Certification> Certifications { get; set; }
 		public DbSet<Class> Classes { get; set; }
 		public DbSet<Contact> Contacts { get; set; }
 		public DbSet<Course> Courses { get; set; } 
@@ -42,6 +43,9 @@ namespace EducationAPI.DataAccess
 
 			modelBuilder.Entity<Attendance>()
 				.ToTable("Attendances", b => b.IsTemporal());
+
+			modelBuilder.Entity<Certification>()
+				.ToTable("Certifications", c => c.IsTemporal());
 
 			modelBuilder.Entity<Exam>()
 				.ToTable("Exams", b => b.IsTemporal());
