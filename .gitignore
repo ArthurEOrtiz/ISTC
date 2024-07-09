@@ -373,3 +373,4 @@ FodyWeavers.xsd
 /EducationAPI/appsettings.Development.json
 /EducationAPI/appsettings.json
 EducationUI/educationui/.env
+secret.txt
