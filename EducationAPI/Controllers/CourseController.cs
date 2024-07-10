@@ -1,5 +1,6 @@
 ﻿using EducationAPI.DataAccess;
 using EducationAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -19,8 +20,17 @@ namespace EducationAPI.Controllers
       _logger = logger;
     }
 
+    [Authorize]
+    [HttpGet("SecureEndpoint")]
+    public IActionResult SecureEndpoint()
+    {
+      return Ok("This endpoint is secure and requires authentication");
+    }
+
+
     /// <summary>
-    /// Gets all Course records from the data base.
+    /// Gets all Course records from the data base. This should be used to get get a quick list of all the 
+    /// courses, without the need for additional information. 
     /// </summary>
     /// <returns> 
     /// A <see cref="List{Course}"/> of <see cref="Course"/> with a children 
@@ -33,13 +43,6 @@ namespace EducationAPI.Controllers
       try
       {
         var courses = await _educationProgramContext.Courses
-          .Include(c => c.Classes)
-            .ThenInclude(c => c.Attendances)
-          .Include(c => c.Topics)
-          .Include(c => c.Exams)
-          .Include(c => c.Location)
-          .Include(c => c.PDF)
-          .Include(c => c.WaitLists)
           .ToListAsync();
 
         foreach (var course in courses)
@@ -425,7 +428,7 @@ namespace EducationAPI.Controllers
           return new StatusCodeResult((int)HttpStatusCode.NotFound);
         }
 
-        List<Course> courses = topic.Courses.ToList();
+        List<Course> courses = [.. topic.Courses];
 
         _logger.LogInformation("GetCourseByTopicId({Id}), called.", Id);
         return courses;
@@ -757,8 +760,6 @@ namespace EducationAPI.Controllers
         return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
       }
     }
-
-
 
     /// <summary>
     /// Gives the end user the ability to add a Course record to the database.
