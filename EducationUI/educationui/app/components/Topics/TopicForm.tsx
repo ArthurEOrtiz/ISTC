@@ -31,7 +31,7 @@ const TopicForm: React.FC<NewTopicFormProps> = ({ onSubmit, topic: inboundTopic 
                         Title
                 </label>
                 <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline resize-y"
                     type="text"
                     id="title"
                     value={topic.title || ""}
@@ -52,6 +52,7 @@ const TopicForm: React.FC<NewTopicFormProps> = ({ onSubmit, topic: inboundTopic 
                     className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
                     value={topic.description || ""}
                     maxLength={500}
+                    rows={5}
                     onChange={(e) => setTopic({ ...topic, description: e.target.value })}
                 />
                 <div className="flex justify-between">

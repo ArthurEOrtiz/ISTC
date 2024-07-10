@@ -11,25 +11,12 @@ interface SelectCourseModalProps {
 
 const SelectCourseModal: React.FC<SelectCourseModalProps> = ({ open, onClose, onSelect, courses: preselectedCourses }) => {
     const [courses, setCourses] = useState<Course[]>([]);
-    const [searchedCourses, setSearchedCourses] = useState<Course[]>(courses); // [ADDED] State for searched courses
+    const [searchedCourses, setSearchedCourses] = useState<Course[]>(courses); 
     const [selectedCourses, setSelectedCourses] = useState<Course[]>(preselectedCourses); // Initialize with preselected courses
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchCourses = async () => {
-            try {
-                setLoading(true);
-                const responseData = await getAllCourses();
-                setCourses(responseData);
-                setSearchedCourses(responseData); // [ADDED] Set searched courses to all courses
-            } catch (error) {
-                setError("Failed to fetch courses");
-            } finally {
-                setLoading(false);
-            }
-        };
-
         if (open) {
             fetchCourses();
         }
@@ -45,7 +32,7 @@ const SelectCourseModal: React.FC<SelectCourseModalProps> = ({ open, onClose, on
     }
 
     const handleSelect = () => {
-        console.log(selectedCourses);
+        //console.log(selectedCourses);
         onSelect(selectedCourses);
         onClose();
     };
@@ -55,22 +42,49 @@ const SelectCourseModal: React.FC<SelectCourseModalProps> = ({ open, onClose, on
         setSearchedCourses(filteredCourses);
     }
 
+    const fetchCourses = async () => {
+        try {
+            setLoading(true);
+            const response = await getAllCourses();
+            if (response.status === 200){
+                setCourses(response.data);
+                setSearchedCourses(response.data);
+            } else {
+                throw new Error(response.message);
+            }
+        } catch (error : any) {
+            setError(`Failed to fetch courses: ${error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${open ? "" : "hidden"}`}>
             <div className="absolute inset-0 bg-black opacity-50"></div>
 
-            <div className="bg-base-100 p-8 rounded-lg z-50">
+            <div className="bg-base-100 p-8 rounded-lg z-50 min-w-72 max-w-[500px]">
 
-                <h2 className="text-xl font-semibold mb-4">Select Course</h2>
+                <div className="flex justify-between items-baseline mb-4">
+                    <h2 className="text-xl font-bold">Select Courses</h2>
+                    <button 
+                        onClick={onClose}
+                        className="text-3xl text-error font-bold"
+                    >
+                        &times;
+                    </button>
+                </div>
 
-                {loading ? (
-                    <span className="loading loading-spinner loading-xs"></span>
-                ) : error ? (
+                {error ? (
                     <p>{error}</p>
                 ) : (
                     <>
                         <div className="mb-4">
-                            <p className="text-lg mb-4">Please select courses from the list below</p>
+                            <p className="mb-4">
+                                Select courses from the list below.
+                                Green highlights indicate already selected courses.
+                                Selected courses will be applied to the topic.
+                            </p>
 
                             <label className="input input-bordered flex items-center gap-2">
                                 <input 
@@ -93,21 +107,32 @@ const SelectCourseModal: React.FC<SelectCourseModalProps> = ({ open, onClose, on
                             </label>
                         </div>
                         
+                        {loading ? (
+                            <span className="loading loading-lg"></span>
+                        ) : (
+                            <ul className="mb-4 max-h-96 overflow-y-auto">
+                                {searchedCourses.length > 0 ? (
+                                searchedCourses.map((course, index) => (
+                                    <li key={index} className="mb-2">
+                                        <button
+                                            className={`w-full text-left p-2 rounded border ${selectedCourses.some((selectedCourse) => selectedCourse.courseId === course.courseId) ? "bg-green-500" : ""}`}
+                                            onClick={() => toggleCourseSelection(course)}
+                                        >
+                                            {course.title}
+                                        </button>
+                                    </li>
+                                ))
+                                ) : (
+                                    <p className="text-error">No courses found</p>
+                                )}
+                            </ul>
+                        )}
 
-                        <ul className="mb-4">
-                            {searchedCourses.map((course, index) => (
-                                <li key={index} className="mb-2">
-                                    <button
-                                        className={`w-full text-left p-2 rounded border ${selectedCourses.some((selectedCourse) => selectedCourse.courseId === course.courseId) ? "bg-green-500" : ""}`}
-                                        onClick={() => toggleCourseSelection(course)}
-                                    >
-                                        {course.title}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
+                        
+                        
                     </>
                 )}
+
                 <div className="flex justify-between">
                     {/* <button 
                         onClick={() => console.log(selectedCourses)}
@@ -116,8 +141,8 @@ const SelectCourseModal: React.FC<SelectCourseModalProps> = ({ open, onClose, on
                     </button> */}
                     <button 
                         onClick={handleSelect} 
-                        className="btn btn-primary text-white px-4 py-2 mr-2">
-                            Select
+                        className="btn btn-success text-white px-4 py-2 mr-2">
+                            Apply Selection
                     </button>
                     <button 
                         onClick={onClose} 

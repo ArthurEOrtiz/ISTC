@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import CharacterCounter from "../../shared/CharacterCounter";
 import { getCoursesByTopicId } from "@/Utilities/api";
 import SelectCourseModal from "../Course/SelectCourseModal";
+import Link from "next/link";
 
 interface TopicInfoCardProps {
     topic: Topic;
@@ -14,26 +15,12 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editTopic, setEditTopic] = useState<Topic>(topic);
     const [courses, setCourses] = useState<Course[]>([]);
+    const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
     const [showSelectCourseModal, setShowSelectCourseModal] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        const fetchData = async () => {
-    
-            if (topic.topicId === 0) return setCourses([]);
-            
-            setLoading(true);
-            try {
-                const responseData = await getCoursesByTopicId(topic.topicId);
-                setCourses(responseData);
-            } catch (error) {
-                console.error("Error fetching courses by topic id: ", error);
-            } finally {
-                setLoading(false);
-            }
-
-        };
-        fetchData();
+        getCourses();
     }, [topic]);
     
     // Handlers
@@ -56,8 +43,6 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
     }
 
     const handleApplyEdit = () => {
-        console.log("Applying edit");
-        console.log("Applying edit: editMode: ", editMode);
         if (editMode) {
             setEditMode(false);
             onApply(editTopic);
@@ -65,6 +50,22 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
             setEditMode(true);
         }
     }
+
+    // helpers
+    const getCourses = async () => {
+    
+        if (topic.topicId === 0) return setCourses([]);
+        
+        setLoading(true);
+        try {
+            const responseData = await getCoursesByTopicId(topic.topicId);
+            setCourses(responseData);
+        } catch (error) {
+            console.error("Error fetching courses by topic id: ", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="bg-base-100 shadow-md rounded-xl p-3 w-full">
@@ -118,54 +119,83 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
 
             </div>
 
-            <div>
-            {topic.topicId !== 0 ? (
+            <div className="m-2">
+            {!loading ? (
                     <>
-                        <strong>Courses: </strong>
+                        
                         {courses.length > 0 ? (
-                            <div className="m-2">
-                                {loading ? (
-                                    <span className="loading loading-spinner loading-xs"></span>
-                                ) : (
-                                    <div className="flex flex-wrap space-y-2 items-baseline">
+                            <div className=''>
+                                <div className="flex space-x-2 items-center">
+                                   
+                                    <button
+                                        className="btn btn-outline text-white btn-sm"
+                                        onClick={() => setIsCollapsed(!isCollapsed)}
+                                    >   
+                                        <p className="">Courses</p>
+                                        {isCollapsed ? 
+                                        (
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                            </svg>
+                                            
+                                        ) : (
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        )}
+                                    </button>
+
+                                </div>
+                                {!isCollapsed && (
+                                    <ul className="bg-base-200 p-2 rounded-xl space-y-2">
                                         {courses.map((course, index) => (
-                                            <div key={index} className="mr-2">
-                                                <div className="badge badge-info p-3">
+                                            <li 
+                                                key={index}
+                                                className="bg-base-300 p-2 rounded-xl"
+                                            >
+                                                <Link  
+                                                    href={`/admin/courses/edit/course/${course.courseId}`}
+                                                    className=''
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
                                                     <p className="font-bold text-white">{course.title}</p>
-                                                </div>
-                                            </div>
+                                                    <p className="text-xs text-gray-400">{course.description}</p>
+                                                </Link>
+                                            </li>
                                         ))}
-                                    </div>
+                                    </ul>
                                 )}
                             </div>
                         ) : (
-                            <div className="badge badge-error p-3 mr-2">
+                            <div className="badge badge-error p-3">
                                 <p className="font-bold text-white">None</p>
                             </div>
                         )}
+
                         {editMode ? (
                             <button
-                                className="btn btn-primary text-white btn-xs"
+                                className="btn btn-primary text-white btn-sm mt-2"
                                 onClick={() => setShowSelectCourseModal(true)}
                             >
-                                Edit Courses...
+                                Edit Courses
                             </button>
                         ) : null}
                     </>
-                ) : null}
+                ) : <span className="loading loading-spinner loading-md"></span>}
             </div>
             
             <button
                 onClick={handleApplyEdit}
-                className="btn btn-primary text-white mt-4"
+                className="btn btn-primary btn-sm text-white mt-4"
             >
-                {editMode ? "Apply" : "Edit"}
+                {editMode ? "Apply" : "Edit Topic"}
             </button>
 
             {editMode && (
                 <button
                     onClick={handleCancel}
-                    className="btn btn-warning text-white mt-4 ml-2"
+                    className="btn btn-warning btn-sm text-white mt-4 ml-2"
                 >
                     Cancel
                 </button>
@@ -174,7 +204,7 @@ const TopicInfoCard: React.FC<TopicInfoCardProps> = ({ topic, onApply, onDelete 
             {editMode && topic.topicId !== 0  && (
                 <button
                     onClick={handleDelete}
-                    className="btn btn-error text-white mt-4 ml-2"
+                    className="btn btn-error btn-sm text-white mt-4 ml-2"
                 >
                     Delete
                 </button>

@@ -6,13 +6,14 @@ import { deleteTopicById, updateTopicById } from "@/Utilities/api";
 
 interface TopicListProps {
     topics: Topic[];
+    onError: (error: string) => void;
 }
 
-const TopicList: React.FC<TopicListProps> = ({ topics }) => {
-    const [topicList, setTopicList] = useState<Topic[]>(topics);
+const TopicList: React.FC<TopicListProps> = ({ topics, onError }) => {
+    const [ topicList, setTopicList ] = useState<Topic[]>(topics);
+    const [ searchString, setSearchString ] = useState<string>("");
 
     const handleTopicInfoCardOnApply = async (topic: Topic) => {
-        console.log(topic);
         try {
             const response = await updateTopicById(topic.topicId, topic);
             const index = topicList.findIndex(topic => topic.topicId === response.topicId);
@@ -23,58 +24,63 @@ const TopicList: React.FC<TopicListProps> = ({ topics }) => {
             } else {
                 throw new Error("Topic not found in list");
             }
-        } catch (error) {
-           throw error
+        } catch (error: any) {
+           onError(error.message);
         }
     };
 
     const handleTopicInfoCardOnDelete = async (topicId: number) => { 
+
         try {
-            await deleteTopicById(topicId);
-        } catch (error) {
-            throw error;
-        } finally {
+           const response = await deleteTopicById(topicId);
+           if (response.status === 204) {
             const newTopicList = topicList.filter(topic => topic.topicId !== topicId);
             setTopicList(newTopicList);
+           } else {
+            throw new Error("Failed to delete topic");
+           }
+        } catch (error: any) {
+            onError(error.message);
+        } finally {
+            
         }
     }
 
     return (
         
-        <div className="flex flex-wrap justify-center gap-4 p-4">
+        <div className="space-y-2">
             
             {topicList.map((topic, index) => (
                 <div key={index} className="card w-full">
-                    <label className="flex items-center">
                         <TopicInfoCard 
                             topic={topic} 
                             onApply={handleTopicInfoCardOnApply} 
                             onDelete={handleTopicInfoCardOnDelete}
                         />
-                    </label>
+                    
                 </div>
             ))}
 
-        {/* <button
-            className="btn btn-primary text-white"
-            onClick={() => console.log(topics)}
-        >
-            Test Topics
-        </button>
+            {/* <button
+                className="btn btn-primary text-white"
+                onClick={() => console.log(topics)}
+            >
+                Test Topics
+            </button>
 
-        <button
-            className="btn btn-primary text-white"
-            onClick={() => console.log(selectedTopics)}
-        >
-            Delete Selected Topics
-        </button>
+            <button
+                className="btn btn-primary text-white"
+                onClick={() => console.log(selectedTopics)}
+            >
+                Delete Selected Topics
+            </button>
 
-        <button
-            className="btn btn-primary text-white"
-            onClick={() => console.log(selectedTopics)}
-        >
-            Test Selected Courses
-        </button> */}
+            <button
+                className="btn btn-primary text-white"
+                onClick={() => console.log(selectedTopics)}
+            >
+                Test Selected Courses
+            </button> */}
         </div>
     );
 };

@@ -17,21 +17,21 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
     const [searchTerm, setSearchTerm] = useState<string>(''); // New state for the search term
 
     useEffect(() => {
-        const fetchTopics = async () => {
-           setLoading(true);
-           const response = await getAllTopics();
-           if (response.status === 200) {
-               setTopics(response.data);
-            } else {
-                setError(`Failed to fetch topics \n ${response}`);
-            }
-            setLoading(false);
-        };
-
         if (open) {
             fetchTopics();
         }
     }, [open]);
+
+    const fetchTopics = async () => {
+        setLoading(true);
+        const response = await getAllTopics();
+        if (response.status === 200) {
+            setTopics(response.data);
+         } else {
+             setError('Failed to fetch topics. Please try again later.');
+         }
+         setLoading(false);
+     };
 
     const toggleTopicSelection = (topic: Topic) => {
         const isSelected = selectedTopics.some((selectedTopic) => selectedTopic.topicId === topic.topicId);
@@ -54,17 +54,14 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
         <div className={`fixed inset-0 flex items-center justify-center z-50 ${open ? "" : "hidden"}`}>
             <div className="absolute inset-0 bg-black opacity-50"></div>
 
-            <div className="bg-base-100 p-8 rounded-lg z-50">
+            <div className="bg-base-100 p-8 rounded-lg z-50 min-w-72">
                 
                 <div className="flex items-baseline justify-between mb-4">
                     <h1 className="text-2xl font-bold">Select Topics</h1>
                     <button onClick={onClose} className="text-3xl text-error font-bold">&times;</button>
                 </div>
-
-                
-                
                 {loading ? (
-                    <span className="loading loading-spinner loading-xs"></span>
+                    <span className="loading loading-spinner loading-lg"></span>
                 ) : error ? (
                     <p className='text-error'>{error}</p>
                 ) : (
@@ -141,7 +138,13 @@ const SelectTopicModal: React.FC<SelectTopicModalProps> = ({ open, onClose, onSe
                     </div>
                 )}
                 <div className="flex justify-between">
-                    <button onClick={handleSelect} className="btn btn-primary text-white px-4 py-2 mr-2">Apply Selection</button>
+                    <button 
+                        onClick={handleSelect} 
+                        className="btn btn-primary text-white px-4 py-2 mr-2"
+                        disabled={selectedTopics.length === 0 || loading}
+                    >
+                            Apply Selection
+                    </button>
                 </div>
             </div>
         </div>

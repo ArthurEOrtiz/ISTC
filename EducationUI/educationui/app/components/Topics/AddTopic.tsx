@@ -37,7 +37,7 @@ const AddTopic: React.FC = () => {
             throw error;
         }
         finally {
-            router.push('/admin/edittopics/edit');
+            router.push('/admin/topics/edit');
             setIsSaving(false);
         }
 
@@ -74,6 +74,7 @@ const AddTopic: React.FC = () => {
                 <ConfirmationModal
                     title={"Save Topic"}
                     message={"Are you sure you want to save this topic?"}
+                    isOpen={showConfirmationModal}
                     onConfirm={handleConfirmationModalOnConfirm}
                     onCancel={() => setShowConfirmationModal(false)}
                 />
