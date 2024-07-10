@@ -295,7 +295,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                     id="title"
                     type="text"
                     placeholder="Title"
-                    value={course.title}
+                    value={course.title || ''}
                     required
                     maxLength={50}
                     onChange = {handleChange}
@@ -315,7 +315,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                     Course Description
                 </label>
                 <textarea
-                    className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline h-32 resize-y"
                     id="description"
                     placeholder="Optional"
                     value={course.description ?? ''}
@@ -387,7 +387,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         id="attendanceCredit"
                         type="text"
                         placeholder="1-100"
-                        value={course.attendanceCredit}
+                        value={course.attendanceCredit || ''}
                         onChange = {handleChange}
                         onBlur={handleAttendanceCreditBlur}
                     />
@@ -410,7 +410,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         type="text"
                         
                         placeholder="1-999"
-                        value={course.maxAttendance}
+                        value={course.maxAttendance || ''}
                         onChange={handleChange}
                         onBlur={handleMaxAttendanceBlur}
                     />
@@ -481,7 +481,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
                         className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${!isEnrollmentDeadlineValid && enrollmentDeadlineTouched ? 'border-error' : ''}`}
                         id="enrollmentDeadline"
                         type="date"
-                        value={enrollmentDeadline}
+                        value={enrollmentDeadline || ''}
                         onChange={handleChange}
                         onBlur={handleEnrollmentDeadlineBlur}
                     />
