@@ -291,7 +291,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
                                 <li>
                                     <button
                                         className="text-nowrap"
-                                        onClick={() => router.push('/admin/editcourse')}
+                                        onClick={() => router.push('/admin/courses')}
                                         >
                                             Courses
                                     </button>
@@ -305,18 +305,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
                                             Users
                                     </button>
                                 </li>
+                
                                 <li>
                                     <button
                                         className="text-nowrap"
-                                        onClick={() => router.push('/admin/attendance')}
-                                        >
-                                            Attendance
-                                    </button>
-                                </li>
-                                <li>
-                                    <button
-                                        className="text-nowrap"
-                                        onClick={() => router.push('/admin/edittopics')}
+                                        onClick={() => router.push('/admin/topics')}
                                         >
                                             Topics
                                     </button>
