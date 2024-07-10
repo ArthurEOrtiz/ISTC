@@ -14,23 +14,18 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     </Link>
                 </li>
                 <li>
-                    <Link href="/admin/editcourse" className="btn btn-ghost text-white">
-                        Add/Edit Courses
+                    <Link href="/admin/courses" className="btn btn-ghost text-white">
+                        Courses
                     </Link>
                 </li>
                 <li>
-                    <Link href="/admin/edittopics" className="btn btn-ghost text-white">
-                        Add/Edit Topics
+                    <Link href="/admin/topics" className="btn btn-ghost text-white">
+                        Topics
                     </Link>
                 </li>
                 <li>
                     <Link href="/admin/users" className="btn btn-ghost text-white">
                         Users
-                    </Link>
-                </li>
-                <li>
-                    <Link href="/admin/attendance" className="btn btn-ghost text-white">
-                        Attendance
                     </Link>
                 </li>
             </ul>
