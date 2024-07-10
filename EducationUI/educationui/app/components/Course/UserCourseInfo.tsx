@@ -340,6 +340,7 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
                 <ConfirmationModal
                     title={confirmationTitle}
                     message={confirmationMessage}
+                    isOpen={showConfirmationModal}
                     onConfirm={() => {
                         handleOnConfirm()
                         setShowConfirmationModal(false)

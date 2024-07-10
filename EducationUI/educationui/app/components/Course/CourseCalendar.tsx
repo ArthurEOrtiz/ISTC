@@ -1,5 +1,5 @@
 'use client';   
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -76,7 +76,7 @@ const CourseCalendar: React.FC<CourseCalendarProps> = ({isAdmin, courses}) => {
 
     const handleSelectEvent = (event: any) => {
         if (isAdmin) {
-            router.push(`/admin/editcourse/edit/course/${event.id}`)
+            router.push(`/admin/courses/edit/course/${event.id}`)
         } else {
             router.push(`/courses/course/${event.id}`);
         }

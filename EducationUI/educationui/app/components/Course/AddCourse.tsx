@@ -163,10 +163,10 @@ const AddCourse: React.FC = () => {
         setIsSaving(true);
         setShowConfirmationModal(false);
         const response = await postCourse(course as Course);
-        console.log(response);
+        //console.log(response);
         if (response.status === 204) {
             setIsSaving(false);
-            router.push('/admin/editcourse/edit');
+            router.push('/admin/courses/edit');
         } else {
             setIsSaving(false);
             setHasError(true);
@@ -329,35 +329,40 @@ const AddCourse: React.FC = () => {
                     /> 
             )}
 
-            <CourseFormModal
-                course={course}
-                isVisable={showCourseForm}
-                onSubmit={(c) => handleCourseFormModalSubmit(c)}
-                onClose={()=>setShowCourseForm(false)}
-            />
+            {showCourseForm && (
+                <CourseFormModal
+                    course={course}
+                    isVisable={showCourseForm}
+                    onSubmit={(c) => handleCourseFormModalSubmit(c)}
+                    onClose={()=>setShowCourseForm(false)}
+                />
+            )}
 
             {showConfirmationModal && (
                 <ConfirmationModal 
                     title={'Save Course'} 
-                    message={'Are you sure you want to save this course to the database?'} 
+                    message={'Are you sure you want to save this course to the database?'}
+                    isOpen={showConfirmationModal}
                     onConfirm={handleConfirmationModalOnConfirm} 
                     onCancel={handleConfirmationModalOnCancel}
                 />
             )}
 
-            <SelectPDFModal
-                open={showPDFModal}
-                onClose={() => setShowPDFModal(false)}
-                onAdd={(pdf) => {
-                    setCourse({...course, pdf: pdf, pdfId: pdf.pdfId})
-                    setShowPDFModal(false);
-                }}
-                onRemove={() => {
-                    setCourse({...course, pdf: null, pdfId: null})
-                    setShowPDFModal(false);
-                }}
-                PDF={course.pdf}
-            />
+            {showPDFModal && (
+                <SelectPDFModal
+                    open={showPDFModal}
+                    onClose={() => setShowPDFModal(false)}
+                    onAdd={(pdf) => {
+                        setCourse({...course, pdf: pdf, pdfId: pdf.pdfId})
+                        setShowPDFModal(false);
+                    }}
+                    onRemove={() => {
+                        setCourse({...course, pdf: null, pdfId: null})
+                        setShowPDFModal(false);
+                    }}
+                    PDF={course.pdf}
+                />
+            )}
 
             {isSaving && (
                 <SavingModal text={'Saving Course...'} />

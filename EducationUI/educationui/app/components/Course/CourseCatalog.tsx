@@ -191,11 +191,11 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
                             <h2 className="text-lg font-bold">Filter by Topic</h2>
                             {isTopicsDivOpen ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                                 </svg>
                             ) : (
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                 </svg>
                             )}
                         </div>
@@ -250,11 +250,13 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
                 
             )}
             
-            {errorMessages && <ErrorModel
-                                    title='Error'
-                                    message={errorMessages}
-                                    onClose={() => setErrorMessages(null)}
-                                />}
+            {errorMessages && (
+                <ErrorModel
+                    title='Error'
+                    message={errorMessages}
+                    onClose={() => setErrorMessages(null)}
+                />
+            )}
 
         </div>
     );

@@ -176,7 +176,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
         setIsSaving(true);
         const response = await DeleteCourseById(course.courseId as number);
         if (response.status === 204) {
-            router.push('/admin/editcourse/edit');
+            router.push('/admin/courses/edit');
         } else {
             setErrorMessages(response);
         }
@@ -388,7 +388,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                 <p className="text-error text-2xl">No information is avaiable for this course. </p>
                 <button 
                     className="btn btn-primary btn-sm text-white"
-                    onClick={() => router.push('/admin/editcourse/edit')}
+                    onClick={() => router.push('/admin/courses/edit')}
                 >
                     Return to Course List
                 </button>
@@ -479,6 +479,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                 <ConfirmationModal
                     title={confirmationModalTitle}
                     message={confirmationModalMessage}
+                    isOpen={showConfirmationModal}
                     onConfirm={handleConfirmationModalOnConfirm}
                     onCancel={() => setShowConfirmationModal(false)} />
             )}
@@ -496,19 +497,21 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                     />
             )}
 
-            <SelectPDFModal
-                open={showPDFModal}
-                onClose={() => setShowPDFModal(false)}
-                onAdd={(pdf) => {
-                    setCourse({...course, pdf: pdf, pdfId: pdf.pdfId});
-                    setShowPDFModal(false);
-                }}
-                onRemove={() => {
-                    setCourse({...course, pdf: null, pdfId: null});
-                    setShowPDFModal(false);
-                }}
-                PDF={course.pdf}
-            />
+            {showPDFModal && (
+                <SelectPDFModal
+                    open={showPDFModal}
+                    onClose={() => setShowPDFModal(false)}
+                    onAdd={(pdf) => {
+                        setCourse({...course, pdf: pdf, pdfId: pdf.pdfId});
+                        setShowPDFModal(false);
+                    }}
+                    onRemove={() => {
+                        setCourse({...course, pdf: null, pdfId: null});
+                        setShowPDFModal(false);
+                    }}
+                    PDF={course.pdf}
+                />
+            )}
 
             {showAttendanceModal && (
                 <ClassAttendanceModal
@@ -528,47 +531,55 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                 />
             )}
 
-            <CourseFormModal
-                course={course}
-                isVisable={showCourseFormModal}
-                onSubmit={(c) => {
-                    setCourse(c)
-                    setShowCourseFormModal(false)
-                }}
-                onClose={() => setShowCourseFormModal(false)}
-            />
-       
-            <SelectTopicModal
-                open={showTopicModal}
-                onClose={() => setShowTopicModal(false)}
-                onSelect={(topics : Topic[]) => {
-                    setCourse({...course, topics: topics});
-                    setShowTopicModal(false);
-                }}
-                topics={course.topics}
-            />
+            {showCourseFormModal && (
+                <CourseFormModal
+                    course={course}
+                    isVisable={showCourseFormModal}
+                    onSubmit={(c) => {
+                        setCourse(c)
+                        setShowCourseFormModal(false)
+                    }}
+                    onClose={() => setShowCourseFormModal(false)}
+                />
+            )}
 
-            <EnrollmentModal
-                isOpen={showEnrollmentModal}
-                course={initialCourse}
-                onExit={() => {setShowEnrollmentModal(false)}}
-                onError={(message) => {
-                    setErrorMessages(message)
-                    setShowEnrollmentModal(false)
-                }}
-                onEnroll={setCourseExams}
-            />
+            {showTopicModal && (
+                <SelectTopicModal
+                    open={showTopicModal}
+                    onClose={() => setShowTopicModal(false)}
+                    onSelect={(topics : Topic[]) => {
+                        setCourse({...course, topics: topics});
+                        setShowTopicModal(false);
+                    }}
+                    topics={course.topics}
+                />
+            )}
 
-            <ExamModal
-                exams={course.exams}
-                courseId={course.courseId}
-                isOpen={showExamModal}
-                onExit={(exams) => {
-                    setShowExamModal(false)
-                    exams && setCourse({...course, exams: exams})
-                }}
-                onError={(message) => setErrorMessages(message)}
-            />
+            {showEnrollmentModal && (
+                <EnrollmentModal
+                    isOpen={showEnrollmentModal}
+                    course={initialCourse}
+                    onExit={() => {setShowEnrollmentModal(false)}}
+                    onError={(message) => {
+                        setErrorMessages(message)
+                        setShowEnrollmentModal(false)
+                    }}
+                    onEnroll={setCourseExams}
+                />
+            )}
+
+            {showExamModal && (
+                <ExamModal
+                    exams={course.exams}
+                    courseId={course.courseId}
+                    isOpen={showExamModal}
+                    onExit={(exams) => {
+                        setShowExamModal(false)
+                        exams && setCourse({...course, exams: exams})
+                    }}
+                    onError={(message) => setErrorMessages(message)}
+                />
+            )}
         </div>
     );
 }

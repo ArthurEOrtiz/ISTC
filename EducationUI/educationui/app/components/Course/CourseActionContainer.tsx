@@ -188,7 +188,7 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                             <div className="flex space-x-2">
                                 <button 
                                     className="btn btn-primary btn-sm text-white"
-                                    onClick={() => router.push(`/admin/editcourse/edit/course/${course.courseId}`)}
+                                    onClick={() => router.push(`/admin/courses/edit/course/${course.courseId}`)}
                                     >
                                         Edit Course
                                 </button>
@@ -256,14 +256,16 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                 </div>
             </div>
                 
-            
+            {showEnrollmentModal && (
                 <EnrollmentModal
                     course={course}
                     isOpen={showEnrollmentModal}
                     onExit={() => setShowEnrollmentModal(false)}
                     onError={handleEnrollmentModelError}
                 />
+            )}
 
+            {showAttendanceModal && (
                 <AttendanceModal
                     course={course}
                     isOpen={showAttendanceModal}
@@ -271,7 +273,9 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                         setShowAttendanceModal(false)
                     }}
                 />
+            )}
 
+            {showExamModal && (
                 <ExamModal
                     exams={course.exams}
                     courseId={course.courseId}
@@ -279,15 +283,17 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                     onExit={() => setShowExamModal(false)}
                     onError={(message: string) => onError(message)}
                 />
+            )}
 
-                {showConfirmationModal && (
-                    <ConfirmationModal 
-                        title={confirmationTitle || ''}
-                        message={confirmationMessage || ''}
-                        onConfirm={handleOnConfirm}
-                        onCancel={() => setShowConfirmationModal(false)}
-                    />
-                )}
+            {showConfirmationModal && (
+                <ConfirmationModal 
+                    title={confirmationTitle || ''}
+                    isOpen={showConfirmationModal}
+                    message={confirmationMessage || ''}
+                    onConfirm={handleOnConfirm}
+                    onCancel={() => setShowConfirmationModal(false)}
+                />
+            )}
 
         </div>
     );
