@@ -18,7 +18,7 @@ const Admin: React.FC = () => {
             <p>Add a course to the current selection. </p>
             <p>Use this feature to add a new course to the current selection of courses.</p>
             <div className="card-actions justify-end">
-              <Link href="/admin/editcourse/add" className="btn btn-primary text-white">Add a course.</Link>
+              <Link href="/admin/courses/add" className="btn btn-primary text-white">Add a course.</Link>
             </div>
           </div>
         </div>
@@ -30,7 +30,7 @@ const Admin: React.FC = () => {
             <p>Edit an existing course.</p>
             <p>Update a courses with new information, or make changes to the class schedule.</p>
             <div className="card-actions justify-end">
-              <Link href="/admin/editcourse/edit" className="btn btn-primary text-white">Edit a course.</Link>
+              <Link href="/admin/courses/edit" className="btn btn-primary text-white">Edit a course.</Link>
             </div>
           </div>
         </div>
