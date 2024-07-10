@@ -113,7 +113,7 @@ export async function getAllCourses() {
         return response;
     } catch (error : any) {
         console.error('Error fetching courses:', error);
-        return error.message;
+        return error;
     }
 }
 
