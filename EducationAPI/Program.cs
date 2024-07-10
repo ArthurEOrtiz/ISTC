@@ -1,6 +1,8 @@
 using EducationAPI.Configuration;
 using EducationAPI.DataAccess;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,9 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 var options =
 	builder.Configuration.GetSection(nameof(EducationProgramDataBaseOptions))
 		.Get<EducationProgramDataBaseOptions>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+  .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 ConfigureServices(builder, options.ConnectionString);
 
@@ -26,6 +31,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
