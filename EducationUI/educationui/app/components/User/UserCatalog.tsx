@@ -110,7 +110,7 @@ const UserCatalog: React.FC = () => {
                     {users.map((user) =>
                         <div 
                             key={user.userId}
-                            className="bg-base-100 rounded-xl"
+                            className="bg-base-100 rounded-xl p-4"
                         >
                             <UserInfoCard 
                                 user={user} 
