@@ -203,9 +203,8 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
     if (!isLoadingUser && user) {
         return(
             <div>
-
+                <h1 className="text-3xl text-center font-bold m-2">Edit User</h1>
                 <div>
-                    <h1 className="text-3xl text-center font-bold mb-2">Edit User</h1>
                     <div className="bg-base-100 rounded-xl p-5">
                         <div className="bg-base-300 rounded-xl p-4">
                             <UserInfoCard user={user} />
@@ -222,25 +221,29 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
 
                 {/* Modals */}
 
-                <EditContactModal
-                    user={user}
-                    isOpen={showContactModal}
-                    onCancel = {() => setShowContactModal(false)}
-                    onSubmit={(user: User) => {
-                        updateUser(user)
-                        setShowContactModal(false)
-                    }}
-                />
+                {showContactModal && (
+                    <EditContactModal
+                        user={user}
+                        isOpen={showContactModal}
+                        onCancel = {() => setShowContactModal(false)}
+                        onSubmit={(user: User) => {
+                            updateUser(user)
+                            setShowContactModal(false)
+                        }}
+                    />
+                )}
 
-                <EditEmployerModal
-                    user={user}
-                    isOpen={showEmployerModal}
-                    onCancel = {() => setShowEmployerModal(false)}
-                    onSubmit={(user: User) => {
-                        updateUser(user)
-                        setShowEmployerModal(false)
-                    }}
-                />
+                {showEmployerModal && (
+                    <EditEmployerModal
+                        user={user}
+                        isOpen={showEmployerModal}
+                        onCancel = {() => setShowEmployerModal(false)}
+                        onSubmit={(user: User) => {
+                            updateUser(user)
+                            setShowEmployerModal(false)
+                        }}
+                    />
+                )}
 
                 {showCertificationModal && (
                     <CertificationModal
@@ -266,21 +269,25 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
                     />
                 )}
 
-                <ConfirmationModal
-                    title={confirmationTitle || ""}
-                    message={confirmationMessage || ""}
-                    isOpen={showConfirmationModal}
-                    onConfirm={handleOnConfirm}
-                    onCancel={() => setShowConfirmationModal(false)}
-                />
+                {showConfirmationModal &&(
+                    <ConfirmationModal
+                        title={confirmationTitle || ""}
+                        message={confirmationMessage || ""}
+                        isOpen={showConfirmationModal}
+                        onConfirm={handleOnConfirm}
+                        onCancel={() => setShowConfirmationModal(false)}
+                    />
+                )}
 
-                <UserDeleteModal
-                    user={user}
-                    isOpen={showUserDeleteModal}
-                    onConfirm={handleDeleteUser}
-                    onCancel={() => {setShowUserDeleteModal(false)}}
-                />
-
+                {showUserDeleteModal &&(
+                    <UserDeleteModal
+                        user={user}
+                        isOpen={showUserDeleteModal}
+                        onConfirm={handleDeleteUser}
+                        onCancel={() => {setShowUserDeleteModal(false)}}
+                    />
+                )}
+                
                 {errorMessage && 
                     <ErrorModal
                         title="Error"
