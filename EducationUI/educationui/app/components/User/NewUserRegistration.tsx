@@ -78,9 +78,14 @@ const NewUserRegistration: React.FC = () => {
         redirect('/');
     }
 
-    const handleNewUserFormError = (error: string): void => {
-        setShowErrorMessage(true);
-        setErrorMessage(error);
+    const handleNewUserFormError = (error: string | null): void => {
+        if (error) {
+            setErrorMessage(error);
+            setShowErrorMessage(true);
+        } else {
+            setShowErrorMessage(false);
+            setErrorMessage('');
+        }
     }
 
     // Helpers
