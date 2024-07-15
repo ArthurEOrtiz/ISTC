@@ -39,7 +39,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({user, onError, onDeleted, vi
 
     // render
     return (
-        <div className="p-4 w-full">
+        <div className="w-full">
             <div className="flex justify-between">
                 <h1 className="text-2xl font-bold">{user.firstName} {user.middleName ?? ""} {user.lastName}</h1>
                 <div>
