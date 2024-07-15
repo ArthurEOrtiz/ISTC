@@ -7,7 +7,7 @@ import 'react-phone-input-2/lib/style.css';
 
 interface NewUserFormProps {
     onSubmit: (user: User) => void;
-    onError : (error: string) => void;
+    onError : (error: string | null) => void;
     user: User | null;
 }
 
@@ -124,6 +124,7 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
 
     const handleEmailBlur = async (event: React.FocusEvent<HTMLInputElement>): Promise<void> => {
         const input = event.target.value;
+        setIsEmailValid(validatEamil(input));
 
         if (!input) {
             setIsEmailValid(true);
@@ -132,18 +133,16 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
             return;
         }
 
-        if (input !== '' && validatEamil(input)) {
+        if (input !== '' && isEmailValid === true) {
             setEmailCheckLoading(true);
             const doesEmailExist = await checkUserExistsByEmail(input);
-            setDoesUserExist(doesEmailExist as boolean);
-            setIsEmailValid(!doesEmailExist);
+            setDoesUserExist(doesEmailExist ?? false);
             setEmailCheckLoading(false);
-            onError(doesEmailExist ? "The E-mail provided is already in use!" : "");
+            onError(doesEmailExist ? "The E-mail provided is already in use!" : null);
             return;
         }
 
-        if (input !== '' && !validatEamil(input)) {
-            setIsEmailValid(false);
+        if (input !== '' && isEmailValid === false) {
             setDoesUserExist(false);
             onError("Please enter a valid email address!");
             return;
@@ -158,14 +157,11 @@ const NewUserForm: React.FC<NewUserFormProps> = ({onSubmit, onError, user : inco
 
     const checkUserExistsByEmail = async (email: string) => {
         const response = await CheckUserExistsByEmail(email);
-        if (response.data === true) {
-            onError("The E-mail provided is already in use!");
-            return true;
-        } else if (response.data === false) {
-            return false;
-        } else if (response.status !== 200) {
-            onError("Error checking email!");
-            return false;
+        if (response.status === 200) {
+            return response.data;
+        } else {
+            onError("An error occured while checking if the user exists!");
+            return null;
         }
     }
 
