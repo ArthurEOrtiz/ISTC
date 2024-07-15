@@ -16,7 +16,7 @@ const UserPage: React.FC<UserPage> = async ({params}) => {
     }
 
     return (
-        <div className="p-4">
+        <div>
             <EditUser userId={userId} clerkId={clerkId} />
         </div>
     );
