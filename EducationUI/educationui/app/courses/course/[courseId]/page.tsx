@@ -2,11 +2,12 @@ import { getCourseById, GetUserByClerkId } from "@/Utilities/api";
 import CourseInfo from "@/app/components/Course/CourseInfo";
 import Loading from "@/app/shared/Loading";
 import { Course, User } from "@/app/shared/types/sharedTypes";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs";
+//import { currentUser } from "@clerk/nextjs/server";
 
 const CourseDetail: React.FC<{ params: { courseId: string } }> = async ({ params }) => {
     const courseId = parseInt(params.courseId);
-    const clerkUser = await currentUser();
+    const { userId: clerkId } = auth();
 
     const courseResponse = await getCourseById(courseId);
 
@@ -16,7 +17,7 @@ const CourseDetail: React.FC<{ params: { courseId: string } }> = async ({ params
 
     const course = courseResponse.data as Course;
 
-    const userResponse = clerkUser ? await GetUserByClerkId(clerkUser.id) : null;
+    const userResponse = clerkId ? await GetUserByClerkId(clerkId) : null;
 
     if (userResponse && userResponse.status !== 200) {
         throw new Error("Error fetching user");
