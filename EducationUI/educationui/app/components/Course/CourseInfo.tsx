@@ -9,17 +9,17 @@ import { useEffect, useState } from "react";
 import ErrorModal from "@/app/shared/modals/ErrorModal";
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
 
-interface UserCourseInfoProps {
+interface CourseInfoProps {
     course: Course | null;
     user: User | null;
 }
 
-const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
+const CourseInfo: React.FC<CourseInfoProps> = ({ course, user }) => {
     const [ isEnrolled, setIsEnrolled ] = useState<boolean>(false);
     const [ isWaitListed, setIsWaitListed ] = useState<boolean>(false);
     const [ userWaitList, setUserWaitList ] = useState<WaitList | null>(null);
     const [ attendance, setAttendance ] = useState<boolean[]>([]);
-    const [ isLoading, setIsLoading ] = useState<boolean>(true);
+    const [ isLoading, setIsLoading ] = useState<boolean>(false);
     const [ errorMessage, setErrorMessage ] = useState<string>("");
     const [ showConfirmationModal, setShowConfirmationModal ] = useState<boolean>(false);
     const [ confirmationTitle, setConfirmationTitle ] = useState<string>("");
@@ -218,23 +218,21 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
 
     const renderNavList = () => {
         return (
-            <>
-                <li>
-                    <button 
-                        className={`font-bold text-nowrap ${isEnrolled ? (isWaitListed ? "text-warning" : "text-success") : (isWaitListed ? 'text-warning' : 'text-success' )}`}
-                        onClick={handleEnroll}>
-                            {isEnrolled ? (isWaitListed ? "Remove from Wait List" : "Apply To Drop Course") : (isWaitListed ? "Remove from Wait List" : " Apply to Enroll")}
-                            {/*                            true true                 true false                                false true                 false false    */}
-                    </button>
-                </li>
-            </>
+            <li>
+                <button 
+                    className={`font-bold text-nowrap ${isEnrolled ? (isWaitListed ? "text-warning" : "text-success") : (isWaitListed ? 'text-warning' : 'text-success' )}`}
+                    onClick={handleEnroll}>
+                        {isEnrolled ? (isWaitListed ? "Remove from Wait List" : "Apply To Drop Course") : (isWaitListed ? "Remove from Wait List" : " Apply to Enroll")}
+                        {/*                            true true                 true false                                false true                 false false    */}
+                </button>
+            </li>
         );
     }
 
-    const renderClasses = async () => {
+    const renderClasses = () => {
         return (
             <>
-                {classes.map(async (cls, index) => {
+                {classes.map((cls, index) => {
 
                     const hasAttended = attendance[index];
                     const day = moment.utc(cls.scheduleStart).tz('America/Denver').format('dddd');
@@ -280,7 +278,7 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
     };
 
     return (
-        <div className="p-4 space-y-2">
+        <div className="p-2 space-y-2">
     
             <div className='bg-base-100 rounded-xl p-5'>
                 <div className='bg-base-300 rounded-xl p-4'>
@@ -324,7 +322,7 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
                 </SignedIn>
             </div>
 
-            <div className='flex flex-wrap justify-start items-baseline'>
+            <div className='flex flex-wrap justify-start  items-center'>
                 {renderClasses()}
             </div>
 
@@ -359,4 +357,4 @@ const UserCourseInfo: React.FC<UserCourseInfoProps> = ({ course, user }) => {
 
 }
 
-export default UserCourseInfo;
+export default CourseInfo;
