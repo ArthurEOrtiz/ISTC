@@ -452,12 +452,14 @@ namespace EducationAPI.Controllers
             .ThenInclude(s => s.Attendances)
           .Include(u => u.Student)
             .ThenInclude(s => s.Exams)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Certifications)
           .FirstOrDefaultAsync(u => u.UserId == id);
 
         if (existingUser == null)
         {
           _logger.LogError("DeleteUserById({Id}), User not found!", id);
-          return new StatusCodeResult((int)HttpStatusCode.NotFound);
+          return NotFound("User not found.");
         }
 
         _educationProgramContext.Users.Remove(existingUser);
@@ -479,6 +481,11 @@ namespace EducationAPI.Controllers
           if (existingUser.Student.Attendances != null)
           {
             _educationProgramContext.Attendances.RemoveRange(existingUser.Student.Attendances);
+          }
+
+          if (existingUser.Student.Certifications != null) 
+          {
+            _educationProgramContext.Certifications.RemoveRange(existingUser.Student.Certifications);
           }
         }
 
