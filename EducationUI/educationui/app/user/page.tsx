@@ -31,13 +31,11 @@ const UserPage: React.FC = async() => {
     
     // render
     return (
-        <div>
-            {hasTheUserSignedUp && user ? (
-                <UserDashboard userId={user.userId} />
-            ) : (
-                <NewUserRegistration />
-            )}
-        </div>
+        hasTheUserSignedUp && user ? (
+            <UserDashboard userId={user.userId} />
+        ) : (
+            <NewUserRegistration />
+        )
     )
 
 }
