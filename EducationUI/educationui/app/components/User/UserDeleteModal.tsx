@@ -22,7 +22,7 @@ const UserDeleteModal: React.FC<UserDeleteModalProps> = ({ user, isOpen, onConfi
                 </div>
                 <div>
                     <p className="text-lg mb-2 text-error">Are you sure you want to delete {user.firstName} {user.lastName}?</p>
-                    <p className="mb-4">This action cannot be undone. Please enter {user.email} into the field below to confirm.</p>
+                    <p className="mb-4">This action cannot be undone. Please type <span className="font-bold">{user.email}</span> into the field below to confirm.</p>
                 </div>
                 <div className="flex justify-between mb-5">
                     <input 
