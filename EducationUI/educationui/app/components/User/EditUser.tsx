@@ -151,14 +151,6 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
                             </li>
                             <li>
                                 <button
-                                    className="text-nowrap"
-                                    onClick={() => setShowCertificationModal(true)}
-                                >
-                                    Certification
-                                </button>
-                            </li>
-                            <li>
-                                <button
                                     className='text-nowrap text-error'
                                     onClick={handleOnDeleteUser}
                                 >
@@ -170,12 +162,27 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
                     </details>
                 </li>
                 <li>
-                    <button 
-                        className='text-nowrap'
-                        onClick={() => {calcAccumulatedCredit()}}
-                    >
-                        Calculate Accumulated Credit
-                    </button>
+                    <details>
+                        <summary>Student</summary>
+                        <ul className="p-2 bg-base-300 z-10">
+                            <li>
+                                <button
+                                    className='text-nowrap'
+                                    onClick={() => setShowCertificationModal(true)}
+                                >
+                                    Certification
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    className='text-nowrap'
+                                    onClick={() => {calcAccumulatedCredit()}}
+                                >
+                                    Calculate Accumulated Credit
+                                </button>
+                            </li>
+                        </ul>
+                    </details>
                 </li>
                 <li>
                     <a href="/admin/users" className="text-error">Back To Users</a>
@@ -203,8 +210,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
     if (!isLoadingUser && user) {
         return(
             <div>
-                <h1 className="text-3xl text-center font-bold m-2">Edit User</h1>
-                <div>
+                <div className="p-4">
                     <div className="bg-base-100 rounded-xl p-5">
                         <div className="bg-base-300 rounded-xl p-4">
                             <UserInfoCard user={user} />
@@ -213,10 +219,9 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
                             navList={renderNavList()}
                         />
                     </div>
-                </div>
-
-                <div className="mt-4">
-                    <UserEnrolledCourses user={user} />
+                    <div className="mt-4">
+                        <UserEnrolledCourses user={user} />
+                    </div>
                 </div>
 
                 {/* Modals */}
@@ -288,13 +293,14 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
                     />
                 )}
                 
-                {errorMessage && 
+                {errorMessage && ( 
                     <ErrorModal
                         title="Error"
                         message={errorMessage}
                         onClose={() => setErrorMessage(null)}
                     />
-                }
+                )}
+
             </div>
         );
     }
