@@ -1,7 +1,6 @@
 ﻿using EducationAPI.DataAccess;
 using EducationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-//using System.Data.Entity;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
