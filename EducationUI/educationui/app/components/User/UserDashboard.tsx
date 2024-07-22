@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { CalculateAccumulatedCredit, DeleteUserById, GetUserById, UpdateUser, UpdateUserContact } from "@/Utilities/api";
+import { CalculateAccumulatedCredit, GetUserById, UpdateUser, UpdateUserContact } from "@/Utilities/api";
 import {  User } from '@/app/shared/types/sharedTypes';
 import Loading from '@/app/shared/Loading';
 import UserInfoCard from './UserInfoCard';
@@ -12,7 +12,6 @@ import EditEmployerModal from './EditEmployerModal';
 import { useRouter } from 'next/navigation';
 import UserEnrolledCourses from './UserEnrolledCourses';
 import ActionBar from '@/app/shared/ActionBar';
-import UserDeleteModal from './UserDeleteModal';
 import UserCertificationModal from '../Certification/UserCertificationModal';
 
 interface UserDashboardProps {
@@ -37,8 +36,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
 
     const [ showUserCertificationModal, setShowUserCertificationModal ] = useState(false);  
 
-    const [ showUserDeleteModal, setShowUserDeleteModal] = useState(false);  
-
     const router = useRouter();
     const { user: clerkUser } = useUser(); 
 
@@ -53,13 +50,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
     }
 
     const handleEditContactModelOnSubmit =  async (editUser: User) => {
-        console.log(editUser);
         const response = await UpdateUserContact(editUser);
-        //console.log(response);
 
         switch (response.status) {
             case 200:
-                //console.log(response.data);
                 setUser(response.data);
                 setShowEditContactModal(false);
                 setConfirmationModalTitle('Success');
@@ -86,9 +80,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
 
     const handleEditEmployerModalOnSubmit = async (editUser: User) => {
         const response = await UpdateUser(editUser);
-        // console.log("editUser", editUser)
-        // console.log(response.status);
-        // console.log(response);
+
         switch (response.status) {
             case 200:
                 setUser(response.data);
@@ -106,7 +98,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
                 setShowErrorMessage(true);
                 break;
             default:
-                console.error('Unhandled status code:', response);
+                console.error('Unhandled status code:', response.message);
                 break;
         }
     }
@@ -115,17 +107,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
         setShowConfirmationModal(false);
         setConfirmationModalTitle('');
         setConfirmationMessage('');
-        if (confirmationModalTitle === 'Delete Account') {
-            setShowUserDeleteModal(true);
-            //deleteAccount();
-        }
-    }
-
-    const handleOnDeleteAccount = () => {
-        setConfirmationModalTitle('Delete Account');
-        setConfirmationMessage('Are you sure you want to delete your account? All records will be lost and cannot be recovered.');
-        setShowConfirmationModal(true);
-        setShowConfirmationModalCancel(true);
     }
 
     const handleConfirmationModalOnCancel = () => {
@@ -135,51 +116,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
             setConfirmationModalTitle(''),
             setConfirmationMessage('')
         )
-    }
-
-    // Helper Methods
-    const deleteAccount = async () => {
-        if (!user?.userId) {
-            setErrorMessage('User not found.');
-            setShowErrorMessage(true);
-            return;
-        }
-
-        if (!clerkUser) {
-            setErrorMessage('User not found.');
-            setShowErrorMessage(true);
-            return;
-        }
-
-
-        // Delete account
-        try {
-            clerkUser.delete();
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            setErrorMessage('Error deleting user.');
-            setShowErrorMessage(true);
-            return
-        }
-
-        const response = await DeleteUserById(user.userId)
-
-        switch (response.status) {
-            case 204:
-                router.push('/');
-                break;
-            case 404:
-                setErrorMessage('User not found.');
-                setShowErrorMessage(true);
-                break;
-            case 500:
-                setErrorMessage('Internal server error.');
-                setShowErrorMessage(true);
-                break;
-            default:
-                // Handle other status codes if needed
-                break;
-        }
     }
 
     const isUserAdmin = () => {
@@ -250,26 +186,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
                                         Update Employer
                                 </button>
                             </li>
-                            <details>
-                                <summary className='text-error'>Sign Out/Delete</summary>
-                                <ul className='p-2 bg-base-300 z-10'>
-                                    <li>
-                                        <SignOutButton
-                                            signOutCallback={handleOnSignOut}>
-                                            <button className="text-nowrap text-error">Sign Out</button>
-                                        </SignOutButton>
-                                    </li>
-                                    <li>
-                                        <button
-                                            className="text-nowrap text-error"
-                                            onClick={handleOnDeleteAccount}
-                                            >
-                                                Delete Account
-                                        </button>
-                                    </li>
-                                </ul>
-
-                            </details>
+                            <li>
+                                <SignOutButton
+                                    signOutCallback={handleOnSignOut}>
+                                    <button className="text-nowrap text-error">Sign Out</button>
+                                </SignOutButton>
+                            </li>
                         </ul>
                     </details>
                 </li>
@@ -341,10 +263,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
                 <div>
                     <UserEnrolledCourses user={user}/>
                 </div>
-                    
             </div>
-
-            
                 
             <EditContactModal 
                 user={user} 
@@ -409,19 +328,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
                     } }
                 />
             )}
-
-            {showUserDeleteModal && (
-                <UserDeleteModal
-                    user={user}
-                    isOpen={showUserDeleteModal}
-                    onCancel={() => setShowUserDeleteModal(false)}
-                    onConfirm={() => {
-                        setShowUserDeleteModal(false);
-                        deleteAccount();
-                    }}
-                />
-            )}
-
         </div>
     );
 }

@@ -12,6 +12,8 @@ import EditEmployerModal from "./EditEmployerModal";
 import ConfirmationModal from "@/app/shared/modals/ConfirmationModal";
 import UserDeleteModal from "./UserDeleteModal";
 import CertificationModal from "../Certification/CertificationModal";
+import UserWaitList from "./UserWaitList";
+
 
 interface EditUserProps {
     userId: number;
@@ -30,6 +32,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
     const [ showCertificationModal, setShowCertificationModal ] = useState<boolean>(false); 
     const [ showContactModal, setShowContactModal ] = useState<boolean>(false);
     const [ showEmployerModal, setShowEmployerModal ] = useState<boolean>(false);
+    const [ menuSelection, setMenuSelection ] = useState<"enrolledCourses" | "waitList">("enrolledCourses");
 
     //Effect
     useEffect(() => {
@@ -52,9 +55,28 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
         setShowConfirmationModal(false);
     }
 
-    const handleDeleteUser = () => {
+    const handleDeleteUser = async () => {
         setShowUserDeleteModal(false);
-        deleteUser();
+        if (!user){
+            setErrorMessage("Error deleting user, please try again later.");
+            return;
+        }
+
+        if (!user.clerkId) {
+            setErrorMessage("Error deleting user, please try again later.");
+            return;
+        }
+        setIsLoadingUser(true);
+        try {
+            //await clerkClient.users.deleteUser(user.clerkId);
+            //await deleteClerkUser();
+            await deleteUser();
+        } catch (error) {
+            console.log(error);
+            setErrorMessage("Error deleting user, please try again later.");
+        } finally {
+            setIsLoadingUser(false);
+        }
     }
 
     // Helpers
@@ -114,14 +136,11 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
     }
 
     const deleteUser = async () => {
-        setIsLoadingUser(true);
         const response = await DeleteUserById(userId);
         if (response.status === 204){
             window.location.href = "/admin/users";
         } else {
-            setIsLoadingUser(false);
-            setErrorMessage(response.data);
-            setIsLoadingUser(false);
+            throw new Error('Failed to delete user');
         }
     }
 
@@ -220,7 +239,31 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
                         />
                     </div>
                     <div className="mt-4">
-                        <UserEnrolledCourses user={user} />
+                        <div className="join">
+                            <button 
+                                className={`join-item btn ${menuSelection === "enrolledCourses" ? " btn-primary text-white" : ""}`}
+                                onClick={() => setMenuSelection("enrolledCourses")}
+                            >
+                                Enrolled Courses
+                            </button>
+                            <button 
+                                className={`join-item btn ${menuSelection === "waitList" ? "btn-primary text-white" : ""}`}
+                                onClick={() => setMenuSelection("waitList")}
+                            >
+                                Wait List
+                            </button>
+                        </div>
+                        <div className="mt-2">
+                            {menuSelection === "enrolledCourses" && (
+                                <UserEnrolledCourses user={user} />
+                            )}
+
+                            {menuSelection === "waitList" && (
+                                <UserWaitList user={user}
+                                onError={(m) => setErrorMessage(m)} />
+                            )}
+                        </div>
+                        
                     </div>
                 </div>
 

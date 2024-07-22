@@ -20,22 +20,21 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
     const [ searchString, setSearchString ] = useState<string>(''); 
     const [ isCourseCalendarVisible, setIsCourseCalendarVisible ] = useState(!isAdmin);
     const [ isCourseListVisible, setIsCourseListVisible ] = useState(isAdmin);
-    const [ courses, setCourses ] = useState<Course[]>();
+    const [ courses, setCourses ] = useState<Course[]>([]);
     const [ topics, setTopics ] = useState<Topic[]>([]);
-    const [ isTopicsDivOpen, setIsTopicsDivOpen ] = useState(false);
+    const [ isTopicsDivOpen, setIsTopicsDivOpen ] = useState(true);
     const [ selectedTopics, setSelectedTopics ] = useState<Topic []>([]);
     const [ errorMessages, setErrorMessages ] = useState<string | null>(null);
     const [ isLoading, setIsLoading ] = useState(false); 
 
     // effects
     useEffect(() => {
-        getCourses(isAdmin, selectedStatuses, selectedTopics.map(topic => topic.topicId), searchString);
+        if (isCourseListVisible && !isCourseCalendarVisible) {
+            getCourses(selectedStatuses, selectedTopics.map(topic => topic.topicId), searchString);
+            fetchTopics();
+        }
     }
-    , [selectedStatuses, selectedTopics]);
-
-    useEffect(() => {
-        fetchTopics();
-    }, []);
+    , [isCourseListVisible, selectedStatuses, selectedTopics]);
 
     useEffect(() => {
         fetchUser();
@@ -66,7 +65,6 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
         if (!clerkUser) {
             return;
         }
-
         const response = await GetUserByClerkId(clerkUser.id);
         if (response.status === 200) {
             setUser(response.data);
@@ -84,9 +82,9 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
         }
     }
 
-    const getCourses = async (isAdmin: boolean, statuses: CourseStatus [], topicIds: number [], searchString: string | null ) => {
+    const getCourses = async (statuses: CourseStatus [], topicIds: number [], searchString: string | null ) => {
         setIsLoading(true);
-        const response = await GetCourses(statuses, topicIds, searchString|| '', isAdmin);
+        const response = await GetCourses(statuses, topicIds, searchString|| '',);
         if (response.status === 200) {
             setCourses(response.data);
         } else {
@@ -103,9 +101,20 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
     return (
        
         <div className='p-4 space-y-2'>
+            {/* Loading */}
+            {isLoading && (
+                 <div className="absolute inset-0 bg-gray-800 bg-opacity-50 z-10 flex items-center justify-center">
+                    <div className="bg-base-100 p-4 rounded-lg">
+                        <div className="flex justify-center">
+                            <span className="loading loading-spinner loading-lg"></span>
+                        </div>
+                        <div className="text-center mt-4">Loading Courses...</div>
+                    </div>
+                </div>
+            )}
 
             <h1 className='text-3xl text-center font-bold'>Courses</h1>
-  
+            {/* Header */}
             <div>
                 <div className='join p-1'>
                     <button
@@ -122,25 +131,12 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
                     </button>
                 </div>
 
-                {/* <div className="space-x-2">
-                    <button className="btn btn-primary btn-sm text-white"
-                            onClick={() => console.log("Courses", courses)}
-                    >
-                        Log Courses
-                    </button>
-                    <button className="btn btn-primary btn-sm text-white"
-                            onClick={() => console.log("Selected Course", filteredCourses)}
-                    >
-                        Log Selected Courses
-                    </button>
-                </div> */}
-
                 {isCourseListVisible && (
                 <div>
                     <div className="flex justify-between">
                         <div className="join p-1">
                             <button
-                                className={`join-item btn ${selectedStatuses.includes('Upcoming') ? 'btn-primary text-white': ''}`}
+                                className={`join-item btn ${selectedStatuses.includes('Upcoming') ? 'btn-success text-white': ''}`}
                                 onClick={() => setSelectedStatuses(selectedStatuses.includes('Upcoming') 
                                     ? selectedStatuses.filter(status => status !== 'Upcoming') 
                                     : [...selectedStatuses, 'Upcoming'])}
@@ -148,23 +144,23 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
                                 Upcoming
                             </button>
                             <button
-                                className={`join-item btn ${selectedStatuses.includes('InProgress') ? 'btn-primary text-white': ''}`}
+                                className={`join-item btn ${selectedStatuses.includes('InProgress') ? 'btn-warning text-white': ''}`}
                                 onClick={() => setSelectedStatuses(selectedStatuses.includes('InProgress') 
                                     ? selectedStatuses.filter(status => status !== 'InProgress') 
                                     : [...selectedStatuses, 'InProgress'])}
                             >
                                 In Progress
                             </button>
-                            {isAdmin && (
-                                <button
-                                    className={`join-item btn ${selectedStatuses.includes('Archived') ? 'btn-primary text-white': ''}`}
-                                    onClick={() => setSelectedStatuses(selectedStatuses.includes('Archived') 
-                                        ? selectedStatuses.filter(status => status !== 'Archived') 
-                                        : [...selectedStatuses, 'Archived'])}
-                                >
-                                    Archived
-                                </button>
-                            )}
+                            
+                            <button
+                                className={`join-item btn ${selectedStatuses.includes('Archived') ? 'btn-error text-white': ''}`}
+                                onClick={() => setSelectedStatuses(selectedStatuses.includes('Archived') 
+                                    ? selectedStatuses.filter(status => status !== 'Archived') 
+                                    : [...selectedStatuses, 'Archived'])}
+                            >
+                                Archived
+                            </button>
+                            
                         </div>
                         <div>
                             <label className="input input-bordered flex items-center gap-2">
@@ -178,7 +174,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 opacity-70"><path fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd" /></svg>
                                 <button 
                                     className="btn btn-success btn-sm text-white"
-                                    onClick={() => getCourses(isAdmin, selectedStatuses, selectedTopics.map(topic => topic.topicId), searchString)}
+                                    onClick={() => getCourses(selectedStatuses, selectedTopics.map(topic => topic.topicId), searchString)}
                                 >
                                     Search
                                 </button>
@@ -221,15 +217,19 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
                 </div>
                 )}
             </div>
-   
-            {isCourseCalendarVisible && courses && 
+
+
+            {/* Body */}
+            {isCourseCalendarVisible && 
                 <CourseCalendar 
                     isAdmin={isAdmin}
-                    courses={courses}
+                    onError={(m) => setErrorMessages(m)}
+                    isLoading={(l) => setIsLoading(l)}
                 />
             }
 
-            {(isCourseListVisible && courses && !isLoading ) ? (
+            {isCourseListVisible && !isLoading  && (
+                courses.length > 0 ? (
                 <CourseList 
                     courses={courses}
                     user={user} 
@@ -237,19 +237,16 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({isAdmin = false, sendEmail
                     onError={(m) => setErrorMessages(m)}
                     sendEmail = {(to: User, subject: string, body: string) => sendEmail && sendEmail(to, subject, body)}
                 />
-            ) : (
-                isLoading ? (
-                <div className="flex justify-center">
-                    <span className="loading loading-spinner loading-lg"></span>
-                </div>
                 ) : (
-                    <div className="flex justify-center">
-                        <p className="text-error">{errorMessages}</p>
+                    <div className="bg-base-100 rounded-xl p-4">
+                        <div className="flex justify-center">
+                            <p className="text-error">No courses match with search criteria selected.</p>
+                        </div>
                     </div>
                 )
-                
             )}
-            
+
+            {/* Modals */}
             {errorMessages && (
                 <ErrorModel
                     title='Error'

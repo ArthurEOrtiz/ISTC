@@ -105,7 +105,7 @@ namespace EducationAPI.Controllers
 				await _educationProgramContext.SaveChangesAsync();
 
 				_logger.LogInformation("PostWaitList({WaitList}) called.", waitList);
-				return new CreatedAtActionResult(nameof(GetWaitListById), "WaitList", new { id = waitList.WaitListId}, waitList);
+				return new CreatedAtActionResult(nameof(GetWaitListById), "WaitList", new { id = waitList.WaitListId }, waitList);
 			}
 			catch (Exception ex)
 			{
@@ -160,7 +160,7 @@ namespace EducationAPI.Controllers
 				_logger.LogInformation("DeleteWaitListById({Id}) called.", id);
 				return NoContent();
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				_logger.LogError(ex, "DeleteWaitListById({Id})", id);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
@@ -197,7 +197,34 @@ namespace EducationAPI.Controllers
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex,"IsUserWaitListed({CourseId},{UserId})", courseId, userId);
+				_logger.LogError(ex, "IsUserWaitListed({CourseId},{UserId})", courseId, userId);
+				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpGet("GetUserWaitList/{userId}/{toEnroll}")]
+		public async Task<ActionResult<List<Course>>> GetUserWaitList(int userId, bool toEnroll)
+		{
+			try
+			{
+				var courses = await _educationProgramContext.WaitLists
+					.Where(w => w.UserId == userId && w.ToEnroll == toEnroll)
+					.Join(_educationProgramContext.Courses,
+						waitList => waitList.CourseId,
+						course => course.CourseId,
+						(waitList, course) => course)
+					.Include(c => c.Classes)
+					.Include(c => c.Topics)
+					.Include(c => c.Location)
+					.ToListAsync();
+
+				_logger.LogInformation("GetUserWaitList({UserId}), called", userId);
+
+				return Ok(courses);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "GetUserWaitList({UserId})", userId);
 				return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 			}
 		}

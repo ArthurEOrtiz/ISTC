@@ -298,7 +298,7 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, user }) => {
                             <span className="loading loading-spinner"></span>
                         </div>
                         ) : (
-                            <div className="flex items-baseline justify-center space-x-4">
+                            <div className="flex justify-center space-x-4 mt-2">
                                 <div>
                                     <p className='text-center'>Enrollment Status</p>
                                     <hr />
@@ -312,11 +312,20 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, user }) => {
                                         <p className="text-error">Not Enrolled</p>
                                     )}
                                 </div>
-                                {course?.status !== "Archived" ? (
+                                {/* {course?.status !== "Archived" ? (
                                     <div>
                                         <ActionBar navList = {renderNavList()}/> 
                                     </div>
-                                ) : null}
+                                ) : null} */}
+
+                                <button 
+                                    className={`btn font-bold ${isEnrolled ? (isWaitListed ? "text-warning" : "text-success") : (isWaitListed ? 'text-warning' : 'text-success' )}`}
+                                    onClick={handleEnroll}
+                                    disabled={course?.status === "Archived"}>
+                                        {isEnrolled ? (isWaitListed ? "Remove from Wait List" : "Apply To Drop Course") : (isWaitListed ? "Remove from Wait List" : " Apply to Enroll")}
+                                        {/*                            true true                 true false                                false true                 false false    */}
+                                </button>
+
                             </div>   
                     )}
                 </SignedIn>

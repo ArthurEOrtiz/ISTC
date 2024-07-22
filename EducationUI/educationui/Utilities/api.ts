@@ -117,9 +117,9 @@ export async function getAllCourses() {
     }
 }
 
-export async function GetCourses(statuses: CourseStatus[], topicIds: number[], searchString: string, isAdmin: boolean) {
+export async function GetCourses(statuses: CourseStatus[], topicIds: number[], searchString: string) {
     try {
-        const response = await axiosInstance.get(`Course/GetCourses/${isAdmin}`, {
+        const response = await axiosInstance.get(`Course/GetCourses/`, {
             params: { statuses, topicIds, searchString }
         });
         return response;
@@ -198,10 +198,10 @@ export async function getCoursesByTopicId(topicId: number) {
 export async function getCoursesByDateRange(startDate: string, endDate: string) {
     try {
         const response = await axiosInstance.get(`Course/GetCoursesByDateRange?startDate=${startDate}&endDate=${endDate}`);
-        return response.data;
-    } catch (error) {
+        return response;
+    } catch (error: any) {
         console.error('Error fetching courses:', error);
-        throw error;
+        throw error.message;
     }
 }
 
@@ -667,6 +667,16 @@ export async function IsUserWaitListed(courseId: Number, userId: Number) {
 export async function GetCourseWaitList(courseId: Number) {
     try {
         const response = await axiosInstance.get(`WaitList/GetCourseWaitList/${courseId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching waitlist:', error);
+        return error.message;
+    }
+}
+
+export async function GetUserWaitList(userId: number, toEnroll: boolean) {
+    try {
+        const response = await axiosInstance.get(`WaitList/GetUserWaitList/${userId}/${toEnroll}`);
         return response;
     } catch (error: any) {
         console.error('Error fetching waitlist:', error);

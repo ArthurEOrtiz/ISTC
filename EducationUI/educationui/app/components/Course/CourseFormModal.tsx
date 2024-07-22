@@ -19,7 +19,7 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({course, isVisable, onS
                         <button onClick={onClose} className="text-3xl text-error font-bold">&times;</button>
                     </div>
                     <div>
-                        <CourseForm course={course} onSubmit={(c) => onSubmit(c)} />
+                        <CourseForm course={course} viewOnly={true} onSubmit={(c) => onSubmit(c)} />
                     </div>
                     
                 </div>

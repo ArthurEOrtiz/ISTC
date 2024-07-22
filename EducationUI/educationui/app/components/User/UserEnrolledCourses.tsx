@@ -50,7 +50,7 @@ const UserEnrolledCourses: React.FC<UserEnrolledCoursesProps> = ({user}) => {
                     {courses.length > 0 ? (
                         courses.map((course: Course, index) => (
                             <Link 
-                                href={user.isAdmin ? `/admin/editcourse/edit/course/${course.courseId}` : `/courses/course/${course.courseId}` }
+                                href={user.isAdmin ? `/admin/courses/edit/course/${course.courseId}` : `/courses/course/${course.courseId}` }
                                 key={index}
                                 className=""
                             >

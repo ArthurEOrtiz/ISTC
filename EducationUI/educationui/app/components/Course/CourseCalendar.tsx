@@ -1,5 +1,5 @@
 'use client';   
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -9,10 +9,11 @@ import { useRouter } from 'next/navigation';
 
 interface CourseCalendarProps {
     isAdmin: boolean;
-    courses: Course[];  
+    onError: (message: string) => void;
+    isLoading: (isLoading: boolean) => void;
 }
 
-const CourseCalendar: React.FC<CourseCalendarProps> = ({isAdmin, courses}) => {
+const CourseCalendar: React.FC<CourseCalendarProps> = ({isAdmin, onError, isLoading}) => {
     // The router is used to redirect the user to the course detail page when a course is clicked on the calendar.
     const router = useRouter();
 
@@ -27,21 +28,20 @@ const CourseCalendar: React.FC<CourseCalendarProps> = ({isAdmin, courses}) => {
     });
 
     // This is the state that will hold the courses that will be displayed on the calendar.
-    // const [courses, setCourses ] = useState<Course []>([]);
+    const [courses, setCourses ] = useState<Course []>([]);
+
+    // This state will be used to show a loading spinner while the courses are being fetched.
+    // const [ isLoading, setIsLoading ] = useState(true);
 
     // This effect will run when the component mounts and when the currentRange changes. It will fetch the courses
     // that are within the current range and set the courses state with the result.
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         const startDate = moment(currentRange.start).format('YYYY-MM-DD');
-    //         const endDate = moment(currentRange.end).format('YYYY-MM-DD');
-    //         const data = await getCoursesByDateRange(startDate, endDate);
-    //         setCourses(data);
-    //     };
-    //     fetchData();
-    // }
-    // , [currentRange]);
-        
+    useEffect(() => {
+        // setIsLoading(true);
+        getCourses();
+        // setIsLoading(false);
+    }
+    , [currentRange]);
+  
     // This function will convert the courses to events that can be displayed on the calendar.
     // It will take the first class of the course as the start date and the last class of the course as the end date.
     // Then if the course has a first class and a last class it will add the course to the events array.
@@ -82,20 +82,34 @@ const CourseCalendar: React.FC<CourseCalendarProps> = ({isAdmin, courses}) => {
         }
     }
 
+    const getCourses = async () => {
+        isLoading(true);
+        const startDate = moment(currentRange.start).format('YYYY-MM-DD');
+        const endDate = moment(currentRange.end).format('YYYY-MM-DD');
+        const response = await getCoursesByDateRange(startDate, endDate);
+        if (response.status === 200) {
+            setCourses(response.data);
+        } else {
+            onError('Failed to fetch courses');
+        }
+        isLoading(false);
+    }
+
+
     return (
         <div className="h-screen flex justify-center">
             <div className="max-w-screen-lg w-full h-3/4 bg-base-200 p-4 rounded-lg">
-                <Calendar
-                    localizer={localizer}
-                    events={events}
-                    startAccessor="start"
-                    endAccessor="end"
-                    style={{ height: '100%' }}
-                    views={['month']}
-                    onNavigate={handleNaigate}
-                    onSelectEvent={handleSelectEvent}
-                   
-                />
+                    <Calendar
+                        localizer={localizer}
+                        events={events}
+                        startAccessor="start"
+                        endAccessor="end"
+                        style={{ height: '100%' }}
+                        views={['month']}
+                        onNavigate={handleNaigate}
+                        onSelectEvent={handleSelectEvent}
+                    />
+               
             </div>
         </div>
     );

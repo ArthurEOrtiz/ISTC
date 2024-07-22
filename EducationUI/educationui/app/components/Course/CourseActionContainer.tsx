@@ -158,7 +158,6 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
         }
 
         const response = await DeleteWaitListById(userWaitList.waitListId);  
-        //console.log(response);
 
         if (response.status === 204) {
             setUserWaitList(undefined);
@@ -225,23 +224,23 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                     
                     {!isAdmin && (
                         <div>
-                            <div className="flex space-x-2">
-                                <SignedIn>
-                                    <button 
-                                        className={`btn ${(isEnrolled || isWaitListed) ? 'btn-error' : 'btn-primary'} btn-sm text-white`}
-                                        onClick={handleEnrollmentClick}>
-                                            {isEnrolled || isWaitListed ? 'Drop Course' : 'Apply to Enroll'}
-                                    </button>
-                                </SignedIn>
-
+                            <div className="flex space-x-2 justify-between">
                                 <a
                                     className="btn btn-primary text-white btn-sm"
                                     href={`/courses/course/${course.courseId}`}
                                     target="_blank"
                                     rel=" noopener noreferrer"
                                     >
-                                        View Course
+                                        View Course Details
                                 </a>
+
+                                <SignedIn>
+                                    <button 
+                                        className={`btn ${(isEnrolled || isWaitListed) ? 'btn-error' : 'btn-success'} btn-sm text-white`}
+                                        onClick={handleEnrollmentClick}>
+                                            {isEnrolled || isWaitListed ? 'Drop Course' : 'Apply to Enroll'}
+                                    </button>
+                                </SignedIn>
                                 {/* <button
                                     className="btn btn-primary text-white"
                                     onClick={() => console.log(course)}

@@ -62,8 +62,8 @@ namespace EducationAPI.Controllers
       }
     }
 
-    [HttpGet("GetCourses/{isAdmin=true}")]
-    public async Task<ActionResult<List<Course>>> GetCourses([FromQuery] string[] statuses, [FromQuery] int[] topicIds, bool isAdmin = true, string? searchString = null)
+    [HttpGet("GetCourses")]
+    public async Task<ActionResult<List<Course>>> GetCourses([FromQuery] string[] statuses, [FromQuery] int[] topicIds, string? searchString = null)
     {
       foreach (var status in statuses)
       {
@@ -76,7 +76,7 @@ namespace EducationAPI.Controllers
       }
       try
       {
-        var courses = await GetAllCoursesByStatusAndTopics(statuses, topicIds, isAdmin);
+        var courses = await GetAllCoursesByStatusAndTopics(statuses, topicIds);
 
         if (searchString != null)
         {
@@ -85,7 +85,7 @@ namespace EducationAPI.Controllers
 
         courses.ForEach(UpdateCourseStatus);
         await _educationProgramContext.SaveChangesAsync();
-        _logger.LogInformation("GetCourses({Statuses}, {TopicIds}, {IsAdmin}, {SearchString}), called", statuses, topicIds, isAdmin, searchString);
+        _logger.LogInformation("GetCourses({Statuses}, {TopicIds}, {SearchString}), called", statuses, topicIds, searchString);
         return Ok(courses);
       }
       catch (Exception ex)
@@ -132,11 +132,9 @@ namespace EducationAPI.Controllers
       }
 
       return filteredCourses.ToList();
-
     }
 
-
-    private async Task<List<Course>> GetAllCoursesByStatusAndTopics(string[] statuses, int[] topicIds, bool isAdmin = true)
+    private async Task<List<Course>> GetAllCoursesByStatusAndTopics(string[] statuses, int[] topicIds)
     {
       IQueryable<Course> query = _educationProgramContext.Courses
           .Include(c => c.Classes)
@@ -150,16 +148,6 @@ namespace EducationAPI.Controllers
       if (topicIds.Length > 0)
       {
         query = query.Where(c => c.Topics.Any(t => topicIds.Contains(t.TopicId)));
-      }
-
-      if (!isAdmin)
-      {
-        var today = DateTime.Today;
-        query = query.Where(c =>
-          c.EnrollmentDeadline >= today &&
-          c.Classes.Count != 0 &&
-          c.Classes.First().Attendances.Count <= c.MaxAttendance
-        );
       }
 
       var courses = await query.ToListAsync();
@@ -614,10 +602,6 @@ namespace EducationAPI.Controllers
           {
             Course? parentCourse = await _educationProgramContext.Courses
                 .Include(c => c.Classes)
-                  .ThenInclude(c => c.Attendances)
-                .Include(c => c.Topics)
-                .Include(c => c.Exams)
-                .Include(c => c.Location)
                 .FirstOrDefaultAsync(c => c.CourseId == @class.CourseId);
 
             if (parentCourse != null)

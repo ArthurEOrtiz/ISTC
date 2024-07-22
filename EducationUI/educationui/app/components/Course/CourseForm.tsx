@@ -7,9 +7,10 @@ import { courseHasClasses } from "@/Utilities/class";
 interface CourseFormProps {
     onSubmit: (course : Course) => void;
     course: Course;
+    viewOnly?: boolean;
 }
 
-const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }) => {
+const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse, viewOnly = false }) => {
     
     const [course, setCourse] = useState<Course>({} as Course);
 
@@ -32,11 +33,12 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
     const [isEnrollmentDeadlineValid, setIsEnrollmentDeadlineValid] = useState<boolean>(true);
 
     const enrollmentDeadline = course.enrollmentDeadline ? new Date(course.enrollmentDeadline).toISOString().split('T')[0] : '';
-    const isFormValid = isTitleValid && isEmailValid && isAttendanceCreditValid && isExamCreditValid && isMaxAttendanceValid && isEnrollmentDeadlineValid;
-
+    const isFormValid = isTitleValid && isEmailValid && isAttendanceCreditValid && isMaxAttendanceValid && isExamCreditValid && isEnrollmentDeadlineValid;
+    
     // effects
     useEffect(() => {
         setCourse(inboundCourse);
+        
     }, [inboundCourse]);
 
     useEffect(() => {
@@ -44,6 +46,8 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
     }, [course.examCredit, course.hasExam]);
 
     useEffect(() => {
+        if (viewOnly) validateForm();
+
         if (course.title === '') {
             setIsTitleValid(false);
         }
@@ -178,13 +182,7 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
         }
     };
 
-    const preventCharInput = (event: React.KeyboardEvent<HTMLInputElement>): void => {
-        const validKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
-        // Prevent non-numeric input
-        if (!/[0-9]/.test(event.key) && !validKeys.includes(event.key)) {
-            event.preventDefault();
-        }
-    }
+    
     
     const handleCourseTitleBlur = (event: FocusEvent<HTMLInputElement, Element>): void => {
         setTitleTouched(true);
@@ -234,6 +232,33 @@ const CourseForm: React.FC<CourseFormProps> = ({onSubmit, course:inboundCourse }
     }
 
     // helper methods.
+    const preventCharInput = (event: React.KeyboardEvent<HTMLInputElement>): void => {
+        const validKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+        // Prevent non-numeric input
+        if (!/[0-9]/.test(event.key) && !validKeys.includes(event.key)) {
+            event.preventDefault();
+        }
+    }
+
+    const validateForm = () => {
+        const titleValid = course.title !== '';
+        const emailValid = course.instructorEmail ? validatEamil(course.instructorEmail) : true;
+        const attendanceCreditValid = course.attendanceCredit !== '' && parseInt(course.attendanceCredit as string) > 0 && parseInt(course.attendanceCredit as string) <= 100;
+        const maxAttendanceValid = course.maxAttendance !== '' && parseInt(course.maxAttendance as string) > 0 && parseInt(course.maxAttendance as string) <= 999;
+        const examCreditValid = validateExamCredit(course.examCredit, course.hasExam);
+        const enrollmentDeadlineValid = validateEnrollmentDeadline(enrollmentDeadline);
+
+        setIsTitleValid(titleValid);
+        setIsEmailValid(emailValid);
+        setIsAttendanceCreditValid(attendanceCreditValid);
+        setIsMaxAttendanceValid(maxAttendanceValid);
+        setIsExamCreditValid(examCreditValid);
+        setIsEnrollmentDeadlineValid(enrollmentDeadlineValid);
+
+        return titleValid && emailValid && attendanceCreditValid && maxAttendanceValid && examCreditValid && enrollmentDeadlineValid;
+    }
+
+
     const validatEamil = (email: string) => {
         const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return re.test(email);
