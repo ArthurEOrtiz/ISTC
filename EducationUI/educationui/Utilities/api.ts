@@ -1,4 +1,4 @@
-import { Attendance, Certification, Course, CourseStatus, Exam, Student, Topic, User, WaitList } from '@/app/shared/types/sharedTypes';
+import { Attendance, Certification, Course, CourseStatus, Exam, Student, Topic, User, WaitList } from '@/Utilities/sharedTypes';
 import axios from 'axios';
 import https from 'https';
 import qs from 'qs';

@@ -1,4 +1,4 @@
-import TopicCatalog from "@/app/components/Topics/TopicCatalog";
+import TopicCatalog from "@/components/Topics/TopicCatalog";
 
 const EditTopicPage: React.FC = async() => {
 

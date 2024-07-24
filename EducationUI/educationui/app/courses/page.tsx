@@ -1,6 +1,6 @@
 import { sendMail } from '@/Utilities/mail';
-import CourseCatalog from '../components/Course/CourseCatalog';
-import { User } from '../shared/types/sharedTypes';
+import CourseCatalog from '../../components/Course/CourseCatalog';
+import { User } from '../../Utilities/sharedTypes';
 
 const CoursesPage: React.FC = async () => {
     const sendEmail = async (to: User, subject: string, body: string) => {

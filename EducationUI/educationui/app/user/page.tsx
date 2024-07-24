@@ -1,10 +1,10 @@
 import { checkUserExistsByClerkId, GetUserByClerkId } from "@/Utilities/api";
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
-import NewUserRegistration from "../components/User/NewUserRegistration";
-import UserDashboard from "../components/User/UserDashboard";
+import NewUserRegistration from "../../components/User/NewUserRegistration";
+import UserDashboard from "../../components/User/UserDashboard";
 import { User as ClerkUser } from "@clerk/nextjs/server";
-import { User } from "../shared/types/sharedTypes";
+import { User } from "../../Utilities/sharedTypes";
 
 /*
 * This is the page the user will see when they log in or sign up. There are three possible scenarios:

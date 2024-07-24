@@ -1,4 +1,4 @@
-import EditUser from "@/app/components/User/EditUser";
+import EditUser from "@/components/User/EditUser";
 import { auth,  } from "@clerk/nextjs/server";
 
 interface UserPage {

@@ -1,4 +1,4 @@
-import EditCourseInfo from "@/app/components/Course/EditCourseInfo";
+import EditCourseInfo from "@/components/Course/EditCourseInfo";
 
 const CourseDetail: React.FC<{ params: { courseId: string } }> = async ({ params }) => {
     const courseId = parseInt(params.courseId);

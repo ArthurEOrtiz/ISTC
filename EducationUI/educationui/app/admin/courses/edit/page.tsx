@@ -1,4 +1,4 @@
-import CourseCatalog from '@/app/components/Course/CourseCatalog';
+import CourseCatalog from '@/components/Course/CourseCatalog';
 import React from 'react';
 
 const EditCourse: React.FC = async () => {

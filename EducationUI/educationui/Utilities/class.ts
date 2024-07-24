@@ -1,4 +1,4 @@
-import { Class } from "@/app/shared/types/sharedTypes";
+import { Class } from "@/Utilities/sharedTypes";
 
 export const courseHasClasses = (classes: Class [] | undefined | null): boolean => {
         

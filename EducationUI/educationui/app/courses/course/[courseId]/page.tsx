@@ -1,7 +1,7 @@
 import { getCourseById, GetUserByClerkId } from "@/Utilities/api";
-import CourseInfo from "@/app/components/Course/CourseInfo";
-import Loading from "@/app/shared/Loading";
-import { Course, User } from "@/app/shared/types/sharedTypes";
+import CourseInfo from "@/components/Course/CourseInfo";
+import Loading from "@/components/shared/Loading";
+import { Course, User } from "@/Utilities/sharedTypes";
 import { auth } from "@clerk/nextjs";
 //import { currentUser } from "@clerk/nextjs/server";
 

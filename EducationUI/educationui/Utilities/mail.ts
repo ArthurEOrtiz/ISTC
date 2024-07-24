@@ -1,4 +1,4 @@
-import { User } from "@/app/shared/types/sharedTypes";
+import { User } from "@/Utilities/sharedTypes";
 import nodemailer from "nodemailer";
 
 export async function sendMail ( {

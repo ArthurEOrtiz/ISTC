@@ -1,4 +1,4 @@
-import UserCatalog from "@/app/components/User/UserCatalog";
+import UserCatalog from "@/components/User/UserCatalog";
 
 const UsersPage: React.FC = () => {
 

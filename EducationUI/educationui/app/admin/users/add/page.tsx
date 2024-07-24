@@ -1,4 +1,4 @@
-import AddUser from "@/app/components/User/AddUser";
+import AddUser from "@/components/User/AddUser";
 
 const AddUserPage: React.FC = () => {
     return (
