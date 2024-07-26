@@ -2,7 +2,6 @@
 import { Class, Course, User, WaitList } from "@/Utilities/sharedTypes";
 import CourseInfoCard from "./CourseInfoCard";
 import { SignedIn } from "@clerk/nextjs";
-import ActionBar from "../shared/ActionBar";
 import moment from "moment-timezone";
 import { DeleteWaitListById, GetWaitListByUserIdCourseId, HasAttendedByClassIdUserId, IsUserEnrolledInCourse, IsUserWaitListed, PostWaitList } from "@/Utilities/api";
 import { useEffect, useState } from "react";
@@ -45,6 +44,7 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, user }) => {
     }
 
     useEffect(() => {
+        setIsLoading(true);
         if (course !== null && user !== null) {
             checkUserEnrollment(user.userId, course.courseId).then((enroll) => {
                 if(enroll) {
@@ -63,11 +63,17 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, user }) => {
                     getUserWaitList(user.userId, course.courseId);
                 } 
             });
-
-            checkUserAttendance();
             setIsLoading(false);
         }
     }, []);
+
+    useEffect(() => {
+        if (user !== null) {
+            setIsLoading(true);
+            checkUserAttendance();
+            setIsLoading(false);
+        }
+    }, [classes, isEnrolled, userId]);
 
     const handleEnroll = () => {
         if (isEnrolled && !isWaitListed) {
@@ -216,20 +222,21 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, user }) => {
         }
     }
 
-    const renderNavList = () => {
-        return (
-            <li>
-                <button 
-                    className={`font-bold text-nowrap ${isEnrolled ? (isWaitListed ? "text-warning" : "text-success") : (isWaitListed ? 'text-warning' : 'text-success' )}`}
-                    onClick={handleEnroll}>
-                        {isEnrolled ? (isWaitListed ? "Remove from Wait List" : "Apply To Drop Course") : (isWaitListed ? "Remove from Wait List" : " Apply to Enroll")}
-                        {/*                            true true                 true false                                false true                 false false    */}
-                </button>
-            </li>
-        );
-    }
-
     const renderClasses = () => {
+        if (classes === undefined) {
+            return (
+                <div className='text-center text-lg text-error p-4'>No classes found</div>
+            );
+        }
+
+        if (isLoading) {
+            return (
+                <div className="flex justify-center mt-2 w-full">
+                    <span className="loading loading-spinner"></span>
+                </div>
+            );
+        }
+
         return (
             <>
                 {classes.map((cls, index) => {
