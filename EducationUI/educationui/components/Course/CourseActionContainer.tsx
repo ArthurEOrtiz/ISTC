@@ -237,7 +237,8 @@ const CourseActionContainer: React.FC<CourseActionContainerProps> = ({course, us
                                 <SignedIn>
                                     <button 
                                         className={`btn ${(isEnrolled || isWaitListed) ? 'btn-error' : 'btn-success'} btn-sm text-white`}
-                                        onClick={handleEnrollmentClick}>
+                                        onClick={handleEnrollmentClick}
+                                        disabled={course.status === "Archived"}>
                                             {isEnrolled || isWaitListed ? 'Drop Course' : 'Apply to Enroll'}
                                     </button>
                                 </SignedIn>

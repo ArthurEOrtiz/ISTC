@@ -3,7 +3,7 @@ import CourseInfo from "@/components/Course/CourseInfo";
 import Loading from "@/components/shared/Loading";
 import { Course, User } from "@/Utilities/sharedTypes";
 import { auth } from "@clerk/nextjs";
-//import { currentUser } from "@clerk/nextjs/server";
+
 
 const CourseDetail: React.FC<{ params: { courseId: string } }> = async ({ params }) => {
     const courseId = parseInt(params.courseId);

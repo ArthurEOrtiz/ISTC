@@ -63,7 +63,10 @@ namespace EducationAPI.Controllers
     }
 
     [HttpGet("GetCourses")]
-    public async Task<ActionResult<List<Course>>> GetCourses([FromQuery] string[] statuses, [FromQuery] int[] topicIds, string? searchString = null)
+    public async Task<ActionResult<List<Course>>> GetCourses(
+      [FromQuery] string[] statuses, 
+      [FromQuery] int[] topicIds, 
+      [FromQuery] string? searchString = null)
     {
       foreach (var status in statuses)
       {
