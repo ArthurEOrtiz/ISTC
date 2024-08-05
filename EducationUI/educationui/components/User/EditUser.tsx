@@ -13,6 +13,9 @@ import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import UserDeleteModal from "./UserDeleteModal";
 import CertificationModal from "../Certification/CertificationModal";
 import UserWaitList from "./UserWaitList";
+import MyDocument from "../Reports/EnrolledCourses";
+import ReactPDF, { PDFDownloadLink } from "@react-pdf/renderer";
+
 
 
 interface EditUserProps {
@@ -144,6 +147,15 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
         }
     }
 
+    const DownloadReportButton = () => (
+        <PDFDownloadLink document={<MyDocument />} fileName="example.pdf">
+          {({ blob, url, loading, error }) =>
+            loading ? 'Loading document...' : 'Download PDF'
+          }
+        </PDFDownloadLink>
+      );
+
+
     //Render
     const renderNavList = () => {
         return (
@@ -191,6 +203,9 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
                                 >
                                     Certification
                                 </button>
+                            </li>
+                            <li>
+                                <DownloadReportButton />
                             </li>
                             <li>
                                 <button
