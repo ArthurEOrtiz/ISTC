@@ -23,6 +23,7 @@ The ISTC Education application is a platform designed to manage educational prog
 - [qs](https://www.npmjs.com/package/qs)
 - [Nodemailer](https://nodemailer.com/)
 - [types/nodemailer](https://www.npmjs.com/package/@types/nodemailer)
+- [React-Pdf](https://react-pdf.org/)
 
 ***
 
