@@ -19,16 +19,13 @@ import Loading from "@/components/shared/Loading";
 import ExamModal from "../Exam/ExamModal";
 import { areClassesOrderedByDate, courseHasClasses, sortClassesByDate } from "@/Utilities/class";
 import CourseActionBar from "../shared/ActionBar";
+import CourseRosterModal from "./CourseRosterModal";
 
 interface EditCourseInfoProps {
     courseId: number;
 }
 
 const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => { 
-
-    // Initializing Logic 
-    
-
     // Constants
     const courseId = crsId;
     const [initialCourse, setInitialCourse] = useState<Course>({} as Course);
@@ -46,6 +43,7 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
     const [showAttendanceModal, setShowAttendanceModal] = useState<Class | null>(null);
     const [showEnrollmentModal, setShowEnrollmentModal] = useState<boolean>(false);
     const [showExamModal, setShowExamModal] = useState<boolean>(false); 
+    const [showCourseRosterModal, setShowCourseRosterModal] = useState<boolean>(false);
     const [errorMessages, setErrorMessages] = useState<string | null>(null);
     const router = useRouter();
     
@@ -345,6 +343,14 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                                     Exams
                                 </button>
                             </li>
+                            <li>
+                                <button
+                                    className="text-nowrap"
+                                    onClick={() => setShowCourseRosterModal(true)}
+                                >
+                                    Roster
+                                </button>
+                            </li>
                         </ul>
                     </details>
                 </li>
@@ -364,14 +370,6 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                         Delete
                     </button>
                 </li>
-                {/* <li>
-                    <button
-                        className="text-nowrap text-warning font-bold"
-                        onClick={() => console.log(course)}
-                    >
-                        Log Course
-                    </button>
-                </li> */}
             </>
         );
     }  
@@ -579,6 +577,17 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                     }}
                     onError={(message) => setErrorMessages(message)}
                 />
+            )}
+
+            {showCourseRosterModal && (
+                <div>
+                    <CourseRosterModal
+                        course={course}
+                        visible={showCourseRosterModal}
+                        onClose={() => setShowCourseRosterModal(false)}
+                        onError={(error) => setErrorMessages(error)}
+                    />
+                </div>
             )}
         </div>
     );

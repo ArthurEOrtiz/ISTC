@@ -148,7 +148,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, clerkId }) => {
     }
 
     const DownloadReportButton = () => (
-        <PDFDownloadLink document={<MyDocument />} fileName="example.pdf">
+        <PDFDownloadLink document={<MyDocument user={user as User} />} fileName="example.pdf">
           {({ blob, url, loading, error }) =>
             loading ? 'Loading document...' : 'Download PDF'
           }
