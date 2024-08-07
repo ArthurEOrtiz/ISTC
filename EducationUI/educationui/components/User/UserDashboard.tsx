@@ -236,6 +236,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({userId}) => {
                                             Topics
                                     </button>
                                 </li>
+                                <li>
+                                    <button
+                                        className="text-nowrap"
+                                        onClick={() => router.push('/admin/reports')}
+                                    >
+                                        Reports
+                                    </button>
+                                </li>
                             </ul>
                         </details>
                     </li>

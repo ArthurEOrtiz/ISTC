@@ -421,21 +421,12 @@ const EditCourseInfo: React.FC<EditCourseInfoProps> = ({courseId : crsId}) => {
                         <div className="bg-base-100 shadow-md rounded-xl relative p-4">
                             <div className="flex justify-between mb-2 mt-4">
                                 <p className="text-xl font-bold">Class {index + 1}</p>
-                                {/* <div>
-                                    <p className="text-sm">Class ID: {cls.classId}</p>
-                                    <p className="text-sm">Index: {index}</p>
-                                </div> */}
                             </div>
                             <ClassCard
                                 cls={cls}
                                 onChange={(newClass) => {
                                     const newClasses = [...course.classes];
                                     newClasses[index] = newClass;
-                                    // console.log("Modified Class Index", index);
-                                    // console.log("Modified Class", newClass);
-                                    // console.log("Modified Classes", newClasses);
-                                    // console.log("Course Classes", course.classes);
-                                    // console.log("Incoming Course Classes", intialCourse.classes);
                                     setCourse({
                                         ...course, 
                                         classes: newClasses});

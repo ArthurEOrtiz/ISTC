@@ -1,6 +1,5 @@
 ﻿using EducationAPI.DataAccess;
 using EducationAPI.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -19,14 +18,6 @@ namespace EducationAPI.Controllers
       _educationProgramContext = educationProgramContext;
       _logger = logger;
     }
-
-    [Authorize]
-    [HttpGet("SecureEndpoint")]
-    public IActionResult SecureEndpoint()
-    {
-      return Ok("This endpoint is secure and requires authentication");
-    }
-
 
     /// <summary>
     /// Gets all Course records from the data base. This should be used to get get a quick list of all the 

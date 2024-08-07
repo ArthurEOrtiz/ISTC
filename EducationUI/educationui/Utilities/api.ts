@@ -367,6 +367,27 @@ export async function UpdateExam(exam: Exam) {
     }
 }
 
+// Reports
+export async function GetEmployers() {
+    try {
+        const response = await axiosInstance.get('Report/GetEmployers');
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching employers:', error);
+        throw error;
+    }
+}
+
+export async function GetUserEnrollment(employer: string, startDate: string, endDate: string) {
+    try {
+        const response = await axiosInstance.get(`Report/GetUserEnrollment/${employer}/${startDate}/${endDate}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching user enrollment:', error);
+        return error.message;
+    }
+}
+
 // Topics
 export async function postTopic(topic: Topic) {
     try {
@@ -462,6 +483,16 @@ export async function GetUserByEmail(email: string) {
 export async function GetUserByClerkId(clerkId: String) {
     try {
         const response = await axiosInstance.get(`User/GetUserByClerkId/${clerkId}`);
+        return response;
+    } catch (error: any) {
+        console.error('Error fetching user:', error);
+        return error.message;
+    }
+}
+
+export async function GetUsersByEmployer(employer: string) {
+    try {
+        const response = await axiosInstance.get(`User/GetUsersByEmployer/${employer}`);
         return response;
     } catch (error: any) {
         console.error('Error fetching user:', error);

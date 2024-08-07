@@ -313,6 +313,33 @@ namespace EducationAPI.Controllers
       }
     }
 
+    [HttpGet("GetUsersByEmployer/{employer}")]
+    public async Task<ActionResult<List<User>>> GetUsersByEmployer(string employer)
+    {
+      try
+      {
+        var users = await _educationProgramContext.Users
+          .Include(u => u.Contact)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Attendances)
+              .ThenInclude(a => a.Class)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Exams)
+          .Include(u => u.Student)
+            .ThenInclude(s => s.Certifications)
+          .Where(u => u.Employer == employer)
+          .ToListAsync();
+
+        _logger.LogInformation("GetUsersByEmployer({Employer}), called", employer);
+        return users;
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "GetUsersByEmployer({Employer})", employer);
+        return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+      }
+    }
+
     [HttpPost("PostUser")]
     public async Task<ActionResult> PostUser(User user)
     {
